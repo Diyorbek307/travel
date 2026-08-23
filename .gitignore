@@ -1,0 +1,12 @@
+node_modules
+.next
+out
+*.log
+*.tsbuildinfo
+
+# Изменяемые данные: база и загруженные медиафайлы.
+# База восстанавливается из scripts/content командой npm run seed.
+data/
+
+.env
+.env*.local

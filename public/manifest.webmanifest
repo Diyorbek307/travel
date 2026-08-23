@@ -1,0 +1,21 @@
+{
+  "name": "Uzbekistan Travel — ваш персональный гид",
+  "short_name": "UZ Travel",
+  "description": "Маршруты, аудиогиды, музеи и достопримечательности Узбекистана. Работает офлайн.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b1115",
+  "theme_color": "#158488",
+  "categories": ["travel", "navigation", "education"],
+  "icons": [
+    { "src": "/icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/icons/maskable.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Сканировать QR", "url": "/scan", "description": "Открыть аудиогид объекта" },
+    { "name": "Карта", "url": "/map", "description": "Достопримечательности рядом" },
+    { "name": "Построить маршрут", "url": "/planner", "description": "Маршрут под ваше время" }
+  ]
+}

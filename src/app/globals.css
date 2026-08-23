@@ -1,0 +1,150 @@
+@import "tailwindcss";
+
+/*
+ * Палитра взята от изразцов: бирюза Регистана, охра сырцовой глины,
+ * тёмно-синий кобальт хивинской майолики.
+ */
+@theme {
+  --color-tile-50: #eefcfb;
+  --color-tile-100: #d3f6f3;
+  --color-tile-200: #abece9;
+  --color-tile-300: #71dcd9;
+  --color-tile-400: #35c2c2;
+  --color-tile-500: #1aa5a8;
+  --color-tile-600: #158488;
+  --color-tile-700: #16696e;
+  --color-tile-800: #175459;
+  --color-tile-900: #17464b;
+  --color-tile-950: #072a2f;
+
+  --color-clay-50: #fbf7f1;
+  --color-clay-100: #f5ecdd;
+  --color-clay-200: #ead7ba;
+  --color-clay-300: #dcbb8e;
+  --color-clay-400: #cd9a60;
+  --color-clay-500: #c38243;
+  --color-clay-600: #b56b38;
+  --color-clay-700: #975330;
+  --color-clay-800: #7a442e;
+  --color-clay-900: #633a28;
+
+  --color-ink-50: #f4f6f8;
+  --color-ink-100: #e6eaef;
+  --color-ink-200: #cfd7e0;
+  --color-ink-300: #a9b8c8;
+  --color-ink-400: #7d92ab;
+  --color-ink-500: #5d7591;
+  --color-ink-600: #495e78;
+  --color-ink-700: #3c4d62;
+  --color-ink-800: #354253;
+  --color-ink-900: #303a47;
+  --color-ink-950: #10151d;
+}
+
+:root {
+  --bg: #ffffff;
+  --bg-soft: #f6f8f9;
+  --surface: #ffffff;
+  --border: #e2e8ec;
+  --text: #10151d;
+  --text-soft: #5d7591;
+  --accent: #158488;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0b1115;
+    --bg-soft: #121a20;
+    --surface: #151e25;
+    --border: #24313b;
+    --text: #e8eef2;
+    --text-soft: #93a6b5;
+    --accent: #35c2c2;
+  }
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--text);
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: ui-sans-serif, system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  /* Место под нижнюю навигацию и safe-area на iPhone. */
+  padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));
+}
+
+/* Утилиты, привязанные к переменным темы. */
+.surface {
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+.soft {
+  color: var(--text-soft);
+}
+.bg-soft {
+  background: var(--bg-soft);
+}
+
+/* Карта Leaflet должна занимать всю отведённую высоту. */
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+  background: var(--bg-soft);
+  font: inherit;
+  z-index: 0;
+}
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: var(--surface);
+  color: var(--text);
+}
+.leaflet-popup-content {
+  margin: 0.75rem 0.9rem;
+}
+
+/* Метка объекта на карте — эмодзи категории в кружке. */
+.poi-marker {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  font-size: 1rem;
+  background: var(--surface);
+  border: 2px solid var(--accent);
+  border-radius: 9999px;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.25);
+}
+.poi-marker.is-dimmed {
+  opacity: 0.45;
+}
+
+/* Текст истории объекта: читаемые абзацы и выделения. */
+.story p {
+  margin-bottom: 0.9rem;
+  line-height: 1.7;
+}
+.story strong {
+  font-weight: 600;
+  color: var(--accent);
+}
+
+/* Скрыть скроллбар у горизонтальных лент фильтров. */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    padding-bottom: 0;
+  }
+}
