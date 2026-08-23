@@ -262,7 +262,7 @@ export function planRoute(req: PlannerRequest): PlanResult | null {
   fill(ctx, anchors, "anchor");
   fill(ctx, candidates, "ratio");
 
-  const { stops, used } = ctx;
+  const { stops } = ctx;
   if (stops.length === 0) return null;
 
   // 3. Улучшение 2-opt --------------------------------------------------
@@ -297,8 +297,14 @@ export function planRoute(req: PlannerRequest): PlanResult | null {
       : stops[stops.length - 1].arrive_min + stops[stops.length - 1].stay_min;
   const totalCost = stops.reduce((s, x) => s + x.poi.price_uzs, 0);
 
+  // Состав маршрута берём из готового списка остановок, а не из ctx.used:
+  // syncContext заменяет там сам объект Set, поэтому любая ссылка, взятая
+  // до догоняющего прохода, устаревает — и объект попадал одновременно
+  // и в маршрут, и в список «не вошло».
+  const included = new Set(stops.map((s) => s.poi.id));
+
   for (const c of candidates) {
-    if (used.has(c.poi.id) || skipped.length >= 6) continue;
+    if (included.has(c.poi.id) || skipped.length >= 6) continue;
     const closed = !opensDuring(c.poi.opening_hours, startAt, req.minutes, day);
     skipped.push({
       name: c.poi.name,
