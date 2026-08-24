@@ -1,0 +1,121 @@
+@import "tailwindcss";
+
+/*
+ * Палитра лендинга — та же, что в приложении: бирюза изразцов Регистана,
+ * охра сырцовой глины, кобальт хивинской майолики. Но лендинг сделан
+ * тёмным: 3D-сцена на тёмном фоне читается лучше, а «дорогой» вид
+ * почти всегда строится на глубоком фоне и одном ярком акценте.
+ */
+@theme {
+  --color-tile-300: #71dcd9;
+  --color-tile-400: #35c2c2;
+  --color-tile-500: #1aa5a8;
+  --color-tile-600: #158488;
+  --color-gold-300: #dcbb8e;
+  --color-gold-400: #cd9a60;
+  --color-gold-500: #c38243;
+  --color-void-900: #070d12;
+  --color-void-950: #04080b;
+}
+
+:root {
+  --bg: #04080b;
+  --bg-soft: #0a1219;
+  --line: #16242f;
+  --text: #e9f1f5;
+  --text-soft: #8ba3b3;
+  --accent: #35c2c2;
+  --gold: #cd9a60;
+}
+
+html {
+  background: var(--bg);
+  color: var(--text);
+  /* Плавный скролл делает Lenis — нативный отключаем, иначе они дерутся. */
+  scroll-behavior: auto;
+}
+
+body {
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Заголовки: крупная сетка и плотный трекинг — это половина ощущения
+   дорогой типографики. Размер тянется от ширины экрана, без брейкпоинтов. */
+.display {
+  font-size: clamp(2.5rem, 8vw, 7rem);
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  font-weight: 600;
+}
+
+.display-sm {
+  font-size: clamp(1.75rem, 4vw, 3.25rem);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  font-weight: 600;
+}
+
+.eyebrow {
+  font-size: 0.75rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+}
+
+.soft {
+  color: var(--text-soft);
+}
+
+/* Градиентный текст для одного акцентного слова в заголовке. */
+.shine {
+  background: linear-gradient(100deg, var(--accent) 0%, var(--gold) 55%, var(--accent) 100%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shine 6s linear infinite;
+}
+
+@keyframes shine {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/* Тонкая линия-разделитель, гаснущая к краям. */
+.hairline {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--line) 20%, var(--line) 80%, transparent);
+}
+
+/* Стеклянная карточка. Без перебора: один слой, аккуратная рамка. */
+.glass {
+  background: color-mix(in srgb, var(--bg-soft) 70%, transparent);
+  border: 1px solid var(--line);
+  backdrop-filter: blur(12px);
+}
+
+/* Элементы, которые появляются по скроллу, до анимации скрыты. */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+}
+
+/* Уважение к системной настройке: при prefers-reduced-motion всё
+   показываем сразу и не двигаем. Иначе анимации вредят доступности. */
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+  .shine {
+    animation: none;
+  }
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
