@@ -5,19 +5,22 @@ import { useEffect, useRef, useState } from "react";
 import Icon from "./icon";
 import PoiCard from "./poi-card";
 import { t } from "@/lib/i18n";
+import { createRecognizer, speechSupported, type Recognizer } from "@/lib/speech";
 import type { AssistantReply } from "@/lib/assistant";
 import type { City, Lang } from "@/lib/types";
 
 /**
  * Экран помощника.
  *
- * Помощник намеренно не языковая модель. Он разбирает фразу и отвечает
- * данными из нашей базы: время работы, цена, расстояние, готовый маршрут.
- * Поэтому он не умеет поболтать — зато физически не может выдумать памятник,
- * назвать неверную цену или отправить туриста в закрытый музей. Для
- * путеводителя это важнее свободной речи.
+ * Вопрос понимает языковая модель, но факты она берёт только из нашей базы
+ * через инструменты (см. lib/ai.ts): цену, часы работы и маршрут выдумать
+ * нельзя. Без ключа или связи отвечает разбор по правилам — суше, зато
+ * всегда и бесплатно.
  *
- * Переписка держится в состоянии страницы и не сохраняется: истории вопросов
+ * Текст приходит потоком и дописывается на месте: ответ модели идёт
+ * несколько секунд, и молчащий экран читается как зависший.
+ *
+ * Переписка живёт в состоянии страницы и не сохраняется: истории вопросов
  * мы не ведём, и обещать её в интерфейсе нельзя.
  */
 
@@ -64,6 +67,9 @@ export default function AssistantScreen({
   const [busy, setBusy] = useState(false);
   const [position, setPosition] = useState<{ lat: number; lon: number } | null>(null);
   const bottom = useRef<HTMLDivElement>(null);
+  const [listening, setListening] = useState(false);
+  const [voiceReady, setVoiceReady] = useState(false);
+  const recognizer = useRef<Recognizer | null>(null);
 
   // Координаты нужны только для «что рядом»; спрашиваем один раз и тихо
   // обходимся без них, если пользователь отказал.
@@ -80,6 +86,30 @@ export default function AssistantScreen({
     bottom.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [turns, busy]);
 
+  // Кнопку микрофона показываем только там, где распознавание есть:
+  // в Firefox его нет, и мёртвая кнопка хуже её отсутствия.
+  useEffect(() => setVoiceReady(speechSupported()), []);
+
+  function toggleVoice() {
+    if (listening) {
+      recognizer.current?.stop();
+      return;
+    }
+    const created = createRecognizer(
+      lang,
+      (heard, final) => {
+        setText(heard);
+        // Договорил — сразу отправляем: лишнее нажатие на ходу неудобно.
+        if (final && heard) void send(heard);
+      },
+      () => setListening(false),
+    );
+    if (!created) return;
+    recognizer.current = created;
+    setListening(true);
+    created.start();
+  }
+
   async function send(question: string) {
     const asked = question.trim();
     if (!asked || busy) return;
@@ -88,28 +118,86 @@ export default function AssistantScreen({
     setText("");
     setBusy(true);
 
-    try {
-      // Историю шлём на сервер: без неё «а сколько это стоит?» после
-      // рассказа о Регистане не к чему привязать.
-      const history = turns
-        .filter((turn) => turn.text)
-        .map((turn) => ({
-          role: turn.role === "user" ? ("user" as const) : ("assistant" as const),
-          content: turn.text,
-        }));
+    // Историю шлём на сервер: без неё «а сколько это стоит?» после рассказа
+    // о Регистане не к чему привязать.
+    const history = turns
+      .filter((turn) => turn.text)
+      .map((turn) => ({
+        role: turn.role === "user" ? ("user" as const) : ("assistant" as const),
+        content: turn.text,
+      }));
 
-      const response = await fetch("/api/assistant", {
+    // Пустую реплику помощника ставим сразу и наполняем по мере ответа:
+    // иначе экран молчит несколько секунд и выглядит зависшим.
+    const slot = turns.length + 1;
+    setTurns((prev) => [...prev, { role: "bot", text: "" }]);
+
+    try {
+      const response = await fetch("/api/assistant/stream", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ text: asked, lang, history, ...(position ?? {}) }),
       });
-      const reply = (await response.json()) as AssistantReply;
-      setTurns((prev) => [...prev, { role: "bot", text: reply.message, reply }]);
+
+      if (response.status === 429) {
+        setTurns((prev) =>
+          prev.map((turn, i) =>
+            i === slot ? { ...turn, text: t(lang, "assistant_rate_limited") } : turn,
+          ),
+        );
+        return;
+      }
+
+      const reader = response.body?.getReader();
+      if (!reader) throw new Error("нет потока");
+
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let collected = "";
+
+      // Ответ приходит построчным JSON: одна строка — одно событие.
+      // Хвост без перевода строки держим в буфере до следующего куска.
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() ?? "";
+
+        for (const raw of lines) {
+          if (!raw.trim()) continue;
+          const parsed = JSON.parse(raw) as { event: string; data: unknown };
+
+          if (parsed.event === "delta") {
+            collected += parsed.data as string;
+            setTurns((prev) =>
+              prev.map((turn, i) => (i === slot ? { ...turn, text: collected } : turn)),
+            );
+          }
+
+          if (parsed.event === "done") {
+            const payload = parsed.data as { pois: AssistantReply["pois"] };
+            setTurns((prev) =>
+              prev.map((turn, i) =>
+                i === slot
+                  ? {
+                      ...turn,
+                      text: collected,
+                      reply: { intent: "ai", message: collected, pois: payload.pois },
+                    }
+                  : turn,
+              ),
+            );
+          }
+        }
+      }
     } catch {
-      setTurns((prev) => [
-        ...prev,
-        { role: "bot", text: t(lang, "assistant_offline") },
-      ]);
+      setTurns((prev) =>
+        prev.map((turn, i) =>
+          i === slot ? { ...turn, text: t(lang, "assistant_offline") } : turn,
+        ),
+      );
     } finally {
       setBusy(false);
     }
@@ -205,6 +293,40 @@ export default function AssistantScreen({
                     </Link>
                   )}
 
+                  {/* Помощник должен уметь действовать, а не только советовать:
+                      город берётся из первого названного места. */}
+                  {turn.reply?.pois[0]?.city_slug && (
+                    <div className="no-scrollbar mt-2 flex gap-2 overflow-x-auto">
+                      {[
+                        {
+                          href: `/planner?city=${turn.reply.pois[0].city_slug}`,
+                          icon: "sparkle" as const,
+                          label: t(lang, "assistant_act_route"),
+                        },
+                        {
+                          href: `/map?city=${turn.reply.pois[0].city_slug}`,
+                          icon: "map" as const,
+                          label: t(lang, "assistant_act_map"),
+                        },
+                        {
+                          href: `/city/${turn.reply.pois[0].city_slug}`,
+                          icon: "download" as const,
+                          label: t(lang, "assistant_act_offline"),
+                        },
+                      ].map((action) => (
+                        <Link
+                          key={action.href}
+                          href={action.href}
+                          className="pressable flex shrink-0 items-center gap-1.5 rounded-full px-3 py-2 text-xs card"
+                          style={{ color: "var(--primary-text)" }}
+                        >
+                          <Icon name={action.icon} size={15} />
+                          {action.label}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+
                   {turn.reply && turn.reply.pois.length > 0 && (
                     <ul className="mt-2 grid gap-2">
                       {turn.reply.pois.slice(0, 6).map((poi) => (
@@ -240,6 +362,23 @@ export default function AssistantScreen({
         className="sticky bottom-0 mt-3 flex gap-2 pb-1"
         style={{ background: "var(--bg)" }}
       >
+        {voiceReady && (
+          <button
+            type="button"
+            onClick={toggleVoice}
+            aria-label={t(lang, listening ? "assistant_voice_stop" : "assistant_voice")}
+            aria-pressed={listening}
+            className="pressable grid h-12 w-12 shrink-0 place-items-center rounded-full"
+            style={{
+              background: listening ? "var(--danger)" : "var(--surface)",
+              color: listening ? "#ffffff" : "var(--primary-text)",
+              border: `1px solid ${listening ? "var(--danger)" : "var(--border)"}`,
+            }}
+          >
+            <Icon name="headphones" size={20} />
+          </button>
+        )}
+
         <input
           value={text}
           onChange={(e) => setText(e.target.value)}

@@ -22,6 +22,8 @@ import type { Budget, Lang, Poi, Theme, TransportMode } from "./types";
  */
 
 export type Intent =
+  /** Ответ собрала языковая модель по данным из базы (см. lib/ai.ts). */
+  | "ai"
   | "plan_route"
   | "nearby"
   | "story"

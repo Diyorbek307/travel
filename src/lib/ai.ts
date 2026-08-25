@@ -383,3 +383,67 @@ export async function askAi(
 
   return { message, slugs: [...mentioned, ...rest].slice(0, 8) };
 }
+
+/**
+ * То же, но с выдачей текста по мере генерации.
+ *
+ * Без этого чат молчит несколько секунд и выглядит зависшим: модель успевает
+ * сходить в базу два-три раза, прежде чем скажет первое слово. Обращения к
+ * инструментам наружу не выводятся — туристу незачем видеть, как помощник
+ * листает базу, ему нужен ответ.
+ */
+export async function askAiStream(
+  text: string,
+  lang: Lang,
+  history: AiTurn[],
+  hint: { city?: string; lat?: number; lon?: number },
+  onDelta: (chunk: string) => void,
+): Promise<AiResult> {
+  const client = new Anthropic();
+
+  const spoken = findCity(text, listCities(lang));
+  const city = spoken ?? hint.city;
+
+  const seen = new Set<string>();
+  const tools = buildTools(lang, { city, lat: hint.lat, lon: hint.lon }, seen);
+
+  const runner = client.beta.messages.toolRunner({
+    model: MODEL,
+    max_tokens: MAX_TOKENS,
+    output_config: { effort: "low" },
+    system: systemPrompt(lang, { city, hasPosition: hint.lat != null }),
+    tools,
+    messages: [
+      ...history.map((turn) => ({ role: turn.role, content: turn.content })),
+      { role: "user" as const, content: text },
+    ],
+    max_iterations: MAX_ITERATIONS,
+    stream: true,
+  });
+
+  let message = "";
+
+  // При stream: true каждая итерация раннера — это поток, а не готовое
+  // сообщение. Промежуточные итерации содержат обращения к инструментам;
+  // текст появляется в последней, и именно он идёт наружу.
+  for await (const stream of runner) {
+    for await (const event of stream) {
+      if (
+        event.type === "content_block_delta" &&
+        event.delta.type === "text_delta" &&
+        event.delta.text
+      ) {
+        message += event.delta.text;
+        onDelta(event.delta.text);
+      }
+    }
+  }
+
+  const mentioned = [...seen].filter((slug) => {
+    const poi = getPoi(slug, lang);
+    return poi ? message.includes(poi.name) : false;
+  });
+  const rest = [...seen].filter((slug) => !mentioned.includes(slug));
+
+  return { message: message.trim(), slugs: [...mentioned, ...rest].slice(0, 8) };
+}
