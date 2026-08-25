@@ -22,8 +22,23 @@ import samarkand from "./content/samarkand.mjs";
 import bukhara from "./content/bukhara.mjs";
 import khiva from "./content/khiva.mjs";
 import tashkent from "./content/tashkent.mjs";
+import shakhrisabz from "./content/shakhrisabz.mjs";
+import nukus from "./content/nukus.mjs";
+import termez from "./content/termez.mjs";
+import fergana from "./content/fergana.mjs";
+import andijan from "./content/andijan.mjs";
+import namangan from "./content/namangan.mjs";
+import navoi from "./content/navoi.mjs";
+import jizzakh from "./content/jizzakh.mjs";
+import karshi from "./content/karshi.mjs";
+import gulistan from "./content/gulistan.mjs";
 
-const CITIES = [tashkent, samarkand, bukhara, khiva];
+// Порядок влияет только на сообщение сидера; на выдачу — популярность объектов.
+const CITIES = [
+  tashkent, samarkand, bukhara, khiva,
+  shakhrisabz, nukus, termez, fergana,
+  andijan, namangan, navoi, jizzakh, karshi, gulistan,
+];
 
 /** Маршруты через несколько городов (п. 10 ТЗ). Привязываются к городу старта. */
 const MULTI_CITY_TOURS = [
