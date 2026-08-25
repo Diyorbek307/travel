@@ -22,6 +22,7 @@ import {
   world,
 } from "@/lib/map-atlas";
 import { SHORT_NAME } from "@/lib/city-names";
+import { RAMP_CSS } from "@/lib/map-palette";
 import { objectsCount, t } from "@/lib/i18n";
 import type { City, Lang } from "@/lib/types";
 
@@ -746,7 +747,7 @@ export default function RegionMap3D({
           <span>{t(lang, "map_less")}</span>
           <span
             className="h-2 w-16 rounded-full"
-            style={{ background: "linear-gradient(90deg,#eac97f,#8ec19c,#2e7d5a)" }}
+            style={{ background: RAMP_CSS }}
           />
           <span>{t(lang, "map_more")}</span>
         </div>
