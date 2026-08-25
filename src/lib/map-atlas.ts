@@ -112,8 +112,11 @@ export const SHEET_CENTER = (() => {
 /* ─────────────────────────── Палитра ─────────────────────────── */
 
 export const PALETTE = {
-  sea: "#cfe0e4",
-  seaDeep: "#b9d2d9",
+  /* Основание — не море, а бумажный лист: так выглядит рельефная карта,
+     на которую ориентирован макет. Вода осталась синей только там, где
+     она действительно есть: Арал, Балхаш, Иссык-Куль, Каспий. */
+  sea: "#efe9dc",
+  seaDeep: "#e4dccb",
   land: "#e2d8bf",
   /* Подложка под Узбекистаном: чуть теплее соседей, чтобы страна
      читалась даже без трёхмерных призм. */
@@ -127,6 +130,11 @@ export const PALETTE = {
   goldDeep: "#8a6a1c",
   uzEdge: "#20563d",
   edge: "#d7cbab",
+  /* Торец выдавленной области — почти чёрный. Именно контраст светлой
+     плоскости и тёмной стенки читается как объём, а не подкрашенный силуэт. */
+  wall: "#161a17",
+  cap: "#efeade",
+  contour: "rgba(150,128,86,0.16)",
 } as const;
 
 const [SAND, MEADOW, FOREST] = RAMP.map((hex) => new THREE.Color(hex));
@@ -200,6 +208,8 @@ const KM_LABEL: Partial<Record<Lang, string>> = { ru: "км", uz: "km", en: "km"
 /* ─────────────────────────── Текстуры ─────────────────────────── */
 
 const FONT = 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+/** Названия стран набраны засечным: так они читаются как печать на карте. */
+const SERIF = 'Georgia, "Times New Roman", "Noto Serif", serif';
 
 function roundRect(
   ctx: CanvasRenderingContext2D,
@@ -288,6 +298,27 @@ export function atlasTexture(lang: Lang): THREE.Texture {
   ctx.fillStyle = sea;
   ctx.fillRect(0, 0, W, H);
 
+  /* Горизонтали. Не настоящие изолинии — высот у нас нет; это фактура
+     бумаги, по которой лист читается как картографический, а не как
+     цветная подложка. Волны детерминированные, чтобы текстура не
+     менялась между сборками. */
+  ctx.strokeStyle = PALETTE.contour;
+  ctx.lineWidth = 1.6;
+  for (let ring = 0; ring < 26; ring++) {
+    const base = (ring / 26) * H * 1.35 - H * 0.18;
+    ctx.beginPath();
+    for (let x = 0; x <= W; x += 12) {
+      const wave =
+        Math.sin(x / 260 + ring * 0.7) * 26 +
+        Math.sin(x / 90 + ring * 1.9) * 9 +
+        Math.sin(x / 620 - ring * 0.4) * 44;
+      const y = base + wave;
+      if (x === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+  }
+
   /* Суша соседей. Мягкая тень под берегом даёт ощущение высоты
      без единого дополнительного треугольника. */
   ctx.save();
@@ -368,7 +399,7 @@ export function atlasTexture(lang: Lang): THREE.Texture {
     if (country.area < 5) continue;
     const name =
       lang === "ru" ? country.nameRu : lang === "uz" ? country.nameUz : country.nameEn;
-    ctx.font = `600 ${country.area > 40 ? 34 : 26}px ${FONT}`;
+    ctx.font = `italic 400 ${country.area > 40 ? 42 : 32}px ${SERIF}`;
     ctx.fillText(name.toUpperCase(), xOf(country.label[0]), yOf(country.label[1]));
   }
 

@@ -40,8 +40,16 @@ import type { City, Lang } from "@/lib/types";
  * страну и останавливается, как только зритель берёт управление.
  */
 
-const MIN_HEIGHT = 0.2;
-const MAX_RISE = 1.55;
+/**
+ * Толщина плит.
+ *
+ * Раньше разброс доходил до 1,55 единицы, и тёмные торцы превращались в
+ * чёрные скалы: объём перекрывал саму карту. В макете это тонкая кромка,
+ * поэтому и высоты сжаты — разница между областями остаётся читаемой,
+ * но перестаёт быть главным, что видно на экране.
+ */
+const MIN_HEIGHT = 0.12;
+const MAX_RISE = 0.46;
 
 /* ─────────────────────────── Управление ─────────────────────────── */
 
@@ -63,8 +71,8 @@ function Controls() {
     controls.rotateSpeed = 0.55;
     controls.zoomSpeed = 0.7;
     controls.panSpeed = 0.6;
-    controls.minDistance = 7;
-    controls.maxDistance = 38;
+    controls.minDistance = 9;
+    controls.maxDistance = 42;
     // Под карту заглядывать незачем, а почти отвесный вид ломает подписи.
     controls.minPolarAngle = 0.12;
     controls.maxPolarAngle = Math.PI / 2.25;
@@ -180,18 +188,44 @@ function RegionMesh({
 
   const color = useMemo(() => shade(ratio), [ratio]);
 
+  const materials = useMemo(() => {
+    const cap = new THREE.MeshStandardMaterial({
+      color: active ? new THREE.Color(PALETTE.gold) : color,
+      roughness: active ? 0.32 : 0.66,
+      metalness: 0.06,
+      emissive: new THREE.Color(active ? PALETTE.gold : "#000000"),
+      emissiveIntensity: active ? 0.22 : 0,
+    });
+    const wall = new THREE.MeshStandardMaterial({
+      color: PALETTE.wall,
+      roughness: 0.85,
+      metalness: 0.02,
+    });
+    return [cap, wall];
+  }, [color, active]);
+
+  useEffect(
+    () => () => materials.forEach((m) => m.dispose()),
+    [materials],
+  );
+
   // Активный регион приподнимается: это заметно и без цвета, а значит
   // работает при дальтонизме и на солнце.
   useFrame((_, delta) => {
     if (!group.current) return;
-    const target = active ? 0.3 : 0;
+    const target = active ? 0.16 : 0;
     group.current.position.y += (target - group.current.position.y) * Math.min(1, delta * 9);
   });
 
   return (
     <group ref={group}>
+      {/* ExtrudeGeometry сама делит поверхность на две группы: крышки и
+          боковые стенки. Пользуемся этим — светлая плоскость и почти чёрный
+          торец. Именно этот контраст читается как объём, а не подкрашенный
+          силуэт; цвет по количеству объектов остаётся на крышке. */}
       <mesh
         geometry={solid}
+        material={materials}
         castShadow
         receiveShadow
         onPointerOver={(e: ThreeEvent<PointerEvent>) => {
@@ -203,15 +237,7 @@ function RegionMesh({
           e.stopPropagation();
           onSelect(region.city);
         }}
-      >
-        <meshStandardMaterial
-          color={active ? PALETTE.gold : color}
-          roughness={active ? 0.32 : 0.7}
-          metalness={0.08}
-          emissive={active ? PALETTE.gold : "#000000"}
-          emissiveIntensity={active ? 0.25 : 0}
-        />
-      </mesh>
+      />
 
       <lineLoop geometry={outline}>
         <lineBasicMaterial
@@ -426,7 +452,7 @@ function CityMarkers({
     [labels],
   );
 
-  const heads = useRef<THREE.Mesh[]>([]);
+  const heads = useRef<THREE.Object3D[]>([]);
 
   // Еле заметное дыхание меток: карта не выглядит замершей картинкой,
   // но и не мельтешит. Фаза у каждой своя, иначе получится пульс сердца.
@@ -448,30 +474,36 @@ function CityMarkers({
 
         return (
           <group key={city.slug} position={base}>
-            <mesh position={[0, 0.16, 0]} onClick={() => onSelect(city.slug)}>
-              <cylinderGeometry args={[0.012, 0.012, 0.32, 6]} />
-              <meshStandardMaterial color={PALETTE.goldDeep} roughness={0.5} />
-            </mesh>
-
-            <mesh
+            {/* Каплевидная булавка вместо шарика на ножке: шар читался как
+                светящаяся точка, а булавка — как отметка на карте. Конус
+                остриём вниз плюс шар сверху дают знакомый силуэт. */}
+            <group
               ref={(node) => {
                 if (node) heads.current[i] = node;
               }}
-              position={[0, 0.36, 0]}
-              castShadow
               onClick={() => onSelect(city.slug)}
             >
-              <sphereGeometry args={[0.062, 14, 14]} />
-              <meshStandardMaterial
-                color={PALETTE.gold}
-                emissive={PALETTE.gold}
-                emissiveIntensity={0.4}
-                roughness={0.3}
-                metalness={0.4}
-              />
-            </mesh>
+              <mesh position={[0, 0.15, 0]} castShadow>
+                <coneGeometry args={[0.075, 0.3, 16]} />
+                <meshStandardMaterial
+                  color={PALETTE.gold}
+                  roughness={0.35}
+                  metalness={0.45}
+                />
+              </mesh>
+              <mesh position={[0, 0.33, 0]} castShadow>
+                <sphereGeometry args={[0.085, 18, 18]} />
+                <meshStandardMaterial
+                  color={PALETTE.gold}
+                  emissive={PALETTE.gold}
+                  emissiveIntensity={0.28}
+                  roughness={0.3}
+                  metalness={0.45}
+                />
+              </mesh>
+            </group>
 
-            <sprite position={[0, 0.62, 0]} scale={[0.34 * label.aspect, 0.34, 1]}>
+            <sprite position={[0, 0.55, 0]} scale={[0.32 * label.aspect, 0.32, 1]}>
               <spriteMaterial map={label.map} transparent depthWrite={false} />
             </sprite>
           </group>
@@ -518,7 +550,7 @@ function Gateways({
               <ringGeometry args={[0.07, 0.11, 20]} />
               <meshBasicMaterial color={PALETTE.goldDeep} transparent opacity={0.75} />
             </mesh>
-            <sprite position={[0, 0.34, 0]} scale={[0.29 * label.aspect, 0.29, 1]}>
+            <sprite position={[0, 0.34, 0]} scale={[0.28 * label.aspect, 0.28, 1]}>
               <spriteMaterial map={label.map} transparent depthWrite={false} />
             </sprite>
           </group>
@@ -651,7 +683,7 @@ export default function RegionMap3D({
       <Canvas
         dpr={[1, 2]}
         shadows
-        camera={{ position: [0, 11, 15.5], fov: 38 }}
+        camera={{ position: [0, 13.5, 17.5], fov: 34 }}
         gl={{ antialias: true, alpha: true }}
         style={{ width: "100%", height: "100%", display: "block" }}
       >
