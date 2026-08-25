@@ -261,6 +261,33 @@ export function labelTexture(
 }
 
 /**
+ * Текстура боковой стенки плиты.
+ *
+ * В макете торец не однотонно чёрный: сверху он почти чёрный, книзу
+ * разогревается до охры — как будто плита подсвечена снизу тёплым светом.
+ * Это и даёт ощущение物 предмета, лежащего на столе, а не вырезанной фигуры.
+ */
+export function wallTexture(): THREE.Texture {
+  const canvas = document.createElement("canvas");
+  canvas.width = 4;
+  canvas.height = 128;
+  const ctx = canvas.getContext("2d")!;
+
+  // v = 0 у основания геометрии выдавливания, v = 1 у верхней грани.
+  const gradient = ctx.createLinearGradient(0, canvas.height, 0, 0);
+  gradient.addColorStop(0, "#c98842");
+  gradient.addColorStop(0.42, "#7a5426");
+  gradient.addColorStop(0.72, "#241d16");
+  gradient.addColorStop(1, "#12161a");
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  const map = new THREE.CanvasTexture(canvas);
+  map.colorSpace = THREE.SRGBColorSpace;
+  return map;
+}
+
+/**
  * Карта окружения целиком: море, суша соседей, крупные озёра, сетка,
  * подписи стран и воды, роза ветров и линейка масштаба.
  *

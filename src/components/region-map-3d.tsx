@@ -15,6 +15,7 @@ import {
   SILK_ROAD,
   UZ_WATER,
   atlasTexture,
+  wallTexture,
   inRing,
   labelTexture,
   project,
@@ -49,8 +50,8 @@ import type { City, Lang } from "@/lib/types";
  * поэтому и высоты сжаты — разница между областями остаётся читаемой,
  * но перестаёт быть главным, что видно на экране.
  */
-const MIN_HEIGHT = 0.12;
-const MAX_RISE = 0.46;
+const MIN_HEIGHT = 0.26;
+const MAX_RISE = 0.5;
 
 /* ─────────────────────────── Управление ─────────────────────────── */
 
@@ -75,8 +76,8 @@ function Controls() {
     controls.minDistance = 9;
     controls.maxDistance = 42;
     // Под карту заглядывать незачем, а почти отвесный вид ломает подписи.
-    controls.minPolarAngle = 0.12;
-    controls.maxPolarAngle = Math.PI / 2.25;
+    controls.minPolarAngle = 0.25;
+    controls.maxPolarAngle = Math.PI / 2.12;
     controls.screenSpacePanning = false;
     controls.autoRotate = true;
     controls.autoRotateSpeed = 0.32;
@@ -153,9 +154,23 @@ function RegionMesh({
   const group = useRef<THREE.Group>(null);
 
   const { solid, outline } = useMemo(() => {
+    /*
+     * Плиты стоят с зазором, как в макете: каждая ужимается к собственному
+     * центру на процент с небольшим. Без этого области смыкаются вплотную,
+     * тёмные торцы сливаются в одну стенку, и вместо набора плит получается
+     * сплошной массив с трещинами.
+     */
+    const flat = region.ring.map(([lon, lat]) => project(lon, lat));
+    const cx = flat.reduce((sum, p) => sum + p[0], 0) / flat.length;
+    const cy = flat.reduce((sum, p) => sum + p[1], 0) / flat.length;
+    const GAP = 0.986;
+    const points = flat.map(([x, y]) => [
+      cx + (x - cx) * GAP,
+      cy + (y - cy) * GAP,
+    ] as [number, number]);
+
     const shape = new THREE.Shape();
-    region.ring.forEach(([lon, lat], i) => {
-      const [x, y] = project(lon, lat);
+    points.forEach(([x, y], i) => {
       if (i === 0) shape.moveTo(x, y);
       else shape.lineTo(x, y);
     });
@@ -164,16 +179,17 @@ function RegionMesh({
     const solid = new THREE.ExtrudeGeometry(shape, {
       depth: height,
       bevelEnabled: true,
-      bevelSize: 0.018,
-      bevelThickness: 0.018,
+      bevelSize: 0.012,
+      bevelThickness: 0.012,
       bevelSegments: 1,
     });
     solid.rotateX(-Math.PI / 2);
     solid.computeVertexNormals();
 
-    // Контур по верхней грани: именно он превращает силуэт в карту.
+    // Контур по верхней грани — по тем же ужатым точкам, иначе он повиснет
+    // над зазором.
     const outline = new THREE.BufferGeometry().setFromPoints(
-      region.ring.map(([lon, lat]) => world(lon, lat, height + 0.012)),
+      points.map(([x, y]) => new THREE.Vector3(x, height + 0.012, -y)),
     );
 
     return { solid, outline };
@@ -198,9 +214,9 @@ function RegionMesh({
       emissiveIntensity: active ? 0.22 : 0,
     });
     const wall = new THREE.MeshStandardMaterial({
-      color: PALETTE.wall,
-      roughness: 0.85,
-      metalness: 0.02,
+      map: wallTexture(),
+      roughness: 0.8,
+      metalness: 0.04,
     });
     return [cap, wall];
   }, [color, active]);
@@ -429,17 +445,38 @@ function SilkRoad({ pointAt }: { pointAt: (slug: string) => THREE.Vector3 | null
 
 /* ─────────────────────────── Метки ─────────────────────────── */
 
+/**
+ * Сколько городов получают выноску с подписью.
+ *
+ * В макете подписаны единицы. Четырнадцать выносок сразу превращают карту
+ * в частокол золотых столбов: подписи наезжают, а сама страна теряется.
+ * Остальные города остаются точками и называются при наведении.
+ */
+const LABELLED = 6;
+
 function CityMarkers({
   cities,
+  counts,
   pointAt,
   lang,
   onSelect,
 }: {
   cities: City[];
+  counts: Record<string, number>;
   pointAt: (slug: string) => THREE.Vector3 | null;
   lang: Lang;
   onSelect: (city: string) => void;
 }) {
+  const labelled = useMemo(
+    () =>
+      new Set(
+        [...cities]
+          .sort((a, b) => (counts[b.slug] ?? 0) - (counts[a.slug] ?? 0))
+          .slice(0, LABELLED)
+          .map((c) => c.slug),
+      ),
+    [cities, counts],
+  );
   const labels = useMemo(
     () =>
       new Map(
@@ -473,40 +510,56 @@ function CityMarkers({
         const label = labels.get(city.slug);
         if (!base || !label) return null;
 
+        const named = labelled.has(city.slug);
+
         return (
           <group key={city.slug} position={base}>
-            {/* Каплевидная булавка вместо шарика на ножке: шар читался как
-                светящаяся точка, а булавка — как отметка на карте. Конус
-                остриём вниз плюс шар сверху дают знакомый силуэт. */}
+            {/* Каплевидная булавка: конус остриём вниз плюс шар сверху дают
+                знакомый силуэт отметки на карте. */}
             <group
               ref={(node) => {
                 if (node) heads.current[i] = node;
               }}
               onClick={() => onSelect(city.slug)}
             >
-              <mesh position={[0, 0.15, 0]} castShadow>
-                <coneGeometry args={[0.075, 0.3, 16]} />
+              <mesh position={[0, named ? 0.2 : 0.12, 0]} castShadow>
+                <coneGeometry args={[named ? 0.1 : 0.06, named ? 0.4 : 0.24, 18]} />
                 <meshStandardMaterial
                   color={PALETTE.gold}
-                  roughness={0.35}
-                  metalness={0.45}
+                  roughness={0.3}
+                  metalness={0.55}
                 />
               </mesh>
-              <mesh position={[0, 0.33, 0]} castShadow>
-                <sphereGeometry args={[0.085, 18, 18]} />
+              <mesh position={[0, named ? 0.45 : 0.27, 0]} castShadow>
+                <sphereGeometry args={[named ? 0.115 : 0.07, 20, 20]} />
                 <meshStandardMaterial
                   color={PALETTE.gold}
                   emissive={PALETTE.gold}
-                  emissiveIntensity={0.28}
-                  roughness={0.3}
-                  metalness={0.45}
+                  emissiveIntensity={0.22}
+                  roughness={0.28}
+                  metalness={0.55}
                 />
               </mesh>
             </group>
 
-            <sprite position={[0, 0.55, 0]} scale={[0.32 * label.aspect, 0.32, 1]}>
-              <spriteMaterial map={label.map} transparent depthWrite={false} />
-            </sprite>
+            {named && (
+              <>
+                {/* Выноска: подпись отведена вверх тонкой линией и не
+                    закрывает то, что называет. */}
+                <mesh position={[0, 0.85, 0]}>
+                  <cylinderGeometry args={[0.006, 0.006, 0.7, 4]} />
+                  <meshBasicMaterial
+                    color={PALETTE.goldDeep}
+                    transparent
+                    opacity={0.55}
+                  />
+                </mesh>
+
+                <sprite position={[0, 1.3, 0]} scale={[0.34 * label.aspect, 0.34, 1]}>
+                  <spriteMaterial map={label.map} transparent depthWrite={false} />
+                </sprite>
+              </>
+            )}
           </group>
         );
       })}
@@ -684,7 +737,7 @@ export default function RegionMap3D({
       <Canvas
         dpr={[1, 2]}
         shadows
-        camera={{ position: [0, 13.5, 17.5], fov: 34 }}
+        camera={{ position: [0, 9.5, 19], fov: 32 }}
         gl={{ antialias: true, alpha: true }}
         style={{ width: "100%", height: "100%", display: "block" }}
       >
@@ -723,6 +776,7 @@ export default function RegionMap3D({
         <Gateways pointAt={pointAt} lang={lang} />
         <CityMarkers
           cities={cities}
+          counts={counts}
           pointAt={pointAt}
           lang={lang}
           onSelect={guardedSelect}
