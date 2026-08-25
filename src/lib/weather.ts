@@ -175,3 +175,49 @@ export function dayLabel(date: string, lang: Lang, today: string): string {
   const weekday = new Date(`${date}T12:00:00`).getDay();
   return (WEEKDAY[lang] ?? WEEKDAY.en)[weekday];
 }
+
+export interface CurrentWeather {
+  temp: number;
+  code: number;
+}
+
+/**
+ * Погода сразу для нескольких точек одним запросом.
+ *
+ * Open-Meteo принимает списки координат и возвращает массив ответов.
+ * Четырнадцать отдельных запросов на список городов были бы и медленно,
+ * и невежливо по отношению к бесплатному сервису.
+ *
+ * Порядок ответов соответствует порядку точек; на любую ошибку возвращается
+ * массив из null — карточки просто останутся без температуры.
+ */
+export async function getCurrentBatch(
+  points: { lat: number; lon: number }[],
+): Promise<(CurrentWeather | null)[]> {
+  if (!points.length) return [];
+
+  const url =
+    `${ENDPOINT}?latitude=${points.map((p) => p.lat.toFixed(3)).join(",")}` +
+    `&longitude=${points.map((p) => p.lon.toFixed(3)).join(",")}` +
+    "&current=temperature_2m,weather_code&timezone=auto";
+
+  try {
+    const response = await fetch(url, { next: { revalidate: CACHE_SECONDS } });
+    if (!response.ok) return points.map(() => null);
+
+    const data = await response.json();
+    // Для одной точки сервис отдаёт объект, для нескольких — массив.
+    const list = Array.isArray(data) ? data : [data];
+
+    return points.map((_, i) => {
+      const current = list[i]?.current;
+      if (!current || typeof current.temperature_2m !== "number") return null;
+      return {
+        temp: Math.round(current.temperature_2m),
+        code: Number(current.weather_code ?? 0),
+      };
+    });
+  } catch {
+    return points.map(() => null);
+  }
+}

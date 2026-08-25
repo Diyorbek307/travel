@@ -4,6 +4,7 @@ import Icon, { type IconName } from "@/components/icon";
 import LangSwitcher from "@/components/lang-switcher";
 import { listCities, listPois, listTours, cityCovers, tourCovers } from "@/lib/db";
 import { t } from "@/lib/i18n";
+import { getCurrentBatch, getForecast, weatherIcon } from "@/lib/weather";
 import { currentLang } from "@/lib/server-lang";
 import type { Lang } from "@/lib/types";
 
@@ -37,63 +38,83 @@ export default async function HomePage() {
   const covers = cityCovers();
   const tourCover = tourCovers();
 
+  // Погода для приветствия. Столица выбрана не произвольно: через Ташкент
+  // прилетает большинство туристов, и подпись города рядом с цифрой
+  // не даёт принять её за «погоду у вас».
+  const capital = cities.find((c) => c.slug === "tashkent") ?? cities[0];
+  const capitalWeather = capital
+    ? await getForecast(capital.lat, capital.lon)
+    : { days: [], now: null };
+
+  // Погода по всем городам — одним запросом, а не четырнадцатью.
+  const cityWeather = await getCurrentBatch(
+    cities.map((c) => ({ lat: c.lat, lon: c.lon })),
+  );
+
   return (
     <>
       {/* ---------------- Шапка ---------------- */}
-      <header
-        className="wave-bottom relative px-4 pb-10 pt-4"
-        style={{ background: "var(--primary)", color: "var(--on-primary)" }}
-      >
-        <div className="mx-auto flex max-w-3xl items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <span
-              className="grid h-10 w-10 place-items-center rounded-[var(--radius-sm)]"
-              style={{ background: "rgb(255 255 255 / 0.16)" }}
-            >
-              <Icon name="landmark" size={22} />
-            </span>
-            <span>
-              <span className="block text-lg font-semibold leading-tight">
-                {t(lang, "app_name")}
-              </span>
-              <span className="block text-xs opacity-80">Открой Узбекистан</span>
-            </span>
+      <header className="mx-auto max-w-3xl px-4 pt-4">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-lg font-semibold leading-tight">
+              {t(lang, "greeting")} <span aria-hidden>👋</span>
+            </p>
+            <p className="mt-0.5 text-xs faint">{t(lang, "tagline_short")}</p>
           </div>
-          <LangSwitcher current={lang} onDark />
+
+          <div className="flex shrink-0 items-center gap-2">
+            {/* Погода в столице: большинство туристов прилетает через Ташкент,
+                и город подписан — иначе цифра ни о чём не говорит. */}
+            {capitalWeather.now && capital && (
+              <Link
+                href={`/city/${capital.slug}`}
+                className="pressable flex items-center gap-2 rounded-full py-1.5 pl-2.5 pr-3 card"
+              >
+                <span style={{ color: "var(--primary-text)" }}>
+                  <Icon name={weatherIcon(capitalWeather.now.code)} size={20} />
+                </span>
+                <span className="leading-none">
+                  <span className="block text-[10px] faint">{capital.name}</span>
+                  <span className="mt-0.5 block text-sm font-semibold">
+                    {capitalWeather.now.temp}°
+                  </span>
+                </span>
+              </Link>
+            )}
+            <LangSwitcher current={lang} />
+          </div>
         </div>
 
-        <div className="mx-auto mt-8 max-w-3xl">
-          <h1 className="text-[1.75rem] font-semibold leading-tight">
-            Путешествуй.
-            <br />
-            Открывай. Вдохновляйся.
-          </h1>
-          <p className="mt-3 max-w-md text-sm leading-relaxed opacity-90">
-            Маршруты, достопримечательности и история Узбекистана в одном приложении
-          </p>
-
-          <Link
-            href="/planner"
-            className="pressable mt-5 inline-flex items-center gap-2 rounded-[var(--radius-full)] px-5 py-3 text-sm font-medium"
-            style={{ background: "var(--surface)", color: "var(--primary)" }}
-          >
-            <Icon name="search" size={18} />
-            {t(lang, "build_route")}
-          </Link>
-        </div>
+        <p className="mt-7 text-[11px] uppercase tracking-[0.22em] faint">
+          {t(lang, "country")}
+        </p>
+        <h1 className="display mt-1.5">
+          {t(lang, "hero_line_1")}
+          <br />
+          {t(lang, "hero_line_2")}
+        </h1>
+        <p className="mt-3 max-w-md text-sm leading-relaxed soft">
+          {t(lang, "hero_lead")}
+        </p>
       </header>
 
       <main className="mx-auto max-w-3xl px-4">
         {/* ---------------- Поиск ---------------- */}
-        <div className="-mt-6 mb-6">
+        <div className="mb-6 mt-5">
           <Link
             href="/map"
-            className="pressable flex items-center gap-3 px-4 py-3.5 card-raised"
+            className="pressable flex items-center gap-3 rounded-full px-5 py-3.5 card"
             style={{ color: "var(--text-faint)" }}
           >
             <Icon name="search" size={20} />
-            <span className="flex-1 text-sm">Куда вы хотите поехать?</span>
-            <Icon name="chevron-right" size={18} />
+            <span className="flex-1 text-sm">{t(lang, "search_placeholder")}</span>
+            <span
+              className="grid h-9 w-9 place-items-center rounded-full"
+              style={{ background: "var(--primary)", color: "var(--on-primary)" }}
+            >
+              <Icon name="chevron-right" size={18} />
+            </span>
           </Link>
         </div>
 
@@ -103,7 +124,7 @@ export default async function HomePage() {
             <Link
               key={item.href}
               href={item.href}
-              className="pressable flex w-[5.5rem] shrink-0 flex-col items-center gap-2 px-2 py-3 card"
+              className="pressable flex shrink-0 items-center gap-2 rounded-full px-4 py-2.5 card"
             >
               <span
                 className="grid h-11 w-11 place-items-center rounded-[var(--radius-sm)]"
@@ -125,7 +146,7 @@ export default async function HomePage() {
             hint={`${cities.length} · ${totalPois} ${t(lang, "objects")}`}
           />
           <ul className="grid gap-3 sm:grid-cols-2">
-            {cities.map((city) => (
+            {cities.map((city, index) => (
               <li key={city.slug}>
                 <Link href={`/city/${city.slug}`} className="pressable block overflow-hidden card">
                   <div className="relative h-32 overflow-hidden">
@@ -147,7 +168,21 @@ export default async function HomePage() {
                     )}
                   </div>
                   <div className="p-3">
-                    <h3 className="font-semibold">{city.name}</h3>
+                    <div className="flex items-start justify-between gap-2">
+                      <h3 className="min-w-0 flex-1 font-semibold">{city.name}</h3>
+                      {cityWeather[index] && (
+                        <span
+                          className="flex shrink-0 items-center gap-1 rounded-full px-2 py-1 text-xs"
+                          style={{
+                            background: "var(--primary-tint)",
+                            color: "var(--primary-text)",
+                          }}
+                        >
+                          <Icon name={weatherIcon(cityWeather[index]!.code)} size={15} />
+                          {cityWeather[index]!.temp}°
+                        </span>
+                      )}
+                    </div>
                     {city.description && (
                       <p className="mt-1 line-clamp-2 text-sm leading-snug soft">
                         {city.description}

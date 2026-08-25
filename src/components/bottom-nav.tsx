@@ -11,84 +11,57 @@ interface Item {
 }
 
 /**
- * Нижняя навигация: пять пунктов, центральный приподнят.
+ * Нижняя навигация: плавающая тёмная пилюля.
  *
- * Пять — предел, после которого подписи перестают читаться на узких экранах.
- * Иконки всегда с подписями: иконка без текста угадывается неверно, особенно
- * иностранным туристом, который видит приложение впервые.
+ * Не панель во всю ширину: пилюля не режет экран горизонтальной линией,
+ * и фотография под ней продолжается до самого низа — ради этого приём и
+ * выбран, вся раскладка приложения построена на снимках.
  *
- * Центральная кнопка — карта: это главный экран платформы, и приподнятая
- * форма делает её попадаемой большим пальцем без прицеливания.
+ * Подпись показывается только у активного пункта. Иконка без подписи
+ * угадывается неверно, особенно иностранцем, который видит приложение
+ * впервые; пять подписей сразу в пилюлю не помещаются. Компромисс:
+ * там, где пользователь находится, написано словом.
  */
 export default function BottomNav({ items }: { items: Item[] }) {
   const pathname = usePathname();
   if (pathname.startsWith("/admin")) return null;
 
-  const middle = Math.floor(items.length / 2);
-
   return (
     <nav
-      className="no-print fixed inset-x-0 bottom-0 z-40"
-      style={{
-        background: "var(--surface)",
-        borderTop: "1px solid var(--border)",
-        paddingBottom: "env(safe-area-inset-bottom)",
-        boxShadow: "0 -2px 16px rgb(43 43 43 / 0.06)",
-      }}
+      className="no-print fixed inset-x-0 bottom-0 z-40 flex justify-center px-4"
+      style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 0.75rem)" }}
       aria-label="Основная навигация"
     >
-      <ul className="mx-auto flex max-w-lg items-end">
-        {items.map((item, index) => {
+      <ul
+        className="flex max-w-full items-center gap-1 rounded-full p-1.5"
+        style={{
+          background: "var(--ink-deep)",
+          boxShadow: "0 12px 32px rgb(22 40 30 / 0.32)",
+        }}
+      >
+        {items.map((item) => {
           const active =
             item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
-          const isCenter = index === middle;
-
-          if (isCenter) {
-            return (
-              <li key={item.href} className="flex-1">
-                <Link
-                  href={item.href}
-                  aria-current={active ? "page" : undefined}
-                  className="pressable flex flex-col items-center gap-1"
-                  // Приподнимаем над панелью, но габариты пункта не меняем —
-                  // соседние кнопки не съезжают.
-                  style={{ marginTop: "-1.25rem" }}
-                >
-                  <span
-                    className="grid h-14 w-14 place-items-center rounded-full"
-                    style={{
-                      background: "var(--primary)",
-                      color: "var(--on-primary)",
-                      boxShadow: "var(--shadow-3)",
-                      border: "4px solid var(--surface)",
-                    }}
-                  >
-                    <Icon name={item.icon} size={24} filled={active} />
-                  </span>
-                  <span
-                    className="pb-2 text-[0.68rem] font-medium"
-                    style={{ color: active ? "var(--primary-text)" : "var(--text-soft)" }}
-                  >
-                    {item.label}
-                  </span>
-                </Link>
-              </li>
-            );
-          }
 
           return (
-            <li key={item.href} className="flex-1">
+            <li key={item.href}>
               <Link
                 href={item.href}
                 aria-current={active ? "page" : undefined}
-                // Высота 56px: минимум для уверенного попадания пальцем.
-                className="pressable flex min-h-14 flex-col items-center justify-center gap-1 py-2"
-                style={{ color: active ? "var(--primary-text)" : "var(--text-soft)" }}
+                aria-label={item.label}
+                // Высота 44px — минимум для уверенного попадания пальцем.
+                className="pressable flex h-11 items-center gap-2 rounded-full px-3.5"
+                style={{
+                  background: active ? "var(--primary-soft)" : "transparent",
+                  color: active ? "var(--ink-deep)" : "rgb(255 255 255 / 0.72)",
+                }}
               >
-                <Icon name={item.icon} size={22} filled={active} />
-                <span className="max-w-full truncate px-1 text-[0.68rem] font-medium">
-                  {item.label}
-                </span>
+                <Icon name={item.icon} size={21} filled={active} />
+                {active && (
+                  <span className="max-w-[6.5rem] truncate text-[0.78rem] font-medium">
+                    {item.label}
+                  </span>
+                )}
               </Link>
             </li>
           );
