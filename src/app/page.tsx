@@ -51,72 +51,126 @@ export default async function HomePage() {
     cities.map((c) => ({ lat: c.lat, lon: c.lon })),
   );
 
+  // Сцена первого экрана. Отдельной фотографии страны у нас нет, поэтому
+  // берётся снимок главного объекта Самарканда — Регистан узнаваем и им
+  // Узбекистан представляют на любой обложке.
+  const stage = covers.samarkand ?? Object.values(covers)[0] ?? null;
+
   return (
     <>
-      {/* ---------------- Шапка ---------------- */}
-      <header className="mx-auto max-w-3xl px-4 pt-4">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <p className="text-lg font-semibold leading-tight">
-              {t(lang, "greeting")} <span aria-hidden>👋</span>
-            </p>
-            <p className="mt-0.5 text-xs faint">{t(lang, "tagline_short")}</p>
+      {/*
+        Композиция из макетов: сцена во весь первый экран, поверх которой
+        снизу наезжает лист с содержимым. Фотография закреплена, поэтому
+        при прокрутке лист уходит по ней вверх — это и создаёт ощущение
+        глубины, ради которого приём выбран.
+      */}
+      <div className="pointer-events-none fixed inset-x-0 top-0 z-0 h-[58vh]" aria-hidden>
+        {stage && (
+          // Кадр смещён вниз: снимки памятников сняты с запасом неба сверху,
+          // и при обрезке по центру в кадр попадает пустое небо, а само
+          // здание уходит за нижний край.
+          <Image
+            src={stage}
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
+            style={{ objectPosition: "center 78%" }}
+          />
+        )}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(to bottom, rgba(12,18,15,0.62) 0%, rgba(12,18,15,0.18) 34%, rgba(12,18,15,0.55) 100%)",
+          }}
+        />
+      </div>
+
+      <div className="relative z-10">
+        <header className="mx-auto max-w-3xl px-4 pt-4 text-white">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-lg font-semibold leading-tight">
+                {t(lang, "greeting")} <span aria-hidden>👋</span>
+              </p>
+              <p className="mt-0.5 text-xs opacity-80">{t(lang, "tagline_short")}</p>
+            </div>
+
+            <div className="flex shrink-0 items-center gap-2">
+              {/* Погода в столице: через Ташкент прилетает большинство
+                  туристов, и город подписан — иначе цифра ни о чём не говорит. */}
+              {capitalWeather.now && capital && (
+                <Link
+                  href={`/city/${capital.slug}`}
+                  className="pressable flex items-center gap-2 rounded-full py-1.5 pl-2.5 pr-3"
+                  style={{
+                    background: "rgba(255,255,255,0.16)",
+                    backdropFilter: "blur(14px)",
+                    border: "1px solid rgba(255,255,255,0.24)",
+                  }}
+                >
+                  <Icon name={weatherIcon(capitalWeather.now.code)} size={20} />
+                  <span className="leading-none">
+                    <span className="block text-[10px] opacity-80">{capital.name}</span>
+                    <span className="mt-0.5 block text-sm font-semibold">
+                      {capitalWeather.now.temp}°
+                    </span>
+                  </span>
+                </Link>
+              )}
+              <LangSwitcher current={lang} onDark />
+            </div>
           </div>
 
-          <div className="flex shrink-0 items-center gap-2">
-            {/* Погода в столице: большинство туристов прилетает через Ташкент,
-                и город подписан — иначе цифра ни о чём не говорит. */}
-            {capitalWeather.now && capital && (
+          <p className="mt-8 text-[11px] uppercase tracking-[0.22em] opacity-75">
+            {t(lang, "country")}
+          </p>
+          <h1 className="display mt-1.5">
+            {t(lang, "hero_line_1")}
+            <br />
+            {t(lang, "hero_line_2")}
+          </h1>
+          <p className="mt-3 max-w-md text-sm leading-relaxed opacity-90">
+            {t(lang, "hero_lead")}
+          </p>
+        </header>
+
+        {/* Лист. Отступ сверху оставляет сцену открытой примерно на треть
+            экрана — столько, чтобы фотография читалась, но первый блок
+            содержимого уже подсказывал: ниже есть что листать. */}
+        <div
+          className="relative mt-[7vh] rounded-t-[2.5rem]"
+          style={{
+            background: "var(--bg)",
+            boxShadow: "0 -20px 44px rgba(12,18,15,0.3)",
+          }}
+        >
+          <div
+            aria-hidden
+            className="mx-auto mt-3 h-1 w-10 rounded-full"
+            style={{ background: "var(--border)" }}
+          />
+
+          <main className="mx-auto max-w-3xl px-4 pt-4">
+            <div className="mb-6">
               <Link
-                href={`/city/${capital.slug}`}
-                className="pressable flex items-center gap-2 rounded-full py-1.5 pl-2.5 pr-3 card"
+                href="/map"
+                className="pressable flex items-center gap-3 rounded-full px-5 py-3.5 card-raised"
+                style={{ color: "var(--text-faint)" }}
               >
-                <span style={{ color: "var(--primary-text)" }}>
-                  <Icon name={weatherIcon(capitalWeather.now.code)} size={20} />
-                </span>
-                <span className="leading-none">
-                  <span className="block text-[10px] faint">{capital.name}</span>
-                  <span className="mt-0.5 block text-sm font-semibold">
-                    {capitalWeather.now.temp}°
-                  </span>
+                <Icon name="search" size={20} />
+                <span className="flex-1 text-sm">{t(lang, "search_placeholder")}</span>
+                <span
+                  className="grid h-9 w-9 place-items-center rounded-full"
+                  style={{ background: "var(--primary)", color: "var(--on-primary)" }}
+                >
+                  <Icon name="chevron-right" size={18} />
                 </span>
               </Link>
-            )}
-            <LangSwitcher current={lang} />
-          </div>
-        </div>
+            </div>
 
-        <p className="mt-7 text-[11px] uppercase tracking-[0.22em] faint">
-          {t(lang, "country")}
-        </p>
-        <h1 className="display mt-1.5">
-          {t(lang, "hero_line_1")}
-          <br />
-          {t(lang, "hero_line_2")}
-        </h1>
-        <p className="mt-3 max-w-md text-sm leading-relaxed soft">
-          {t(lang, "hero_lead")}
-        </p>
-      </header>
-
-      <main className="mx-auto max-w-3xl px-4">
-        {/* ---------------- Поиск ---------------- */}
-        <div className="mb-6 mt-5">
-          <Link
-            href="/map"
-            className="pressable flex items-center gap-3 rounded-full px-5 py-3.5 card"
-            style={{ color: "var(--text-faint)" }}
-          >
-            <Icon name="search" size={20} />
-            <span className="flex-1 text-sm">{t(lang, "search_placeholder")}</span>
-            <span
-              className="grid h-9 w-9 place-items-center rounded-full"
-              style={{ background: "var(--primary)", color: "var(--on-primary)" }}
-            >
-              <Icon name="chevron-right" size={18} />
-            </span>
-          </Link>
-        </div>
 
         {/* ---------------- Быстрые действия ---------------- */}
         <nav className="no-scrollbar -mx-4 mb-8 flex gap-3 overflow-x-auto px-4">
@@ -269,7 +323,9 @@ export default async function HomePage() {
             Админ-панель
           </Link>
         </footer>
-      </main>
+          </main>
+        </div>
+      </div>
     </>
   );
 }
