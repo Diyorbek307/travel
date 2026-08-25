@@ -6,6 +6,30 @@ import type { Category, Lang, Theme } from "./types";
  * плюс переводы контента через админ-панель.
  */
 
+/**
+ * Число с существительным в правильной форме.
+ *
+ * «4 объектов» в интерфейсе выглядит как недоделка. В русском три формы,
+ * в узбекском счётное существительное не меняется, в английском две.
+ * Для остальных языков остаётся словарная форма — она нейтральна.
+ */
+export function objectsCount(lang: Lang, n: number): string {
+  if (lang === "ru") {
+    const ten = n % 10;
+    const hundred = n % 100;
+    const form =
+      ten === 1 && hundred !== 11
+        ? "объект"
+        : ten >= 2 && ten <= 4 && (hundred < 12 || hundred > 14)
+          ? "объекта"
+          : "объектов";
+    return `${n} ${form}`;
+  }
+  if (lang === "uz") return `${n} obyekt`;
+  if (lang === "en") return `${n} ${n === 1 ? "place" : "places"}`;
+  return `${n} ${t(lang, "objects")}`;
+}
+
 export const LANG_LABEL: Record<Lang, string> = {
   ru: "Русский",
   uz: "O'zbekcha",
@@ -98,10 +122,16 @@ const ru: Dict = {
   landmarks_short: "Места",
   sos_short: "SOS",
   explore_short: "Карта 3D",
-  map_hint: "Высота региона показывает, сколько в нём объектов на платформе.",
+  map_hint: "Цвет и высота региона показывают, сколько в нём объектов на платформе.",
   map_less: "меньше",
   map_more: "больше",
   map_silk_road: "Великий шёлковый путь",
+  map_drag: "Тяните, чтобы повернуть",
+  map_regions: "Регионы страны",
+  map_stat_cities: "городов и областей",
+  map_stat_objects: "объектов",
+  map_stat_routes: "маршрутов",
+  map_intro: "Вся страна на одной карте: рельеф показывает, где больше мест, золотая нить — Великий шёлковый путь.",
   map_open: "нажмите, чтобы открыть",
   map_no_webgl: "Браузер не поддерживает трёхмерную графику — регионы доступны списком ниже.",
   see_all: "Все",
@@ -172,10 +202,16 @@ const uz: Dict = {
   landmarks_short: "Joylar",
   sos_short: "SOS",
   explore_short: "3D xarita",
-  map_hint: "Viloyat balandligi undagi obyektlar sonini ko'rsatadi.",
+  map_hint: "Viloyat rangi va balandligi undagi obyektlar sonini ko'rsatadi.",
   map_less: "kamroq",
   map_more: "ko'proq",
   map_silk_road: "Buyuk Ipak yo'li",
+  map_drag: "Aylantirish uchun torting",
+  map_regions: "Mamlakat viloyatlari",
+  map_stat_cities: "shahar va viloyat",
+  map_stat_objects: "obyekt",
+  map_stat_routes: "marshrut",
+  map_intro: "Butun mamlakat bitta xaritada: relyef qayerda ko'proq joy borligini, oltin ip esa Buyuk Ipak yo'lini ko'rsatadi.",
   map_open: "ochish uchun bosing",
   map_no_webgl: "Brauzer uch o'lchamli grafikani qo'llamaydi — viloyatlar quyidagi ro'yxatda.",
   see_all: "Barchasi",
@@ -246,10 +282,16 @@ const en: Dict = {
   landmarks_short: "Places",
   sos_short: "SOS",
   explore_short: "3D map",
-  map_hint: "A region's height shows how many places it holds on the platform.",
+  map_hint: "A region's colour and height show how many places it holds.",
   map_less: "fewer",
   map_more: "more",
   map_silk_road: "The Great Silk Road",
+  map_drag: "Drag to rotate",
+  map_regions: "Regions of the country",
+  map_stat_cities: "cities and regions",
+  map_stat_objects: "places",
+  map_stat_routes: "routes",
+  map_intro: "The whole country on one map: relief shows where the places are, the golden thread is the Great Silk Road.",
   map_open: "tap to open",
   map_no_webgl: "This browser has no 3D graphics — the regions are listed below.",
   see_all: "See all",

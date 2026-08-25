@@ -230,6 +230,79 @@ body {
   scrollbar-width: none;
 }
 
+/* ------------------------------------------------------------------ */
+/* Движение                                                            */
+/* ------------------------------------------------------------------ */
+
+/*
+ * Фон-«аврора»: два мягких пятна медленно расходятся и сходятся.
+ * Анимируются только transform и opacity — единственные свойства,
+ * которые браузер считает без пересчёта раскладки. Это важно: рядом
+ * крутится трёхмерная сцена, и фон не должен отбирать у неё кадры.
+ */
+.aurora {
+  position: absolute;
+  inset: -25%;
+  pointer-events: none;
+  overflow: hidden;
+}
+.aurora::before,
+.aurora::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(70px);
+  will-change: transform;
+}
+.aurora::before {
+  width: 46%;
+  padding-bottom: 46%;
+  left: 6%;
+  top: 4%;
+  background: radial-gradient(circle, rgb(102 179 142 / 0.5), transparent 70%);
+  animation: aurora-a 19s ease-in-out infinite alternate;
+}
+.aurora::after {
+  width: 52%;
+  padding-bottom: 52%;
+  right: 4%;
+  bottom: 2%;
+  background: radial-gradient(circle, rgb(233 196 106 / 0.45), transparent 70%);
+  animation: aurora-b 23s ease-in-out infinite alternate;
+}
+@keyframes aurora-a {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to   { transform: translate3d(14%, 9%, 0) scale(1.18); }
+}
+@keyframes aurora-b {
+  from { transform: translate3d(0, 0, 0) scale(1.06); }
+  to   { transform: translate3d(-11%, -7%, 0) scale(0.94); }
+}
+
+/* Исламская геометрия, медленно уезжающая по диагонали. Тот же мотив,
+   что и в плашке вместо фотографии, — узор в приложении один. */
+.ornament {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    repeating-linear-gradient(45deg, rgb(46 125 90 / 0.05) 0 10px, transparent 10px 20px),
+    repeating-linear-gradient(-45deg, rgb(233 196 106 / 0.07) 0 10px, transparent 10px 20px);
+  animation: ornament-drift 44s linear infinite;
+}
+@keyframes ornament-drift {
+  to { background-position: 56px 56px, -56px 56px; }
+}
+
+/* Появление списков: короткая ступенька задаёт порядок чтения. */
+.rise-in {
+  animation: rise-in 520ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .pressable {
     transition: none;
