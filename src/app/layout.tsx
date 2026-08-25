@@ -30,7 +30,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   // главный экран платформы.
   const nav = [
     { href: "/", icon: "home" as const, label: t(lang, "cities") },
-    { href: "/routes", icon: "explore" as const, label: t(lang, "routes") },
+    { href: "/explore", icon: "explore" as const, label: "Исследовать" },
     { href: "/map", icon: "map" as const, label: t(lang, "map") },
     { href: "/scan", icon: "qr" as const, label: t(lang, "scan") },
     { href: "/profile", icon: "user" as const, label: t(lang, "profile") },

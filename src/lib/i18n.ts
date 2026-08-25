@@ -97,6 +97,7 @@ const ru: Dict = {
   hours_short: "ч",
   landmarks_short: "Места",
   sos_short: "SOS",
+  explore_short: "Карта 3D",
   see_all: "Все",
   draft_notice: "Черновой текст, требует проверки историком",
 };
@@ -164,6 +165,7 @@ const uz: Dict = {
   hours_short: "soat",
   landmarks_short: "Joylar",
   sos_short: "SOS",
+  explore_short: "3D xarita",
   see_all: "Barchasi",
   draft_notice: "Qoralama matn, tarixchi tekshiruvi zarur",
 };
@@ -231,6 +233,7 @@ const en: Dict = {
   hours_short: "h",
   landmarks_short: "Places",
   sos_short: "SOS",
+  explore_short: "3D map",
   see_all: "See all",
   draft_notice: "Draft text, pending review by a historian",
 };
