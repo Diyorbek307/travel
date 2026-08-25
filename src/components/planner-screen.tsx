@@ -381,7 +381,7 @@ export default function PlannerScreen({
               {!reply.route && reply.pois.length > 0 && (
                 <ul className="mt-3 grid gap-2">
                   {reply.pois.map((poi) => (
-                    <li key={poi.id}>
+                    <li key={poi.id} className="min-w-0">
                       <Link
                         href={`/poi/${poi.slug}`}
                         className="block rounded-xl p-3 transition-colors surface hover:bg-soft"

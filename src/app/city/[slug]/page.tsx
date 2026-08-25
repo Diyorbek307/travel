@@ -4,8 +4,11 @@ import CityTracker from "@/components/city-tracker";
 import Header from "@/components/header";
 import OfflineButton from "@/components/offline-button";
 import PoiCard from "@/components/poi-card";
-import { getCity, listPois, listTours } from "@/lib/db";
-import { categoryLabel, t } from "@/lib/i18n";
+import PoiPhoto from "@/components/poi-photo";
+import WeatherCard from "@/components/weather-card";
+import { getCity, getPoiMedia, listPois, listTours } from "@/lib/db";
+import { getForecast } from "@/lib/weather";
+import { categoryLabel, objectsCount, routesCount, t } from "@/lib/i18n";
 import { currentLang } from "@/lib/server-lang";
 import Icon from "@/components/icon";
 import { CATEGORIES, type Category } from "@/lib/types";
@@ -30,6 +33,16 @@ export default async function CityPage({
   const all = listPois({ city: slug, lang });
   const tours = listTours(lang, slug);
 
+  // Обложка города — снимок самого популярного объекта, у которого он есть.
+  // Отдельной фотографии города у нас нет, а собирать коллаж не из чего.
+  const hero = all.find((p) => p.cover) ?? null;
+  const heroCredit = hero ? getPoiMedia(hero.id)[0] : null;
+  const featured = all.filter((p) => p.cover).slice(0, 8);
+
+  // Погода грузится параллельно странице и не обязана успеть: без неё
+  // город показывается как раньше.
+  const forecast = await getForecast(city.lat, city.lon);
+
   const active = (CATEGORIES as readonly string[]).includes(category ?? "")
     ? (category as Category)
     : null;
@@ -44,6 +57,46 @@ export default async function CityPage({
       <CityTracker cityId={city.id} citySlug={city.slug} lang={lang} />
 
       <main className="mx-auto max-w-3xl px-4 py-4">
+        {hero && (
+          <section className="relative -mx-4 mb-4 h-60 overflow-hidden sm:mx-0 sm:rounded-[var(--radius-lg)]">
+            <PoiPhoto poi={hero} priority sizes="(max-width: 768px) 100vw, 768px" />
+            <div
+              aria-hidden
+              className="absolute inset-0"
+              style={{
+                background:
+                  "linear-gradient(to top, rgba(18,24,20,0.92) 0%, rgba(18,24,20,0.4) 46%, rgba(18,24,20,0.05) 100%)",
+              }}
+            />
+            <div className="absolute inset-x-0 bottom-0 p-5 text-white">
+              <p className="text-[11px] uppercase tracking-[0.16em] opacity-80">
+                {t(lang, "country")}
+              </p>
+              <h1 className="mt-1 text-2xl font-semibold leading-tight">{city.name}</h1>
+              <p className="mt-1 text-sm opacity-90">
+                {objectsCount(lang, all.length)} · {routesCount(lang, tours.length)}
+              </p>
+            </div>
+
+            {/* Атрибуция обязательна для CC BY и CC BY-SA: снимок чужой,
+                и указать автора — условие, на котором его можно показывать. */}
+            {heroCredit?.author && (
+              <p
+                className="absolute right-2 top-2 max-w-[60%] truncate rounded-full px-2 py-0.5 text-[10px] text-white"
+                style={{ background: "rgba(18,24,20,0.45)", backdropFilter: "blur(4px)" }}
+              >
+                {t(lang, "photo_by")}: {heroCredit.author} · {heroCredit.license}
+              </p>
+            )}
+          </section>
+        )}
+
+        {forecast.days.length > 0 && (
+          <div className="mb-4">
+            <WeatherCard forecast={forecast} lang={lang} />
+          </div>
+        )}
+
         {city.description && <p className="mb-4 text-sm soft">{city.description}</p>}
 
         <div className="mb-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
@@ -70,6 +123,19 @@ export default async function CityPage({
           </Link>
           <OfflineButton citySlug={city.slug} cityName={city.name} lang={lang} />
         </div>
+
+        {featured.length > 2 && (
+          <section className="mb-5">
+            <h2 className="mb-2 font-semibold">{t(lang, "top_places")}</h2>
+            <div className="no-scrollbar -mx-4 flex gap-3 overflow-x-auto px-4 pb-1">
+              {featured.map((poi, i) => (
+                <div key={poi.id} className="w-44 shrink-0">
+                  <PoiCard poi={poi} lang={lang} variant="feature" priority={i === 0} />
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
         {tours.length > 0 && (
           <section className="mb-5">
@@ -110,7 +176,7 @@ export default async function CityPage({
 
         <ul className="grid gap-2">
           {shown.map((poi) => (
-            <li key={poi.id}>
+            <li key={poi.id} className="min-w-0">
               <PoiCard poi={poi} lang={lang} />
             </li>
           ))}

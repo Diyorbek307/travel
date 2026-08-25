@@ -409,3 +409,46 @@ export function getTourBySlug(slug: string, lang: Lang) {
   if (!tour) return null;
   return { ...tour, stops: getTourStops(tour.id, lang) };
 }
+
+/**
+ * Обложки городов и маршрутов.
+ *
+ * Своих снимков у города нет и быть не может: фотографии мы берём с
+ * Викисклада по конкретным памятникам. Поэтому обложкой города служит снимок
+ * самого известного объекта внутри него, а обложкой маршрута — первая
+ * остановка, у которой снимок есть.
+ */
+export function cityCovers(): Record<string, string> {
+  const db = getDb();
+  const rows = db
+    .prepare(
+      `SELECT c.slug AS slug,
+              (SELECT p.cover FROM pois p
+                WHERE p.city_id = c.id AND p.cover IS NOT NULL AND p.is_active = 1
+                ORDER BY p.popularity DESC LIMIT 1) AS cover
+         FROM cities c`,
+    )
+    .all() as Row[];
+
+  const out: Record<string, string> = {};
+  for (const row of rows) if (row.cover) out[String(row.slug)] = String(row.cover);
+  return out;
+}
+
+export function tourCovers(): Record<string, string> {
+  const db = getDb();
+  const rows = db
+    .prepare(
+      `SELECT t.slug AS slug,
+              (SELECT p.cover FROM tour_stops ts
+                 JOIN pois p ON p.id = ts.poi_id
+                WHERE ts.tour_id = t.id AND p.cover IS NOT NULL
+                ORDER BY ts.order_index LIMIT 1) AS cover
+         FROM tours t`,
+    )
+    .all() as Row[];
+
+  const out: Record<string, string> = {};
+  for (const row of rows) if (row.cover) out[String(row.slug)] = String(row.cover);
+  return out;
+}

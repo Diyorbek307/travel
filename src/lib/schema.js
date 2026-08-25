@@ -55,6 +55,9 @@ export const SCHEMA_SQL = `
       caption TEXT,
       author  TEXT,
       license TEXT,
+      -- Ссылка на страницу файла: CC BY и CC BY-SA требуют указать не только
+      -- автора и лицензию, но и откуда снимок взят.
+      source  TEXT,
       sort    INTEGER NOT NULL DEFAULT 0
     );
 

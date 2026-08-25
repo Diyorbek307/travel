@@ -193,7 +193,7 @@ export default function MapScreen({
 
         <ul className="grid gap-2">
           {sorted.slice(0, 40).map((poi) => (
-            <li key={poi.id}>
+            <li key={poi.id} className="min-w-0">
               <Link
                 href={`/poi/${poi.slug}`}
                 className="flex items-center gap-3 rounded-xl p-3 transition-colors surface hover:bg-soft"

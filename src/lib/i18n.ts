@@ -30,6 +30,24 @@ export function objectsCount(lang: Lang, n: number): string {
   return `${n} ${t(lang, "objects")}`;
 }
 
+/** Маршруты по тем же правилам, что и объекты. */
+export function routesCount(lang: Lang, n: number): string {
+  if (lang === "ru") {
+    const ten = n % 10;
+    const hundred = n % 100;
+    const form =
+      ten === 1 && hundred !== 11
+        ? "маршрут"
+        : ten >= 2 && ten <= 4 && (hundred < 12 || hundred > 14)
+          ? "маршрута"
+          : "маршрутов";
+    return `${n} ${form}`;
+  }
+  if (lang === "uz") return `${n} marshrut`;
+  if (lang === "en") return `${n} ${n === 1 ? "route" : "routes"}`;
+  return `${n} ${t(lang, "map_stat_routes")}`;
+}
+
 export const LANG_LABEL: Record<Lang, string> = {
   ru: "Русский",
   uz: "O'zbekcha",
@@ -128,6 +146,9 @@ const ru: Dict = {
   map_silk_road: "Великий шёлковый путь",
   map_drag: "Тяните, чтобы повернуть",
   map_regions: "Регионы страны",
+  country: "Узбекистан",
+  top_places: "Главное в городе",
+  photo_by: "фото",
   map_stat_cities: "городов и областей",
   map_stat_objects: "объектов",
   map_stat_routes: "маршрутов",
@@ -208,6 +229,9 @@ const uz: Dict = {
   map_silk_road: "Buyuk Ipak yo'li",
   map_drag: "Aylantirish uchun torting",
   map_regions: "Mamlakat viloyatlari",
+  country: "O'zbekiston",
+  top_places: "Shahardagi asosiy joylar",
+  photo_by: "surat",
   map_stat_cities: "shahar va viloyat",
   map_stat_objects: "obyekt",
   map_stat_routes: "marshrut",
@@ -288,6 +312,9 @@ const en: Dict = {
   map_silk_road: "The Great Silk Road",
   map_drag: "Drag to rotate",
   map_regions: "Regions of the country",
+  country: "Uzbekistan",
+  top_places: "Top places",
+  photo_by: "photo",
   map_stat_cities: "cities and regions",
   map_stat_objects: "places",
   map_stat_routes: "routes",

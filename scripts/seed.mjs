@@ -13,10 +13,21 @@
  */
 
 import { DatabaseSync } from "node:sqlite";
-import { existsSync, mkdirSync, rmSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, rmSync } from "node:fs";
 import path from "node:path";
 import { SCHEMA_SQL } from "../src/lib/schema.js";
 import { dbPath } from "../src/lib/paths.js";
+
+/**
+ * Снимки объектов и их атрибуция.
+ *
+ * Манифест собирает scripts/media/fetch-photos.mjs с Викисклада. Здесь он
+ * только раскладывается по объектам: у кого снимка нет, тот остаётся с
+ * орнаментной плашкой — подставлять чужую фотографию нельзя.
+ */
+const PHOTO_CREDITS = JSON.parse(
+  readFileSync(new URL("../src/data/photo-credits.json", import.meta.url), "utf8"),
+);
 
 import samarkand from "./content/samarkand.mjs";
 import bukhara from "./content/bukhara.mjs";
@@ -248,6 +259,26 @@ for (const city of CITIES) {
         tr.f ?? null,
       );
       counts.translations++;
+    }
+
+    const photo = PHOTO_CREDITS[p.slug];
+    if (photo) {
+      run(`UPDATE pois SET cover = ? WHERE id = ?`, photo.file, poiId);
+
+      // Снимок без подписи публиковать нельзя, поэтому автор и лицензия
+      // едут вместе с ним одной строкой.
+      run(`DELETE FROM poi_media WHERE poi_id = ? AND url = ?`, poiId, photo.file);
+      run(
+        `INSERT INTO poi_media (poi_id, url, caption, author, license, source, sort)
+         VALUES (?, ?, ?, ?, ?, ?, 0)`,
+        poiId,
+        photo.file,
+        photo.title ?? null,
+        photo.author ?? null,
+        photo.license ?? null,
+        photo.source ?? null,
+      );
+      counts.photos = (counts.photos ?? 0) + 1;
     }
 
     if (p.qr) {

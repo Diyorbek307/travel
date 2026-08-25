@@ -1,7 +1,8 @@
+import Image from "next/image";
 import Link from "next/link";
 import Icon, { type IconName } from "@/components/icon";
 import LangSwitcher from "@/components/lang-switcher";
-import { listCities, listPois, listTours } from "@/lib/db";
+import { listCities, listPois, listTours, cityCovers, tourCovers } from "@/lib/db";
 import { t } from "@/lib/i18n";
 import { currentLang } from "@/lib/server-lang";
 import type { Lang } from "@/lib/types";
@@ -29,6 +30,11 @@ export default async function HomePage() {
   const cities = listCities(lang);
   const tours = listTours(lang).filter((x) => x.kind === "curated");
   const totalPois = listPois({ lang }).length;
+
+  // Обложки берутся у главного объекта города и первой остановки маршрута:
+  // отдельных снимков у них нет.
+  const covers = cityCovers();
+  const tourCover = tourCovers();
 
   return (
     <>
@@ -121,11 +127,23 @@ export default async function HomePage() {
             {cities.map((city) => (
               <li key={city.slug}>
                 <Link href={`/city/${city.slug}`} className="pressable block overflow-hidden card">
-                  <div
-                    className="photo-placeholder grid h-28 place-items-center"
-                    style={{ color: "var(--primary-text)" }}
-                  >
-                    <Icon name="landmark" size={34} />
+                  <div className="relative h-32 overflow-hidden">
+                    {covers[city.slug] ? (
+                      <Image
+                        src={covers[city.slug]}
+                        alt={city.name}
+                        fill
+                        sizes="(max-width: 640px) 100vw, 360px"
+                        className="object-cover"
+                      />
+                    ) : (
+                      <div
+                        className="photo-placeholder grid h-full place-items-center"
+                        style={{ color: "var(--primary-text)" }}
+                      >
+                        <Icon name="landmark" size={34} />
+                      </div>
+                    )}
                   </div>
                   <div className="p-3">
                     <h3 className="font-semibold">{city.name}</h3>
@@ -149,11 +167,23 @@ export default async function HomePage() {
               {tours.slice(0, 6).map((tour) => (
                 <li key={tour.slug} className="w-64 shrink-0">
                   <Link href={`/routes/${tour.slug}`} className="pressable block h-full overflow-hidden card">
-                    <div
-                      className="photo-placeholder grid h-24 place-items-center"
-                      style={{ color: "var(--primary-text)" }}
-                    >
-                      <Icon name="explore" size={30} />
+                    <div className="relative h-28 overflow-hidden">
+                      {tourCover[tour.slug] ? (
+                        <Image
+                          src={tourCover[tour.slug]}
+                          alt={tour.title}
+                          fill
+                          sizes="256px"
+                          className="object-cover"
+                        />
+                      ) : (
+                        <div
+                          className="photo-placeholder grid h-full place-items-center"
+                          style={{ color: "var(--primary-text)" }}
+                        >
+                          <Icon name="explore" size={30} />
+                        </div>
+                      )}
                     </div>
                     <div className="p-3">
                       <h3 className="line-clamp-2 text-sm font-semibold leading-snug">
