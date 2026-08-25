@@ -56,21 +56,20 @@ export default function ExploreScreen({
         className="relative mb-5 h-[58vh] min-h-80 overflow-hidden rounded-[var(--radius-lg)]"
         style={{
           background:
-            "radial-gradient(ellipse at 50% 30%, #eef6f1 0%, #dcebe2 55%, #cfe2d6 100%)",
+            "radial-gradient(ellipse at 50% 25%, #fbf7ec 0%, #efe8d6 60%, #e2d9c2 100%)",
         }}
       >
         {webglOk ? (
           <RegionMap3D
+            cities={cities}
             counts={counts}
+            lang={lang}
             onSelect={(city) => router.push(`/city/${city}`)}
             className="h-full w-full"
           />
         ) : (
           <div className="grid h-full place-items-center px-6 text-center">
-            <p className="text-sm soft">
-              Ваш браузер не поддерживает трёхмерную графику. Регионы доступны
-              списком ниже.
-            </p>
+            <p className="text-sm soft">{t(lang, "map_no_webgl")}</p>
           </div>
         )}
       </div>
@@ -79,10 +78,7 @@ export default function ExploreScreen({
         <span className="mt-0.5 shrink-0">
           <Icon name="sparkle" size={14} />
         </span>
-        <p>
-          Высота региона показывает, сколько в нём объектов на платформе.
-          Наведите или нажмите, чтобы открыть.
-        </p>
+        <p>{t(lang, "map_hint")}</p>
       </div>
 
       <h2 className="mb-3 text-base font-semibold">{t(lang, "cities")}</h2>
