@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useAppState } from "./app-state";
 import { track } from "@/lib/track";
+import Icon from "./icon";
 import type { Lang } from "@/lib/types";
 
 /**
@@ -80,9 +81,9 @@ export default function AudioGuide({
 
   if (audioUrl) {
     return (
-      <section className="rounded-xl p-4 surface">
+      <section className="p-4 card">
         <div className="mb-2 flex items-center gap-2">
-          <span className="text-xl">🎧</span>
+          <span style={{ color: "var(--primary-text)" }}><Icon name="headphones" size={22} /></span>
           <span className="font-medium">Аудиогид</span>
           {durationSec ? (
             <span className="text-xs soft">{formatClock(durationSec)}</span>
@@ -137,7 +138,7 @@ export default function AudioGuide({
   return (
     <section className="rounded-xl p-4 surface">
       <div className="mb-3 flex items-center gap-2">
-        <span className="text-xl">🎧</span>
+        <span style={{ color: "var(--primary-text)" }}><Icon name="headphones" size={22} /></span>
         <span className="font-medium">Аудиогид</span>
         <span className="text-xs soft">≈ {formatClock(estimatedSec)}</span>
       </div>
@@ -152,17 +153,17 @@ export default function AudioGuide({
         <>
           <button
             onClick={playing ? stop : speak}
-            className="flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3 font-medium text-white transition-opacity hover:opacity-90"
-            style={{ background: "var(--accent)" }}
+            className="pressable flex min-h-12 w-full items-center justify-center gap-2 rounded-[var(--radius-full)] px-4 font-medium"
+            style={{ background: "var(--primary)", color: "var(--on-primary)" }}
           >
-            {playing ? "⏹ Остановить" : "▶ Слушать историю"}
+            {playing ? "⏹ Остановить" : "▶  Слушать историю"}
           </button>
 
           {playing && (
             <div className="mt-3 h-1 overflow-hidden rounded-full bg-soft">
               <div
                 className="h-full transition-[width] duration-300"
-                style={{ width: `${progress * 100}%`, background: "var(--accent)" }}
+                style={{ width: `${progress * 100}%`, background: "var(--primary)" }}
               />
             </div>
           )}

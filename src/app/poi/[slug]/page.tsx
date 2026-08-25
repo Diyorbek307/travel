@@ -8,7 +8,7 @@ import { getCity, getMuseumByPoi, getPoi, getPoiMedia, listExhibits } from "@/li
 import { formatPrice, todayHours } from "@/lib/geo";
 import { categoryLabel, t, themeLabel } from "@/lib/i18n";
 import { currentLang } from "@/lib/server-lang";
-import { CATEGORY_ICON } from "@/lib/types";
+import Icon from "@/components/icon";
 
 export const dynamic = "force-dynamic";
 
@@ -48,14 +48,14 @@ export default async function PoiPage({
         {from === "qr" && (
           <p
             className="mb-4 rounded-lg px-3 py-2 text-sm"
-            style={{ background: "var(--bg-soft)", color: "var(--accent)" }}
+            style={{ background: "var(--bg-soft)", color: "var(--primary-text)" }}
           >
-            📷 Открыто по QR-коду {poi.qr_code ? `«${poi.qr_code}»` : ""}
+            <Icon name="qr" size={16} className="mr-1 inline align-[-3px]" />Открыто по QR-коду {poi.qr_code ? `«${poi.qr_code}»` : ""}
           </p>
         )}
 
         <div className="mb-4 flex items-start gap-3">
-          <span className="text-4xl">{CATEGORY_ICON[poi.category]}</span>
+          <span style={{ color: "var(--primary)" }}><Icon name={poi.category} size={40} /></span>
           <div className="min-w-0 flex-1">
             {poi.short_desc && <p className="text-sm">{poi.short_desc}</p>}
             <div className="mt-2 flex flex-wrap gap-1.5">
@@ -75,7 +75,7 @@ export default async function PoiPage({
           <Fact label={t(lang, "duration")}>
             {poi.avg_visit_min} {t(lang, "minutes")}
           </Fact>
-          <Fact label="Рейтинг">★ {poi.rating.toFixed(1)}</Fact>
+          <Fact label="Рейтинг">{poi.rating.toFixed(1)}</Fact>
         </dl>
 
         <div className="mb-4">
@@ -112,7 +112,7 @@ export default async function PoiPage({
               href={`https://www.google.com/maps/dir/?api=1&destination=${poi.lat},${poi.lon}`}
               target="_blank"
               rel="noopener noreferrer"
-              style={{ color: "var(--accent)" }}
+              style={{ color: "var(--primary-text)" }}
             >
               Проложить маршрут →
             </a>
@@ -170,7 +170,7 @@ export default async function PoiPage({
                   >
                     <span
                       className="grid h-10 w-10 shrink-0 place-items-center rounded-lg text-xs font-semibold bg-soft"
-                      style={{ color: "var(--accent)" }}
+                      style={{ color: "var(--primary-text)" }}
                     >
                       №{ex.number}
                     </span>
@@ -180,7 +180,7 @@ export default async function PoiPage({
                         <span className="block truncate text-sm soft">{ex.short_desc}</span>
                       )}
                       {ex.qr_code && (
-                        <span className="block text-xs soft">📷 {ex.qr_code}</span>
+                        <span className="block text-xs soft"><Icon name="qr" size={12} className="mr-1 inline align-[-2px]" />{ex.qr_code}</span>
                       )}
                     </span>
                   </Link>

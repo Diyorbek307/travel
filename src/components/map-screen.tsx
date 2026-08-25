@@ -5,11 +5,11 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useAppState } from "./app-state";
 import { formatDistance, formatPrice, haversine } from "@/lib/geo";
+import Icon from "./icon";
 import { categoryLabel, t, themeLabel } from "@/lib/i18n";
 import { track } from "@/lib/track";
 import {
   CATEGORIES,
-  CATEGORY_ICON,
   THEMES,
   type Category,
   type City,
@@ -148,15 +148,15 @@ export default function MapScreen({
               <Link
                 href={`/poi/${nearby.slug}`}
                 className="flex-1 rounded-lg px-3 py-2 text-center text-sm font-medium text-white"
-                style={{ background: "var(--accent)" }}
+                style={{ background: "var(--primary)" }}
               >
-                🎧 Слушать
+                <Icon name="headphones" size={16} className="mr-1 inline align-[-3px]" />Слушать
               </Link>
               <button
                 onClick={() => setNearby(null)}
                 className="rounded-lg px-3 py-2 text-sm surface"
               >
-                ✕ Позже
+                Позже
               </button>
             </div>
           </div>
@@ -173,7 +173,7 @@ export default function MapScreen({
               active={categories.has(c)}
               onClick={() => toggle(categories, c, setCategories)}
             >
-              {CATEGORY_ICON[c]} {categoryLabel(lang, c)}
+              <Icon name={c} size={16} /> {categoryLabel(lang, c)}
             </Chip>
           ))}
         </div>
@@ -198,7 +198,7 @@ export default function MapScreen({
                 href={`/poi/${poi.slug}`}
                 className="flex items-center gap-3 rounded-xl p-3 transition-colors surface hover:bg-soft"
               >
-                <span className="text-xl">{CATEGORY_ICON[poi.category]}</span>
+                <span style={{ color: "var(--primary)" }}><Icon name={poi.category} size={22} /></span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate font-medium">{poi.name}</span>
                   <span className="block truncate text-xs soft">
@@ -207,7 +207,7 @@ export default function MapScreen({
                   </span>
                 </span>
                 {position && (
-                  <span className="shrink-0 text-xs" style={{ color: "var(--accent)" }}>
+                  <span className="shrink-0 text-xs" style={{ color: "var(--primary-text)" }}>
                     {formatDistance(haversine(position[0], position[1], poi.lat, poi.lon), lang)}
                   </span>
                 )}
@@ -235,9 +235,9 @@ function Chip({
       aria-pressed={active}
       className="shrink-0 whitespace-nowrap rounded-full px-3 py-1.5 text-sm transition-colors"
       style={{
-        background: active ? "var(--accent)" : "var(--surface)",
+        background: active ? "var(--primary)" : "var(--surface)",
         color: active ? "#fff" : "var(--text)",
-        border: `1px solid ${active ? "var(--accent)" : "var(--border)"}`,
+        border: `1px solid ${active ? "var(--primary)" : "var(--border)"}`,
       }}
     >
       {children}

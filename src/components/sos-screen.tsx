@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { t } from "@/lib/i18n";
+import Icon from "./icon";
 import type { Lang } from "@/lib/types";
 
 /**
@@ -13,12 +14,17 @@ import type { Lang } from "@/lib/types";
  * много, они меняются, и придумывать их нельзя.
  */
 
+/*
+ * Иконок полиции, скорой и пожарной в наборе нет, и выдумывать их не стоит:
+ * узнаваемость таких символов различается по странам. Визуальный якорь здесь —
+ * сам номер: он крупный, и именно его нужно набрать.
+ */
 const EMERGENCY = [
-  { number: "112", label: "Единая служба спасения", icon: "🆘", note: "Работает без SIM-карты" },
-  { number: "102", label: "Полиция", icon: "🚔" },
-  { number: "103", label: "Скорая помощь", icon: "🚑" },
-  { number: "101", label: "Пожарная служба", icon: "🔥" },
-  { number: "104", label: "Аварийная газовая служба", icon: "⚠️" },
+  { number: "112", label: "Единая служба спасения", note: "Работает без SIM-карты" },
+  { number: "102", label: "Полиция" },
+  { number: "103", label: "Скорая помощь" },
+  { number: "101", label: "Пожарная служба" },
+  { number: "104", label: "Аварийная газовая служба" },
 ];
 
 export default function SosScreen({ lang }: { lang: Lang }) {
@@ -68,14 +74,13 @@ export default function SosScreen({ lang }: { lang: Lang }) {
           <a
             key={e.number}
             href={`tel:${e.number}`}
-            className="flex items-center gap-3 rounded-xl p-4 transition-colors surface hover:bg-soft"
+            className="pressable flex min-h-16 items-center gap-3 p-4 card"
           >
-            <span className="text-2xl">{e.icon}</span>
             <span className="min-w-0 flex-1">
               <span className="block font-semibold">{e.label}</span>
               {e.note && <span className="block text-xs soft">{e.note}</span>}
             </span>
-            <span className="shrink-0 text-2xl font-bold" style={{ color: "var(--accent)" }}>
+            <span className="shrink-0 text-2xl font-bold" style={{ color: "var(--primary-text)" }}>
               {e.number}
             </span>
           </a>
@@ -85,10 +90,10 @@ export default function SosScreen({ lang }: { lang: Lang }) {
       <section className="mb-5">
         <button
           onClick={shareLocation}
-          className="w-full rounded-xl px-4 py-4 font-medium text-white transition-opacity hover:opacity-90"
-          style={{ background: "var(--accent)" }}
+          className="pressable min-h-14 w-full rounded-[var(--radius-full)] px-4 font-medium text-white"
+          style={{ background: "var(--primary)" }}
         >
-          📍 Передать своё местоположение
+          <Icon name="explore" size={20} className="mr-2 inline align-[-4px]" />Передать своё местоположение
         </button>
         {status && <p className="mt-2 text-sm soft">{status}</p>}
         {coords && (
@@ -99,7 +104,7 @@ export default function SosScreen({ lang }: { lang: Lang }) {
       </section>
 
       <section className="mb-5 rounded-xl p-4 surface">
-        <h2 className="mb-2 font-semibold">🏛 Посольства</h2>
+        <h2 className="mb-2 flex items-center gap-2 font-semibold"><Icon name="museum" size={20} /> Посольства</h2>
         <p className="text-sm soft">
           Список посольств в Ташкенте пока не заполнен. Контакты дипломатических
           представительств меняются, поэтому они вносятся через админ-панель из
@@ -110,7 +115,7 @@ export default function SosScreen({ lang }: { lang: Lang }) {
           target="_blank"
           rel="noopener noreferrer"
           className="mt-2 inline-block text-sm"
-          style={{ color: "var(--accent)" }}
+          style={{ color: "var(--primary-text)" }}
         >
           Справочник МИД Узбекистана →
         </a>

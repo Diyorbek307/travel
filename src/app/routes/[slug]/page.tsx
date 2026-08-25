@@ -6,7 +6,7 @@ import { getCity, getTourBySlug } from "@/lib/db";
 import { formatDistance, formatDuration, formatPrice, haversine, travelMinutes } from "@/lib/geo";
 import { t } from "@/lib/i18n";
 import { currentLang } from "@/lib/server-lang";
-import { CATEGORY_ICON } from "@/lib/types";
+import Icon from "@/components/icon";
 
 export const dynamic = "force-dynamic";
 
@@ -84,13 +84,13 @@ export default async function RoutePage({ params }: { params: Promise<{ slug: st
               >
                 <span
                   className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-sm font-semibold"
-                  style={{ background: "var(--accent)", color: "#fff" }}
+                  style={{ background: "var(--primary)", color: "var(--on-primary)" }}
                 >
                   {i + 1}
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate font-medium">
-                    {CATEGORY_ICON[leg.poi.category]} {leg.poi.name}
+                    <Icon name={leg.poi.category} size={18} className="inline align-[-3px]" /> {leg.poi.name}
                   </span>
                   {leg.poi.short_desc && (
                     <span className="block truncate text-sm soft">{leg.poi.short_desc}</span>

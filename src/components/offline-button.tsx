@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useAppState } from "./app-state";
 import { track } from "@/lib/track";
 import { t } from "@/lib/i18n";
+import Icon from "./icon";
 import type { Lang } from "@/lib/types";
 
 /**
@@ -74,7 +75,7 @@ export default function OfflineButton({
 
   return (
     <div className="rounded-xl p-3 text-center surface">
-      <div className="text-xl">{downloaded ? "✅" : "⬇️"}</div>
+      <span style={{ color: "var(--primary-text)" }}><Icon name={downloaded ? "shield" : "download"} size={24} /></span>
       {!ready ? (
         <div className="mt-1 text-sm soft">…</div>
       ) : progress != null ? (

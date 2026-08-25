@@ -162,7 +162,6 @@ export function useAppState(): Ctx {
 
 export interface Achievement {
   id: string;
-  icon: string;
   title: Record<string, string>;
   /** Сколько нужно и сколько уже есть. */
   progress: (s: AppState) => { have: number; need: number };
@@ -171,7 +170,6 @@ export interface Achievement {
 export const ACHIEVEMENTS: Achievement[] = [
   {
     id: "samarkand-explorer",
-    icon: "🏆",
     title: { ru: "Открыл Самарканд", uz: "Samarqandni kashf etdi", en: "Discovered Samarkand" },
     progress: (s) => ({
       have: s.visits.filter((v) => v.city === "samarkand").length,
@@ -180,7 +178,6 @@ export const ACHIEVEMENTS: Achievement[] = [
   },
   {
     id: "bukhara-explorer",
-    icon: "🏆",
     title: { ru: "Исследователь Бухары", uz: "Buxoro tadqiqotchisi", en: "Explorer of Bukhara" },
     progress: (s) => ({
       have: s.visits.filter((v) => v.city === "bukhara").length,
@@ -189,7 +186,6 @@ export const ACHIEVEMENTS: Achievement[] = [
   },
   {
     id: "silk-road",
-    icon: "🏆",
     title: { ru: "Шёлковый путь", uz: "Ipak yo'li", en: "The Silk Road" },
     progress: (s) => ({
       have: new Set(s.visits.map((v) => v.city)).size,
@@ -198,13 +194,11 @@ export const ACHIEVEMENTS: Achievement[] = [
   },
   {
     id: "ten-museums",
-    icon: "🏆",
     title: { ru: "10 музеев Узбекистана", uz: "O'zbekistonning 10 muzeyi", en: "10 museums of Uzbekistan" },
     progress: (s) => ({ have: s.visits.length, need: 10 }),
   },
   {
     id: "listener",
-    icon: "🎧",
     title: { ru: "Внимательный слушатель", uz: "Diqqatli tinglovchi", en: "Attentive listener" },
     progress: (s) => ({ have: s.listens.filter((l) => l.completed).length, need: 10 }),
   },

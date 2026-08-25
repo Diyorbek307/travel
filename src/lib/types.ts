@@ -26,22 +26,6 @@ export const CATEGORIES = [
 ] as const;
 export type Category = (typeof CATEGORIES)[number];
 
-/** Эмодзи-метки категорий — используются на карте и в списках. */
-export const CATEGORY_ICON: Record<Category, string> = {
-  landmark: "📍",
-  museum: "🏛",
-  religious: "🕌",
-  nature: "🌄",
-  restaurant: "🍽",
-  cafe: "☕",
-  hotel: "🏨",
-  bazaar: "🛍",
-  craft: "🎁",
-  toilet: "🚻",
-  station: "🚉",
-  airport: "✈️",
-  transport: "🚕",
-};
 
 /** Тематические фильтры карты (п. 9 ТЗ) — надстройка над категориями. */
 export const THEMES = [

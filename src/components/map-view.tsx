@@ -4,7 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import type * as L from "leaflet";
 import { formatDuration, formatPrice } from "@/lib/geo";
 import { t } from "@/lib/i18n";
-import { CATEGORY_ICON, type Lang, type Poi } from "@/lib/types";
+import { iconMarkup } from "@/lib/icon-paths";
+import type { Lang, Poi } from "@/lib/types";
 
 /**
  * Интерактивная карта (п. 9 ТЗ).
@@ -103,9 +104,9 @@ export default function MapView({
       const dimmed = activeSlug && activeSlug !== poi.slug ? " is-dimmed" : "";
       const icon = leaflet.divIcon({
         className: "",
-        html: `<div class="poi-marker${dimmed}">${CATEGORY_ICON[poi.category]}</div>`,
-        iconSize: [32, 32],
-        iconAnchor: [16, 16],
+        html: `<div class="poi-marker${dimmed}">${iconMarkup(poi.category, 18)}</div>`,
+        iconSize: [36, 36],
+        iconAnchor: [18, 18],
       });
 
       const marker = leaflet.marker([poi.lat, poi.lon], { icon, title: poi.name });
@@ -114,8 +115,8 @@ export default function MapView({
 
       marker.bindPopup(
         `<strong>${escapeHtml(poi.name)}</strong><br>` +
-          `<span style="opacity:.7">★ ${poi.rating.toFixed(1)} · ${escapeHtml(price)} · ${escapeHtml(visit)}</span><br>` +
-          `<a href="/poi/${encodeURIComponent(poi.slug)}" style="color:var(--accent)">${t(lang, "read")} →</a>`,
+          `<span style="opacity:.7">${poi.rating.toFixed(1)} · ${escapeHtml(price)} · ${escapeHtml(visit)}</span><br>` +
+          `<a href="/poi/${encodeURIComponent(poi.slug)}" style="color:var(--primary);font-weight:500">${t(lang, "read")} →</a>`,
       );
       marker.on("click", () => onSelectRef.current?.(poi));
       marker.addTo(layer);
@@ -123,7 +124,7 @@ export default function MapView({
 
     if (routeLine && routeLine.length > 1) {
       leaflet
-        .polyline(routeLine, { color: "#158488", weight: 4, opacity: 0.75, dashArray: "6 8" })
+        .polyline(routeLine, { color: "#2e7d5a", weight: 4, opacity: 0.8, dashArray: "6 8" })
         .addTo(layer);
     }
 
@@ -133,7 +134,7 @@ export default function MapView({
           radius: 8,
           color: "#ffffff",
           weight: 3,
-          fillColor: "#1a73e8",
+          fillColor: "#2e7d5a",
           fillOpacity: 1,
         })
         .bindPopup(t(lang, "nearby"))

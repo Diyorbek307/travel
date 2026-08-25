@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useAppState } from "./app-state";
 import { track } from "@/lib/track";
+import Icon from "./icon";
 import type { Lang } from "@/lib/types";
 
 /**
@@ -58,30 +59,31 @@ export default function PoiActions({
           if (!isFavorite) track("favorite_add", { poi_id: poiId, city_id: cityId, lang });
         }}
         aria-pressed={isFavorite}
-        className="rounded-lg px-2 py-2.5 text-sm transition-colors surface"
-        style={{ color: isFavorite ? "var(--accent)" : "var(--text)" }}
+        className="pressable flex min-h-12 items-center justify-center gap-1.5 rounded-[var(--radius-full)] px-2 text-sm card"
+        style={{ color: isFavorite ? "var(--primary-text)" : "var(--text-soft)" }}
       >
-        {isFavorite ? "❤️" : "🤍"}
-        <span className="ml-1.5">Избранное</span>
+        <Icon name="heart" size={18} filled={isFavorite} />
+        <span>Избранное</span>
       </button>
 
       <button
         onClick={() => toggleWantToVisit(slug)}
         aria-pressed={isWanted}
-        className="rounded-lg px-2 py-2.5 text-sm transition-colors surface"
-        style={{ color: isWanted ? "var(--accent)" : "var(--text)" }}
+        className="pressable flex min-h-12 items-center justify-center gap-1.5 rounded-[var(--radius-full)] px-2 text-sm card"
+        style={{ color: isWanted ? "var(--primary-text)" : "var(--text-soft)" }}
       >
-        📍<span className="ml-1.5">{isWanted ? "В планах" : "Хочу"}</span>
+        <Icon name="explore" size={18} filled={isWanted} />
+        <span>{isWanted ? "В планах" : "Хочу"}</span>
       </button>
 
       <button
         onClick={() => !isVisited && addVisit({ slug, city: citySlug, name })}
         disabled={isVisited}
-        className="rounded-lg px-2 py-2.5 text-sm transition-colors surface disabled:opacity-70"
-        style={{ color: isVisited ? "var(--accent)" : "var(--text)" }}
+        className="pressable flex min-h-12 items-center justify-center gap-1.5 rounded-[var(--radius-full)] px-2 text-sm card disabled:opacity-70"
+        style={{ color: isVisited ? "var(--primary-text)" : "var(--text-soft)" }}
       >
-        {isVisited ? "✓" : "🎫"}
-        <span className="ml-1.5">{isVisited ? "Посещено" : "Отметить"}</span>
+        <Icon name="ticket" size={18} filled={isVisited} />
+        <span>{isVisited ? "Посещено" : "Отметить"}</span>
       </button>
     </div>
   );

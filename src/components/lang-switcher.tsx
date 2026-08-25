@@ -14,7 +14,14 @@ const LANG_COOKIE = "uz_lang";
  * Языки вне MVP показаны неактивными — так видно, что архитектура
  * рассчитана на все 10 языков из п. 6 ТЗ, но контент ещё не переведён.
  */
-export default function LangSwitcher({ current }: { current: Lang }) {
+export default function LangSwitcher({
+  current,
+  onDark = false,
+}: {
+  current: Lang;
+  /** На тёмной шапке кнопка должна быть полупрозрачной, а не белой карточкой. */
+  onDark?: boolean;
+}) {
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
   const router = useRouter();
@@ -29,7 +36,12 @@ export default function LangSwitcher({ current }: { current: Lang }) {
     <div className="relative">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm surface"
+        className="pressable flex min-h-11 items-center gap-1.5 rounded-[var(--radius-full)] px-3 text-sm"
+        style={
+          onDark
+            ? { background: "rgb(255 255 255 / 0.16)", color: "inherit" }
+            : { background: "var(--surface)", border: "1px solid var(--border)" }
+        }
         aria-label={LANG_LABEL[current]}
         aria-expanded={open}
         disabled={pending}

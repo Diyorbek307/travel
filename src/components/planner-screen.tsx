@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useAppState } from "./app-state";
+import Icon, { type IconName } from "./icon";
 import { formatDistance, formatDuration, formatPrice } from "@/lib/geo";
 import { t, themeLabel } from "@/lib/i18n";
 import {
@@ -56,10 +57,10 @@ const TIME_OPTIONS = [
   { minutes: 480, label: "1 день" },
 ];
 
-const MODE_OPTIONS: { value: TransportMode; label: string; icon: string }[] = [
-  { value: "walk", label: "Пешком", icon: "🚶" },
-  { value: "taxi", label: "Такси", icon: "🚕" },
-  { value: "car", label: "Машина", icon: "🚗" },
+const MODE_OPTIONS: { value: TransportMode; label: string; icon: IconName }[] = [
+  { value: "walk", label: "Пешком", icon: "explore" },
+  { value: "taxi", label: "Такси", icon: "transport" },
+  { value: "car", label: "Машина", icon: "transport" },
 ];
 
 const BUDGET_OPTIONS: { value: Budget; label: string; hint: string }[] = [
@@ -192,10 +193,10 @@ export default function PlannerScreen({
     <main className="mx-auto max-w-3xl px-4 py-4">
       <div className="mb-4 flex gap-2">
         <TabButton active={tab === "form"} onClick={() => setTab("form")}>
-          🧭 {t(lang, "planner")}
+          <Icon name="sparkle" size={16} className="mr-1 inline align-[-3px]" />{t(lang, "planner")}
         </TabButton>
         <TabButton active={tab === "assistant"} onClick={() => setTab("assistant")}>
-          💬 {t(lang, "assistant")}
+          <Icon name="headphones" size={16} className="mr-1 inline align-[-3px]" />{t(lang, "assistant")}
         </TabButton>
       </div>
 
@@ -255,7 +256,7 @@ export default function PlannerScreen({
             <div className="grid grid-cols-3 gap-2">
               {MODE_OPTIONS.map((opt) => (
                 <Choice key={opt.value} active={mode === opt.value} onClick={() => setMode(opt.value)}>
-                  {opt.icon} {opt.label}
+                  <Icon name={opt.icon} size={16} className="mr-1 inline align-[-3px]" />{opt.label}
                 </Choice>
               ))}
             </div>
@@ -299,7 +300,7 @@ export default function PlannerScreen({
             onClick={generate}
             disabled={loading || !city}
             className="w-full rounded-lg px-4 py-3 font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
-            style={{ background: "var(--accent)" }}
+            style={{ background: "var(--primary)" }}
           >
             {loading ? "Считаю маршрут…" : t(lang, "generate")}
           </button>
@@ -335,7 +336,7 @@ export default function PlannerScreen({
               type="submit"
               disabled={asking || !question.trim()}
               className="mt-2 w-full rounded-lg px-4 py-3 font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
-              style={{ background: "var(--accent)" }}
+              style={{ background: "var(--primary)" }}
             >
               {asking ? "Думаю…" : "Спросить"}
             </button>
@@ -434,7 +435,7 @@ function RouteResult({ route, lang }: { route: PlannedRoute; lang: Lang }) {
             >
               <span
                 className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-sm font-semibold"
-                style={{ background: "var(--accent)", color: "#fff" }}
+                style={{ background: "var(--primary)", color: "var(--on-primary)" }}
               >
                 {i + 1}
               </span>
@@ -509,9 +510,9 @@ function Choice({
       aria-pressed={active}
       className="rounded-lg px-3 py-2 text-sm transition-colors"
       style={{
-        background: active ? "var(--accent)" : "var(--surface)",
+        background: active ? "var(--primary)" : "var(--surface)",
         color: active ? "#fff" : "var(--text)",
-        border: `1px solid ${active ? "var(--accent)" : "var(--border)"}`,
+        border: `1px solid ${active ? "var(--primary)" : "var(--border)"}`,
       }}
     >
       {children}
@@ -533,9 +534,9 @@ function TabButton({
       onClick={onClick}
       className="flex-1 rounded-lg px-3 py-2 text-sm font-medium transition-colors"
       style={{
-        background: active ? "var(--accent)" : "var(--surface)",
+        background: active ? "var(--primary)" : "var(--surface)",
         color: active ? "#fff" : "var(--text)",
-        border: `1px solid ${active ? "var(--accent)" : "var(--border)"}`,
+        border: `1px solid ${active ? "var(--primary)" : "var(--border)"}`,
       }}
     >
       {children}

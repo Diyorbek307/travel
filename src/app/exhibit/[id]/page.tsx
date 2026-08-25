@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import AudioGuide from "@/components/audio-guide";
 import Header from "@/components/header";
+import Icon from "@/components/icon";
 import { getExhibitById, getMuseumPoi } from "@/lib/db";
 import { t } from "@/lib/i18n";
 import { currentLang } from "@/lib/server-lang";
@@ -40,9 +41,9 @@ export default async function ExhibitPage({
         {from === "qr" && (
           <p
             className="mb-4 rounded-lg px-3 py-2 text-sm"
-            style={{ background: "var(--bg-soft)", color: "var(--accent)" }}
+            style={{ background: "var(--bg-soft)", color: "var(--primary-text)" }}
           >
-            📷 Открыто по QR-коду {exhibit.qr_code ? `«${exhibit.qr_code}»` : ""}
+            <Icon name="qr" size={16} className="mr-1 inline align-[-3px]" />Открыто по QR-коду {exhibit.qr_code ? `«${exhibit.qr_code}»` : ""}
           </p>
         )}
 

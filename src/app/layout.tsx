@@ -16,8 +16,7 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#158488" },
-    { media: "(prefers-color-scheme: dark)", color: "#0b1115" },
+    { color: "#2e7d5a" },
   ],
   width: "device-width",
   initialScale: 1,
@@ -27,12 +26,14 @@ export const viewport: Viewport = {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const lang = await currentLang();
 
+  // Порядок важен: центральный пункт приподнят, туда ставим карту —
+  // главный экран платформы.
   const nav = [
-    { href: "/", icon: "🏠", label: t(lang, "cities") },
-    { href: "/map", icon: "🗺", label: t(lang, "map") },
-    { href: "/scan", icon: "📷", label: t(lang, "scan") },
-    { href: "/routes", icon: "🧭", label: t(lang, "routes") },
-    { href: "/profile", icon: "👤", label: t(lang, "profile") },
+    { href: "/", icon: "home" as const, label: t(lang, "cities") },
+    { href: "/routes", icon: "explore" as const, label: t(lang, "routes") },
+    { href: "/map", icon: "map" as const, label: t(lang, "map") },
+    { href: "/scan", icon: "qr" as const, label: t(lang, "scan") },
+    { href: "/profile", icon: "user" as const, label: t(lang, "profile") },
   ];
 
   return (

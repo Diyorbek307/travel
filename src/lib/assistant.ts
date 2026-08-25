@@ -320,7 +320,7 @@ export function ask(req: AssistantRequest): AssistantReply {
       if (top.length === 0) return { intent, message: say(lang, "no_results"), pois: [], parsed };
       const lines = top.map((p) => {
         const open = word(lang, isOpenAt(p.opening_hours, nowMin, day) ? "open_now" : "closed_now");
-        return `• ${p.name} — ★ ${p.rating.toFixed(1)}, ${open}`;
+        return `• ${p.name} — ${p.rating.toFixed(1)}, ${open}`;
       });
       return {
         intent,

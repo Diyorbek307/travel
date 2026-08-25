@@ -1,66 +1,77 @@
 @import "tailwindcss";
 
 /*
- * Палитра взята от изразцов: бирюза Регистана, охра сырцовой глины,
- * тёмно-синий кобальт хивинской майолики.
+ * Палитра «зелёный + песочный»: природа, гармония, гостеприимство.
+ * Значения заданы заказчиком, здесь они превращены в семантические токены —
+ * в компонентах используются только имена ролей, не сырые коды цветов.
  */
 @theme {
-  --color-tile-50: #eefcfb;
-  --color-tile-100: #d3f6f3;
-  --color-tile-200: #abece9;
-  --color-tile-300: #71dcd9;
-  --color-tile-400: #35c2c2;
-  --color-tile-500: #1aa5a8;
-  --color-tile-600: #158488;
-  --color-tile-700: #16696e;
-  --color-tile-800: #175459;
-  --color-tile-900: #17464b;
-  --color-tile-950: #072a2f;
+  --color-brand-50: #eef6f1;
+  --color-brand-100: #d7ebe0;
+  --color-brand-200: #b0d7c3;
+  --color-brand-300: #66b38e;
+  --color-brand-400: #429a72;
+  --color-brand-500: #2e7d5a;
+  --color-brand-600: #256647;
+  --color-brand-700: #1d4f38;
+  --color-brand-800: #163c2b;
+  --color-brand-900: #102b1f;
 
-  --color-clay-50: #fbf7f1;
-  --color-clay-100: #f5ecdd;
-  --color-clay-200: #ead7ba;
-  --color-clay-300: #dcbb8e;
-  --color-clay-400: #cd9a60;
-  --color-clay-500: #c38243;
-  --color-clay-600: #b56b38;
-  --color-clay-700: #975330;
-  --color-clay-800: #7a442e;
-  --color-clay-900: #633a28;
+  --color-sand-100: #faf8f2;
+  --color-sand-200: #f5f1e6;
+  --color-sand-300: #ece4d1;
+  --color-sand-400: #e9c46a;
+  --color-sand-500: #d9ab45;
+  --color-sand-600: #b98c2f;
 
-  --color-ink-50: #f4f6f8;
-  --color-ink-100: #e6eaef;
-  --color-ink-200: #cfd7e0;
-  --color-ink-300: #a9b8c8;
-  --color-ink-400: #7d92ab;
-  --color-ink-500: #5d7591;
-  --color-ink-600: #495e78;
-  --color-ink-700: #3c4d62;
-  --color-ink-800: #354253;
-  --color-ink-900: #303a47;
-  --color-ink-950: #10151d;
+  --color-ink-900: #2b2b2b;
+  --color-ink-600: #5f6360;
+  --color-ink-400: #8b908c;
 }
 
 :root {
-  --bg: #ffffff;
-  --bg-soft: #f6f8f9;
+  /* Роли, а не цвета: если палитра поменяется, правится только этот блок. */
+  --bg: #f5f1e6;
   --surface: #ffffff;
-  --border: #e2e8ec;
-  --text: #10151d;
-  --text-soft: #5d7591;
-  --accent: #158488;
-}
+  --surface-alt: #faf8f2;
+  --border: #e6e0d0;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0b1115;
-    --bg-soft: #121a20;
-    --surface: #151e25;
-    --border: #24313b;
-    --text: #e8eef2;
-    --text-soft: #93a6b5;
-    --accent: #35c2c2;
-  }
+  --text: #2b2b2b;
+  --text-soft: #5f6360;
+  --text-faint: #686d69;
+
+  --primary: #2e7d5a;
+  /* Отдельный оттенок для мелкого текста: сам #2e7d5a на песочном фоне
+     даёт 4.43:1 — чуть ниже нормы 4.5:1 для обычного кегля. Как заливка
+     под белым текстом бренд-цвет остаётся без изменений. */
+  --primary-text: #256647;
+  --primary-soft: #66b38e;
+  --primary-tint: #eef6f1;
+  --on-primary: #ffffff;
+
+  --accent: #e9c46a;
+  /* Золото читаемо как текст только в затемнённом варианте. */
+  --accent-strong: #96701f;
+
+  --danger: #b3261e;
+
+  /* Ритм отступов кратен четырём — так вертикаль не «плывёт». */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+
+  --radius-sm: 0.625rem;
+  --radius-md: 1rem;
+  --radius-lg: 1.5rem;
+  --radius-full: 9999px;
+
+  /* Одна шкала теней на всё приложение, без случайных значений. */
+  --shadow-1: 0 1px 2px rgb(43 43 43 / 0.06);
+  --shadow-2: 0 4px 16px rgb(43 43 43 / 0.08);
+  --shadow-3: 0 10px 30px rgb(43 43 43 / 0.12);
 }
 
 html,
@@ -73,26 +84,102 @@ body {
 body {
   font-family: ui-sans-serif, system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   /* Место под нижнюю навигацию и safe-area на iPhone. */
-  padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));
+  padding-bottom: calc(5.25rem + env(safe-area-inset-bottom));
+  font-size: 16px;
+  line-height: 1.5;
 }
 
-/* Утилиты, привязанные к переменным темы. */
+/* ------------------------------------------------------------------ */
+/* Поверхности                                                        */
+/* ------------------------------------------------------------------ */
+
+/*
+ * Две базовые поверхности. `surface` — плоская панель с рамкой,
+ * `card` — приподнятая карточка со скруглением и тенью. Обе берут цвет
+ * из токенов, поэтому смена палитры не требует правок в компонентах.
+ */
 .surface {
   background: var(--surface);
   border: 1px solid var(--border);
 }
+
+.bg-soft {
+  background: var(--surface-alt);
+}
+
+.card {
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-1);
+}
+
+.card-raised {
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-2);
+}
+
 .soft {
   color: var(--text-soft);
 }
-.bg-soft {
-  background: var(--bg-soft);
+
+.faint {
+  color: var(--text-faint);
 }
 
-/* Карта Leaflet должна занимать всю отведённую высоту. */
+/* Волна под шапкой — мягкая граница вместо прямой линии. */
+.wave-bottom {
+  border-bottom-left-radius: 50% 2.5rem;
+  border-bottom-right-radius: 50% 2.5rem;
+}
+
+/*
+ * Плашка вместо фотографии.
+ *
+ * Настоящих снимков объектов у нас нет: использовать чужие без лицензии
+ * нельзя. Вместо серого прямоугольника — восьмиконечная звезда, мотив
+ * исламской геометрии. Выглядит намеренно, а не как сломанная картинка.
+ */
+.photo-placeholder {
+  background-color: var(--primary-tint);
+  background-image:
+    repeating-linear-gradient(45deg, rgb(46 125 90 / 0.07) 0 8px, transparent 8px 16px),
+    repeating-linear-gradient(-45deg, rgb(233 196 106 / 0.14) 0 8px, transparent 8px 16px);
+  position: relative;
+  overflow: hidden;
+}
+
+/* ------------------------------------------------------------------ */
+/* Интерактив                                                          */
+/* ------------------------------------------------------------------ */
+
+/* Нажатие меняет только прозрачность и масштаб — границы блока не едут,
+   поэтому соседние элементы не дёргаются. */
+.pressable {
+  transition:
+    transform 180ms ease-out,
+    box-shadow 180ms ease-out,
+    background-color 180ms ease-out;
+}
+.pressable:active {
+  transform: scale(0.98);
+}
+
+/* Кольцо фокуса не убираем: без него навигация с клавиатуры слепая. */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ------------------------------------------------------------------ */
+/* Карта                                                               */
+/* ------------------------------------------------------------------ */
+
 .leaflet-container {
   height: 100%;
   width: 100%;
-  background: var(--bg-soft);
+  background: var(--surface-alt);
   font: inherit;
   z-index: 0;
 }
@@ -100,38 +187,41 @@ body {
 .leaflet-popup-tip {
   background: var(--surface);
   color: var(--text);
+  border-radius: var(--radius-sm);
 }
 .leaflet-popup-content {
   margin: 0.75rem 0.9rem;
 }
 
-/* Метка объекта на карте — эмодзи категории в кружке. */
 .poi-marker {
   display: grid;
   place-items: center;
-  width: 2rem;
-  height: 2rem;
-  font-size: 1rem;
+  width: 2.25rem;
+  height: 2.25rem;
   background: var(--surface);
-  border: 2px solid var(--accent);
-  border-radius: 9999px;
-  box-shadow: 0 2px 6px rgb(0 0 0 / 0.25);
+  border: 2px solid var(--primary);
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-2);
+  color: var(--primary);
 }
 .poi-marker.is-dimmed {
   opacity: 0.45;
 }
 
-/* Текст истории объекта: читаемые абзацы и выделения. */
+/* ------------------------------------------------------------------ */
+/* Текст истории объекта                                               */
+/* ------------------------------------------------------------------ */
+
 .story p {
   margin-bottom: 0.9rem;
   line-height: 1.7;
 }
 .story strong {
   font-weight: 600;
-  color: var(--accent);
+  color: var(--primary);
 }
 
-/* Скрыть скроллбар у горизонтальных лент фильтров. */
+/* Горизонтальные ленты фильтров без видимой полосы прокрутки. */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
@@ -140,11 +230,27 @@ body {
   scrollbar-width: none;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .pressable {
+    transition: none;
+  }
+  .pressable:active {
+    transform: none;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 @media print {
   .no-print {
     display: none !important;
   }
   body {
     padding-bottom: 0;
+    background: #fff;
   }
 }

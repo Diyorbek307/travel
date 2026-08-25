@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import Icon from "./icon";
 
 /**
  * Сканер QR-кодов (п. 5 ТЗ).
@@ -81,9 +82,9 @@ export default function QrScanner() {
       <button
         onClick={scanning ? stop : start}
         className="w-full rounded-lg px-4 py-3 font-medium text-white transition-opacity hover:opacity-90"
-        style={{ background: "var(--accent)" }}
+        style={{ background: "var(--primary)" }}
       >
-        {scanning ? "⏹ Остановить" : "📷 Включить камеру"}
+        {scanning ? "Остановить" : <><Icon name="qr" size={18} className="mr-1.5 inline align-[-3px]" />Включить камеру</>}
       </button>
 
       {error && <p className="mt-3 text-sm soft">{error}</p>}

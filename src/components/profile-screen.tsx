@@ -5,7 +5,8 @@ import { useMemo } from "react";
 import { ACHIEVEMENTS, useAppState } from "./app-state";
 import { haversine } from "@/lib/geo";
 import { t } from "@/lib/i18n";
-import { CATEGORY_ICON, type City, type Lang, type Poi } from "@/lib/types";
+import type { City, Lang, Poi } from "@/lib/types";
+import Icon from "./icon";
 
 /**
  * Личный кабинет (п. 12) и туристический паспорт со штампами (п. 13).
@@ -66,7 +67,7 @@ export default function ProfileScreen({
       {/* Туристический паспорт — п. 13 ТЗ */}
       <section className="mb-5">
         <h2 className="mb-2 font-semibold">
-          🛂 {t(lang, "passport")} · {visits.length} {t(lang, "stamps")}
+          <Icon name="ticket" size={18} className="inline align-[-3px]" /> {t(lang, "passport")} · {visits.length} {t(lang, "stamps")}
         </h2>
         <div className="rounded-xl p-4 surface">
           {visits.length === 0 ? (
@@ -85,10 +86,10 @@ export default function ProfileScreen({
                     <li
                       key={visit.slug}
                       className="rounded-lg border-2 border-dashed px-3 py-2"
-                      style={{ borderColor: "var(--accent)" }}
+                      style={{ borderColor: "var(--primary-soft)" }}
                     >
-                      <span className="block text-sm font-medium" style={{ color: "var(--accent)" }}>
-                        ✓ {poi?.name ?? visit.name}
+                      <span className="block text-sm font-medium" style={{ color: "var(--primary-text)" }}>
+                        {poi?.name ?? visit.name}
                       </span>
                       <span className="block text-[0.65rem] soft">
                         {city?.name} · {new Date(visit.ts).toLocaleDateString("ru-RU")}
@@ -102,7 +103,7 @@ export default function ProfileScreen({
       </section>
 
       <section className="mb-5">
-        <h2 className="mb-2 font-semibold">🏆 {t(lang, "achievements")}</h2>
+        <h2 className="mb-2 font-semibold"><Icon name="star" size={18} className="inline align-[-3px]" /> {t(lang, "achievements")}</h2>
         <ul className="grid gap-2">
           {ACHIEVEMENTS.map((a) => {
             const { have, need } = a.progress(state);
@@ -111,7 +112,7 @@ export default function ProfileScreen({
               <li key={a.id} className="rounded-xl p-3 surface">
                 <div className="flex items-center justify-between gap-2">
                   <span className={done ? "" : "opacity-50"}>
-                    {a.icon} {a.title[lang] ?? a.title.en}
+                    {a.title[lang] ?? a.title.en}
                   </span>
                   <span className="shrink-0 text-xs soft">
                     {Math.min(have, need)} / {need}
@@ -122,7 +123,7 @@ export default function ProfileScreen({
                     className="h-full"
                     style={{
                       width: `${Math.min(100, (have / need) * 100)}%`,
-                      background: "var(--accent)",
+                      background: "var(--primary)",
                     }}
                   />
                 </div>
@@ -133,14 +134,16 @@ export default function ProfileScreen({
       </section>
 
       <PoiList
-        title={`❤️ ${t(lang, "favorited")}`}
+        title={t(lang, "favorited")}
+        icon="heart"
         slugs={favorites}
         bySlug={bySlug}
         empty="Здесь появятся объекты, добавленные в избранное."
       />
 
       <PoiList
-        title={`📍 ${t(lang, "want_to_visit")}`}
+        title={t(lang, "want_to_visit")}
+        icon="explore"
         slugs={wantToVisit}
         bySlug={bySlug}
         empty="Отмечайте места, куда планируете попасть."
@@ -148,7 +151,7 @@ export default function ProfileScreen({
 
       {listens.length > 0 && (
         <section className="mb-5">
-          <h2 className="mb-2 font-semibold">🎧 История прослушиваний</h2>
+          <h2 className="mb-2 font-semibold"><Icon name="headphones" size={18} className="inline align-[-3px]" /> История прослушиваний</h2>
           <ul className="grid gap-1 rounded-xl p-3 text-sm surface">
             {[...listens]
               .sort((a, b) => b.ts - a.ts)
@@ -165,10 +168,10 @@ export default function ProfileScreen({
 
       <section className="mb-5 grid gap-2">
         <Link href="/offline" className="rounded-xl p-3 text-sm transition-colors surface hover:bg-soft">
-          ⬇️ {t(lang, "offline")}
+          <Icon name="download" size={18} className="inline align-[-3px]" /> {t(lang, "offline")}
         </Link>
         <Link href="/sos" className="rounded-xl p-3 text-sm transition-colors surface hover:bg-soft">
-          🆘 {t(lang, "sos")}
+          <Icon name="sos" size={18} className="inline align-[-3px]" /> {t(lang, "sos")}
         </Link>
       </section>
 
@@ -192,19 +195,21 @@ export default function ProfileScreen({
 
 function PoiList({
   title,
+  icon,
   slugs,
   bySlug,
   empty,
 }: {
   title: string;
+  icon: "heart" | "explore";
   slugs: string[];
   bySlug: Map<string, Poi>;
   empty: string;
 }) {
   return (
     <section className="mb-5">
-      <h2 className="mb-2 font-semibold">
-        {title} · {slugs.length}
+      <h2 className="mb-2 flex items-center gap-1.5 font-semibold">
+        <Icon name={icon} size={18} /> {title} · {slugs.length}
       </h2>
       {slugs.length === 0 ? (
         <p className="rounded-xl p-3 text-sm surface soft">{empty}</p>
@@ -219,7 +224,7 @@ function PoiList({
                   href={`/poi/${slug}`}
                   className="flex items-center gap-3 rounded-xl p-3 transition-colors surface hover:bg-soft"
                 >
-                  <span className="text-lg">{CATEGORY_ICON[poi.category]}</span>
+                  <span style={{ color: "var(--primary)" }}><Icon name={poi.category} size={20} /></span>
                   <span className="min-w-0 flex-1 truncate">{poi.name}</span>
                 </Link>
               </li>
@@ -234,7 +239,7 @@ function PoiList({
 function Stat({ value, label }: { value: string | number; label: string }) {
   return (
     <div className="rounded-xl p-3 surface">
-      <div className="text-xl font-semibold" style={{ color: "var(--accent)" }}>
+      <div className="text-xl font-semibold" style={{ color: "var(--primary-text)" }}>
         {value}
       </div>
       <div className="text-xs soft">{label}</div>

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Header from "@/components/header";
+import Icon from "@/components/icon";
 import { getCity, listCities, listTours } from "@/lib/db";
 import { formatDuration } from "@/lib/geo";
 import { t } from "@/lib/i18n";
@@ -7,7 +8,7 @@ import { currentLang } from "@/lib/server-lang";
 
 export const dynamic = "force-dynamic";
 
-const MODE_ICON = { walk: "🚶", taxi: "🚕", car: "🚗" } as const;
+const MODE_ICON = { walk: "explore", taxi: "transport", car: "transport" } as const;
 
 /** Готовые маршруты (п. 10 ТЗ), включая межгородские. */
 export default async function RoutesPage({
@@ -52,7 +53,7 @@ export default async function RoutesPage({
               >
                 <div className="flex items-baseline justify-between gap-2">
                   <h2 className="font-semibold">{tour.title}</h2>
-                  <span className="shrink-0 text-lg">{MODE_ICON[tour.mode]}</span>
+                  <span className="shrink-0" style={{ color: "var(--primary-text)" }}><Icon name={MODE_ICON[tour.mode]} size={20} /></span>
                 </div>
                 {tour.description && (
                   <p className="mt-1 text-sm soft">{tour.description}</p>
@@ -71,7 +72,7 @@ export default async function RoutesPage({
           href={activeCity ? `/planner?city=${activeCity.slug}` : "/planner"}
           className="mt-5 block rounded-xl p-4 text-center transition-colors surface hover:bg-soft"
         >
-          <span className="text-2xl">🧭</span>
+          <span style={{ color: "var(--primary-text)" }}><Icon name="sparkle" size={26} /></span>
           <span className="mt-1 block font-medium">Составить свой маршрут</span>
           <span className="block text-xs soft">
             Под ваше время, интересы и бюджет
@@ -96,9 +97,9 @@ function Chip({
       href={href}
       className="shrink-0 whitespace-nowrap rounded-full px-3 py-1.5 text-sm transition-colors"
       style={{
-        background: active ? "var(--accent)" : "var(--surface)",
+        background: active ? "var(--primary)" : "var(--surface)",
         color: active ? "#fff" : "var(--text)",
-        border: `1px solid ${active ? "var(--accent)" : "var(--border)"}`,
+        border: `1px solid ${active ? "var(--primary)" : "var(--border)"}`,
       }}
     >
       {children}

@@ -7,7 +7,8 @@ import PoiCard from "@/components/poi-card";
 import { getCity, listPois, listTours } from "@/lib/db";
 import { categoryLabel, t } from "@/lib/i18n";
 import { currentLang } from "@/lib/server-lang";
-import { CATEGORIES, CATEGORY_ICON, type Category } from "@/lib/types";
+import Icon from "@/components/icon";
+import { CATEGORIES, type Category } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
@@ -48,23 +49,23 @@ export default async function CityPage({
         <div className="mb-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
           <Link
             href={`/map?city=${city.slug}`}
-            className="rounded-xl p-3 text-center transition-colors surface hover:bg-soft"
+            className="pressable grid place-items-center gap-1 p-3 text-center card"
           >
-            <div className="text-xl">🗺</div>
+            <span style={{ color: "var(--primary-text)" }}><Icon name="map" size={24} /></span>
             <div className="mt-1 text-sm">{t(lang, "map")}</div>
           </Link>
           <Link
             href={`/planner?city=${city.slug}`}
-            className="rounded-xl p-3 text-center transition-colors surface hover:bg-soft"
+            className="pressable grid place-items-center gap-1 p-3 text-center card"
           >
-            <div className="text-xl">🧭</div>
+            <span style={{ color: "var(--primary-text)" }}><Icon name="sparkle" size={24} /></span>
             <div className="mt-1 text-sm">{t(lang, "build_route")}</div>
           </Link>
           <Link
             href={`/routes?city=${city.slug}`}
-            className="rounded-xl p-3 text-center transition-colors surface hover:bg-soft"
+            className="pressable grid place-items-center gap-1 p-3 text-center card"
           >
-            <div className="text-xl">📋</div>
+            <span style={{ color: "var(--primary-text)" }}><Icon name="explore" size={24} /></span>
             <div className="mt-1 text-sm">{t(lang, "ready_routes")}</div>
           </Link>
           <OfflineButton citySlug={city.slug} cityName={city.name} lang={lang} />
@@ -102,7 +103,7 @@ export default async function CityPage({
               href={`/city/${city.slug}?category=${c}`}
               active={active === c}
             >
-              {CATEGORY_ICON[c]} {categoryLabel(lang, c)}
+              <Icon name={c} size={16} className="inline align-[-3px]" /> {categoryLabel(lang, c)}
             </FilterChip>
           ))}
         </nav>
@@ -135,9 +136,9 @@ function FilterChip({
       href={href}
       className="shrink-0 whitespace-nowrap rounded-full px-3 py-1.5 text-sm transition-colors"
       style={{
-        background: active ? "var(--accent)" : "var(--surface)",
+        background: active ? "var(--primary)" : "var(--surface)",
         color: active ? "#fff" : "var(--text)",
-        border: `1px solid ${active ? "var(--accent)" : "var(--border)"}`,
+        border: `1px solid ${active ? "var(--primary)" : "var(--border)"}`,
       }}
     >
       {children}

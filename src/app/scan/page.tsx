@@ -48,7 +48,7 @@ export default async function ScanPage({
                   href={`/s/${c.code}`}
                   className="block truncate rounded-lg px-3 py-2 text-sm transition-colors surface hover:bg-soft"
                 >
-                  <span className="font-mono" style={{ color: "var(--accent)" }}>
+                  <span className="font-mono" style={{ color: "var(--primary-text)" }}>
                     {String(c.code)}
                   </span>
                   <span className="block truncate text-xs soft">{String(c.target_name)}</span>

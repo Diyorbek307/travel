@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { Table, Td, Tr } from "@/components/admin/fields";
 import { listCitiesAdmin, listPoisAdmin } from "@/lib/admin-db";
-import { CATEGORY_ICON, type Category } from "@/lib/types";
+import Icon from "@/components/icon";
+import type { Category } from "@/lib/types";
 import { removePoi, togglePoi } from "../actions";
 
 export const dynamic = "force-dynamic";
@@ -53,7 +54,7 @@ export default async function AdminPoisPage({
             </Td>
             <Td className="text-xs">{String(p.city_slug)}</Td>
             <Td>
-              {CATEGORY_ICON[String(p.category) as Category]}{" "}
+              <Icon name={String(p.category) as Category} size={16} className="inline" />{" "}
               <span className="text-xs soft">{String(p.category)}</span>
             </Td>
             <Td className="whitespace-nowrap text-xs">
