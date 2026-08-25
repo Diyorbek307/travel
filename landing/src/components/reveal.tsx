@@ -15,14 +15,14 @@ export default function Reveal({
   children,
   delay = 0,
   className = "",
-  as: Tag = "div",
 }: {
   children: React.ReactNode;
   delay?: number;
   className?: string;
-  as?: "div" | "section" | "li" | "span";
 }) {
-  const ref = useRef<HTMLElement>(null);
+  // Всегда div: полиморфный тег требовал бы объединения типов ссылок
+  // на разные элементы, а выигрыш в разметке этого не стоит.
+  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const el = ref.current;
@@ -57,11 +57,8 @@ export default function Reveal({
   }, [delay]);
 
   return (
-    <Tag
-      ref={ref as React.RefObject<HTMLDivElement>}
-      className={`reveal ${className}`}
-    >
+    <div ref={ref} className={`reveal ${className}`}>
       {children}
-    </Tag>
+    </div>
   );
 }

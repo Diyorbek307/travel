@@ -74,7 +74,7 @@ export default function HeroScene() {
       dpr={[1, 2]}
       camera={{ position: [0, 1.1, 5.2], fov: 42 }}
       gl={{ antialias: true, alpha: true }}
-      style={{ position: "absolute", inset: 0 }}
+      style={{ width: "100%", height: "100%", display: "block" }}
     >
       <fog attach="fog" args={["#04080b", 6, 16]} />
 
