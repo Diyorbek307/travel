@@ -76,7 +76,7 @@ export default function ExploreScreen({
         className="rise-in relative mb-4 overflow-hidden rounded-[var(--radius-lg)] px-5 py-5"
         style={{
           background:
-            "linear-gradient(135deg, var(--primary-tint) 0%, var(--surface-alt) 55%, #f4ead2 100%)",
+            "linear-gradient(135deg, var(--primary-tint) 0%, var(--surface-alt) 55%, #dfeaf2 100%)",
           border: "1px solid var(--border)",
         }}
       >
@@ -119,7 +119,7 @@ export default function ExploreScreen({
         style={{
           animationDelay: "80ms",
           background:
-            "radial-gradient(ellipse at 50% 20%, #fbf7ec 0%, #eee7d5 60%, #e0d7c0 100%)",
+            "radial-gradient(ellipse at 50% 20%, #f7fbfd 0%, #e6eff5 60%, #d6e4ed 100%)",
           border: "1px solid var(--border)",
           boxShadow: "var(--shadow-2)",
         }}

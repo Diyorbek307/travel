@@ -6,16 +6,19 @@
  * в компонентах используются только имена ролей, не сырые коды цветов.
  */
 @theme {
-  --color-brand-50: #eef6f1;
-  --color-brand-100: #d7ebe0;
-  --color-brand-200: #b0d7c3;
-  --color-brand-300: #66b38e;
-  --color-brand-400: #429a72;
-  --color-brand-500: #2e7d5a;
-  --color-brand-600: #256647;
-  --color-brand-700: #1d4f38;
-  --color-brand-800: #163c2b;
-  --color-brand-900: #102b1f;
+  /* Палитра переведена в сине-петролевую: первый экран открывается небом
+     над памятником, и зелёный интерфейс с ним спорил. Золото сохранено —
+     с синим оно работает так же, как с зелёным. */
+  --color-brand-50: #eaf3f8;
+  --color-brand-100: #d3e6ef;
+  --color-brand-200: #a9cfde;
+  --color-brand-300: #7cb6ce;
+  --color-brand-400: #3f8dac;
+  --color-brand-500: #1f6f8b;
+  --color-brand-600: #175a73;
+  --color-brand-700: #12475b;
+  --color-brand-800: #0f3746;
+  --color-brand-900: #0b2836;
 
   --color-sand-100: #faf8f2;
   --color-sand-200: #f5f1e6;
@@ -34,24 +37,24 @@
   /* Фон — очень светлый оттенок бренд-зелёного, а не песок. Песочный
      остался акцентом (золото), но полотно страницы теперь мятное:
      на нём белые карточки и фотографии читаются свежее. */
-  --bg: #e3efe4;
+  --bg: #e4edf3;
   --surface: #ffffff;
-  --surface-alt: #f4f9f4;
-  --border: #d5e4d7;
-  /* Тёмная зелень для плавающей навигации и заливок «наоборот». */
-  --ink-deep: #16281e;
+  --surface-alt: #f3f8fb;
+  --border: #d2e0e9;
+  /* Тёмная синь для плавающей навигации и заливок «наоборот». */
+  --ink-deep: #10222c;
 
-  --text: #2b2b2b;
-  --text-soft: #5f6360;
-  --text-faint: #686d69;
+  --text: #16222b;
+  --text-soft: #4b5b66;
+  --text-faint: #5d6d78;
 
-  --primary: #2e7d5a;
-  /* Отдельный оттенок для мелкого текста: сам #2e7d5a на песочном фоне
-     даёт 4.43:1 — чуть ниже нормы 4.5:1 для обычного кегля. Как заливка
-     под белым текстом бренд-цвет остаётся без изменений. */
-  --primary-text: #256647;
-  --primary-soft: #66b38e;
-  --primary-tint: #eef6f1;
+  --primary: #1f6f8b;
+  /* Отдельный оттенок для мелкого текста: 6.45:1 на фоне и 7.65:1 на
+     карточке. Сам бренд-цвет остаётся заливкой под белым текстом — там
+     5.67:1, чего достаточно. */
+  --primary-text: #175a73;
+  --primary-soft: #7cb6ce;
+  --primary-tint: #e8f2f7;
   --on-primary: #ffffff;
 
   --accent: #e9c46a;
@@ -150,7 +153,7 @@ body {
 .photo-placeholder {
   background-color: var(--primary-tint);
   background-image:
-    repeating-linear-gradient(45deg, rgb(46 125 90 / 0.07) 0 8px, transparent 8px 16px),
+    repeating-linear-gradient(45deg, rgb(31 111 139 / 0.08) 0 8px, transparent 8px 16px),
     repeating-linear-gradient(-45deg, rgb(233 196 106 / 0.14) 0 8px, transparent 8px 16px);
   position: relative;
   overflow: hidden;
@@ -280,7 +283,7 @@ body {
   padding-bottom: 46%;
   left: 6%;
   top: 4%;
-  background: radial-gradient(circle, rgb(102 179 142 / 0.5), transparent 70%);
+  background: radial-gradient(circle, rgb(124 182 206 / 0.55), transparent 70%);
   animation: aurora-a 19s ease-in-out infinite alternate;
 }
 .aurora::after {
@@ -307,7 +310,7 @@ body {
   inset: 0;
   pointer-events: none;
   background-image:
-    repeating-linear-gradient(45deg, rgb(46 125 90 / 0.05) 0 10px, transparent 10px 20px),
+    repeating-linear-gradient(45deg, rgb(31 111 139 / 0.06) 0 10px, transparent 10px 20px),
     repeating-linear-gradient(-45deg, rgb(233 196 106 / 0.07) 0 10px, transparent 10px 20px);
   animation: ornament-drift 44s linear infinite;
 }

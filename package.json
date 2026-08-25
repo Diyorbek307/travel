@@ -12,6 +12,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.120.0",
     "@react-three/fiber": "^9.7.0",
     "html5-qrcode": "^2.3.8",
     "leaflet": "^1.9.4",

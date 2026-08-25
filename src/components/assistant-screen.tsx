@@ -89,10 +89,19 @@ export default function AssistantScreen({
     setBusy(true);
 
     try {
+      // Историю шлём на сервер: без неё «а сколько это стоит?» после
+      // рассказа о Регистане не к чему привязать.
+      const history = turns
+        .filter((turn) => turn.text)
+        .map((turn) => ({
+          role: turn.role === "user" ? ("user" as const) : ("assistant" as const),
+          content: turn.text,
+        }));
+
       const response = await fetch("/api/assistant", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ text: asked, lang, ...(position ?? {}) }),
+        body: JSON.stringify({ text: asked, lang, history, ...(position ?? {}) }),
       });
       const reply = (await response.json()) as AssistantReply;
       setTurns((prev) => [...prev, { role: "bot", text: reply.message, reply }]);
@@ -113,7 +122,7 @@ export default function AssistantScreen({
           className="rise-in relative mt-3 overflow-hidden rounded-[var(--radius-lg)] px-5 py-6"
           style={{
             background:
-              "linear-gradient(135deg, var(--primary-tint) 0%, var(--surface-alt) 55%, #f4ead2 100%)",
+              "linear-gradient(135deg, var(--primary-tint) 0%, var(--surface-alt) 55%, #dfeaf2 100%)",
             border: "1px solid var(--border)",
           }}
         >
