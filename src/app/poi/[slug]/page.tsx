@@ -4,6 +4,7 @@ import AudioGuide from "@/components/audio-guide";
 import Header from "@/components/header";
 import PoiActions from "@/components/poi-actions";
 import PoiMap from "@/components/poi-map";
+import PoiPhoto from "@/components/poi-photo";
 import { getCity, getMuseumByPoi, getPoi, getPoiMedia, listExhibits } from "@/lib/db";
 import { formatPrice, todayHours } from "@/lib/geo";
 import { categoryLabel, t, themeLabel } from "@/lib/i18n";
@@ -45,6 +46,50 @@ export default async function PoiPage({
       />
 
       <main className="mx-auto max-w-3xl px-4 py-4">
+        {/* Снимок во весь кадр: объект должен быть виден раньше, чем прочитан.
+            Подпись автора обязательна — фотография чужая, и указание автора
+            и лицензии есть условие, на котором её разрешено показывать. */}
+        {poi.cover && (
+          <section className="relative -mx-4 mb-4 h-64 overflow-hidden sm:mx-0 sm:rounded-[var(--radius-lg)]">
+            <PoiPhoto poi={poi} priority sizes="(max-width: 768px) 100vw, 768px" />
+            <div
+              aria-hidden
+              className="absolute inset-0"
+              style={{
+                background:
+                  "linear-gradient(to top, rgba(18,24,20,0.9) 0%, rgba(18,24,20,0.35) 48%, rgba(18,24,20,0) 100%)",
+              }}
+            />
+
+            <div className="absolute inset-x-0 bottom-0 p-5 text-white">
+              <p className="text-[11px] uppercase tracking-[0.16em] opacity-80">
+                {categoryLabel(lang, poi.category)}
+              </p>
+              <h1 className="mt-1 text-2xl font-semibold leading-tight">{poi.name}</h1>
+              <p className="mt-1.5 flex flex-wrap items-center gap-x-3 text-sm opacity-90">
+                <span className="inline-flex items-center gap-1">
+                  <Icon name="star" size={14} filled />
+                  {poi.rating.toFixed(1)}
+                </span>
+                <span className="inline-flex items-center gap-1">
+                  <Icon name="clock" size={13} />
+                  {poi.avg_visit_min} {t(lang, "minutes")}
+                </span>
+                <span>{formatPrice(poi.price_uzs, lang)}</span>
+              </p>
+            </div>
+
+            {media[0]?.author && (
+              <p
+                className="absolute right-2 top-2 max-w-[62%] truncate rounded-full px-2 py-0.5 text-[10px] text-white"
+                style={{ background: "rgba(18,24,20,0.45)", backdropFilter: "blur(4px)" }}
+              >
+                {t(lang, "photo_by")}: {media[0].author} · {media[0].license}
+              </p>
+            )}
+          </section>
+        )}
+
         {from === "qr" && (
           <p
             className="mb-4 rounded-lg px-3 py-2 text-sm"
@@ -55,7 +100,11 @@ export default async function PoiPage({
         )}
 
         <div className="mb-4 flex items-start gap-3">
-          <span style={{ color: "var(--primary)" }}><Icon name={poi.category} size={40} /></span>
+          {!poi.cover && (
+            <span style={{ color: "var(--primary)" }}>
+              <Icon name={poi.category} size={40} />
+            </span>
+          )}
           <div className="min-w-0 flex-1">
             {poi.short_desc && <p className="text-sm">{poi.short_desc}</p>}
             <div className="mt-2 flex flex-wrap gap-1.5">

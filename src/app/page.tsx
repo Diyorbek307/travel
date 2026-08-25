@@ -12,7 +12,8 @@ export const dynamic = "force-dynamic";
 const QUICK: { href: string; icon: IconName; key: string }[] = [
   { href: "/map", icon: "landmark", key: "landmarks_short" },
   { href: "/explore", icon: "explore", key: "explore_short" },
-  { href: "/planner", icon: "sparkle", key: "planner" },
+  { href: "/assistant", icon: "sparkle", key: "assistant_title" },
+  { href: "/planner", icon: "explore", key: "planner" },
   { href: "/scan", icon: "qr", key: "scan" },
   { href: "/sos", icon: "sos", key: "sos_short" },
 ];

@@ -12,7 +12,6 @@ import {
   SHEET_H,
   SHEET_THICKNESS,
   SHEET_W,
-  SHORT_NAME,
   SILK_ROAD,
   UZ_WATER,
   atlasTexture,
@@ -22,6 +21,7 @@ import {
   shade,
   world,
 } from "@/lib/map-atlas";
+import { SHORT_NAME } from "@/lib/city-names";
 import { objectsCount, t } from "@/lib/i18n";
 import type { City, Lang } from "@/lib/types";
 

@@ -1,4 +1,5 @@
 import { getCity, listCities, listPois } from "./db";
+import { findCity } from "./city-names";
 import {
   formatDistance,
   formatDuration,
@@ -131,14 +132,11 @@ function parseBudget(text: string): Budget {
 
 /** Находит упомянутый город по названию на любом из языков или по slug. */
 function parseCity(text: string, lang: Lang): string | undefined {
-  const s = text.toLowerCase();
+  // Ищем на всех трёх языках: турист может писать по-русски, а интерфейс
+  // держать английским, и наоборот.
   for (const l of ["ru", "uz", "en"] as Lang[]) {
-    for (const c of listCities(l)) {
-      const name = c.name.toLowerCase();
-      // Отсекаем окончания: «в Бухаре» → «бухар»
-      const stem = name.length > 5 ? name.slice(0, name.length - 1) : name;
-      if (s.includes(stem) || s.includes(c.slug)) return c.slug;
-    }
+    const found = findCity(text, listCities(l));
+    if (found) return found;
   }
   void lang;
   return undefined;
@@ -194,6 +192,7 @@ const SAY: Partial<Record<Lang, Record<string, string>>> = {
     no_results: "По этому запросу ничего не нашлось. Попробуйте выбрать другой город или тему.",
     route_head: "Собрал для вас маршрут:",
     route_fail: "Не получилось составить маршрут: слишком мало времени или все подходящие объекты закрыты.",
+    route_morning: "Сейчас всё закрыто, поэтому маршрут составлен на завтрашнее утро, с 9:00.",
     food_head: "Где можно поесть:",
     free_head: "Эти места можно посетить бесплатно:",
     evening_head: "Вечером стоит посмотреть:",
@@ -216,6 +215,7 @@ const SAY: Partial<Record<Lang, Record<string, string>>> = {
     no_results: "Bu so'rov bo'yicha hech narsa topilmadi. Boshqa shahar yoki mavzuni tanlang.",
     route_head: "Sizga marshrut tuzdim:",
     route_fail: "Marshrut tuzilmadi: vaqt juda kam yoki mos obyektlar yopiq.",
+    route_morning: "Hozir hammasi yopiq, shuning uchun marshrut ertangi ertalabga, soat 9:00 dan tuzildi.",
     food_head: "Qayerda ovqatlanish mumkin:",
     free_head: "Bu joylarga bepul kirish mumkin:",
     evening_head: "Kechqurun ko'rishga arziydi:",
@@ -238,6 +238,7 @@ const SAY: Partial<Record<Lang, Record<string, string>>> = {
     no_results: "Nothing matched that. Try another city or topic.",
     route_head: "Here is your route:",
     route_fail: "Could not build a route: too little time, or all matching sites are closed.",
+    route_morning: "Everything is closed right now, so the route is planned for tomorrow morning, from 9:00.",
     food_head: "Places to eat:",
     free_head: "These places are free to visit:",
     evening_head: "Worth seeing in the evening:",
@@ -398,18 +399,43 @@ export function ask(req: AssistantRequest): AssistantReply {
           parsed,
         };
       }
-      const route = planRoute({
-        city,
-        minutes: minutes ?? 240,
-        themes,
-        budget,
-        mode,
-        lang,
-        startLat: req.lat,
-        startLon: req.lon,
-        includeMeals: themes.includes("food"),
-      });
-      if (!route) {
+      const plan = (startAtMin?: number) =>
+        planRoute({
+          city,
+          minutes: minutes ?? 240,
+          themes,
+          budget,
+          mode,
+          lang,
+          startLat: req.lat,
+          startLon: req.lon,
+          includeMeals: themes.includes("food"),
+          startAtMin,
+        });
+
+      /**
+       * Вечером и ночью открытых объектов нет, и планировщик честно
+       * возвращает пустоту. Туристу от этого никакой пользы: спрашивая
+       * маршрут в одиннадцать вечера, он планирует завтрашний день.
+       * Поэтому пробуем ещё раз с утра и говорим, что маршрут на утро.
+       */
+      const MORNING_START = 9 * 60;
+      const nowRoute = plan();
+      let route = nowRoute;
+      let forMorning = false;
+
+      // Сравниваем с утренним вариантом, а не только спасаем пустой ответ:
+      // вечером маршрут выходит не пустым, а куцым — одна открытая точка
+      // из десяти, и это читается как бедная база, а не как позднее время.
+      if (!nowRoute || nowRoute.stops.length < 3) {
+        const morning = plan(MORNING_START);
+        if (morning && morning.stops.length > (nowRoute?.stops.length ?? 0)) {
+          route = morning;
+          forMorning = true;
+        }
+      }
+
+      if (!route || route.stops.length === 0) {
         return { intent: "plan_route", message: say(lang, "route_fail"), pois: [], parsed };
       }
       const lines = route.stops.map((s, i) => {
@@ -432,7 +458,9 @@ export function ask(req: AssistantRequest): AssistantReply {
       return {
         intent: "plan_route",
         message:
-          `${say(lang, "route_head")}\n\n${lines.join("\n")}\n\n${route.summary}` + closedNote,
+          (forMorning ? `${say(lang, "route_morning")}\n\n` : "") +
+          `${say(lang, "route_head")}\n\n${lines.join("\n")}\n\n${route.summary}` +
+          closedNote,
         pois: route.stops.map((s) => s.poi),
         route,
         parsed,

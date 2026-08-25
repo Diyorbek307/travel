@@ -2,6 +2,7 @@ import * as THREE from "three";
 import regions from "@/data/uzbekistan-regions.json";
 import water from "@/data/uzbekistan-water.json";
 import context from "@/data/region-context.json";
+import { SHORT_NAME } from "./city-names";
 import { RAMP } from "./map-palette";
 import type { Lang } from "./types";
 
@@ -173,29 +174,6 @@ export const SILK_ROAD: string[][] = [
   ["termez", "shakhrisabz", "samarkand"],
 ];
 
-/**
- * Короткие имена для карты.
- *
- * В базе города названы описательно — «Нукус и Каракалпакстан», «Джизак
- * и Заминские горы»: так они читаются в списке. На карте нужен топоним,
- * иначе три города Ферганской долины сливаются в кашу из плашек.
- */
-export const SHORT_NAME: Record<string, Partial<Record<Lang, string>>> = {
-  nukus: { ru: "Нукус", uz: "Nukus", en: "Nukus" },
-  khiva: { ru: "Хива", uz: "Xiva", en: "Khiva" },
-  bukhara: { ru: "Бухара", uz: "Buxoro", en: "Bukhara" },
-  navoi: { ru: "Навои", uz: "Navoiy", en: "Navoi" },
-  samarkand: { ru: "Самарканд", uz: "Samarqand", en: "Samarkand" },
-  shakhrisabz: { ru: "Шахрисабз", uz: "Shahrisabz", en: "Shakhrisabz" },
-  karshi: { ru: "Карши", uz: "Qarshi", en: "Karshi" },
-  termez: { ru: "Термез", uz: "Termiz", en: "Termez" },
-  jizzakh: { ru: "Джизак", uz: "Jizzax", en: "Jizzakh" },
-  gulistan: { ru: "Гулистан", uz: "Guliston", en: "Gulistan" },
-  tashkent: { ru: "Ташкент", uz: "Toshkent", en: "Tashkent" },
-  fergana: { ru: "Фергана", uz: "Farg'ona", en: "Fergana" },
-  namangan: { ru: "Наманган", uz: "Namangan", en: "Namangan" },
-  andijan: { ru: "Андижан", uz: "Andijon", en: "Andijan" },
-};
 
 /* ─────────────────────────── Подписи воды ─────────────────────────── */
 
