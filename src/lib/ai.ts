@@ -292,7 +292,15 @@ const LANGUAGE_NAME: Partial<Record<Lang, string>> = {
   en: "английском",
 };
 
-function systemPrompt(lang: Lang, hint: { city?: string; hasPosition: boolean }): string {
+/**
+ * Постоянная часть подсказки.
+ *
+ * Вынесена отдельно ради кеширования: за неё и за описания инструментов
+ * платится в десять раз меньше, если байты не меняются между запросами.
+ * Всё, что зависит от конкретного вопроса, живёт в contextSystem и в кеш
+ * не попадает — иначе любая мелочь обесценивала бы весь префикс.
+ */
+function stableSystem(lang: Lang): string {
   return [
     "Ты — помощник туристической платформы Узбекистана. Помогаешь туристу спланировать поездку.",
     "",
@@ -308,6 +316,14 @@ function systemPrompt(lang: Lang, hint: { city?: string; hasPosition: boolean })
     "Коротко: два–четыре предложения плюс список, если он уместен. Без вводных вроде «конечно».",
     "Не повторяй в тексте всё, что и так видно в карточках мест под ответом — назови главное.",
     "",
+  ]
+    .filter(Boolean)
+    .join("\n");
+}
+
+/** Переменная часть: зависит от вопроса и потому не кешируется. */
+function contextSystem(hint: { city?: string; hasPosition: boolean }): string {
+  return [
     hint.city ? `Турист сейчас смотрит город: ${hint.city}.` : "",
     hint.hasPosition
       ? "Координаты туриста известны — «что рядом» считается от них."
@@ -315,6 +331,27 @@ function systemPrompt(lang: Lang, hint: { city?: string; hasPosition: boolean })
   ]
     .filter(Boolean)
     .join("\n");
+}
+
+/**
+ * Системная часть запроса двумя блоками.
+ *
+ * Порядок в запросе — инструменты, затем система, затем переписка. Отметка
+ * кеша стоит в конце постоянного блока, поэтому под неё попадают и описания
+ * инструментов, и неизменные правила: около двух с половиной тысяч токенов,
+ * которые иначе оплачивались бы заново на каждом обращении к модели, а их
+ * два-три на один вопрос.
+ */
+function systemBlocks(lang: Lang, hint: { city?: string; hasPosition: boolean }) {
+  const context = contextSystem(hint);
+  return [
+    {
+      type: "text" as const,
+      text: stableSystem(lang),
+      cache_control: { type: "ephemeral" as const },
+    },
+    ...(context ? [{ type: "text" as const, text: context }] : []),
+  ];
 }
 
 export interface AiResult {
@@ -349,7 +386,7 @@ export async function askAi(
     // Ответы туристу простые, а задержка в чате заметна: глубокое
     // рассуждение здесь стоило бы секунд и денег без выигрыша в качестве.
     output_config: { effort: "low" },
-    system: systemPrompt(lang, { city, hasPosition: hint.lat != null }),
+    system: systemBlocks(lang, { city, hasPosition: hint.lat != null }),
     tools,
     messages: [
       ...history.map((turn) => ({ role: turn.role, content: turn.content })),
@@ -411,7 +448,7 @@ export async function askAiStream(
     model: MODEL,
     max_tokens: MAX_TOKENS,
     output_config: { effort: "low" },
-    system: systemPrompt(lang, { city, hasPosition: hint.lat != null }),
+    system: systemBlocks(lang, { city, hasPosition: hint.lat != null }),
     tools,
     messages: [
       ...history.map((turn) => ({ role: turn.role, content: turn.content })),

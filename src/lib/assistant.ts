@@ -93,15 +93,30 @@ const BUDGET_KEYWORDS: Record<Budget, string[]> = {
 export function parseMinutes(text: string): number | undefined {
   const s = text.toLowerCase();
 
-  const dayMatch = /(\d+)\s*(дн|дня|дней|день|kun|day)/.exec(s);
+  /*
+   * Границы слова заданы просмотром по буквам, а не \b.
+   *
+   * В JavaScript \b опирается на латиницу: между «т» и концом строки
+   * границы нет, поэтому «90 минут», «на день» и «полдня» не распознавались
+   * вовсе. Часы работали лишь потому, что там \b не стояло. Нашли тесты.
+   *
+   * Порядок в переборе — от длинного к короткому: иначе «minute» откусывает
+   * начало «minutes», упирается в «s», и всё выражение срывается.
+   */
+  const dayMatch = /(\d+)\s*(дней|дня|день|дн|kun|days|day)(?![\p{L}])/u.exec(s);
   if (dayMatch) return Math.min(7, Number(dayMatch[1])) * 8 * 60;
-  if (/\b(на день|весь день|butun kun|full day|all day)\b/.test(s)) return 8 * 60;
-  if (/\b(полдня|yarim kun|half day)\b/.test(s)) return 4 * 60;
 
-  const hourMatch = /(\d+)\s*(час|часа|часов|соат|soat|hour|hours|h\b)/.exec(s);
+  if (/(?:^|[^\p{L}])(на день|весь день|butun kun|full day|all day)(?![\p{L}])/u.test(s)) {
+    return 8 * 60;
+  }
+  if (/(?:^|[^\p{L}])(полдня|yarim kun|half day)(?![\p{L}])/u.test(s)) {
+    return 4 * 60;
+  }
+
+  const hourMatch = /(\d+)\s*(часов|часа|час|соат|soat|hours|hour|h)(?![\p{L}])/u.exec(s);
   if (hourMatch) return Math.min(12, Number(hourMatch[1])) * 60;
 
-  const minMatch = /(\d+)\s*(минут|мин|daqiqa|daq|minute|min)\b/.exec(s);
+  const minMatch = /(\d+)\s*(минут|мин|daqiqa|daq|minutes|minute|min)(?![\p{L}])/u.exec(s);
   if (minMatch) return Math.min(720, Number(minMatch[1]));
 
   return undefined;
