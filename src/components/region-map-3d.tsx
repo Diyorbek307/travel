@@ -16,14 +16,16 @@ import {
   UZ_WATER,
   atlasTexture,
   wallTexture,
+  RELIEF,
+  RELIEF_BOX,
+  RELIEF_LIFT,
+  RELIEF_SIZE,
   inRing,
   labelTexture,
   project,
-  shade,
   world,
 } from "@/lib/map-atlas";
 import { SHORT_NAME } from "@/lib/city-names";
-import { RAMP_CSS } from "@/lib/map-palette";
 import { objectsCount, t } from "@/lib/i18n";
 import type { City, Lang } from "@/lib/types";
 
@@ -43,15 +45,14 @@ import type { City, Lang } from "@/lib/types";
  */
 
 /**
- * Толщина плит.
+ * Толщина плиты — одна на все области.
  *
- * Раньше разброс доходил до 1,55 единицы, и тёмные торцы превращались в
- * чёрные скалы: объём перекрывал саму карту. В макете это тонкая кромка,
- * поэтому и высоты сжаты — разница между областями остаётся читаемой,
- * но перестаёт быть главным, что видно на экране.
+ * Раньше высота несла число объектов. Теперь поверх плит лежит настоящий
+ * рельеф сплошной поверхностью, и разные высоты порвали бы её на ступени.
+ * Данные о наполнении переехали на булавки городов, а высота стала тем,
+ * чем и должна быть на карте, — географией.
  */
-const MIN_HEIGHT = 0.26;
-const MAX_RISE = 0.5;
+const PLATE_HEIGHT = 0.3;
 
 /* ─────────────────────────── Управление ─────────────────────────── */
 
@@ -76,7 +77,7 @@ function Controls() {
     controls.minDistance = 9;
     controls.maxDistance = 42;
     // Под карту заглядывать незачем, а почти отвесный вид ломает подписи.
-    controls.minPolarAngle = 0.25;
+    controls.minPolarAngle = 0.2;
     controls.maxPolarAngle = Math.PI / 2.12;
     controls.screenSpacePanning = false;
     controls.autoRotate = true;
@@ -136,24 +137,16 @@ function MapBoard({ lang }: { lang: Lang }) {
 
 /* ─────────────────────────── Регионы ─────────────────────────── */
 
-function RegionMesh({
-  region,
-  height,
-  ratio,
-  active,
-  onHover,
-  onSelect,
-}: {
-  region: (typeof REGIONS)[number];
-  height: number;
-  ratio: number;
-  active: boolean;
-  onHover: (city: string | null) => void;
-  onSelect: (city: string) => void;
-}) {
-  const group = useRef<THREE.Group>(null);
-
-  const { solid, outline } = useMemo(() => {
+/**
+ * Плита области.
+ *
+ * Даёт силуэту толщину и тёмный торец с тёплым низом — то, что в макете
+ * читается как предмет на столе. Верх плиты почти не виден: поверх лежит
+ * рельеф. Взаимодействия у плиты нет, и это осознанно — рельеф перекрыл бы
+ * её собой, а нажимать по невидимому нельзя. Городами управляют булавки.
+ */
+function RegionMesh({ region }: { region: (typeof REGIONS)[number] }) {
+  const solid = useMemo(() => {
     /*
      * Плиты стоят с зазором, как в макете: каждая ужимается к собственному
      * центру на процент с небольшим. Без этого области смыкаются вплотную,
@@ -164,54 +157,34 @@ function RegionMesh({
     const cx = flat.reduce((sum, p) => sum + p[0], 0) / flat.length;
     const cy = flat.reduce((sum, p) => sum + p[1], 0) / flat.length;
     const GAP = 0.986;
-    const points = flat.map(([x, y]) => [
-      cx + (x - cx) * GAP,
-      cy + (y - cy) * GAP,
-    ] as [number, number]);
 
     const shape = new THREE.Shape();
-    points.forEach(([x, y], i) => {
-      if (i === 0) shape.moveTo(x, y);
-      else shape.lineTo(x, y);
+    flat.forEach(([x, y], i) => {
+      const px = cx + (x - cx) * GAP;
+      const py = cy + (y - cy) * GAP;
+      if (i === 0) shape.moveTo(px, py);
+      else shape.lineTo(px, py);
     });
     shape.closePath();
 
-    const solid = new THREE.ExtrudeGeometry(shape, {
-      depth: height,
+    const geometry = new THREE.ExtrudeGeometry(shape, {
+      depth: PLATE_HEIGHT,
       bevelEnabled: true,
       bevelSize: 0.012,
       bevelThickness: 0.012,
       bevelSegments: 1,
     });
-    solid.rotateX(-Math.PI / 2);
-    solid.computeVertexNormals();
-
-    // Контур по верхней грани — по тем же ужатым точкам, иначе он повиснет
-    // над зазором.
-    const outline = new THREE.BufferGeometry().setFromPoints(
-      points.map(([x, y]) => new THREE.Vector3(x, height + 0.012, -y)),
-    );
-
-    return { solid, outline };
-  }, [region, height]);
-
-  useEffect(
-    () => () => {
-      solid.dispose();
-      outline.dispose();
-    },
-    [solid, outline],
-  );
-
-  const color = useMemo(() => shade(ratio), [ratio]);
+    geometry.rotateX(-Math.PI / 2);
+    geometry.computeVertexNormals();
+    return geometry;
+  }, [region]);
 
   const materials = useMemo(() => {
+    // ExtrudeGeometry сама делит поверхность на две группы: крышки и стенки.
     const cap = new THREE.MeshStandardMaterial({
-      color: active ? new THREE.Color(PALETTE.gold) : color,
-      roughness: active ? 0.32 : 0.66,
-      metalness: 0.06,
-      emissive: new THREE.Color(active ? PALETTE.gold : "#000000"),
-      emissiveIntensity: active ? 0.22 : 0,
+      color: PALETTE.cap,
+      roughness: 0.7,
+      metalness: 0.04,
     });
     const wall = new THREE.MeshStandardMaterial({
       map: wallTexture(),
@@ -219,129 +192,142 @@ function RegionMesh({
       metalness: 0.04,
     });
     return [cap, wall];
-  }, [color, active]);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      solid.dispose();
+      materials.forEach((m) => m.dispose());
+    };
+  }, [solid, materials]);
+
+  return <mesh geometry={solid} material={materials} castShadow receiveShadow />;
+}
+
+/* ─────────────────────────── Рельеф ─────────────────────────── */
+
+/**
+ * Настоящий рельеф страны поверх плит.
+ *
+ * Высоты и раскраска — SRTM, собранные в два растра скриптом сборки.
+ * Плоскость смещается картой высот, цвет берётся из гипсометрической
+ * раскраски с отмывкой; за границей страны раскраска прозрачна, поэтому
+ * рельеф обрывается ровно по контуру и лишнего не показывает.
+ *
+ * Сетка в 320 на 208 делений — примерно треть разрешения растра. Больше
+ * не нужно: на экране телефона страна занимает около тысячи точек, а
+ * каждое деление это два треугольника.
+ */
+function Relief({ base }: { base: number }) {
+  const [maps, setMaps] = useState<{
+    height: THREE.Texture;
+    color: THREE.Texture;
+  } | null>(null);
+
+  useEffect(() => {
+    const loader = new THREE.TextureLoader();
+    let alive = true;
+
+    Promise.all([
+      loader.loadAsync(RELIEF.height),
+      loader.loadAsync(RELIEF.color),
+    ])
+      .then(([height, color]) => {
+        if (!alive) {
+          height.dispose();
+          color.dispose();
+          return;
+        }
+        color.colorSpace = THREE.SRGBColorSpace;
+        color.anisotropy = 8;
+        setMaps({ height, color });
+      })
+      // Рельеф — украшение поверх работающей карты: не загрузился,
+      // значит остаются плиты, и экран не ломается.
+      .catch(() => {});
+
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   useEffect(
-    () => () => materials.forEach((m) => m.dispose()),
-    [materials],
+    () => () => {
+      maps?.height.dispose();
+      maps?.color.dispose();
+    },
+    [maps],
   );
 
-  // Активный регион приподнимается: это заметно и без цвета, а значит
-  // работает при дальтонизме и на солнце.
-  useFrame((_, delta) => {
-    if (!group.current) return;
-    const target = active ? 0.16 : 0;
-    group.current.position.y += (target - group.current.position.y) * Math.min(1, delta * 9);
-  });
+  if (!maps) return null;
 
   return (
-    <group ref={group}>
-      {/* ExtrudeGeometry сама делит поверхность на две группы: крышки и
-          боковые стенки. Пользуемся этим — светлая плоскость и почти чёрный
-          торец. Именно этот контраст читается как объём, а не подкрашенный
-          силуэт; цвет по количеству объектов остаётся на крышке. */}
-      <mesh
-        geometry={solid}
-        material={materials}
-        castShadow
-        receiveShadow
-        onPointerOver={(e: ThreeEvent<PointerEvent>) => {
-          e.stopPropagation();
-          onHover(region.city);
-        }}
-        onPointerOut={() => onHover(null)}
-        onClick={(e: ThreeEvent<MouseEvent>) => {
-          e.stopPropagation();
-          onSelect(region.city);
-        }}
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, base, 0]} receiveShadow castShadow>
+      <planeGeometry args={[RELIEF_SIZE.width, RELIEF_SIZE.depth, 320, 208]} />
+      <meshStandardMaterial
+        map={maps.color}
+        displacementMap={maps.height}
+        displacementScale={RELIEF_LIFT}
+        transparent
+        // Прозрачные точки за границей не должны писать глубину, иначе они
+        // закрывают собой то, что лежит ниже, — торцы плит и подложку.
+        alphaTest={0.5}
+        roughness={0.95}
+        metalness={0}
       />
-
-      <lineLoop geometry={outline}>
-        <lineBasicMaterial
-          color={active ? PALETTE.goldDeep : PALETTE.uzEdge}
-          transparent
-          opacity={0.6}
-        />
-      </lineLoop>
-    </group>
+    </mesh>
   );
 }
 
-/* ─────────────────────────── Вода страны ─────────────────────────── */
+/**
+ * Высота рельефа в точке.
+ *
+ * Читается из той же карты высот, что смещает вершины, — иначе булавка
+ * встанет не на ту отметку, на которую поднялась под ней земля. Растр
+ * рисуется в скрытый холст один раз, дальше это просто выборка из массива.
+ *
+ * Пока карта не загружена, возвращается null: сцена рисует булавки на
+ * плоскости и переставит их, когда рельеф приедет.
+ */
+function useElevation(): ((lon: number, lat: number) => number) | null {
+  const [sample, setSample] = useState<
+    ((lon: number, lat: number) => number) | null
+  >(null);
 
-function UzRivers({ heightAt }: { heightAt: (lon: number, lat: number) => number }) {
-  const parts = useMemo(() => {
-    const out: THREE.BufferGeometry[] = [];
-    for (const river of UZ_WATER.rivers) {
-      // Совпадающие подряд точки дают нулевую касательную, а с ней — NaN
-      // в геометрии трубки, и участок реки просто пропадает.
-      const points: THREE.Vector3[] = [];
-      for (const [lon, lat] of river.path) {
-        const point = world(lon, lat, heightAt(lon, lat) + 0.035);
-        const previous = points[points.length - 1];
-        if (!previous || previous.distanceToSquared(point) > 1e-8) points.push(point);
-      }
-      if (points.length < 2) continue;
+  useEffect(() => {
+    let alive = true;
+    const image = new window.Image();
 
-      const curve = new THREE.CatmullRomCurve3(points);
-      out.push(new THREE.TubeGeometry(curve, points.length * 6, 0.04, 6, false));
-    }
-    return out;
-  }, [heightAt]);
+    image.onload = () => {
+      if (!alive) return;
+      const canvas = document.createElement("canvas");
+      canvas.width = image.width;
+      canvas.height = image.height;
+      const ctx = canvas.getContext("2d", { willReadFrequently: true });
+      if (!ctx) return;
 
-  useEffect(() => () => parts.forEach((p) => p.dispose()), [parts]);
+      ctx.drawImage(image, 0, 0);
+      const { data } = ctx.getImageData(0, 0, image.width, image.height);
+      const { width, height } = image;
 
-  return (
-    <>
-      {parts.map((geometry, i) => (
-        <mesh key={i} geometry={geometry}>
-          <meshStandardMaterial color={PALETTE.lake} roughness={0.22} metalness={0.3} />
-        </mesh>
-      ))}
-    </>
-  );
-}
+      setSample(() => (lon: number, lat: number) => {
+        const u = (lon - RELIEF_BOX.minLon) / (RELIEF_BOX.maxLon - RELIEF_BOX.minLon);
+        const v = (RELIEF_BOX.maxLat - lat) / (RELIEF_BOX.maxLat - RELIEF_BOX.minLat);
+        if (u < 0 || u > 1 || v < 0 || v > 1) return 0;
 
-function UzLakes({ heightAt }: { heightAt: (lon: number, lat: number) => number }) {
-  const parts = useMemo(
-    () =>
-      UZ_WATER.lakes.map((lake) => {
-        const shape = new THREE.Shape();
-        lake.ring.forEach(([lon, lat], i) => {
-          const [x, y] = project(lon, lat);
-          if (i === 0) shape.moveTo(x, y);
-          else shape.lineTo(x, y);
-        });
-        shape.closePath();
+        const x = Math.min(width - 1, Math.max(0, Math.round(u * width)));
+        const y = Math.min(height - 1, Math.max(0, Math.round(v * height)));
+        return (data[(y * width + x) * 4] / 255) * RELIEF_LIFT;
+      });
+    };
 
-        // Озеро лежит на высоте своего региона, иначе оно утонет в призме.
-        const mid = lake.ring[Math.floor(lake.ring.length / 2)];
-        const y = heightAt(mid[0], mid[1]) + 0.03;
+    image.src = RELIEF.height;
+    return () => {
+      alive = false;
+    };
+  }, []);
 
-        const geometry = new THREE.ShapeGeometry(shape);
-        geometry.rotateX(-Math.PI / 2);
-        geometry.translate(0, y, 0);
-        return geometry;
-      }),
-    [heightAt],
-  );
-
-  useEffect(() => () => parts.forEach((p) => p.dispose()), [parts]);
-
-  return (
-    <>
-      {parts.map((geometry, i) => (
-        <mesh key={i} geometry={geometry}>
-          <meshStandardMaterial
-            color={PALETTE.lake}
-            roughness={0.2}
-            metalness={0.3}
-            side={THREE.DoubleSide}
-          />
-        </mesh>
-      ))}
-    </>
-  );
+  return sample;
 }
 
 /* ─────────────────────────── Шёлковый путь ─────────────────────────── */
@@ -459,12 +445,14 @@ function CityMarkers({
   counts,
   pointAt,
   lang,
+  onHover,
   onSelect,
 }: {
   cities: City[];
   counts: Record<string, number>;
   pointAt: (slug: string) => THREE.Vector3 | null;
   lang: Lang;
+  onHover: (city: string | null) => void;
   onSelect: (city: string) => void;
 }) {
   const labelled = useMemo(
@@ -520,6 +508,11 @@ function CityMarkers({
               ref={(node) => {
                 if (node) heads.current[i] = node;
               }}
+              onPointerOver={(e: ThreeEvent<PointerEvent>) => {
+                e.stopPropagation();
+                onHover(city.slug);
+              }}
+              onPointerOut={() => onHover(null)}
               onClick={() => onSelect(city.slug)}
             >
               <mesh position={[0, named ? 0.2 : 0.12, 0]} castShadow>
@@ -546,8 +539,8 @@ function CityMarkers({
               <>
                 {/* Выноска: подпись отведена вверх тонкой линией и не
                     закрывает то, что называет. */}
-                <mesh position={[0, 0.85, 0]}>
-                  <cylinderGeometry args={[0.006, 0.006, 0.7, 4]} />
+                <mesh position={[0, 0.72, 0]}>
+                  <cylinderGeometry args={[0.006, 0.006, 0.45, 4]} />
                   <meshBasicMaterial
                     color={PALETTE.goldDeep}
                     transparent
@@ -555,7 +548,7 @@ function CityMarkers({
                   />
                 </mesh>
 
-                <sprite position={[0, 1.3, 0]} scale={[0.34 * label.aspect, 0.34, 1]}>
+                <sprite position={[0, 1.02, 0]} scale={[0.34 * label.aspect, 0.34, 1]}>
                   <spriteMaterial map={label.map} transparent depthWrite={false} />
                 </sprite>
               </>
@@ -688,20 +681,21 @@ export default function RegionMap3D({
 
   const maxWeight = Math.max(1, ...Object.values(weights));
 
-  const heights = useMemo(() => {
-    const out: Record<string, number> = {};
-    for (const region of REGIONS) {
-      out[region.city] = MIN_HEIGHT + (weights[region.city] / maxWeight) * MAX_RISE;
-    }
-    return out;
-  }, [weights, maxWeight]);
+  const elevation = useElevation();
 
+  /**
+   * Отметка, на которой стоит объект: верх плиты плюс подъём рельефа.
+   * Пока карта высот не приехала, всё стоит на плоскости и переставится
+   * само, когда она загрузится.
+   */
   const heightAt = useMemo(() => {
     return (lon: number, lat: number) => {
-      const region = REGIONS.find((r) => inRing(lon, lat, r.ring));
-      return region ? heights[region.city] : 0;
+      if (!inRing(lon, lat, REGIONS[0].ring) && !REGIONS.some((r) => inRing(lon, lat, r.ring))) {
+        return 0;
+      }
+      return PLATE_HEIGHT + (elevation?.(lon, lat) ?? 0);
     };
-  }, [heights]);
+  }, [elevation]);
 
   /** Точка на карте по имени: города базы и внешние ворота пути. */
   const pointAt = useMemo(() => {
@@ -717,7 +711,6 @@ export default function RegionMap3D({
     };
   }, [cities, heightAt]);
 
-  const hoveredRegion = hovered ? REGIONS.find((r) => r.city === hovered) : null;
   const hoveredCity = hovered ? cities.find((c) => c.slug === hovered) : null;
 
   return (
@@ -737,7 +730,7 @@ export default function RegionMap3D({
       <Canvas
         dpr={[1, 2]}
         shadows
-        camera={{ position: [0, 9.5, 19], fov: 32 }}
+        camera={{ position: [0, 12.5, 16], fov: 34 }}
         gl={{ antialias: true, alpha: true }}
         style={{ width: "100%", height: "100%", display: "block" }}
       >
@@ -759,19 +752,13 @@ export default function RegionMap3D({
         <MapBoard lang={lang} />
 
         {REGIONS.map((region) => (
-          <RegionMesh
-            key={region.city}
-            region={region}
-            height={heights[region.city]}
-            ratio={weights[region.city] / maxWeight}
-            active={hovered === region.city}
-            onHover={setHovered}
-            onSelect={guardedSelect}
-          />
+          <RegionMesh key={region.city} region={region} />
         ))}
 
-        <UzRivers heightAt={heightAt} />
-        <UzLakes heightAt={heightAt} />
+        {/* Рельеф ложится поверх плит сплошной поверхностью. Реки, озёра
+            и границы областей нарисованы прямо в его раскраске: трубками
+            поверх настоящих склонов они бы висели в воздухе. */}
+        <Relief base={PLATE_HEIGHT} />
         <SilkRoad pointAt={pointAt} />
         <Gateways pointAt={pointAt} lang={lang} />
         <CityMarkers
@@ -779,6 +766,7 @@ export default function RegionMap3D({
           counts={counts}
           pointAt={pointAt}
           lang={lang}
+          onHover={setHovered}
           onSelect={guardedSelect}
         />
 
@@ -798,12 +786,17 @@ export default function RegionMap3D({
         }}
       >
         <div className="flex items-center gap-2">
-          <span>{t(lang, "map_less")}</span>
+          <span>{t(lang, "map_lowland")}</span>
           <span
             className="h-2 w-16 rounded-full"
-            style={{ background: RAMP_CSS }}
+            // Те же ступени, что и в гипсометрической шкале рельефа
+            // (см. scripts/geo/build-relief.py): пески, предгорья, горы, снег.
+            style={{
+              background:
+                "linear-gradient(90deg,#d6cdb0,#bfa876,#aa8d62,#927658,#968d85,#e2e2e2)",
+            }}
           />
-          <span>{t(lang, "map_more")}</span>
+          <span>{t(lang, "map_mountains")}</span>
         </div>
         <div className="mt-1.5 flex items-center gap-2">
           <span
@@ -827,7 +820,7 @@ export default function RegionMap3D({
         {t(lang, "map_drag")}
       </div>
 
-      {hoveredRegion && (
+      {hoveredCity && (
         <div
           className="pointer-events-none absolute bottom-3 left-3 right-3 rounded-[var(--radius-md)] px-4 py-3"
           style={{
@@ -837,9 +830,9 @@ export default function RegionMap3D({
             boxShadow: "var(--shadow-2)",
           }}
         >
-          <p className="font-semibold">{hoveredCity?.name ?? hoveredRegion.nameRu}</p>
+          <p className="font-semibold">{hoveredCity.name}</p>
           <p className="text-sm soft">
-            {objectsCount(lang, weights[hoveredRegion.city])} · {t(lang, "map_open")}
+            {objectsCount(lang, counts[hoveredCity.slug] ?? 0)} · {t(lang, "map_open")}
           </p>
         </div>
       )}
