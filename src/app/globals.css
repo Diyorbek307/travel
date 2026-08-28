@@ -91,6 +91,19 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
+/*
+ * Без isolation body не создаёт свой стековый контекст, и .ambient-bg
+ * (z-index: -1) считается относительно КОРНЯ документа — там негативный
+ * z-index красится НИЖЕ собственного фона body, а не выше. Из-за этого
+ * пятна были в разметке и двигались, но физически перекрывались фоном
+ * страницы и не были видны ни при какой яркости. isolate делает body
+ * границей: его фон становится нижним слоем именно в этом контексте,
+ * и -1 внутри нею уже красится поверх него, как и задумано.
+ */
+body {
+  isolation: isolate;
+}
+
 body {
   font-family: ui-sans-serif, system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   /* Место под нижнюю навигацию и safe-area на iPhone. */
@@ -328,9 +341,11 @@ body {
 }
 
 /*
- * Фоновое дыхание приложения: те же два пятна, что и в «авроре», растянутые
- * на весь экран, очень тихие (яркость зашита в rgb-альфе) и всегда позади
- * контента (z-index: -1 не создаёт своего слоя выше обычной вёрстки).
+ * Фоновое дыхание приложения: три цветных пятна на весь экран, всегда
+ * позади контента (z-index: -1 не создаёт своего слоя выше обычной
+ * вёрстки). Первая версия была почти не видна — альфа и блюр гасили друг
+ * друга, а ход в 34–40 секунд не успевал прочитаться за время, пока
+ * смотришь на экран. Здесь цвет плотнее, блюр меньше, ход втрое быстрее.
  * Экран /explore и обложка первого экрана рисуются поверх — там пятна
  * просто не видны, слой не мешает и не удваивает движение.
  */
@@ -346,64 +361,93 @@ body {
   content: "";
   position: absolute;
   border-radius: 50%;
-  filter: blur(90px);
+  filter: blur(60px);
   will-change: transform;
 }
 .ambient-bg::before {
-  width: 60vmax;
-  height: 60vmax;
-  left: -18vmax;
-  top: -14vmax;
-  background: radial-gradient(circle, rgb(124 182 206 / 0.28), transparent 70%);
-  animation: ambient-a 34s ease-in-out infinite alternate;
+  width: 62vmax;
+  height: 62vmax;
+  left: -20vmax;
+  top: -16vmax;
+  background: radial-gradient(circle, rgb(124 182 206 / 0.55), transparent 68%);
+  animation: ambient-a 16s ease-in-out infinite alternate;
 }
 .ambient-bg::after {
-  width: 54vmax;
-  height: 54vmax;
-  right: -16vmax;
-  bottom: -12vmax;
-  background: radial-gradient(circle, rgb(233 196 106 / 0.22), transparent 70%);
-  animation: ambient-b 40s ease-in-out infinite alternate;
+  width: 56vmax;
+  height: 56vmax;
+  right: -18vmax;
+  bottom: -14vmax;
+  background: radial-gradient(circle, rgb(233 196 106 / 0.48), transparent 68%);
+  animation: ambient-b 20s ease-in-out infinite alternate;
+}
+/* Третье пятно — фирменный тёмно-синий, в центре, самое медленное:
+   без него первые два просто меняются местами, а с ним фон ощущается
+   объёмным, а не парой прожекторов по углам. У .ambient-bg уже заняты
+   ::before и ::after первыми двумя пятнами, поэтому это — настоящий
+   вложенный элемент, а не третий псевдоэлемент (их бывает только два). */
+.ambient-bg-mid {
+  position: absolute;
+  left: 50%;
+  top: 55%;
+  width: 50vmax;
+  height: 50vmax;
+  border-radius: 50%;
+  filter: blur(70px);
+  background: radial-gradient(circle, rgb(31 111 139 / 0.4), transparent 70%);
+  animation: ambient-c 24s ease-in-out infinite alternate;
+  will-change: transform;
 }
 @keyframes ambient-a {
   from { transform: translate3d(0, 0, 0) scale(1); }
-  to   { transform: translate3d(6vmax, 5vmax, 0) scale(1.12); }
+  to   { transform: translate3d(14vmax, 11vmax, 0) scale(1.25); }
 }
 @keyframes ambient-b {
-  from { transform: translate3d(0, 0, 0) scale(1.05); }
-  to   { transform: translate3d(-5vmax, -4vmax, 0) scale(0.92); }
+  from { transform: translate3d(0, 0, 0) scale(1.08); }
+  to   { transform: translate3d(-13vmax, -10vmax, 0) scale(0.85); }
+}
+@keyframes ambient-c {
+  from { transform: translate3d(-50%, -50%, 0) scale(0.9); }
+  to   { transform: translate3d(-38%, -62%, 0) scale(1.2); }
 }
 
-/* Медленный «дышащий» зум фотографии — кадр живёт, а не стоит стоп-кадром.
-   Только transform, поэтому дёшево даже рядом с трёхмерной сценой. Класс
-   вешается на конкретных крупных снимках (сцена, шапка города/объекта),
-   а не в PoiPhoto целиком — миниатюры в списках не должны шевелиться. */
+/* Зум фотографии — кадр живёт, а не стоит стоп-кадром. Только transform,
+   поэтому дёшево даже рядом с трёхмерной сценой. Класс вешается на
+   конкретных крупных снимках (сцена, шапка города/объекта), а не в
+   PoiPhoto целиком — миниатюры в списках не должны шевелиться. */
 .kenburns {
-  animation: kenburns 26s ease-in-out infinite alternate;
+  animation: kenburns 14s ease-in-out infinite alternate;
   will-change: transform;
 }
 @keyframes kenburns {
   from { transform: scale(1); }
-  to   { transform: scale(1.08); }
+  to   { transform: scale(1.16); }
 }
 
-/* 3D-разворот карточек-витрин: тот же язык, что у рельефной карты, только
-   в масштабе карточки. animation-delay берётся из --tilt-delay, которую
-   страница проставляет по индексу карточки в строке — так они не выходят
-   одной пачкой, а раскрываются по очереди. */
+/* Карточки-витрины: сначала 3D-разворот при появлении (animation-delay
+   берётся из --tilt-delay, которую страница проставляет по индексу
+   карточки — так они раскрываются по очереди, а не одной пачкой), а
+   затем — не останавливаются: лёгкое непрерывное покачивание в 3D,
+   тем же языком, что у рельефной карты. Первая версия разворачивалась
+   один раз за 620мс и дальше стояла неподвижно — почти незаметно. */
 .tilt-in {
-  animation: tilt-in 620ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
-  animation-delay: var(--tilt-delay, 0ms);
+  animation:
+    tilt-in 620ms cubic-bezier(0.22, 0.61, 0.36, 1) both,
+    tilt-float 5.5s ease-in-out 620ms infinite;
+  animation-delay: var(--tilt-delay, 0ms), calc(var(--tilt-delay, 0ms) + 620ms);
 }
 @keyframes tilt-in {
   from {
     opacity: 0;
-    transform: perspective(800px) rotateY(-12deg) rotateX(4deg) translateY(14px) scale(0.96);
+    transform: perspective(800px) rotateY(-16deg) rotateX(6deg) translateY(18px) scale(0.94);
   }
   to {
     opacity: 1;
     transform: perspective(800px) rotateY(0) rotateX(0) translateY(0) scale(1);
   }
+}
+@keyframes tilt-float {
+  0%, 100% { transform: perspective(800px) rotateY(-3deg) rotateX(1.5deg) translateY(0); }
+  50%      { transform: perspective(800px) rotateY(3deg) rotateX(-1.5deg) translateY(-6px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
