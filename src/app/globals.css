@@ -410,6 +410,70 @@ body {
   to   { transform: translate3d(-38%, -62%, 0) scale(1.2); }
 }
 
+/*
+ * Сюжет «путешествие»: дуга маршрута из угла в угол, как на карте
+ * авиалиний, с пунктиром «в движении» и точками вылета/прилёта —
+ * и самолёт, который эту дугу пролетает. Цветные пятна дают настроение,
+ * это — конкретный образ, ради которого просили анимацию «про
+ * путешествие», а не абстракцию.
+ */
+.ambient-route {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.ambient-route path {
+  fill: none;
+  stroke: var(--accent-strong);
+  stroke-width: 0.3;
+  stroke-linecap: round;
+  stroke-dasharray: 1.4 2.2;
+  opacity: 0.4;
+  animation: route-march 5s linear infinite;
+}
+@keyframes route-march {
+  to { stroke-dashoffset: -36; }
+}
+.ambient-route-dot {
+  fill: var(--primary);
+  opacity: 0.5;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: route-dot-pulse 2.8s ease-in-out infinite;
+}
+.ambient-route-dot--end {
+  fill: var(--accent-strong);
+  animation-delay: 1.4s;
+}
+@keyframes route-dot-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.35; }
+  50%      { transform: scale(1.9); opacity: 0.75; }
+}
+
+/* Самолёт летит той же диагональю, что и дуга маршрута выше — глиф уже
+   нарисован носом в верхний правый угол, поэтому его не нужно
+   доворачивать: направление рисунка и направление полёта совпадают. */
+.ambient-plane {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 26px;
+  height: 26px;
+  fill: var(--accent-strong);
+  filter: drop-shadow(0 3px 8px rgb(233 196 106 / 0.55));
+  opacity: 0;
+  animation: plane-fly 22s linear infinite;
+  will-change: transform, opacity;
+}
+@keyframes plane-fly {
+  0%   { transform: translate3d(-10vw, 84vh, 0) scale(0.7); opacity: 0; }
+  10%  { opacity: 0.6; }
+  50%  { transform: translate3d(52vw, 32vh, 0) scale(1); opacity: 0.6; }
+  90%  { opacity: 0.6; }
+  100% { transform: translate3d(114vw, -14vh, 0) scale(1.15); opacity: 0; }
+}
+
 /* Зум фотографии — кадр живёт, а не стоит стоп-кадром. Только transform,
    поэтому дёшево даже рядом с трёхмерной сценой. Класс вешается на
    конкретных крупных снимках (сцена, шапка города/объекта), а не в
