@@ -141,6 +141,29 @@ export const SCHEMA_SQL = `
       PRIMARY KEY (tour_id, order_index)
     );
 
+    -- Платное размещение ресторанов/кафе/зон отдыха в топе подборки —
+    -- трейт-таблица поверх pois, как museums. Для остальных категорий
+    -- строки нет вовсе, а не 0 по умолчанию.
+    CREATE TABLE IF NOT EXISTS venue_details (
+      poi_id             INTEGER NOT NULL UNIQUE REFERENCES pois(id) ON DELETE CASCADE,
+      sponsored_priority INTEGER NOT NULL DEFAULT 0
+    );
+
+    -- Заявка на столик, не подтверждённая бронь: интеграции с
+    -- POS-системами заведений нет, администратор перезванивает сам.
+    CREATE TABLE IF NOT EXISTS reservations (
+      id           INTEGER PRIMARY KEY AUTOINCREMENT,
+      poi_id       INTEGER NOT NULL REFERENCES pois(id) ON DELETE CASCADE,
+      name         TEXT NOT NULL,
+      phone        TEXT NOT NULL,
+      party_size   INTEGER NOT NULL,
+      requested_at TEXT NOT NULL,
+      note         TEXT,
+      status       TEXT NOT NULL DEFAULT 'new',
+      created_at   TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+    CREATE INDEX IF NOT EXISTS idx_reservations_poi ON reservations(poi_id, created_at);
+
     -- Обезличенная аналитика (п. 17): только хэш сессии, без персональных данных.
     CREATE TABLE IF NOT EXISTS events (
       id           INTEGER PRIMARY KEY AUTOINCREMENT,

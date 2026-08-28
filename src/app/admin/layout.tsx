@@ -13,6 +13,7 @@ const NAV = [
   { href: "/admin/qr", label: "QR-коды" },
   { href: "/admin/tours", label: "Маршруты" },
   { href: "/admin/museums", label: "Музеи" },
+  { href: "/admin/reservations", label: "Столики" },
   { href: "/admin/analytics", label: "Аналитика" },
 ];
 

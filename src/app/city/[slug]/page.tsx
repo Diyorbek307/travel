@@ -13,6 +13,10 @@ import { currentLang } from "@/lib/server-lang";
 import Icon from "@/components/icon";
 import { CATEGORIES, type Category } from "@/lib/types";
 
+/** Рестораны, кафе и зоны отдыха — отдельная витрина, платный топ уже
+ * учтён порядком в listPois, здесь просто отбираем категории. */
+const DINING_CATEGORIES: Category[] = ["restaurant", "cafe", "rest_zone"];
+
 export const dynamic = "force-dynamic";
 
 /** Экран города: объекты по категориям, готовые маршруты, офлайн-пакет. */
@@ -38,6 +42,7 @@ export default async function CityPage({
   const hero = all.find((p) => p.cover) ?? null;
   const heroCredit = hero ? getPoiMedia(hero.id)[0] : null;
   const featured = all.filter((p) => p.cover).slice(0, 8);
+  const dining = all.filter((p) => DINING_CATEGORIES.includes(p.category)).slice(0, 10);
 
   // Погода грузится параллельно странице и не обязана успеть: без неё
   // город показывается как раньше.
@@ -181,6 +186,23 @@ export default async function CityPage({
                   style={{ "--tilt-delay": `${i * 70}ms` } as React.CSSProperties}
                 >
                   <PoiCard poi={poi} lang={lang} variant="feature" priority={i === 0} />
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {dining.length > 0 && (
+          <section className="mb-5">
+            <h2 className="mb-2 font-semibold">{t(lang, "dining_title")}</h2>
+            <div className="no-scrollbar -mx-4 flex gap-3 overflow-x-auto px-4 pb-1">
+              {dining.map((poi, i) => (
+                <div
+                  key={poi.id}
+                  className="w-44 shrink-0"
+                  style={{ "--tilt-delay": `${i * 70}ms` } as React.CSSProperties}
+                >
+                  <PoiCard poi={poi} lang={lang} variant="feature" />
                 </div>
               ))}
             </div>

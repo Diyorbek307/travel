@@ -181,6 +181,16 @@ const ru: Dict = {
   map_no_webgl: "Браузер не поддерживает трёхмерную графику — регионы доступны списком ниже.",
   see_all: "Все",
   draft_notice: "Черновой текст, требует проверки историком",
+  dining_title: "Рестораны и кафе",
+  reserve_table: "Забронировать столик",
+  reserve_name: "Имя",
+  reserve_phone: "Телефон",
+  reserve_party_size: "Гостей",
+  reserve_time: "Дата и время",
+  reserve_note: "Пожелания (необязательно)",
+  reserve_submit: "Отправить заявку",
+  reserve_sent: "Заявка отправлена — с вами свяжутся, чтобы подтвердить столик.",
+  reserve_error: "Не получилось отправить заявку. Попробуйте ещё раз.",
 };
 
 const uz: Dict = {
@@ -288,6 +298,16 @@ const uz: Dict = {
   map_no_webgl: "Brauzer uch o'lchamli grafikani qo'llamaydi — viloyatlar quyidagi ro'yxatda.",
   see_all: "Barchasi",
   draft_notice: "Qoralama matn, tarixchi tekshiruvi zarur",
+  dining_title: "Restoranlar va kafelar",
+  reserve_table: "Stol band qilish",
+  reserve_name: "Ism",
+  reserve_phone: "Telefon",
+  reserve_party_size: "Mehmonlar soni",
+  reserve_time: "Sana va vaqt",
+  reserve_note: "Istaklar (ixtiyoriy)",
+  reserve_submit: "Ariza yuborish",
+  reserve_sent: "Ariza yuborildi — stolni tasdiqlash uchun siz bilan bog'lanishadi.",
+  reserve_error: "Arizani yuborib bo'lmadi. Qayta urinib ko'ring.",
 };
 
 const en: Dict = {
@@ -395,6 +415,16 @@ const en: Dict = {
   map_no_webgl: "This browser has no 3D graphics — the regions are listed below.",
   see_all: "See all",
   draft_notice: "Draft text, pending review by a historian",
+  dining_title: "Restaurants & cafés",
+  reserve_table: "Reserve a table",
+  reserve_name: "Name",
+  reserve_phone: "Phone",
+  reserve_party_size: "Guests",
+  reserve_time: "Date and time",
+  reserve_note: "Notes (optional)",
+  reserve_submit: "Send request",
+  reserve_sent: "Request sent — the venue will contact you to confirm.",
+  reserve_error: "Couldn't send the request. Please try again.",
 };
 
 const DICTS: Partial<Record<Lang, Dict>> = { ru, uz, en };
@@ -415,6 +445,7 @@ export const CATEGORY_LABEL: Partial<Record<Lang, Record<Category, string>>> = {
     nature: "Природа",
     restaurant: "Рестораны",
     cafe: "Кафе",
+    rest_zone: "Зоны отдыха",
     hotel: "Гостиницы",
     bazaar: "Базары",
     craft: "Ремёсла и сувениры",
@@ -430,6 +461,7 @@ export const CATEGORY_LABEL: Partial<Record<Lang, Record<Category, string>>> = {
     nature: "Tabiat",
     restaurant: "Restoranlar",
     cafe: "Kafelar",
+    rest_zone: "Dam olish zonalari",
     hotel: "Mehmonxonalar",
     bazaar: "Bozorlar",
     craft: "Hunarmandchilik va sovg'alar",
@@ -445,6 +477,7 @@ export const CATEGORY_LABEL: Partial<Record<Lang, Record<Category, string>>> = {
     nature: "Nature",
     restaurant: "Restaurants",
     cafe: "Cafés",
+    rest_zone: "Rest areas",
     hotel: "Hotels",
     bazaar: "Bazaars",
     craft: "Crafts & souvenirs",

@@ -246,6 +246,15 @@ for (const city of CITIES) {
     poiIds.set(p.slug, poiId);
     counts.pois++;
 
+    if (p.sponsoredPriority) {
+      run(
+        `INSERT INTO venue_details (poi_id, sponsored_priority) VALUES (?, ?)
+         ON CONFLICT(poi_id) DO UPDATE SET sponsored_priority = excluded.sponsored_priority`,
+        poiId,
+        p.sponsoredPriority,
+      );
+    }
+
     for (const [lang, tr] of Object.entries(p.tr)) {
       run(
         `INSERT INTO poi_translations (poi_id, lang, name, short_desc, full_story)

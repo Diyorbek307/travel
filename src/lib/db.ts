@@ -97,6 +97,7 @@ function mapPoi(r: Row): Poi {
     audio_url: (r.audio_url as string) ?? null,
     audio_duration_sec: r.audio_duration_sec == null ? null : Number(r.audio_duration_sec),
     qr_code: (r.qr_code as string) ?? null,
+    sponsored_priority: Number(r.sponsored_priority ?? 0),
   };
 }
 
@@ -144,15 +145,29 @@ const POI_SELECT = (lang: Lang) => `
          MAX(CASE WHEN a.lang = '${lang}' THEN a.url END)          AS audio_url,
          MAX(CASE WHEN a.lang = '${lang}' THEN a.duration_sec END) AS audio_duration_sec,
          (SELECT q.code FROM qr_codes q
-           WHERE q.target_type = 'poi' AND q.target_id = p.id LIMIT 1) AS qr_code
+           WHERE q.target_type = 'poi' AND q.target_id = p.id LIMIT 1) AS qr_code,
+         COALESCE(vd.sponsored_priority, 0) AS sponsored_priority
     FROM pois p
     JOIN cities c            ON c.id = p.city_id
     LEFT JOIN poi_translations t ON t.poi_id = p.id
     LEFT JOIN poi_audio a        ON a.poi_id = p.id
+    LEFT JOIN venue_details vd   ON vd.poi_id = p.id
 `;
 
+/** Общий порядок сортировки: платное размещение (рестораны/кафе/зоны
+ * отдыха) поднимает объект наверх везде, где вызывается listPois —
+ * в списке города, в фильтре категории и в поиске ассистента. У всех
+ * остальных объектов sponsored_priority = 0, порядок не меняется. */
+const POI_ORDER = "ORDER BY sponsored_priority DESC, p.popularity DESC, p.rating DESC";
+
 export function listPois(
-  opts: { city?: string; category?: Category; lang: Lang; includeInactive?: boolean } ,
+  opts: {
+    city?: string;
+    category?: Category;
+    categories?: Category[];
+    lang: Lang;
+    includeInactive?: boolean;
+  },
 ): Poi[] {
   const db = getDb();
   const where: string[] = [];
@@ -166,10 +181,14 @@ export function listPois(
     where.push("p.category = ?");
     args.push(opts.category);
   }
+  if (opts.categories && opts.categories.length > 0) {
+    where.push(`p.category IN (${opts.categories.map(() => "?").join(",")})`);
+    args.push(...opts.categories);
+  }
   const sql = `${POI_SELECT(opts.lang)}
     ${where.length ? "WHERE " + where.join(" AND ") : ""}
     GROUP BY p.id
-    ORDER BY p.popularity DESC, p.rating DESC`;
+    ${POI_ORDER}`;
   return (db.prepare(sql).all(...args) as Row[]).map(mapPoi);
 }
 
@@ -355,6 +374,27 @@ export function trackEvent(e: {
     e.session_hash ?? null,
     e.meta ? JSON.stringify(e.meta) : null,
   );
+}
+
+/**
+ * Заявка на столик — обычная запись, не редактирование контента объекта,
+ * поэтому живёт здесь же, рядом с trackEvent, а не в admin-db.ts.
+ * Валидация полей — на вызывающей стороне (API-роут).
+ */
+export function createReservation(input: {
+  poi_id: number;
+  name: string;
+  phone: string;
+  party_size: number;
+  requested_at: string;
+  note: string | null;
+}): number {
+  const db = getDb();
+  db.prepare(
+    `INSERT INTO reservations (poi_id, name, phone, party_size, requested_at, note)
+     VALUES (?, ?, ?, ?, ?, ?)`,
+  ).run(input.poi_id, input.name, input.phone, input.party_size, input.requested_at, input.note);
+  return Number((db.prepare(`SELECT last_insert_rowid() AS id`).get() as Row).id);
 }
 
 export function analytics() {

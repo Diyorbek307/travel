@@ -520,6 +520,9 @@ The mausoleum is deliberately austere: a cubic building, an octagonal drum, a do
       visit: 45,
       rating: 4.5,
       pop: 0.45,
+      // Платное размещение — ниже рейтинг и значимость, чем у
+      // platan-restaurant, но выше в разделе «Рестораны и кафе».
+      sponsoredPriority: 10,
       hours: H("09:00", "21:00"),
       tr: {
         ru: {

@@ -62,6 +62,9 @@ export function listCitiesAdmin() {
 /* Объекты                                                            */
 /* ------------------------------------------------------------------ */
 
+/** Категории, для которых имеет смысл платное размещение в топе. */
+const VENUE_CATEGORIES: Category[] = ["restaurant", "cafe", "rest_zone"];
+
 export interface PoiInput {
   slug: string;
   citySlug: string;
@@ -77,6 +80,8 @@ export interface PoiInput {
   phone: string | null;
   website: string | null;
   isActive: boolean;
+  /** Только для ресторанов/кафе/зон отдыха — см. VENUE_CATEGORIES. */
+  sponsoredPriority: number;
   translations: Partial<Record<Lang, { name: string; shortDesc: string; fullStory: string }>>;
 }
 
@@ -127,6 +132,15 @@ export function upsertPoi(input: PoiInput): number {
     ).run(id, lang, tr.name, tr.shortDesc || null, tr.fullStory || null);
   }
 
+  // Строка в venue_details — только для ресторанов/кафе/зон отдыха:
+  // остальным категориям платный приоритет не нужен и не пригождается.
+  if (VENUE_CATEGORIES.includes(input.category)) {
+    db.prepare(
+      `INSERT INTO venue_details (poi_id, sponsored_priority) VALUES (?, ?)
+       ON CONFLICT(poi_id) DO UPDATE SET sponsored_priority = excluded.sponsored_priority`,
+    ).run(id, input.sponsoredPriority);
+  }
+
   return id;
 }
 
@@ -141,8 +155,12 @@ export function deletePoi(slug: string): void {
 /** Объект со всеми переводами — для формы редактирования. */
 export function getPoiForEdit(slug: string) {
   const db = getDb();
-  const poi = db.prepare(`SELECT p.*, c.slug AS city_slug FROM pois p
-      JOIN cities c ON c.id = p.city_id WHERE p.slug = ?`).get(slug) as Row | undefined;
+  const poi = db.prepare(`SELECT p.*, c.slug AS city_slug,
+        COALESCE(vd.sponsored_priority, 0) AS sponsored_priority
+      FROM pois p
+      JOIN cities c ON c.id = p.city_id
+      LEFT JOIN venue_details vd ON vd.poi_id = p.id
+      WHERE p.slug = ?`).get(slug) as Row | undefined;
   if (!poi) return null;
 
   const translations = db
@@ -367,6 +385,33 @@ export function upsertExhibit(input: {
 
 export function deleteExhibit(id: number): void {
   getDb().prepare(`DELETE FROM exhibits WHERE id = ?`).run(id);
+}
+
+/* ------------------------------------------------------------------ */
+/* Заявки на столик                                                   */
+/* ------------------------------------------------------------------ */
+
+export function listReservationsAdmin() {
+  const db = getDb();
+  return db
+    .prepare(
+      `SELECT r.id, r.name, r.phone, r.party_size, r.requested_at, r.note,
+              r.status, r.created_at, p.slug AS poi_slug, c.slug AS city_slug,
+              COALESCE(t.name, p.slug) AS poi_name
+         FROM reservations r
+         JOIN pois p   ON p.id = r.poi_id
+         JOIN cities c ON c.id = p.city_id
+         LEFT JOIN poi_translations t ON t.poi_id = p.id AND t.lang = 'ru'
+        ORDER BY r.created_at DESC`,
+    )
+    .all() as Row[];
+}
+
+export function updateReservationStatus(
+  id: number,
+  status: "new" | "confirmed" | "declined",
+): void {
+  getDb().prepare(`UPDATE reservations SET status = ? WHERE id = ?`).run(status, id);
 }
 
 export function listMuseumsAdmin() {

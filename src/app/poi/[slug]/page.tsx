@@ -5,6 +5,7 @@ import Header from "@/components/header";
 import PoiActions from "@/components/poi-actions";
 import PoiMap from "@/components/poi-map";
 import PoiPhoto from "@/components/poi-photo";
+import ReserveTable from "@/components/reserve-table";
 import {
   getCity,
   getMuseumByPoi,
@@ -161,6 +162,10 @@ export default async function PoiPage({
             lang={lang}
           />
         </div>
+
+        {(poi.category === "restaurant" || poi.category === "cafe") && (
+          <ReserveTable slug={poi.slug} lang={lang} />
+        )}
 
         <div className="mb-4">
           <AudioGuide

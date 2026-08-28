@@ -186,6 +186,15 @@ export default async function AdminPoiEditPage({
               defaultValue={poi ? String(poi.popularity) : "0.5"}
               hint="От 0,85 объект считается обязательным и ставится в маршрут первым"
             />
+            <Input
+              name="sponsored_priority"
+              label="Приоритет в топе"
+              type="number"
+              min={0}
+              step={1}
+              defaultValue={poi?.sponsored_priority ? String(poi.sponsored_priority) : "0"}
+              hint="Только рестораны/кафе/зоны отдыха — чем выше, тем раньше в списке"
+            />
           </div>
 
           <div className="mt-4 grid gap-3 sm:grid-cols-3">

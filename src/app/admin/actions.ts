@@ -15,6 +15,7 @@ import {
   ensureMuseum,
   setPoiActive,
   setPoiAudio,
+  updateReservationStatus,
   upsertCity,
   upsertExhibit,
   upsertPoi,
@@ -182,6 +183,7 @@ export async function savePoi(_prev: ActionResult | null, formData: FormData): P
       phone: str(formData, "phone") || null,
       website: str(formData, "website") || null,
       isActive: str(formData, "is_active") === "on",
+      sponsoredPriority: Math.max(0, num(formData, "sponsored_priority")),
       translations,
     });
 
@@ -397,4 +399,16 @@ export async function removeExhibit(formData: FormData): Promise<void> {
   await requireAuth();
   deleteExhibit(num(formData, "id"));
   revalidatePath("/admin/museums");
+}
+
+/* ------------------------------------------------------------------ */
+/* Заявки на столик                                                   */
+/* ------------------------------------------------------------------ */
+
+export async function setReservationStatus(formData: FormData): Promise<void> {
+  await requireAuth();
+  const status = str(formData, "status");
+  if (status !== "confirmed" && status !== "declined" && status !== "new") return;
+  updateReservationStatus(num(formData, "id"), status);
+  revalidatePath("/admin/reservations");
 }

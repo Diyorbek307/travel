@@ -16,6 +16,7 @@ export const CATEGORIES = [
   "nature",
   "restaurant",
   "cafe",
+  "rest_zone",
   "hotel",
   "bazaar",
   "craft",
@@ -90,6 +91,25 @@ export interface Poi {
   audio_url?: string | null;
   audio_duration_sec?: number | null;
   qr_code?: string | null;
+  /**
+   * Платное размещение в топе (только рестораны/кафе/зоны отдыха, из
+   * venue_details). 0 у всех остальных категорий — влияет на сортировку
+   * везде, где вызывается listPois, без отдельной логики ранжирования.
+   */
+  sponsored_priority?: number;
+}
+
+/** Заявка на столик — не подтверждённая бронь, администратор перезванивает сам. */
+export interface Reservation {
+  id: number;
+  poi_id: number;
+  name: string;
+  phone: string;
+  party_size: number;
+  requested_at: string;
+  note: string | null;
+  status: "new" | "confirmed" | "declined";
+  created_at: string;
 }
 
 export interface Museum {
@@ -173,4 +193,5 @@ export type EventType =
   | "tour_open"
   | "favorite_add"
   | "gps_nearby_shown"
-  | "offline_download";
+  | "offline_download"
+  | "reservation_request";

@@ -42,7 +42,9 @@ export type IconName =
   /* Плеер аудиогида: своя пара вместо символов ▶/⏹ — эмодзи рисует шрифт
      системы и на разных платформах выглядит по-разному. */
   | "play"
-  | "pause";
+  | "pause"
+  /* Заявка на бронирование столика. */
+  | "booking";
 
 export const ICON_PATHS: Record<IconName, string> = {
   /* --- Категории объектов (п. 2.1 ТЗ) --- */
@@ -56,6 +58,8 @@ export const ICON_PATHS: Record<IconName, string> = {
     '<path d="M6 3v8a2 2 0 0 0 4 0V3"/><path d="M8 11v10"/><path d="M17 3c-1.5 1.5-2 3-2 5s.7 2.5 2 2.5V21"/>',
   cafe:
     '<path d="M4 8h12v5a5 5 0 0 1-10 0V8Z"/><path d="M16 9h2a2.5 2.5 0 0 1 0 5h-2"/><path d="M4 21h14"/>',
+  rest_zone:
+    '<path d="M12 3v6"/><path d="M4 9h16l-2 4H6L4 9Z"/><path d="M6 13v8M18 13v8"/><path d="M4 21h16"/>',
   hotel:
     '<path d="M3 18V7"/><path d="M3 12h14a4 4 0 0 1 4 4v2"/><path d="M3 18h18"/><circle cx="7.5" cy="9.5" r="1.75"/>',
   bazaar:
@@ -96,6 +100,8 @@ export const ICON_PATHS: Record<IconName, string> = {
   sparkle: '<path d="M12 4l1.6 4.4L18 10l-4.4 1.6L12 16l-1.6-4.4L6 10l4.4-1.6L12 4Z"/>',
   play: '<path d="M8 5.5v13l11-6.5-11-6.5Z"/>',
   pause: '<path d="M7 5h4v14H7ZM13 5h4v14h-4Z"/>',
+  booking:
+    '<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 9.5h16"/><path d="M8 3v3M16 3v3"/><path d="m9 14 2 2 4-4"/>',
   sos:
     '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5v5"/><circle cx="12" cy="16" r="0.6" fill="currentColor"/>',
 
