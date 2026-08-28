@@ -64,18 +64,22 @@ export default async function HomePage() {
         при прокрутке лист уходит по ней вверх — это и создаёт ощущение
         глубины, ради которого приём выбран.
       */}
-      <div className="pointer-events-none fixed inset-x-0 top-0 z-0 h-[58vh]" aria-hidden>
+      <div
+        className="pointer-events-none fixed inset-x-0 top-0 z-0 h-[58vh] overflow-hidden"
+        aria-hidden
+      >
         {stage && (
           // Кадр смещён вниз: снимки памятников сняты с запасом неба сверху,
           // и при обрезке по центру в кадр попадает пустое небо, а само
-          // здание уходит за нижний край.
+          // здание уходит за нижний край. overflow-hidden на обёртке нужен
+          // из-за kenburns — без него зум съезжал бы за пределы шапки.
           <Image
             src={stage}
             alt=""
             fill
             priority
             sizes="100vw"
-            className="object-cover"
+            className="kenburns object-cover"
             style={{ objectPosition: "center 78%" }}
           />
         )}

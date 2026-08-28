@@ -327,6 +327,85 @@ body {
   to   { opacity: 1; transform: none; }
 }
 
+/*
+ * Фоновое дыхание приложения: те же два пятна, что и в «авроре», растянутые
+ * на весь экран, очень тихие (яркость зашита в rgb-альфе) и всегда позади
+ * контента (z-index: -1 не создаёт своего слоя выше обычной вёрстки).
+ * Экран /explore и обложка первого экрана рисуются поверх — там пятна
+ * просто не видны, слой не мешает и не удваивает движение.
+ */
+.ambient-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+.ambient-bg::before,
+.ambient-bg::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  will-change: transform;
+}
+.ambient-bg::before {
+  width: 60vmax;
+  height: 60vmax;
+  left: -18vmax;
+  top: -14vmax;
+  background: radial-gradient(circle, rgb(124 182 206 / 0.28), transparent 70%);
+  animation: ambient-a 34s ease-in-out infinite alternate;
+}
+.ambient-bg::after {
+  width: 54vmax;
+  height: 54vmax;
+  right: -16vmax;
+  bottom: -12vmax;
+  background: radial-gradient(circle, rgb(233 196 106 / 0.22), transparent 70%);
+  animation: ambient-b 40s ease-in-out infinite alternate;
+}
+@keyframes ambient-a {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to   { transform: translate3d(6vmax, 5vmax, 0) scale(1.12); }
+}
+@keyframes ambient-b {
+  from { transform: translate3d(0, 0, 0) scale(1.05); }
+  to   { transform: translate3d(-5vmax, -4vmax, 0) scale(0.92); }
+}
+
+/* Медленный «дышащий» зум фотографии — кадр живёт, а не стоит стоп-кадром.
+   Только transform, поэтому дёшево даже рядом с трёхмерной сценой. Класс
+   вешается на конкретных крупных снимках (сцена, шапка города/объекта),
+   а не в PoiPhoto целиком — миниатюры в списках не должны шевелиться. */
+.kenburns {
+  animation: kenburns 26s ease-in-out infinite alternate;
+  will-change: transform;
+}
+@keyframes kenburns {
+  from { transform: scale(1); }
+  to   { transform: scale(1.08); }
+}
+
+/* 3D-разворот карточек-витрин: тот же язык, что у рельефной карты, только
+   в масштабе карточки. animation-delay берётся из --tilt-delay, которую
+   страница проставляет по индексу карточки в строке — так они не выходят
+   одной пачкой, а раскрываются по очереди. */
+.tilt-in {
+  animation: tilt-in 620ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  animation-delay: var(--tilt-delay, 0ms);
+}
+@keyframes tilt-in {
+  from {
+    opacity: 0;
+    transform: perspective(800px) rotateY(-12deg) rotateX(4deg) translateY(14px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: perspective(800px) rotateY(0) rotateX(0) translateY(0) scale(1);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .pressable {
     transition: none;

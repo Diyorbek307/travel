@@ -59,7 +59,7 @@ export default async function CityPage({
       <main className="mx-auto max-w-3xl px-4 py-4">
         {hero && (
           <section className="relative -mx-4 mb-4 h-[23rem] overflow-hidden sm:mx-0 sm:rounded-[var(--radius-lg)]">
-            <PoiPhoto poi={hero} priority sizes="(max-width: 768px) 100vw, 768px" />
+            <PoiPhoto poi={hero} priority sizes="(max-width: 768px) 100vw, 768px" className="kenburns" />
             <div
               aria-hidden
               className="absolute inset-0"
@@ -175,7 +175,11 @@ export default async function CityPage({
             <h2 className="mb-2 font-semibold">{t(lang, "top_places")}</h2>
             <div className="no-scrollbar -mx-4 flex gap-3 overflow-x-auto px-4 pb-1">
               {featured.map((poi, i) => (
-                <div key={poi.id} className="w-44 shrink-0">
+                <div
+                  key={poi.id}
+                  className="w-44 shrink-0"
+                  style={{ "--tilt-delay": `${i * 70}ms` } as React.CSSProperties}
+                >
                   <PoiCard poi={poi} lang={lang} variant="feature" priority={i === 0} />
                 </div>
               ))}

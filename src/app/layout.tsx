@@ -39,6 +39,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang={lang} dir={lang === "ar" ? "rtl" : "ltr"} suppressHydrationWarning>
       <body>
+        {/* Фоновая анимация на весь сайт — см. .ambient-bg в globals.css. */}
+        <div className="ambient-bg" aria-hidden />
         <AppStateProvider>
           {children}
           <BottomNav items={nav} />

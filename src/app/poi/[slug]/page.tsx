@@ -61,6 +61,7 @@ export default async function PoiPage({
               poi={poi}
               priority
               sizes="(max-width: 768px) 100vw, 768px"
+              className="kenburns"
             />
             <div
               aria-hidden

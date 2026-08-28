@@ -41,7 +41,7 @@ export default function PoiCard({
     return (
       <Link
         href={`/poi/${poi.slug}`}
-        className="pressable group relative block aspect-[3/4] overflow-hidden rounded-[var(--radius-lg)]"
+        className="pressable tilt-in group relative block aspect-[3/4] overflow-hidden rounded-[var(--radius-lg)]"
         style={{ boxShadow: "var(--shadow-2)" }}
       >
         <PoiPhoto
