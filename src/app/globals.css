@@ -411,11 +411,13 @@ body {
 }
 
 /*
- * Сюжет «путешествие»: дуга маршрута из угла в угол, как на карте
- * авиалиний, с пунктиром «в движении» и точками вылета/прилёта —
- * и самолёт, который эту дугу пролетает. Цветные пятна дают настроение,
- * это — конкретный образ, ради которого просили анимацию «про
- * путешествие», а не абстракцию.
+ * Сюжет «путешествие»: пин на точке отправления, дуга маршрута к ней,
+ * как на карте авиалиний, и самолёт, который эту дугу пролетает —
+ * тот же образ, что на присланном референсе, только живой. Пин и
+ * пульс-кольцо вынесены ИЗ svg дуги отдельными элементами с процентным
+ * left/top: у дуги preserveAspectRatio="none" (тянется неравномерно под
+ * прямоугольный экран), и круг/иконка внутри неё превратились бы в
+ * эллипс — так их форма не зависит от соотношения сторон экрана.
  */
 .ambient-route {
   position: absolute;
@@ -435,20 +437,38 @@ body {
 @keyframes route-march {
   to { stroke-dashoffset: -36; }
 }
-.ambient-route-dot {
+
+.ambient-pin {
+  position: absolute;
+  left: 6%;
+  top: 90%;
+  width: 20px;
+  height: 20px;
+  margin: -20px 0 0 -10px; /* остриём точно в точку отправления */
   fill: var(--primary);
-  opacity: 0.5;
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: route-dot-pulse 2.8s ease-in-out infinite;
+  opacity: 0.6;
+  filter: drop-shadow(0 2px 5px rgb(31 111 139 / 0.4));
+  animation: pin-drop 2.8s ease-in-out infinite;
 }
-.ambient-route-dot--end {
-  fill: var(--accent-strong);
-  animation-delay: 1.4s;
+.ambient-pin-ring {
+  position: absolute;
+  left: 6%;
+  top: 90%;
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
+  border-radius: 50%;
+  background: var(--primary);
+  opacity: 0.3;
+  animation: pin-ring-pulse 2.8s ease-in-out infinite;
 }
-@keyframes route-dot-pulse {
-  0%, 100% { transform: scale(1); opacity: 0.35; }
-  50%      { transform: scale(1.9); opacity: 0.75; }
+@keyframes pin-drop {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-3px); }
+}
+@keyframes pin-ring-pulse {
+  0%   { transform: scale(0.6); opacity: 0.4; }
+  70%, 100% { transform: scale(2.4); opacity: 0; }
 }
 
 /* Самолёт летит той же диагональю, что и дуга маршрута выше — глиф уже
