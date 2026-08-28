@@ -38,7 +38,11 @@ export type IconName =
   | "rain"
   | "snow"
   | "storm"
-  | "fog";
+  | "fog"
+  /* Плеер аудиогида: своя пара вместо символов ▶/⏹ — эмодзи рисует шрифт
+     системы и на разных платформах выглядит по-разному. */
+  | "play"
+  | "pause";
 
 export const ICON_PATHS: Record<IconName, string> = {
   /* --- Категории объектов (п. 2.1 ТЗ) --- */
@@ -90,6 +94,8 @@ export const ICON_PATHS: Record<IconName, string> = {
     '<path d="M4 8h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4V8Z"/><path d="M13 8v10" stroke-dasharray="2 2.5"/>',
   shield: '<path d="M12 3.5 19 6v6c0 4.2-3 7.2-7 8.5-4-1.3-7-4.3-7-8.5V6l7-2.5Z"/><path d="m9 12 2 2 4-4"/>',
   sparkle: '<path d="M12 4l1.6 4.4L18 10l-4.4 1.6L12 16l-1.6-4.4L6 10l4.4-1.6L12 4Z"/>',
+  play: '<path d="M8 5.5v13l11-6.5-11-6.5Z"/>',
+  pause: '<path d="M7 5h4v14H7ZM13 5h4v14h-4Z"/>',
   sos:
     '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5v5"/><circle cx="12" cy="16" r="0.6" fill="currentColor"/>',
 

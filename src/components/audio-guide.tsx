@@ -58,10 +58,14 @@ export default function AudioGuide({
   const audioRef = useRef<HTMLAudioElement>(null);
 
   const plainStory = story ? stripMarkdown(story) : "";
-  const estimatedSec = durationSec ?? Math.round((plainStory.split(/\s+/).length / WORDS_PER_MINUTE) * 60);
+  const estimatedSec =
+    durationSec ??
+    Math.round((plainStory.split(/\s+/).length / WORDS_PER_MINUTE) * 60);
 
   useEffect(() => {
-    setSpeechAvailable(typeof window !== "undefined" && "speechSynthesis" in window);
+    setSpeechAvailable(
+      typeof window !== "undefined" && "speechSynthesis" in window,
+    );
     // Уходя со страницы, обрываем чтение — иначе голос продолжит звучать.
     return () => {
       if (typeof window !== "undefined" && "speechSynthesis" in window) {
@@ -74,7 +78,8 @@ export default function AudioGuide({
     setPlaying(false);
     setProgress(completed ? 1 : progress);
     addListen({ slug, name, completed });
-    if (completed) track("audio_complete", { poi_id: poiId, city_id: cityId, lang });
+    if (completed)
+      track("audio_complete", { poi_id: poiId, city_id: cityId, lang });
   }
 
   /* --- Профессиональная запись ------------------------------------- */
@@ -83,7 +88,9 @@ export default function AudioGuide({
     return (
       <section className="p-4 card">
         <div className="mb-2 flex items-center gap-2">
-          <span style={{ color: "var(--primary-text)" }}><Icon name="headphones" size={22} /></span>
+          <span style={{ color: "var(--primary-text)" }}>
+            <Icon name="headphones" size={22} />
+          </span>
           <span className="font-medium">Аудиогид</span>
           {durationSec ? (
             <span className="text-xs soft">{formatClock(durationSec)}</span>
@@ -136,34 +143,45 @@ export default function AudioGuide({
   }
 
   return (
-    <section className="rounded-xl p-4 surface">
+    <section className="p-4 card">
       <div className="mb-3 flex items-center gap-2">
-        <span style={{ color: "var(--primary-text)" }}><Icon name="headphones" size={22} /></span>
+        <span style={{ color: "var(--primary-text)" }}>
+          <Icon name="headphones" size={22} />
+        </span>
         <span className="font-medium">Аудиогид</span>
         <span className="text-xs soft">≈ {formatClock(estimatedSec)}</span>
       </div>
 
       {!plainStory ? (
-        <p className="text-sm soft">Текст истории для этого объекта ещё не написан.</p>
+        <p className="text-sm soft">
+          Текст истории для этого объекта ещё не написан.
+        </p>
       ) : !speechAvailable ? (
         <p className="text-sm soft">
           Браузер не поддерживает озвучивание. Историю можно прочитать ниже.
         </p>
       ) : (
         <>
+          {/* Свои иконки вместо ▶/⏹: символы рисует системный шрифт и на
+              разных платформах они выглядят по-разному и не подчиняются
+              цветовым токенам. */}
           <button
             onClick={playing ? stop : speak}
             className="pressable flex min-h-12 w-full items-center justify-center gap-2 rounded-[var(--radius-full)] px-4 font-medium"
             style={{ background: "var(--primary)", color: "var(--on-primary)" }}
           >
-            {playing ? "⏹ Остановить" : "▶  Слушать историю"}
+            <Icon name={playing ? "pause" : "play"} size={18} filled />
+            {playing ? "Остановить" : "Слушать историю"}
           </button>
 
           {playing && (
             <div className="mt-3 h-1 overflow-hidden rounded-full bg-soft">
               <div
                 className="h-full transition-[width] duration-300"
-                style={{ width: `${progress * 100}%`, background: "var(--primary)" }}
+                style={{
+                  width: `${progress * 100}%`,
+                  background: "var(--primary)",
+                }}
               />
             </div>
           )}

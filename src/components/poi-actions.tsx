@@ -48,19 +48,42 @@ export default function PoiActions({
   // До чтения localStorage состояние кнопок неизвестно — показываем заглушку,
   // иначе при гидратации кнопки мигнут из «не в избранном» в «в избранном».
   if (!ready) {
-    return <div className="h-11 animate-pulse rounded-lg bg-soft" aria-hidden />;
+    return (
+      <div className="h-11 animate-pulse rounded-lg bg-soft" aria-hidden />
+    );
   }
+
+  /*
+   * Активное состояние раньше меняло только цвет текста поверх той же
+   * белой плашки — разница едва читалась. Теперь активная кнопка получает
+   * заливку: «Посещено» — золотую, тем же акцентом, что и звезда рейтинга
+   * и нить Шёлкового пути на карте, — это уже цвет «достижения» в
+   * приложении, а не новый смысл. Остальные два — фирменную тёмно-синюю.
+   */
+  const tint = (active: boolean, gold = false) =>
+    active
+      ? gold
+        ? "color-mix(in srgb, var(--accent) 24%, transparent)"
+        : "var(--primary-tint)"
+      : "var(--surface)";
+  const ink = (active: boolean, gold = false) =>
+    active
+      ? gold
+        ? "var(--accent-strong)"
+        : "var(--primary-text)"
+      : "var(--text-soft)";
 
   return (
     <div className="grid grid-cols-3 gap-2">
       <button
         onClick={() => {
           toggleFavorite(slug);
-          if (!isFavorite) track("favorite_add", { poi_id: poiId, city_id: cityId, lang });
+          if (!isFavorite)
+            track("favorite_add", { poi_id: poiId, city_id: cityId, lang });
         }}
         aria-pressed={isFavorite}
         className="pressable flex min-h-12 items-center justify-center gap-1.5 rounded-[var(--radius-full)] px-2 text-sm card"
-        style={{ color: isFavorite ? "var(--primary-text)" : "var(--text-soft)" }}
+        style={{ background: tint(isFavorite), color: ink(isFavorite) }}
       >
         <Icon name="heart" size={18} filled={isFavorite} />
         <span>Избранное</span>
@@ -70,7 +93,7 @@ export default function PoiActions({
         onClick={() => toggleWantToVisit(slug)}
         aria-pressed={isWanted}
         className="pressable flex min-h-12 items-center justify-center gap-1.5 rounded-[var(--radius-full)] px-2 text-sm card"
-        style={{ color: isWanted ? "var(--primary-text)" : "var(--text-soft)" }}
+        style={{ background: tint(isWanted), color: ink(isWanted) }}
       >
         <Icon name="explore" size={18} filled={isWanted} />
         <span>{isWanted ? "В планах" : "Хочу"}</span>
@@ -79,8 +102,11 @@ export default function PoiActions({
       <button
         onClick={() => !isVisited && addVisit({ slug, city: citySlug, name })}
         disabled={isVisited}
-        className="pressable flex min-h-12 items-center justify-center gap-1.5 rounded-[var(--radius-full)] px-2 text-sm card disabled:opacity-70"
-        style={{ color: isVisited ? "var(--primary-text)" : "var(--text-soft)" }}
+        className="pressable flex min-h-12 items-center justify-center gap-1.5 rounded-[var(--radius-full)] px-2 text-sm card disabled:opacity-100"
+        style={{
+          background: tint(isVisited, true),
+          color: ink(isVisited, true),
+        }}
       >
         <Icon name="ticket" size={18} filled={isVisited} />
         <span>{isVisited ? "Посещено" : "Отметить"}</span>
