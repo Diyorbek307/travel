@@ -7,6 +7,8 @@ import PoiCard from "@/components/poi-card";
 import { listCities, listFestivals, listPois, listTours, cityCovers, tourCovers } from "@/lib/db";
 import { t } from "@/lib/i18n";
 import { conditionLabel, getCurrentBatch, getForecast, weatherIcon } from "@/lib/weather";
+import { getRates } from "@/lib/rates";
+import CurrencyConverter from "@/components/currency-converter";
 import { currentLang } from "@/lib/server-lang";
 import type { Category, Festival, Lang } from "@/lib/types";
 
@@ -69,6 +71,8 @@ export default async function HomePage() {
   const cities = listCities(lang);
   const tours = listTours(lang).filter((x) => x.kind === "curated");
   const festivals = listFestivals(lang, 8);
+  // Курсы ЦБ для конвертера. Не ответил — блок просто не покажется.
+  const rates = await getRates();
   const allPois = listPois({ lang });
   const totalPois = allPois.length;
 
@@ -595,6 +599,11 @@ export default async function HomePage() {
         {/* ---------------- Полезно знать ---------------- */}
         <section className="mb-8">
           <h2 className="mb-3 text-base font-semibold">{t(lang, "practical_title")}</h2>
+          {rates.length > 0 && (
+            <div className="mb-2">
+              <CurrencyConverter rates={rates} lang={lang} />
+            </div>
+          )}
           <ul className="grid gap-2 sm:grid-cols-2">
             {TIPS.map((tip) => {
               const body = (
