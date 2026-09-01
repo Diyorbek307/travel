@@ -99,6 +99,25 @@ export interface Poi {
   sponsored_priority?: number;
 }
 
+/** Места, куда можно поставить рекламный блок. */
+export const AD_SLOTS = ["city", "explore", "audio", "profile"] as const;
+export type AdSlot = (typeof AD_SLOTS)[number];
+
+/** Рекламный блок. Приложение бесплатное и живёт за счёт рекламы. */
+export interface AdBanner {
+  id: number;
+  slot: AdSlot;
+  /** Язык показа; null — показывать на всех языках. */
+  lang: Lang | null;
+  title: string;
+  subtitle: string | null;
+  cta_label: string | null;
+  url: string;
+  weight: number;
+  starts_at: string | null;
+  ends_at: string | null;
+}
+
 /** Заявка на столик — не подтверждённая бронь, администратор перезванивает сам. */
 export interface Reservation {
   id: number;
@@ -194,4 +213,5 @@ export type EventType =
   | "favorite_add"
   | "gps_nearby_shown"
   | "offline_download"
-  | "reservation_request";
+  | "reservation_request"
+  | "ad_click";

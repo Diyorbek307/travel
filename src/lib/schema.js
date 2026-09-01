@@ -164,6 +164,28 @@ export const SCHEMA_SQL = `
     );
     CREATE INDEX IF NOT EXISTS idx_reservations_poi ON reservations(poi_id, created_at);
 
+    -- Рекламные блоки. Переводов нет намеренно: креатив приходит от
+    -- рекламодателя на конкретном языке, а не переводится нами. lang = NULL
+    -- означает «показывать всем». Даты размещения обязательны для
+    -- открутки по оплаченному периоду, счётчики — для отчёта рекламодателю.
+    CREATE TABLE IF NOT EXISTS ad_banners (
+      id          INTEGER PRIMARY KEY AUTOINCREMENT,
+      slot        TEXT NOT NULL,
+      lang        TEXT,
+      title       TEXT NOT NULL,
+      subtitle    TEXT,
+      cta_label   TEXT,
+      url         TEXT NOT NULL,
+      weight      INTEGER NOT NULL DEFAULT 0,
+      starts_at   TEXT,
+      ends_at     TEXT,
+      impressions INTEGER NOT NULL DEFAULT 0,
+      clicks      INTEGER NOT NULL DEFAULT 0,
+      is_active   INTEGER NOT NULL DEFAULT 1,
+      created_at  TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+    CREATE INDEX IF NOT EXISTS idx_ads_slot ON ad_banners(slot, is_active, weight);
+
     -- Обезличенная аналитика (п. 17): только хэш сессии, без персональных данных.
     CREATE TABLE IF NOT EXISTS events (
       id           INTEGER PRIMARY KEY AUTOINCREMENT,

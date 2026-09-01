@@ -4,6 +4,8 @@ import path from "node:path";
 import { SCHEMA_SQL } from "./schema.js";
 import { dbPath } from "./paths.js";
 import type {
+  AdBanner,
+  AdSlot,
   Category,
   City,
   Exhibit,
@@ -395,6 +397,56 @@ export function createReservation(input: {
      VALUES (?, ?, ?, ?, ?, ?)`,
   ).run(input.poi_id, input.name, input.phone, input.party_size, input.requested_at, input.note);
   return Number((db.prepare(`SELECT last_insert_rowid() AS id`).get() as Row).id);
+}
+
+/**
+ * Баннер для места показа.
+ *
+ * Отбирается один, а не список: рекламный блок в макете единственный на
+ * экран. Фильтр по датам — открутка идёт только внутри оплаченного
+ * периода; NULL с обеих сторон означает «бессрочно». Язык либо совпадает
+ * с языком интерфейса, либо у баннера не задан — тогда он общий.
+ */
+export function pickAdBanner(slot: AdSlot, lang: Lang): AdBanner | null {
+  const db = getDb();
+  const row = db
+    .prepare(
+      `SELECT id, slot, lang, title, subtitle, cta_label, url, weight, starts_at, ends_at
+         FROM ad_banners
+        WHERE is_active = 1
+          AND slot = ?
+          AND (lang IS NULL OR lang = ?)
+          AND (starts_at IS NULL OR starts_at <= datetime('now'))
+          AND (ends_at   IS NULL OR ends_at   >= datetime('now'))
+        ORDER BY weight DESC, id
+        LIMIT 1`,
+    )
+    .get(slot, lang) as Row | undefined;
+  if (!row) return null;
+
+  // Показ засчитываем здесь же: отдельный запрос с клиента ради счётчика
+  // блокировался бы любым блокировщиком рекламы, и отчёт рекламодателю
+  // оказался бы заниженным.
+  db.prepare(`UPDATE ad_banners SET impressions = impressions + 1 WHERE id = ?`).run(
+    Number(row.id),
+  );
+
+  return {
+    id: Number(row.id),
+    slot: String(row.slot) as AdSlot,
+    lang: (row.lang as Lang) ?? null,
+    title: String(row.title),
+    subtitle: (row.subtitle as string) ?? null,
+    cta_label: (row.cta_label as string) ?? null,
+    url: String(row.url),
+    weight: Number(row.weight),
+    starts_at: (row.starts_at as string) ?? null,
+    ends_at: (row.ends_at as string) ?? null,
+  };
+}
+
+export function countAdClick(id: number): void {
+  getDb().prepare(`UPDATE ad_banners SET clicks = clicks + 1 WHERE id = ?`).run(id);
 }
 
 export function analytics() {

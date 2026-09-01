@@ -61,6 +61,19 @@ export default function PoiCard({
           }}
         />
 
+        {/* Платное размещение помечается бейджем: место подняли в списке
+            за деньги, и турист должен видеть, что порядок здесь не только
+            по рейтингу. Формулировка мягкая — «рекомендуем», а не «реклама»:
+            заведение реальное и проверено редакцией, платной была позиция. */}
+        {(poi.sponsored_priority ?? 0) > 0 && (
+          <span
+            className="absolute left-3 top-3 rounded-full px-2.5 py-1 text-[0.65rem] font-semibold uppercase tracking-wide"
+            style={{ background: "var(--accent)", color: "#2b2b2b" }}
+          >
+            {t(lang, "featured_badge")}
+          </span>
+        )}
+
         <span
           className="absolute right-3 top-3 rounded-full px-2.5 py-1 text-xs"
           style={{

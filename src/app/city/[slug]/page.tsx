@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import AdBannerSlot from "@/components/ad-slot";
 import CityTracker from "@/components/city-tracker";
 import Header from "@/components/header";
 import OfflineButton from "@/components/offline-button";
@@ -191,6 +192,11 @@ export default async function CityPage({
             </div>
           </section>
         )}
+
+        {/* Реклама стоит между витринами, а не в углу: приложение
+            бесплатное и живёт за счёт неё, поэтому блок должен попадать
+            в поле зрения при обычной прокрутке. */}
+        <AdBannerSlot slot="city" lang={lang} className="mb-5" />
 
         {dining.length > 0 && (
           <section className="mb-5">

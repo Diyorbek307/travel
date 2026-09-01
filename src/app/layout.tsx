@@ -26,11 +26,11 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: "Uzbekistan Travel — ваш персональный гид",
+  title: "UzUp — ваш персональный гид по Узбекистану",
   description:
     "Маршруты, аудиогиды, музеи и достопримечательности Узбекистана в одном приложении. Работает офлайн.",
   manifest: "/manifest.webmanifest",
-  appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "Uzbekistan Travel" },
+  appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "UzUp" },
 };
 
 export const viewport: Viewport = {

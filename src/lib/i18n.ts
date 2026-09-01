@@ -77,7 +77,7 @@ export const LANG_FLAG: Record<Lang, string> = {
 type Dict = Record<string, string>;
 
 const ru: Dict = {
-  app_name: "Uzbekistan Travel",
+  app_name: "UzUp",
   tagline: "Узбекистан без гида — ваш персональный гид всегда с вами",
   choose_city: "Выберите город",
   cities: "Города",
@@ -191,10 +191,13 @@ const ru: Dict = {
   reserve_submit: "Отправить заявку",
   reserve_sent: "Заявка отправлена — с вами свяжутся, чтобы подтвердить столик.",
   reserve_error: "Не получилось отправить заявку. Попробуйте ещё раз.",
+  featured_badge: "Рекомендуем",
+  ad_label: "Реклама",
+  ad_hide: "Скрыть",
 };
 
 const uz: Dict = {
-  app_name: "Uzbekistan Travel",
+  app_name: "UzUp",
   tagline: "Gidsiz O'zbekiston — shaxsiy gidingiz doim yoningizda",
   choose_city: "Shaharni tanlang",
   cities: "Shaharlar",
@@ -308,10 +311,13 @@ const uz: Dict = {
   reserve_submit: "Ariza yuborish",
   reserve_sent: "Ariza yuborildi — stolni tasdiqlash uchun siz bilan bog'lanishadi.",
   reserve_error: "Arizani yuborib bo'lmadi. Qayta urinib ko'ring.",
+  featured_badge: "Tavsiya",
+  ad_label: "Reklama",
+  ad_hide: "Yashirish",
 };
 
 const en: Dict = {
-  app_name: "Uzbekistan Travel",
+  app_name: "UzUp",
   tagline: "Uzbekistan without a guide — your personal guide is always with you",
   choose_city: "Choose a city",
   cities: "Cities",
@@ -425,6 +431,9 @@ const en: Dict = {
   reserve_submit: "Send request",
   reserve_sent: "Request sent — the venue will contact you to confirm.",
   reserve_error: "Couldn't send the request. Please try again.",
+  featured_badge: "Featured",
+  ad_label: "Ad",
+  ad_hide: "Hide",
 };
 
 const DICTS: Partial<Record<Lang, Dict>> = { ru, uz, en };

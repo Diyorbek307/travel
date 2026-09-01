@@ -14,6 +14,7 @@ const NAV = [
   { href: "/admin/tours", label: "Маршруты" },
   { href: "/admin/museums", label: "Музеи" },
   { href: "/admin/reservations", label: "Столики" },
+  { href: "/admin/ads", label: "Реклама" },
   { href: "/admin/analytics", label: "Аналитика" },
 ];
 

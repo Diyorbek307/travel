@@ -7,6 +7,7 @@ import { revalidatePath } from "next/cache";
 import { ADMIN_COOKIE, checkPassword, isAuthenticated, makeToken } from "@/lib/admin-auth";
 import { mediaDir } from "@/lib/paths.js";
 import {
+  deleteAdBanner,
   deleteExhibit,
   deletePoi,
   deletePoiAudio,
@@ -14,15 +15,17 @@ import {
   deleteTour,
   ensureMuseum,
   setPoiActive,
+  setAdBannerActive,
   setPoiAudio,
   updateReservationStatus,
+  upsertAdBanner,
   upsertCity,
   upsertExhibit,
   upsertPoi,
   upsertQr,
   upsertTour,
 } from "@/lib/admin-db";
-import { LANGS, type Category, type Lang, type OpeningHours, type Theme } from "@/lib/types";
+import { AD_SLOTS, LANGS, type Category, type Lang, type OpeningHours, type Theme } from "@/lib/types";
 
 export interface ActionResult {
   ok: boolean;
@@ -399,6 +402,71 @@ export async function removeExhibit(formData: FormData): Promise<void> {
   await requireAuth();
   deleteExhibit(num(formData, "id"));
   revalidatePath("/admin/museums");
+}
+
+/* ------------------------------------------------------------------ */
+/* Рекламные блоки                                                    */
+/* ------------------------------------------------------------------ */
+
+export async function saveAd(_prev: ActionResult | null, formData: FormData): Promise<ActionResult> {
+  await requireAuth();
+
+  const title = str(formData, "title");
+  const url = str(formData, "url");
+  if (!title) return { ok: false, message: "Укажите заголовок объявления" };
+
+  // Адрес проверяем здесь, а не только при переходе: администратор должен
+  // увидеть ошибку сразу, а не получить нерабочий баннер в открутке.
+  let parsed: URL;
+  try {
+    parsed = new URL(url);
+  } catch {
+    return { ok: false, message: "Ссылка должна быть полной, вместе с https://" };
+  }
+  if (parsed.protocol !== "https:" && parsed.protocol !== "http:") {
+    return { ok: false, message: "Разрешены только ссылки http и https" };
+  }
+
+  const slot = str(formData, "slot");
+  if (!(AD_SLOTS as readonly string[]).includes(slot)) {
+    return { ok: false, message: "Неизвестное место показа" };
+  }
+
+  const lang = str(formData, "lang");
+  const starts = str(formData, "starts_at");
+  const ends = str(formData, "ends_at");
+  if (starts && ends && starts > ends) {
+    return { ok: false, message: "Дата начала позже даты окончания" };
+  }
+
+  upsertAdBanner({
+    id: num(formData, "id") || undefined,
+    slot,
+    lang: lang && (LANGS as readonly string[]).includes(lang) ? lang : null,
+    title,
+    subtitle: str(formData, "subtitle") || null,
+    ctaLabel: str(formData, "cta_label") || null,
+    url,
+    weight: num(formData, "weight"),
+    startsAt: starts || null,
+    endsAt: ends || null,
+    isActive: str(formData, "is_active") === "on",
+  });
+
+  revalidatePath("/admin/ads");
+  return { ok: true, message: `Объявление «${title}» сохранено` };
+}
+
+export async function toggleAd(formData: FormData): Promise<void> {
+  await requireAuth();
+  setAdBannerActive(num(formData, "id"), str(formData, "active") === "1");
+  revalidatePath("/admin/ads");
+}
+
+export async function removeAd(formData: FormData): Promise<void> {
+  await requireAuth();
+  deleteAdBanner(num(formData, "id"));
+  revalidatePath("/admin/ads");
 }
 
 /* ------------------------------------------------------------------ */

@@ -1,6 +1,6 @@
 {
-  "name": "Uzbekistan Travel — ваш персональный гид",
-  "short_name": "UZ Travel",
+  "name": "UzUp — ваш персональный гид по Узбекистану",
+  "short_name": "UzUp",
   "description": "Маршруты, аудиогиды, музеи и достопримечательности Узбекистана. Работает офлайн.",
   "start_url": "/",
   "scope": "/",

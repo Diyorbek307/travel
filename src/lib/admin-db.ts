@@ -388,6 +388,62 @@ export function deleteExhibit(id: number): void {
 }
 
 /* ------------------------------------------------------------------ */
+/* Рекламные блоки                                                    */
+/* ------------------------------------------------------------------ */
+
+export function upsertAdBanner(input: {
+  id?: number;
+  slot: string;
+  lang: string | null;
+  title: string;
+  subtitle: string | null;
+  ctaLabel: string | null;
+  url: string;
+  weight: number;
+  startsAt: string | null;
+  endsAt: string | null;
+  isActive: boolean;
+}): void {
+  const db = getDb();
+  if (input.id) {
+    db.prepare(
+      `UPDATE ad_banners SET slot = ?, lang = ?, title = ?, subtitle = ?,
+              cta_label = ?, url = ?, weight = ?, starts_at = ?, ends_at = ?, is_active = ?
+        WHERE id = ?`,
+    ).run(
+      input.slot, input.lang, input.title, input.subtitle, input.ctaLabel,
+      input.url, input.weight, input.startsAt, input.endsAt, input.isActive ? 1 : 0, input.id,
+    );
+    return;
+  }
+  db.prepare(
+    `INSERT INTO ad_banners (slot, lang, title, subtitle, cta_label, url, weight, starts_at, ends_at, is_active)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+  ).run(
+    input.slot, input.lang, input.title, input.subtitle, input.ctaLabel,
+    input.url, input.weight, input.startsAt, input.endsAt, input.isActive ? 1 : 0,
+  );
+}
+
+export function deleteAdBanner(id: number): void {
+  getDb().prepare(`DELETE FROM ad_banners WHERE id = ?`).run(id);
+}
+
+export function setAdBannerActive(id: number, active: boolean): void {
+  getDb().prepare(`UPDATE ad_banners SET is_active = ? WHERE id = ?`).run(active ? 1 : 0, id);
+}
+
+export function listAdBannersAdmin() {
+  return getDb()
+    .prepare(
+      `SELECT id, slot, lang, title, subtitle, cta_label, url, weight,
+              starts_at, ends_at, impressions, clicks, is_active
+         FROM ad_banners ORDER BY slot, weight DESC, id`,
+    )
+    .all() as Row[];
+}
+
+/* ------------------------------------------------------------------ */
 /* Заявки на столик                                                   */
 /* ------------------------------------------------------------------ */
 
