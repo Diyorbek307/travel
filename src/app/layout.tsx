@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Manrope } from "next/font/google";
+import { Fraunces, Manrope } from "next/font/google";
 import "./globals.css";
 import { AppStateProvider } from "@/components/app-state";
 import BottomNav from "@/components/bottom-nav";
@@ -24,6 +24,20 @@ const manrope = Manrope({
   weight: ["400", "500", "600", "700"],
   display: "swap",
   variable: "--font-sans",
+});
+
+/*
+ * Второй шрифт макета: им набраны заголовки и логотип. Кириллицы у
+ * Fraunces нет, поэтому русские заголовки останутся на Manrope — как и в
+ * самом макете, где их рисовал запасной шрифт. Смысл всё равно есть:
+ * латинское «UzUp» и цифры получают тот самый характер, ради которого
+ * шрифт и выбирали.
+ */
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  weight: ["600", "700"],
+  display: "swap",
+  variable: "--font-display",
 });
 
 export const metadata: Metadata = {
@@ -60,7 +74,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html
       lang={lang}
       dir={lang === "ar" ? "rtl" : "ltr"}
-      className={manrope.variable}
+      className={`${manrope.variable} ${fraunces.variable}`}
       suppressHydrationWarning
     >
       <body>

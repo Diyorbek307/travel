@@ -589,3 +589,81 @@ body {
     background: #fff;
   }
 }
+
+/* ------------------------------------------------------------------ */
+/* Стекло и движение из макета                                        */
+/* ------------------------------------------------------------------ */
+
+/*
+ * Три вида «стекла» — значения перенесены из исходников макета как есть.
+ * .glass поверх фотографии, .glass-light белой плашкой на снимке,
+ * .glass-dark для затемнённой подложки.
+ */
+.glass {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+.glass-light {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 0 4px 24px rgb(0 0 0 / 0.12);
+}
+.glass-dark {
+  background: rgba(0, 0, 0, 0.22);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+/* Заголовочный шрифт макета. Кириллицу Fraunces не покрывает, поэтому
+   следом идёт основной — русские заголовки просто останутся на нём. */
+.display-font {
+  font-family: var(--font-display), var(--font-sans), Georgia, serif;
+}
+
+/* Плавающие фигуры исламской геометрии в шапке — из макета. */
+@keyframes uz-float-1 {
+  0%   { transform: translateY(0) rotate(0deg) scale(1); opacity: 0.18; }
+  50%  { transform: translateY(-28px) rotate(22deg) scale(1.08); opacity: 0.28; }
+  100% { transform: translateY(0) rotate(0deg) scale(1); opacity: 0.18; }
+}
+@keyframes uz-float-2 {
+  0%   { transform: translateY(0) rotate(45deg) scale(1); opacity: 0.12; }
+  60%  { transform: translateY(-18px) rotate(72deg) scale(0.92); opacity: 0.22; }
+  100% { transform: translateY(0) rotate(45deg) scale(1); opacity: 0.12; }
+}
+@keyframes uz-float-3 {
+  0%   { transform: translateY(0) rotate(0deg); opacity: 0.08; }
+  40%  { transform: translateY(-38px) rotate(-15deg); opacity: 0.18; }
+  100% { transform: translateY(0) rotate(0deg); opacity: 0.08; }
+}
+@keyframes uz-drift {
+  0%   { transform: translate(0, 0) rotate(0deg); }
+  33%  { transform: translate(12px, -16px) rotate(30deg); }
+  66%  { transform: translate(-8px, -28px) rotate(-20deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+.uz-float-1 { animation: uz-float-1 6s ease-in-out infinite; }
+.uz-float-2 { animation: uz-float-2 8s ease-in-out infinite; }
+.uz-float-3 { animation: uz-float-3 10s ease-in-out infinite; }
+.uz-drift   { animation: uz-drift 12s ease-in-out infinite; }
+
+/* Нить Шёлкового пути, прочерчивающая себя. */
+@keyframes silk-road {
+  0%   { stroke-dashoffset: 800; opacity: 0; }
+  20%  { opacity: 0.6; }
+  80%  { opacity: 0.4; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+.silk-road-path {
+  stroke-dasharray: 800;
+  animation: silk-road 6s ease-in-out infinite;
+}
+
+/* Расходящееся кольцо у точки на карте. */
+@keyframes pulse-ring {
+  0%   { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+.pulse-ring { animation: pulse-ring 2s ease-out infinite; }

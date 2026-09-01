@@ -44,7 +44,10 @@ export type IconName =
   | "play"
   | "pause"
   /* Заявка на бронирование столика. */
-  | "booking";
+  | "booking"
+  /* Знак приложения и колокол уведомлений — из макета. */
+  | "logo"
+  | "menu-lines";
 
 export const ICON_PATHS: Record<IconName, string> = {
   /* --- Категории объектов (п. 2.1 ТЗ) --- */
@@ -100,6 +103,10 @@ export const ICON_PATHS: Record<IconName, string> = {
   sparkle: '<path d="M12 4l1.6 4.4L18 10l-4.4 1.6L12 16l-1.6-4.4L6 10l4.4-1.6L12 4Z"/>',
   play: '<path d="M8 5.5v13l11-6.5-11-6.5Z"/>',
   pause: '<path d="M7 5h4v14H7ZM13 5h4v14h-4Z"/>',
+  /* Знак приложения: восьмиконечная звезда в круге — перенесён из макета. */
+  logo:
+    '<circle cx="12" cy="12" r="10.5" stroke-width="1.6"/><path d="M12 4l2.3 4.9 5.3.5-3.9 3.7 1.2 5.3L12 15.9 7.1 18.4l1.2-5.3L4.4 9.4l5.3-.5z" stroke-width="1.3"/><circle cx="12" cy="12" r="2.2" fill="currentColor" stroke="none"/>',
+  "menu-lines": '<path d="M3 6h18"/><path d="M3 12h12"/><path d="M3 18h8"/>',
   booking:
     '<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 9.5h16"/><path d="M8 3v3M16 3v3"/><path d="m9 14 2 2 4-4"/>',
   sos:

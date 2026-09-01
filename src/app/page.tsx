@@ -2,10 +2,11 @@ import Image from "next/image";
 import Link from "next/link";
 import Icon, { type IconName } from "@/components/icon";
 import LangSwitcher from "@/components/lang-switcher";
+import HeroPattern from "@/components/hero-pattern";
 import PoiCard from "@/components/poi-card";
 import { listCities, listFestivals, listPois, listTours, cityCovers, tourCovers } from "@/lib/db";
 import { t } from "@/lib/i18n";
-import { getCurrentBatch, getForecast, weatherIcon } from "@/lib/weather";
+import { conditionLabel, getCurrentBatch, getForecast, weatherIcon } from "@/lib/weather";
 import { currentLang } from "@/lib/server-lang";
 import type { Category, Festival, Lang } from "@/lib/types";
 
@@ -137,6 +138,14 @@ export default async function HomePage() {
   // Узбекистан представляют на любой обложке.
   const stage = covers.samarkand ?? Object.values(covers)[0] ?? null;
 
+  // Дата рядом с приветствием, как в макете. Считается на сервере при
+  // каждом запросе: страница и так force-dynamic, расхождения с клиентом
+  // не будет.
+  const today = new Date().toLocaleDateString(
+    lang === "uz" ? "uz-UZ" : lang === "en" ? "en-GB" : "ru-RU",
+    { day: "numeric", month: "long" },
+  );
+
   return (
     <>
       {/*
@@ -168,73 +177,108 @@ export default async function HomePage() {
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(to bottom, rgba(12,18,15,0.62) 0%, rgba(12,18,15,0.18) 34%, rgba(12,18,15,0.55) 100%)",
+              "linear-gradient(to bottom, rgba(0,0,0,0.32) 0%, rgba(0,0,0,0.04) 38%, rgba(0,0,0,0.75) 100%)",
           }}
         />
+        <HeroPattern />
       </div>
 
       <div className="relative z-10">
-        <header className="mx-auto max-w-3xl px-4 pt-4 text-white">
-          <div className="flex items-start justify-between gap-3">
-            {/* Логотип из макета: знак приложения в стеклянной плашке
-                поверх снимка. Имя платформы должно быть на первом экране —
-                иначе турист не запомнит, куда он вернулся. */}
-            <div className="flex min-w-0 items-center gap-2.5">
-              <span
-                className="grid h-10 w-10 shrink-0 place-items-center rounded-[var(--radius-sm)]"
-                style={{
-                  background: "rgba(255,255,255,0.18)",
-                  backdropFilter: "blur(14px)",
-                  border: "1px solid rgba(255,255,255,0.26)",
-                }}
-              >
-                <Icon name="landmark" size={22} />
-              </span>
-              <span className="min-w-0">
-                <span className="block text-lg font-semibold leading-tight">
-                  {t(lang, "app_name")}
-                </span>
-                <span className="block text-xs opacity-80">{t(lang, "tagline_short")}</span>
-              </span>
-            </div>
+        {/*
+          Шапка перенесена из исходников макета: меню слева, знак
+          приложения в стеклянной пилюле по центру, колокол справа.
+          Поиск лежит внутри шапки, поверх снимка, а не в листе ниже —
+          в макете он часть сцены, и это меняет весь первый экран.
+        */}
+        <header className="relative mx-auto max-w-3xl px-4 pt-3 text-white">
+          <div className="flex items-center justify-between gap-3">
+            <Link
+              href="/profile"
+              aria-label={t(lang, "profile")}
+              className="pressable grid h-9 w-9 place-items-center rounded-[var(--radius-sm)] glass"
+            >
+              <Icon name="menu-lines" size={18} />
+            </Link>
 
-            <div className="flex shrink-0 items-center gap-2">
-              {/* Погода в столице: через Ташкент прилетает большинство
-                  туристов, и город подписан — иначе цифра ни о чём не говорит. */}
-              {capitalWeather.now && capital && (
-                <Link
-                  href={`/city/${capital.slug}`}
-                  className="pressable flex items-center gap-2 rounded-full py-1.5 pl-2.5 pr-3"
-                  style={{
-                    background: "rgba(255,255,255,0.16)",
-                    backdropFilter: "blur(14px)",
-                    border: "1px solid rgba(255,255,255,0.24)",
-                  }}
-                >
-                  <Icon name={weatherIcon(capitalWeather.now.code)} size={20} />
-                  <span className="leading-none">
-                    <span className="block text-[10px] opacity-80">{capital.name}</span>
-                    <span className="mt-0.5 block text-sm font-semibold">
-                      {capitalWeather.now.temp}°
-                    </span>
-                  </span>
-                </Link>
-              )}
-              <LangSwitcher current={lang} onDark />
-            </div>
+            <span className="flex items-center gap-2 rounded-full px-3 py-1.5 glass">
+              <Icon name="logo" size={22} />
+              <span className="display-font text-sm font-bold">{t(lang, "app_name")}</span>
+            </span>
+
+            <Link
+              href="/audio"
+              aria-label={t(lang, "audio_title")}
+              className="pressable grid h-9 w-9 place-items-center rounded-[var(--radius-sm)] glass"
+            >
+              <Icon name="headphones" size={17} />
+            </Link>
           </div>
 
-          <p className="mt-8 text-[11px] uppercase tracking-[0.22em] opacity-75">
-            {t(lang, "country")}
-          </p>
-          <h1 className="display mt-1.5">
-            {t(lang, "hero_line_1")}
-            <br />
-            {t(lang, "hero_line_2")}
-          </h1>
-          <p className="mt-3 max-w-md text-sm leading-relaxed opacity-90">
-            {t(lang, "hero_lead")}
-          </p>
+          {/* Погода белой стеклянной плашкой справа — как в макете:
+              город, градусы и словесное описание, а не одна цифра. */}
+          {capitalWeather.now && capital && (
+            <Link
+              href={`/city/${capital.slug}`}
+              className="pressable absolute right-4 top-16 rounded-[var(--radius-md)] p-3 glass-light"
+              style={{ color: "var(--text)", minWidth: 118 }}
+            >
+              <p className="mb-1.5 text-[9px] font-bold uppercase tracking-wider faint">
+                {capital.name}
+              </p>
+              <span className="flex items-center gap-2">
+                <span style={{ color: "var(--primary)" }}>
+                  <Icon name={weatherIcon(capitalWeather.now.code)} size={30} />
+                </span>
+                <span>
+                  <span className="display-font block text-2xl font-bold leading-none">
+                    {capitalWeather.now.temp}°C
+                  </span>
+                  <span className="mt-0.5 block text-[9px] faint">
+                    {conditionLabel(capitalWeather.now.code, lang)}
+                  </span>
+                </span>
+              </span>
+            </Link>
+          )}
+
+          <div className="mt-24">
+            <p className="mb-1 flex items-center gap-2 text-xs text-white/70">
+              <span
+                aria-hidden
+                className="inline-block h-1.5 w-1.5 rounded-full"
+                style={{ background: "var(--accent)" }}
+              />
+              {t(lang, "greeting")} · {today}
+            </p>
+            <h1 className="display mb-1">
+              {t(lang, "hero_line_1")}
+              <br />
+              {t(lang, "hero_line_2")}
+            </h1>
+            <p className="mb-3 max-w-md text-xs text-white/70">{t(lang, "hero_lead")}</p>
+
+            {/* Поиск стеклянной строкой прямо в сцене — из макета. */}
+            <Link
+              href="/map"
+              className="pressable flex w-full items-center gap-3 rounded-[var(--radius-md)] px-4 py-3.5"
+              style={{
+                background: "rgba(255,255,255,0.2)",
+                backdropFilter: "blur(20px)",
+                border: "1px solid rgba(255,255,255,0.38)",
+              }}
+            >
+              <Icon name="search" size={16} />
+              <span className="flex-1 text-left text-sm text-white/75">
+                {t(lang, "search_placeholder")}
+              </span>
+              <span
+                className="rounded-lg px-2.5 py-1 text-[10px] font-bold"
+                style={{ background: "var(--accent)", color: "#2b2b2b" }}
+              >
+                {t(lang, "search_action")}
+              </span>
+            </Link>
+          </div>
         </header>
 
         {/* Лист. Отступ сверху оставляет сцену открытой примерно на треть
@@ -254,24 +298,7 @@ export default async function HomePage() {
           />
 
           <main className="mx-auto max-w-3xl px-4 pt-4">
-            <div className="mb-6">
-              <Link
-                href="/map"
-                className="pressable flex items-center gap-3 rounded-full px-5 py-3.5 card-raised"
-                style={{ color: "var(--text-faint)" }}
-              >
-                <Icon name="search" size={20} />
-                <span className="flex-1 text-sm">{t(lang, "search_placeholder")}</span>
-                {/* Золотая кнопка из макета: на белом листе она заметнее
-                    зелёной, а зелёный в интерфейсе уже занят навигацией. */}
-                <span
-                  className="rounded-full px-4 py-2 text-xs font-semibold"
-                  style={{ background: "var(--accent)", color: "#2b2b2b" }}
-                >
-                  {t(lang, "search_action")}
-                </span>
-              </Link>
-            </div>
+
 
             {/* Плитки со счётчиками — из макета. Число сверху, подпись под
                 ним: сначала видно масштаб платформы, потом что это. */}
@@ -467,7 +494,7 @@ export default async function HomePage() {
         )}
 
         {/* ---------------- Как добраться ---------------- */}
-        <section className="mb-8">
+        <section id="transport" className="mb-8 scroll-mt-4">
           <h2 className="mb-1 text-base font-semibold">{t(lang, "transport_title")}</h2>
           <p className="mb-3 text-sm soft">{t(lang, "transport_lead")}</p>
           <ul className="grid gap-2 sm:grid-cols-3">
