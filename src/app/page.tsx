@@ -259,7 +259,7 @@ export default async function HomePage() {
 
             {/* Поиск стеклянной строкой прямо в сцене — из макета. */}
             <Link
-              href="/map"
+              href="/search"
               className="pressable flex w-full items-center gap-3 rounded-[var(--radius-md)] px-4 py-3.5"
               style={{
                 background: "rgba(255,255,255,0.2)",
