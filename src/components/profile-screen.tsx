@@ -7,6 +7,7 @@ import { haversine } from "@/lib/geo";
 import { t } from "@/lib/i18n";
 import type { City, Lang, Poi } from "@/lib/types";
 import Icon from "./icon";
+import PassportCard from "./passport-card";
 
 /**
  * Личный кабинет (п. 12) и туристический паспорт со штампами (п. 13).
@@ -57,6 +58,8 @@ export default function ProfileScreen({
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-4">
+      <PassportCard lang={lang} totalPlaces={pois.length} />
+
       <section className="mb-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
         <Stat value={visits.length} label={t(lang, "places_visited")} />
         <Stat value={visitedCities.size} label={t(lang, "cities_visited")} />

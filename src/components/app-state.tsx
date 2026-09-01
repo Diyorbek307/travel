@@ -47,6 +47,10 @@ export interface AppState {
   lastCity: string | null;
   /** Темы, выбранные при первом запуске: подставляются в планировщик. */
   interests: Theme[];
+  /** Имя в паспорте. Вводит сам турист — аккаунтов в приложении нет. */
+  name: string | null;
+  /** Постоянный номер паспорта. Заводится один раз на устройстве. */
+  travellerId: string | null;
   /** Пройден ли онбординг. Отдельный флаг, а не пустой список интересов:
       «пропустил выбор» и «ещё не видел экран» — разные состояния. */
   onboarded: boolean;
@@ -60,6 +64,8 @@ const EMPTY: AppState = {
   offlineCities: [],
   lastCity: null,
   interests: [],
+  name: null,
+  travellerId: null,
   onboarded: false,
 };
 
@@ -72,20 +78,34 @@ interface Ctx extends AppState {
   setOffline: (city: string, downloaded: boolean) => void;
   setLastCity: (city: string) => void;
   completeOnboarding: (interests: Theme[]) => void;
+  setName: (name: string) => void;
   reset: () => void;
 }
 
 const AppStateContext = createContext<Ctx | null>(null);
 
 function load(): AppState {
-  if (typeof window === "undefined") return EMPTY;
+  // Всегда копия, а не сама константа: вызывающий дописывает в результат
+  // номер паспорта, и возврат EMPTY по ссылке испортил бы образец пустого
+  // состояния на всё время жизни страницы.
+  if (typeof window === "undefined") return { ...EMPTY };
   try {
     const raw = window.localStorage.getItem(KEY);
-    if (!raw) return EMPTY;
+    if (!raw) return { ...EMPTY };
     return { ...EMPTY, ...(JSON.parse(raw) as Partial<AppState>) };
   } catch {
-    return EMPTY;
+    return { ...EMPTY };
   }
+}
+
+/**
+ * Номер паспорта: год и шесть случайных знаков. Ничего личного внутри —
+ * это просто метка устройства, по которой партнёр сверяет штампы.
+ */
+function makeTravellerId(): string {
+  const year = new Date().getFullYear();
+  const rnd = Math.floor(Math.random() * 1_000_000).toString().padStart(6, "0");
+  return `UZT-${year}-${rnd}`;
 }
 
 export function AppStateProvider({ children }: { children: ReactNode }) {
@@ -95,7 +115,11 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
   // Читаем localStorage только после монтирования: иначе серверный и клиентский
   // HTML разойдутся и React выбросит ошибку гидратации.
   useEffect(() => {
-    setState(load());
+    const loaded = load();
+    // Номер выдаём один раз и больше не меняем: он печатается в паспорте,
+    // и турист, показавший его партнёру, должен найти тот же номер завтра.
+    if (!loaded.travellerId) loaded.travellerId = makeTravellerId();
+    setState(loaded);
     setReady(true);
   }, []);
 
@@ -152,6 +176,7 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
         })),
       setLastCity: (city) => setState((s) => (s.lastCity === city ? s : { ...s, lastCity: city })),
       completeOnboarding: (interests) => setState((s) => ({ ...s, interests, onboarded: true })),
+      setName: (name) => setState((s) => ({ ...s, name: name.trim() || null })),
       reset: () => setState(EMPTY),
     }),
     [state, ready, toggleIn],
