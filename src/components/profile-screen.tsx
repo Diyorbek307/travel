@@ -1,12 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { ACHIEVEMENTS, useAppState } from "./app-state";
 import { haversine } from "@/lib/geo";
 import { t } from "@/lib/i18n";
 import type { City, Lang, Poi } from "@/lib/types";
-import Icon from "./icon";
+import Icon, { type IconName } from "./icon";
 import PassportCard from "./passport-card";
 
 /**
@@ -17,6 +17,13 @@ import PassportCard from "./passport-card";
  * а не заполняет форму. Синхронизация между устройствами появится вместе
  * с аккаунтом, формат состояния уже к этому готов.
  */
+const TABS: { id: "passport" | "lists" | "stats" | "settings"; icon: IconName; key: string }[] = [
+  { id: "passport", icon: "ticket", key: "passport" },
+  { id: "lists", icon: "heart", key: "tab_lists" },
+  { id: "stats", icon: "star", key: "tab_stats" },
+  { id: "settings", icon: "shield", key: "tab_settings" },
+];
+
 export default function ProfileScreen({
   pois,
   cities,
@@ -28,6 +35,15 @@ export default function ProfileScreen({
 }) {
   const state = useAppState();
   const { ready, favorites, wantToVisit, visits, listens } = state;
+
+  /*
+   * Вкладки из макета. Профиль был одной длинной лентой: паспорт, цифры,
+   * штампы, достижения, два списка, история и настройки подряд — до
+   * настроек приходилось листать через всё остальное. Вместо «AI-гида»
+   * из макета здесь «Списки»: помощник у нас живёт отдельным экраном, и
+   * дублировать его в профиле незачем.
+   */
+  const [tab, setTab] = useState<"passport" | "lists" | "stats" | "settings">("passport");
 
   const bySlug = useMemo(() => new Map(pois.map((p) => [p.slug, p])), [pois]);
 
@@ -60,13 +76,36 @@ export default function ProfileScreen({
     <main className="mx-auto max-w-3xl px-4 py-4">
       <PassportCard lang={lang} totalPlaces={pois.length} />
 
+      <nav className="no-scrollbar -mx-4 mb-5 flex gap-2 overflow-x-auto px-4">
+        {TABS.map((item) => (
+          <button
+            key={item.id}
+            onClick={() => setTab(item.id)}
+            aria-pressed={tab === item.id}
+            className="pressable flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-[var(--radius-full)] px-3.5 py-2 text-sm"
+            style={{
+              background: tab === item.id ? "var(--primary)" : "var(--surface)",
+              color: tab === item.id ? "var(--on-primary)" : "var(--text)",
+              border: `1px solid ${tab === item.id ? "var(--primary)" : "var(--border)"}`,
+            }}
+          >
+            <Icon name={item.icon} size={16} />
+            {t(lang, item.key)}
+          </button>
+        ))}
+      </nav>
+
+      {tab === "stats" && (
       <section className="mb-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
         <Stat value={visits.length} label={t(lang, "places_visited")} />
         <Stat value={visitedCities.size} label={t(lang, "cities_visited")} />
         <Stat value={`${(meters / 1000).toFixed(1)} км`} label={t(lang, "km_walked")} />
         <Stat value={completedListens} label={t(lang, "stories_heard")} />
       </section>
+      )}
 
+      {tab === "passport" && (
+      <>
       {/* Туристический паспорт — п. 13 ТЗ */}
       <section className="mb-5">
         <h2 className="mb-2 font-semibold">
@@ -135,7 +174,11 @@ export default function ProfileScreen({
           })}
         </ul>
       </section>
+      </>
+      )}
 
+      {tab === "lists" && (
+      <>
       <PoiList
         title={t(lang, "favorited")}
         icon="heart"
@@ -151,8 +194,10 @@ export default function ProfileScreen({
         bySlug={bySlug}
         empty="Отмечайте места, куда планируете попасть."
       />
+      </>
+      )}
 
-      {listens.length > 0 && (
+      {tab === "stats" && listens.length > 0 && (
         <section className="mb-5">
           <h2 className="mb-2 font-semibold"><Icon name="headphones" size={18} className="inline align-[-3px]" /> История прослушиваний</h2>
           <ul className="grid gap-1 rounded-xl p-3 text-sm surface">
@@ -169,6 +214,8 @@ export default function ProfileScreen({
         </section>
       )}
 
+      {tab === "settings" && (
+      <>
       <section className="mb-5 grid gap-2">
         <Link href="/offline" className="rounded-xl p-3 text-sm transition-colors surface hover:bg-soft">
           <Icon name="download" size={18} className="inline align-[-3px]" /> {t(lang, "offline")}
@@ -192,6 +239,8 @@ export default function ProfileScreen({
         Данные профиля хранятся только на этом устройстве и никуда не отправляются.
         Аналитика платформы обезличена: в неё попадают события без привязки к вам.
       </p>
+      </>
+      )}
     </main>
   );
 }
