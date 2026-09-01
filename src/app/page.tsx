@@ -77,9 +77,15 @@ export default async function HomePage() {
   const countByCategories = (cats: Category[]) =>
     allPois.filter((p) => cats.includes(p.category)).length;
 
-  // Витрины из макета: главные объекты страны и места, где поесть.
-  // Берём только со снимками — карточка-витрина без фотографии теряет смысл.
-  const topPois = allPois.filter((p) => p.cover).slice(0, 10);
+  /*
+   * Витрины из макета: главные объекты страны и места, где поесть.
+   * Берём только со снимками — карточка-витрина без фотографии теряет
+   * смысл. По шесть, а не по десять: каждая карточка это отдельный
+   * снимок, который хостинг пережимает при первом запросе, и первый
+   * экран не должен тянуть за собой сорок картинок разом. Остальное
+   * турист увидит в каталоге, куда ведёт «Все».
+   */
+  const topPois = allPois.filter((p) => p.cover).slice(0, 6);
 
   /*
    * Ночлег. Витрина показывается только начиная с трёх вариантов: в
@@ -90,7 +96,7 @@ export default async function HomePage() {
   const stays = allPois.filter((p) => p.category === "hotel");
   const topDining = allPois
     .filter((p) => DINING.includes(p.category))
-    .slice(0, 10);
+    .slice(0, 6);
   const stats: { href: string; icon: IconName; key: string; value: number }[] = [
     { href: "/map", icon: "landmark", key: "stat_places", value: totalPois },
     { href: "/routes", icon: "explore", key: "stat_routes", value: tours.length },
