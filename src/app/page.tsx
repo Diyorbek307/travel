@@ -41,10 +41,13 @@ const TIPS: { icon: IconName; key: string; href?: string }[] = [
 ];
 
 /**
- * Как добраться. Ссылки ведут на официальные кассы, а не изображают
- * покупку внутри приложения: доступа к системам продажи у платформы нет,
- * и кнопка «Купить билет», которая ничего не покупает, обманет туриста.
- * Когда появится партнёрский API, эти же карточки станут формой поиска.
+ * Как добраться. Кнопка названа «Купить билет», как в макете, и ведёт в
+ * официальную кассу — там билет действительно продают, так что подпись
+ * честная. Обманом было бы открывать по ней форму оплаты: доступа к
+ * системам продажи у платформы пока нет.
+ *
+ * Когда появится партнёрский API, эти же карточки станут формой поиска —
+ * поменяется обработчик, а вёрстка и подпись останутся.
  */
 const TRANSPORT: { key: string; icon: IconName; url: string; host: string }[] = [
   { key: "train", icon: "station", url: "https://eticket.railway.uz", host: "eticket.railway.uz" },
@@ -480,7 +483,16 @@ export default async function HomePage() {
                     <span className="block font-medium">{t(lang, `transport_${item.key}_t`)}</span>
                     <span className="block truncate text-xs faint">{item.host}</span>
                   </span>
-                  <Icon name="chevron-right" size={16} />
+                  {/* Кнопка названа как в макете — «Купить билет». Это не
+                      обман: она ведёт в официальную кассу, где билет
+                      действительно продают. Обманом было бы открывать по
+                      ней форму оплаты, которой у платформы нет. */}
+                  <span
+                    className="shrink-0 rounded-[var(--radius-full)] px-3 py-1.5 text-xs font-semibold"
+                    style={{ background: "var(--accent)", color: "#2b2b2b" }}
+                  >
+                    {t(lang, item.key === "taxi" ? "transport_cta_taxi" : "transport_cta")}
+                  </span>
                 </a>
               </li>
             ))}
