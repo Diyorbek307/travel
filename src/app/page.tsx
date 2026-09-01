@@ -3,6 +3,7 @@ import Link from "next/link";
 import Icon, { type IconName } from "@/components/icon";
 import LangSwitcher from "@/components/lang-switcher";
 import HeroPattern from "@/components/hero-pattern";
+import SideMenu from "@/components/side-menu";
 import PoiCard from "@/components/poi-card";
 import { listCities, listFestivals, listPois, listTours, cityCovers, tourCovers } from "@/lib/db";
 import { t } from "@/lib/i18n";
@@ -196,13 +197,7 @@ export default async function HomePage() {
         */}
         <header className="relative mx-auto max-w-3xl px-4 pt-3 text-white">
           <div className="flex items-center justify-between gap-3">
-            <Link
-              href="/profile"
-              aria-label={t(lang, "profile")}
-              className="pressable grid h-9 w-9 place-items-center rounded-[var(--radius-sm)] glass"
-            >
-              <Icon name="menu-lines" size={18} />
-            </Link>
+            <SideMenu lang={lang} />
 
             <span className="flex items-center gap-2 rounded-full px-3 py-1.5 glass">
               <Icon name="logo" size={22} />
