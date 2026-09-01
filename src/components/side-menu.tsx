@@ -53,6 +53,7 @@ export default function SideMenu({ lang }: { lang: Lang }) {
     { href: "/routes", icon: "explore", key: "my_routes" },
     { href: "/offline", icon: "download", key: "offline", badge: offlineCities.length },
     { href: "/search", icon: "search", key: "search_action" },
+    { href: "/support", icon: "shield", key: "support_title" },
     { href: "/sos", icon: "sos", key: "sos" },
   ];
 

@@ -53,8 +53,8 @@ export default function CardDeck({
   return (
     <section className="mb-8">
       <div className="mb-3 flex items-center justify-between gap-3">
-        <h2 className="display-font text-base font-bold">{title}</h2>
-        <div className="flex items-center gap-2">
+        <h2 className="display-font min-w-0 flex-1 truncate text-base font-bold">{title}</h2>
+        <div className="flex shrink-0 items-center gap-2">
           {seeAllHref && (
             <a href={seeAllHref} className="text-sm font-medium" style={{ color: "var(--primary-text)" }}>
               {seeAllLabel}
@@ -81,8 +81,11 @@ export default function CardDeck({
         </div>
       </div>
 
+      {/* overflow-hidden обязателен: боковые карточки уезжают на 104
+          пикселя от центра, и на узком телефоне (320) правый край вылезал
+          за экран, давая горизонтальную прокрутку всей страницы. */}
       <div
-        className="relative"
+        className="relative -mx-4 overflow-hidden px-4"
         style={{ height: 334 }}
         onTouchStart={(e) => {
           dragX.current = e.touches[0].clientX;

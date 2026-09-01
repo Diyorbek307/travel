@@ -264,6 +264,9 @@ export default function ProfileScreen({
         <Link href="/offline" className="rounded-xl p-3 text-sm transition-colors surface hover:bg-soft">
           <Icon name="download" size={18} className="inline align-[-3px]" /> {t(lang, "offline")}
         </Link>
+        <Link href="/support" className="rounded-xl p-3 text-sm transition-colors surface hover:bg-soft">
+          <Icon name="shield" size={18} className="inline align-[-3px]" /> {t(lang, "support_title")}
+        </Link>
         <Link href="/sos" className="rounded-xl p-3 text-sm transition-colors surface hover:bg-soft">
           <Icon name="sos" size={18} className="inline align-[-3px]" /> {t(lang, "sos")}
         </Link>

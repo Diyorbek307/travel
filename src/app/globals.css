@@ -161,6 +161,17 @@ body {
   background: var(--surface-alt);
 }
 
+/*
+ * Ячейки сеток и флексов не должны раздуваться под длинный контент.
+ * По умолчанию у них min-width: auto, и одно длинное название объекта
+ * растягивало колонку так, что вся страница получала горизонтальную
+ * прокрутку — при том, что внутри карточки стоит truncate.
+ */
+:where(ul, ol) > li,
+:where(.grid) > * {
+  min-width: 0;
+}
+
 .card {
   background: var(--surface);
   border-radius: var(--radius-md);
@@ -442,127 +453,47 @@ body {
 }
 
 /*
- * Сюжет «путешествие»: пин на точке отправления, дуга маршрута к ней,
- * как на карте авиалиний, и самолёт, который эту дугу пролетает —
- * тот же образ, что на присланном референсе, только живой. Пин и
- * пульс-кольцо вынесены ИЗ svg дуги отдельными элементами с процентным
- * left/top: у дуги preserveAspectRatio="none" (тянется неравномерно под
- * прямоугольный экран), и круг/иконка внутри неё превратились бы в
- * эллипс — так их форма не зависит от соотношения сторон экрана.
+ * Фоновая графика: светящаяся сеть гириха.
+ *
+ * Прежде здесь были пунктирная дуга и самолёт — образ читался буквально
+ * и быстро приедался. Сеть исламской геометрии говорит «Узбекистан»
+ * тем же мотивом, что и изразцы Самарканда, но выглядит современно:
+ * тонкие линии прочерчивают себя, узлы пульсируют, крупные звёзды
+ * плывут в глубине.
  */
-.ambient-route {
+.ambient-grid {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-}
-.ambient-route path {
-  fill: none;
-  stroke: var(--accent-strong);
-  stroke-width: 0.3;
-  stroke-linecap: round;
-  stroke-dasharray: 1.4 2.2;
-  opacity: 0.4;
-  animation: route-march 5s linear infinite;
-}
-@keyframes route-march {
-  to { stroke-dashoffset: -36; }
+  pointer-events: none;
 }
 
-.ambient-pin {
-  position: absolute;
-  left: 6%;
-  top: 90%;
-  width: 20px;
-  height: 20px;
-  margin: -20px 0 0 -10px; /* остриём точно в точку отправления */
-  fill: var(--primary);
-  opacity: 0.6;
-  filter: drop-shadow(0 2px 5px rgb(45 123 87 / 0.4));
-  animation: pin-drop 2.8s ease-in-out infinite;
-}
-.ambient-pin-ring {
-  position: absolute;
-  left: 6%;
-  top: 90%;
-  width: 14px;
-  height: 14px;
-  margin: -7px 0 0 -7px;
-  border-radius: 50%;
-  background: var(--primary);
-  opacity: 0.3;
-  animation: pin-ring-pulse 2.8s ease-in-out infinite;
-}
-@keyframes pin-drop {
-  0%, 100% { transform: translateY(0); }
-  50%      { transform: translateY(-3px); }
-}
-@keyframes pin-ring-pulse {
-  0%   { transform: scale(0.6); opacity: 0.4; }
-  70%, 100% { transform: scale(2.4); opacity: 0; }
+/* Дальний слой приглушён, иначе спорит с содержимым страницы. */
+.ambient-grid-deep {
+  opacity: 0.5;
 }
 
-/* Самолёт летит той же диагональю, что и дуга маршрута выше — глиф уже
-   нарисован носом в верхний правый угол, поэтому его не нужно
-   доворачивать: направление рисунка и направление полёта совпадают. */
-.ambient-plane {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 26px;
-  height: 26px;
-  fill: var(--accent-strong);
-  filter: drop-shadow(0 3px 8px rgb(233 196 106 / 0.55));
-  opacity: 0;
-  animation: plane-fly 22s linear infinite;
-  will-change: transform, opacity;
+/* Линия прочерчивает себя и гаснет, освобождая место следующей. */
+@keyframes grid-line-draw {
+  0%   { stroke-dasharray: 0 120; opacity: 0; }
+  25%  { opacity: 0.9; }
+  60%  { stroke-dasharray: 120 0; opacity: 0.55; }
+  100% { stroke-dasharray: 120 0; opacity: 0; }
 }
-@keyframes plane-fly {
-  0%   { transform: translate3d(-10vw, 84vh, 0) scale(0.7); opacity: 0; }
-  10%  { opacity: 0.6; }
-  50%  { transform: translate3d(52vw, 32vh, 0) scale(1); opacity: 0.6; }
-  90%  { opacity: 0.6; }
-  100% { transform: translate3d(114vw, -14vh, 0) scale(1.15); opacity: 0; }
+.grid-line {
+  animation: grid-line-draw 9s ease-in-out infinite;
 }
 
-/* Зум фотографии — кадр живёт, а не стоит стоп-кадром. Только transform,
-   поэтому дёшево даже рядом с трёхмерной сценой. Класс вешается на
-   конкретных крупных снимках (сцена, шапка города/объекта), а не в
-   PoiPhoto целиком — миниатюры в списках не должны шевелиться. */
-.kenburns {
-  animation: kenburns 14s ease-in-out infinite alternate;
-  will-change: transform;
+/* Узел дышит: свечение расходится и возвращается. */
+@keyframes grid-node-pulse {
+  0%, 100% { transform: scale(0.7); opacity: 0.35; }
+  50%      { transform: scale(1.35); opacity: 0.9; }
 }
-@keyframes kenburns {
-  from { transform: scale(1); }
-  to   { transform: scale(1.16); }
-}
-
-/* Карточки-витрины: сначала 3D-разворот при появлении (animation-delay
-   берётся из --tilt-delay, которую страница проставляет по индексу
-   карточки — так они раскрываются по очереди, а не одной пачкой), а
-   затем — не останавливаются: лёгкое непрерывное покачивание в 3D,
-   тем же языком, что у рельефной карты. Первая версия разворачивалась
-   один раз за 620мс и дальше стояла неподвижно — почти незаметно. */
-.tilt-in {
-  animation:
-    tilt-in 620ms cubic-bezier(0.22, 0.61, 0.36, 1) both,
-    tilt-float 5.5s ease-in-out 620ms infinite;
-  animation-delay: var(--tilt-delay, 0ms), calc(var(--tilt-delay, 0ms) + 620ms);
-}
-@keyframes tilt-in {
-  from {
-    opacity: 0;
-    transform: perspective(800px) rotateY(-16deg) rotateX(6deg) translateY(18px) scale(0.94);
-  }
-  to {
-    opacity: 1;
-    transform: perspective(800px) rotateY(0) rotateX(0) translateY(0) scale(1);
-  }
-}
-@keyframes tilt-float {
-  0%, 100% { transform: perspective(800px) rotateY(-3deg) rotateX(1.5deg) translateY(0); }
-  50%      { transform: perspective(800px) rotateY(3deg) rotateX(-1.5deg) translateY(-6px); }
+.grid-node-glow {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: grid-node-pulse 5s ease-in-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {

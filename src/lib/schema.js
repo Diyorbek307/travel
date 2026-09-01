@@ -224,6 +224,19 @@ export const SCHEMA_SQL = `
       created_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
 
+    -- Обращения в поддержку. Ответ уходит на контакт, который оставил
+    -- турист: аккаунтов нет, писать больше некуда.
+    CREATE TABLE IF NOT EXISTS support_tickets (
+      id         INTEGER PRIMARY KEY AUTOINCREMENT,
+      topic      TEXT NOT NULL,
+      message    TEXT NOT NULL,
+      contact    TEXT,
+      lang       TEXT,
+      status     TEXT NOT NULL DEFAULT 'new',
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+    CREATE INDEX IF NOT EXISTS idx_support_status ON support_tickets(status, created_at);
+
     -- Обезличенная аналитика (п. 17): только хэш сессии, без персональных данных.
     CREATE TABLE IF NOT EXISTS events (
       id           INTEGER PRIMARY KEY AUTOINCREMENT,

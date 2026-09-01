@@ -19,6 +19,7 @@ import {
   setAdBannerActive,
   setPoiAudio,
   updateReservationStatus,
+  updateSupportStatus,
   upsertAdBanner,
   upsertCity,
   upsertExhibit,
@@ -530,6 +531,18 @@ export async function removeAd(formData: FormData): Promise<void> {
   await requireAuth();
   deleteAdBanner(num(formData, "id"));
   revalidatePath("/admin/ads");
+}
+
+/* ------------------------------------------------------------------ */
+/* Поддержка                                                          */
+/* ------------------------------------------------------------------ */
+
+export async function setSupportStatus(formData: FormData): Promise<void> {
+  await requireAuth();
+  const status = str(formData, "status");
+  if (status !== "new" && status !== "done") return;
+  updateSupportStatus(num(formData, "id"), status);
+  revalidatePath("/admin/support");
 }
 
 /* ------------------------------------------------------------------ */

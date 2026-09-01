@@ -510,6 +510,20 @@ export function createProLead(contact: string, lang: Lang): void {
     .run(contact, lang);
 }
 
+/** Обращение в поддержку. Валидация — на стороне роута. */
+export function createSupportTicket(input: {
+  topic: string;
+  message: string;
+  contact: string | null;
+  lang: Lang;
+}): number {
+  const db = getDb();
+  db.prepare(
+    `INSERT INTO support_tickets (topic, message, contact, lang) VALUES (?, ?, ?, ?)`,
+  ).run(input.topic, input.message, input.contact, input.lang);
+  return Number((db.prepare(`SELECT last_insert_rowid() AS id`).get() as Row).id);
+}
+
 export function analytics() {
   const db = getDb();
   const q = (sql: string) => db.prepare(sql).all() as Row[];

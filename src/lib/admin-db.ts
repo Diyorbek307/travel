@@ -511,6 +511,23 @@ export function listAdBannersAdmin() {
 }
 
 /* ------------------------------------------------------------------ */
+/* Поддержка                                                          */
+/* ------------------------------------------------------------------ */
+
+export function listSupportAdmin() {
+  return getDb()
+    .prepare(
+      `SELECT id, topic, message, contact, lang, status, created_at
+         FROM support_tickets ORDER BY created_at DESC`,
+    )
+    .all() as Row[];
+}
+
+export function updateSupportStatus(id: number, status: "new" | "done"): void {
+  getDb().prepare(`UPDATE support_tickets SET status = ? WHERE id = ?`).run(status, id);
+}
+
+/* ------------------------------------------------------------------ */
 /* Заявки на столик                                                   */
 /* ------------------------------------------------------------------ */
 
