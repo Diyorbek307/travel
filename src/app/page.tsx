@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Icon, { type IconName } from "@/components/icon";
 import LangSwitcher from "@/components/lang-switcher";
+import PoiCard from "@/components/poi-card";
 import { listCities, listPois, listTours, cityCovers, tourCovers } from "@/lib/db";
 import { t } from "@/lib/i18n";
 import { getCurrentBatch, getForecast, weatherIcon } from "@/lib/weather";
@@ -17,6 +18,26 @@ const QUICK: { href: string; icon: IconName; key: string }[] = [
   { href: "/planner", icon: "explore", key: "planner" },
   { href: "/scan", icon: "qr", key: "scan" },
   { href: "/sos", icon: "sos", key: "sos_short" },
+];
+
+/** Категории «где поесть» — те же, что в витрине города. */
+const DINING: Category[] = ["restaurant", "cafe", "rest_zone"];
+
+/**
+ * Практическая информация из макета. Ключи, а не готовый текст: экран
+ * трёхъязычный. Курса валюты здесь намеренно нет — в макете стояло
+ * «$1 = 12 740 сум», а такая цифра устаревает за недели и врёт туристу.
+ * Экстренные номера тоже не дублируются: они живут на экране SOS, и два
+ * списка телефонов однажды разойдутся.
+ */
+const TIPS: { icon: IconName; key: string; href?: string }[] = [
+  { icon: "ticket", key: "currency" },
+  { icon: "sun", key: "climate" },
+  { icon: "transport", key: "transport" },
+  { icon: "restaurant", key: "food" },
+  { icon: "qr", key: "sim" },
+  { icon: "religious", key: "etiquette" },
+  { icon: "sos", key: "sos", href: "/sos" },
 ];
 
 const WHY: { icon: IconName; title: string; text: string }[] = [
@@ -39,6 +60,13 @@ export default async function HomePage() {
   // и такая приписка — обещание, которого платформа не выполняет.
   const countByCategories = (cats: Category[]) =>
     allPois.filter((p) => cats.includes(p.category)).length;
+
+  // Витрины из макета: главные объекты страны и места, где поесть.
+  // Берём только со снимками — карточка-витрина без фотографии теряет смысл.
+  const topPois = allPois.filter((p) => p.cover).slice(0, 10);
+  const topDining = allPois
+    .filter((p) => DINING.includes(p.category))
+    .slice(0, 10);
   const stats: { href: string; icon: IconName; key: string; value: number }[] = [
     { href: "/map", icon: "landmark", key: "stat_places", value: totalPois },
     { href: "/routes", icon: "explore", key: "stat_routes", value: tours.length },
@@ -311,6 +339,42 @@ export default async function HomePage() {
           </ul>
         </section>
 
+        {/* ---------------- Топ достопримечательностей ---------------- */}
+        {topPois.length > 2 && (
+          <section className="mb-8">
+            <SectionHead title={t(lang, "top_sights")} href="/map" lang={lang} />
+            <ul className="no-scrollbar -mx-4 flex gap-3 overflow-x-auto px-4 pb-1">
+              {topPois.map((poi, i) => (
+                <li
+                  key={poi.id}
+                  className="w-44 shrink-0"
+                  style={{ "--tilt-delay": `${i * 70}ms` } as React.CSSProperties}
+                >
+                  <PoiCard poi={poi} lang={lang} variant="feature" />
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {/* ---------------- Где поесть ---------------- */}
+        {topDining.length > 0 && (
+          <section className="mb-8">
+            <SectionHead title={t(lang, "dining_title")} href="/map?category=restaurant" lang={lang} />
+            <ul className="no-scrollbar -mx-4 flex gap-3 overflow-x-auto px-4 pb-1">
+              {topDining.map((poi, i) => (
+                <li
+                  key={poi.id}
+                  className="w-44 shrink-0"
+                  style={{ "--tilt-delay": `${i * 70}ms` } as React.CSSProperties}
+                >
+                  <PoiCard poi={poi} lang={lang} variant="feature" />
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
         {/* ---------------- Готовые маршруты ---------------- */}
         {tours.length > 0 && (
           <section className="mb-8">
@@ -353,6 +417,45 @@ export default async function HomePage() {
             </ul>
           </section>
         )}
+
+        {/* ---------------- Полезно знать ---------------- */}
+        <section className="mb-8">
+          <h2 className="mb-3 text-base font-semibold">{t(lang, "practical_title")}</h2>
+          <ul className="grid gap-2 sm:grid-cols-2">
+            {TIPS.map((tip) => {
+              const body = (
+                <>
+                  <span
+                    className="grid h-10 w-10 shrink-0 place-items-center rounded-[var(--radius-sm)]"
+                    style={{ background: "var(--primary-tint)", color: "var(--primary-text)" }}
+                  >
+                    <Icon name={tip.icon} size={20} />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block font-medium">{t(lang, `tip_${tip.key}_t`)}</span>
+                    <span className="mt-0.5 block text-sm leading-relaxed soft">
+                      {t(lang, `tip_${tip.key}_d`)}
+                    </span>
+                  </span>
+                </>
+              );
+              return (
+                <li key={tip.key}>
+                  {tip.href ? (
+                    <Link
+                      href={tip.href}
+                      className="pressable flex items-start gap-3 p-3 card hover:shadow-[var(--shadow-2)]"
+                    >
+                      {body}
+                    </Link>
+                  ) : (
+                    <div className="flex items-start gap-3 p-3 card">{body}</div>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </section>
 
         {/* ---------------- Почему мы ---------------- */}
         <section className="mb-8">
