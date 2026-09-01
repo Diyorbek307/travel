@@ -87,7 +87,7 @@ export default function PlannerScreen({
   initialCity: string | null;
   lang: Lang;
 }) {
-  const { lastCity } = useAppState();
+  const { lastCity, interests } = useAppState();
   const [tab, setTab] = useState<"form" | "assistant">("form");
 
   const [city, setCity] = useState(initialCity ?? cities[0]?.slug ?? "");
@@ -116,6 +116,16 @@ export default function PlannerScreen({
       setCity(lastCity);
     }
   }, [initialCity, lastCity, cities]);
+
+  // Интересы, выбранные при первом запуске, подставляются в форму — ради
+  // этого их и спрашивали. Перетирать сделанный руками выбор нельзя,
+  // поэтому подстановка одноразовая: только пока форма в исходном виде.
+  const themesTouched = useRef(false);
+  useEffect(() => {
+    if (themesTouched.current || interests.length === 0) return;
+    themesTouched.current = true;
+    setThemes(new Set(interests));
+  }, [interests]);
 
   useEffect(() => {
     if (!("geolocation" in navigator)) return;

@@ -199,6 +199,15 @@ const ru: Dict = {
   stat_routes: "Маршруты",
   stat_dining: "Где поесть",
   stat_stays: "Ночлег",
+  onb_welcome: "Добро пожаловать!",
+  onb_pick_lang: "Выберите язык интерфейса",
+  onb_step: "Шаг",
+  onb_of: "из",
+  onb_interests_title: "Что вас интересует?",
+  onb_interests_lead: "Подставим это в планировщик маршрутов. Можно изменить позже.",
+  onb_continue: "Продолжить",
+  onb_start: "Начать путешествие",
+  onb_skip: "Пропустить",
 };
 
 const uz: Dict = {
@@ -324,6 +333,15 @@ const uz: Dict = {
   stat_routes: "Marshrutlar",
   stat_dining: "Ovqatlanish",
   stat_stays: "Tunash",
+  onb_welcome: "Xush kelibsiz!",
+  onb_pick_lang: "Interfeys tilini tanlang",
+  onb_step: "Qadam",
+  onb_of: "dan",
+  onb_interests_title: "Sizni nima qiziqtiradi?",
+  onb_interests_lead: "Buni marshrut rejalashtiruvchisiga qo'yamiz. Keyin o'zgartirish mumkin.",
+  onb_continue: "Davom etish",
+  onb_start: "Sayohatni boshlash",
+  onb_skip: "O'tkazib yuborish",
 };
 
 const en: Dict = {
@@ -449,6 +467,15 @@ const en: Dict = {
   stat_routes: "Routes",
   stat_dining: "Eat",
   stat_stays: "Stay",
+  onb_welcome: "Welcome!",
+  onb_pick_lang: "Choose your language",
+  onb_step: "Step",
+  onb_of: "of",
+  onb_interests_title: "What interests you?",
+  onb_interests_lead: "We will preset these in the route planner. You can change them later.",
+  onb_continue: "Continue",
+  onb_start: "Start exploring",
+  onb_skip: "Skip",
 };
 
 const DICTS: Partial<Record<Lang, Dict>> = { ru, uz, en };

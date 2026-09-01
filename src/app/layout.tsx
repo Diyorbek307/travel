@@ -3,6 +3,7 @@ import { Manrope } from "next/font/google";
 import "./globals.css";
 import { AppStateProvider } from "@/components/app-state";
 import BottomNav from "@/components/bottom-nav";
+import Onboarding from "@/components/onboarding";
 import ServiceWorkerRegistrar from "@/components/service-worker";
 import { t } from "@/lib/i18n";
 import { currentLang } from "@/lib/server-lang";
@@ -81,6 +82,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <AppStateProvider>
           {children}
           <BottomNav items={nav} />
+          <Onboarding lang={lang} />
           <ServiceWorkerRegistrar />
         </AppStateProvider>
       </body>

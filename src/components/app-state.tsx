@@ -9,6 +9,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import type { Theme } from "@/lib/types";
 
 /**
  * Личный кабинет туриста (п. 12–13 ТЗ) без обязательной регистрации.
@@ -44,6 +45,11 @@ export interface AppState {
   listens: ListenRecord[];
   offlineCities: string[];
   lastCity: string | null;
+  /** Темы, выбранные при первом запуске: подставляются в планировщик. */
+  interests: Theme[];
+  /** Пройден ли онбординг. Отдельный флаг, а не пустой список интересов:
+      «пропустил выбор» и «ещё не видел экран» — разные состояния. */
+  onboarded: boolean;
 }
 
 const EMPTY: AppState = {
@@ -53,6 +59,8 @@ const EMPTY: AppState = {
   listens: [],
   offlineCities: [],
   lastCity: null,
+  interests: [],
+  onboarded: false,
 };
 
 interface Ctx extends AppState {
@@ -63,6 +71,7 @@ interface Ctx extends AppState {
   addListen: (r: Omit<ListenRecord, "ts">) => void;
   setOffline: (city: string, downloaded: boolean) => void;
   setLastCity: (city: string) => void;
+  completeOnboarding: (interests: Theme[]) => void;
   reset: () => void;
 }
 
@@ -142,6 +151,7 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
             : s.offlineCities.filter((c) => c !== city),
         })),
       setLastCity: (city) => setState((s) => (s.lastCity === city ? s : { ...s, lastCity: city })),
+      completeOnboarding: (interests) => setState((s) => ({ ...s, interests, onboarded: true })),
       reset: () => setState(EMPTY),
     }),
     [state, ready, toggleIn],
