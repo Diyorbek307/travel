@@ -48,7 +48,7 @@ export default function WeatherCard({
     <section
       className="overflow-hidden rounded-[var(--radius-lg)]"
       style={{
-        background: "linear-gradient(140deg, #1f6f8b 0%, #175a73 60%, #12475b 100%)",
+        background: "linear-gradient(140deg, #2d7b57 0%, #246144 60%, #1d4e37 100%)",
         color: "#ffffff",
         boxShadow: "var(--shadow-2)",
       }}

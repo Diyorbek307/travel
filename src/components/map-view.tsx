@@ -124,7 +124,7 @@ export default function MapView({
 
     if (routeLine && routeLine.length > 1) {
       leaflet
-        .polyline(routeLine, { color: "#1f6f8b", weight: 4, opacity: 0.8, dashArray: "6 8" })
+        .polyline(routeLine, { color: "#2d7b57", weight: 4, opacity: 0.8, dashArray: "6 8" })
         .addTo(layer);
     }
 
@@ -134,7 +134,7 @@ export default function MapView({
           radius: 8,
           color: "#ffffff",
           weight: 3,
-          fillColor: "#1f6f8b",
+          fillColor: "#2d7b57",
           fillOpacity: 1,
         })
         .bindPopup(t(lang, "nearby"))

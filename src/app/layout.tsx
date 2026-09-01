@@ -1,10 +1,29 @@
 import type { Metadata, Viewport } from "next";
+import { Manrope } from "next/font/google";
 import "./globals.css";
 import { AppStateProvider } from "@/components/app-state";
 import BottomNav from "@/components/bottom-nav";
 import ServiceWorkerRegistrar from "@/components/service-worker";
 import { t } from "@/lib/i18n";
 import { currentLang } from "@/lib/server-lang";
+
+/*
+ * Manrope, а не Outfit из макета: у Outfit нет кириллицы — только латиница.
+ * То есть в самом макете русские подписи рисовал не Outfit, а запасной
+ * системный шрифт, и копировать его сюда значило бы получить ту же кашу:
+ * латиница одним шрифтом, кириллица другим. Manrope держит тот же
+ * геометрический характер и закрывает русский и узбекский целиком.
+ *
+ * Берём через next/font, а не ссылкой на Google Fonts: файлы скачиваются
+ * при сборке и отдаются с нашего домена, иначе офлайн-режим ломался бы на
+ * внешнем запросе. display: swap — текст виден сразу, без «мигания пустотой».
+ */
+const manrope = Manrope({
+  subsets: ["latin", "cyrillic"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+  variable: "--font-sans",
+});
 
 export const metadata: Metadata = {
   title: "Uzbekistan Travel — ваш персональный гид",
@@ -16,7 +35,7 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { color: "#1f6f8b" },
+    { color: "#2d7b57" },
   ],
   width: "device-width",
   initialScale: 1,
@@ -37,7 +56,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   ];
 
   return (
-    <html lang={lang} dir={lang === "ar" ? "rtl" : "ltr"} suppressHydrationWarning>
+    <html
+      lang={lang}
+      dir={lang === "ar" ? "rtl" : "ltr"}
+      className={manrope.variable}
+      suppressHydrationWarning
+    >
       <body>
         {/* Фоновая анимация на весь сайт — см. .ambient-bg в globals.css.
             Дуга маршрута и самолёт — образ путешествия, а не абстракция. */}
