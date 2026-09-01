@@ -40,6 +40,18 @@ const TIPS: { icon: IconName; key: string; href?: string }[] = [
   { icon: "sos", key: "sos", href: "/sos" },
 ];
 
+/**
+ * Как добраться. Ссылки ведут на официальные кассы, а не изображают
+ * покупку внутри приложения: доступа к системам продажи у платформы нет,
+ * и кнопка «Купить билет», которая ничего не покупает, обманет туриста.
+ * Когда появится партнёрский API, эти же карточки станут формой поиска.
+ */
+const TRANSPORT: { key: string; icon: IconName; url: string; host: string }[] = [
+  { key: "train", icon: "station", url: "https://eticket.railway.uz", host: "eticket.railway.uz" },
+  { key: "plane", icon: "airport", url: "https://www.uzairways.com", host: "uzairways.com" },
+  { key: "taxi", icon: "transport", url: "https://taxi.yandex.uz", host: "taxi.yandex.uz" },
+];
+
 const WHY: { icon: IconName; title: string; text: string }[] = [
   { icon: "shield", title: "Надёжно", text: "Проверенные данные об объектах" },
   { icon: "headphones", title: "Удобно", text: "Аудиогид на вашем языке" },
@@ -415,6 +427,65 @@ export default async function HomePage() {
                   </Link>
                 </li>
               ))}
+            </ul>
+          </section>
+        )}
+
+        {/* ---------------- Как добраться ---------------- */}
+        <section className="mb-8">
+          <h2 className="mb-1 text-base font-semibold">{t(lang, "transport_title")}</h2>
+          <p className="mb-3 text-sm soft">{t(lang, "transport_lead")}</p>
+          <ul className="grid gap-2 sm:grid-cols-3">
+            {TRANSPORT.map((item) => (
+              <li key={item.key}>
+                <a
+                  href={item.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="pressable flex items-center gap-3 p-3 card hover:shadow-[var(--shadow-2)]"
+                >
+                  <span
+                    className="grid h-10 w-10 shrink-0 place-items-center rounded-[var(--radius-sm)]"
+                    style={{ background: "var(--primary-tint)", color: "var(--primary-text)" }}
+                  >
+                    <Icon name={item.icon} size={20} />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block font-medium">{t(lang, `transport_${item.key}_t`)}</span>
+                    <span className="block truncate text-xs faint">{item.host}</span>
+                  </span>
+                  <Icon name="chevron-right" size={16} />
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        {/* ---------------- Погода по городам ---------------- */}
+        {cityWeather.some(Boolean) && (
+          <section className="mb-8">
+            <h2 className="mb-3 text-base font-semibold">{t(lang, "weather_today")}</h2>
+            <ul className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
+              {cities.map((city, index) => {
+                const w = cityWeather[index];
+                if (!w) return null;
+                return (
+                  <li key={city.slug} className="w-28 shrink-0">
+                    <Link
+                      href={`/city/${city.slug}`}
+                      className="pressable grid place-items-center gap-1 p-3 text-center card hover:shadow-[var(--shadow-2)]"
+                    >
+                      <span className="w-full truncate text-[0.65rem] uppercase tracking-wide faint">
+                        {city.name}
+                      </span>
+                      <span style={{ color: "var(--primary-text)" }}>
+                        <Icon name={weatherIcon(w.code)} size={24} />
+                      </span>
+                      <span className="text-lg font-semibold leading-none">{w.temp}°</span>
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           </section>
         )}
