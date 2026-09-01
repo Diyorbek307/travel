@@ -22,6 +22,17 @@ const EMPTY: Forecast = { days: [], now: null };
 /** Прогноз обновляется раз в полчаса: чаще модель всё равно не считает. */
 const CACHE_SECONDS = 1800;
 
+/*
+ * Сколько ждём ответа сервиса погоды.
+ *
+ * Без ограничения зависший внешний запрос держал всю страницу: главный
+ * экран ждёт погоду перед отрисовкой, и один медленный ответ Open-Meteo
+ * превращался в тридцать секунд белого экрана. Погода — приятное
+ * дополнение, а не содержимое платформы: лучше показать город без
+ * градусов, чем не показать ничего.
+ */
+const TIMEOUT_MS = 2500;
+
 export interface WeatherHour {
   /** Местное время в часах, 0–23. */
   hour: number;
@@ -107,7 +118,10 @@ export async function getForecast(lat: number, lon: number): Promise<Forecast> {
     "&timezone=auto&forecast_days=7";
 
   try {
-    const response = await fetch(url, { next: { revalidate: CACHE_SECONDS } });
+    const response = await fetch(url, {
+      next: { revalidate: CACHE_SECONDS },
+      signal: AbortSignal.timeout(TIMEOUT_MS),
+    });
     if (!response.ok) return EMPTY;
 
     const data = (await response.json()) as OpenMeteoResponse;
@@ -202,7 +216,10 @@ export async function getCurrentBatch(
     "&current=temperature_2m,weather_code&timezone=auto";
 
   try {
-    const response = await fetch(url, { next: { revalidate: CACHE_SECONDS } });
+    const response = await fetch(url, {
+      next: { revalidate: CACHE_SECONDS },
+      signal: AbortSignal.timeout(TIMEOUT_MS),
+    });
     if (!response.ok) return points.map(() => null);
 
     const data = await response.json();
