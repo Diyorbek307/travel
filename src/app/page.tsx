@@ -4,9 +4,12 @@ import Icon, { type IconName } from "@/components/icon";
 import LangSwitcher from "@/components/lang-switcher";
 import HeroPattern from "@/components/hero-pattern";
 import SideMenu from "@/components/side-menu";
+import CardDeck from "@/components/card-deck";
+import TaxiCard from "@/components/taxi-card";
 import PoiCard from "@/components/poi-card";
 import { listCities, listFestivals, listPois, listTours, cityCovers, tourCovers } from "@/lib/db";
-import { t } from "@/lib/i18n";
+import { categoryLabel, t } from "@/lib/i18n";
+import { formatPrice } from "@/lib/geo";
 import { conditionLabel, getCurrentBatch, getForecast, weatherIcon } from "@/lib/weather";
 import { getRates } from "@/lib/rates";
 import CurrencyConverter from "@/components/currency-converter";
@@ -103,6 +106,30 @@ export default async function HomePage() {
   const topDining = allPois
     .filter((p) => DINING.includes(p.category))
     .slice(0, 6);
+  /* Колода карточек из макета: те же данные, что и в лентах, но в
+     форме, которую макет использует для городов, мест и заведений. */
+  const deckItem = (poi: (typeof allPois)[number]) => ({
+    href: `/poi/${poi.slug}`,
+    img: poi.cover,
+    badge: categoryLabel(lang, poi.category),
+    sub: cities.find((c) => c.slug === poi.city_slug)?.name ?? "",
+    title: poi.name,
+    // Две колонки, а не три: третьей в макете стояло расстояние, но его
+    // на сервере не посчитать — геолокация есть только у браузера. Цена
+    // и так показана отдельной строкой ниже, дублировать её незачем.
+    stats: [
+      [poi.rating.toFixed(1), t(lang, "rating_short")],
+      [`${poi.avg_visit_min} ${t(lang, "minutes")}`, t(lang, "duration")],
+    ] as [string, string][],
+    price: formatPrice(poi.price_uzs, lang),
+    priceLabel: t(lang, "price"),
+  });
+
+  const taxiSpots = [
+    ...allPois.filter((p) => p.category === "airport" || p.category === "station"),
+    ...allPois.filter((p) => p.cover).slice(0, 4),
+  ].slice(0, 6);
+
   const stats: { href: string; icon: IconName; key: string; value: number }[] = [
     { href: "/map", icon: "landmark", key: "stat_places", value: totalPois },
     { href: "/routes", icon: "explore", key: "stat_routes", value: tours.length },
@@ -137,6 +164,24 @@ export default async function HomePage() {
   const cityWeather = await getCurrentBatch(
     cities.map((c) => ({ lat: c.lat, lon: c.lon })),
   );
+
+  const cityDeck = cities
+    .filter((c) => covers[c.slug])
+    .map((c, i) => ({
+      href: `/city/${c.slug}`,
+      img: covers[c.slug],
+      badge: t(lang, "country"),
+      sub: t(lang, "country"),
+      title: c.name,
+      stats: [
+        [String(allPois.filter((p) => p.city_slug === c.slug).length), t(lang, "objects")],
+        [cityWeather[i] ? `${cityWeather[i]!.temp}°` : "—", t(lang, "now")],
+        [String(tours.filter((x) => x.city_slug === c.slug).length), t(lang, "routes")],
+      ] as [string, string][],
+      price: "",
+      priceLabel: "",
+    }));
+
 
   // Сцена первого экрана. Отдельной фотографии страны у нас нет, поэтому
   // берётся снимок главного объекта Самарканда — Регистан узнаваем и им
@@ -340,95 +385,33 @@ export default async function HomePage() {
         </nav>
 
         {/* ---------------- Города ---------------- */}
-        <section className="mb-8">
-          <SectionHead
+        {cityDeck.length > 2 ? (
+          <CardDeck
+            items={cityDeck}
             title={t(lang, "choose_city")}
-            hint={`${cities.length} · ${totalPois} ${t(lang, "objects")}`}
+            seeAllHref="/map"
+            seeAllLabel={t(lang, "see_all")}
           />
-          <ul className="grid gap-3 sm:grid-cols-2">
-            {cities.map((city, index) => (
-              <li key={city.slug}>
-                <Link href={`/city/${city.slug}`} className="pressable block overflow-hidden card">
-                  <div className="relative h-32 overflow-hidden">
-                    {covers[city.slug] ? (
-                      <Image
-                        src={covers[city.slug]}
-                        alt={city.name}
-                        fill
-                        sizes="(max-width: 640px) 100vw, 360px"
-                        className="object-cover"
-                      />
-                    ) : (
-                      <div
-                        className="photo-placeholder grid h-full place-items-center"
-                        style={{ color: "var(--primary-text)" }}
-                      >
-                        <Icon name="landmark" size={34} />
-                      </div>
-                    )}
-                  </div>
-                  <div className="p-3">
-                    <div className="flex items-start justify-between gap-2">
-                      <h3 className="min-w-0 flex-1 font-semibold">{city.name}</h3>
-                      {cityWeather[index] && (
-                        <span
-                          className="flex shrink-0 items-center gap-1 rounded-full px-2 py-1 text-xs"
-                          style={{
-                            background: "var(--primary-tint)",
-                            color: "var(--primary-text)",
-                          }}
-                        >
-                          <Icon name={weatherIcon(cityWeather[index]!.code)} size={15} />
-                          {cityWeather[index]!.temp}°
-                        </span>
-                      )}
-                    </div>
-                    {city.description && (
-                      <p className="mt-1 line-clamp-2 text-sm leading-snug soft">
-                        {city.description}
-                      </p>
-                    )}
-                  </div>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
+        ) : null}
 
         {/* ---------------- Топ достопримечательностей ---------------- */}
         {topPois.length > 2 && (
-          <section className="mb-8">
-            <SectionHead title={t(lang, "top_sights")} href="/map" lang={lang} />
-            <ul className="no-scrollbar -mx-4 flex gap-3 overflow-x-auto px-4 pb-1">
-              {topPois.map((poi, i) => (
-                <li
-                  key={poi.id}
-                  className="w-44 shrink-0"
-                  style={{ "--tilt-delay": `${i * 70}ms` } as React.CSSProperties}
-                >
-                  <PoiCard poi={poi} lang={lang} variant="feature" />
-                </li>
-              ))}
-            </ul>
-          </section>
+          <CardDeck
+            items={topPois.map(deckItem)}
+            title={t(lang, "top_sights")}
+            seeAllHref="/map"
+            seeAllLabel={t(lang, "see_all")}
+          />
         )}
 
         {/* ---------------- Где поесть ---------------- */}
-        {topDining.length > 0 && (
-          <section className="mb-8">
-            <SectionHead title={t(lang, "dining_title")} href="/map?category=restaurant" lang={lang} />
-            <ul className="no-scrollbar -mx-4 flex gap-3 overflow-x-auto px-4 pb-1">
-              {topDining.map((poi, i) => (
-                <li
-                  key={poi.id}
-                  className="w-44 shrink-0"
-                  style={{ "--tilt-delay": `${i * 70}ms` } as React.CSSProperties}
-                >
-                  <PoiCard poi={poi} lang={lang} variant="feature" />
-                </li>
-              ))}
-            </ul>
-          </section>
+        {topDining.length > 2 && (
+          <CardDeck
+            items={topDining.map(deckItem)}
+            title={t(lang, "dining_title")}
+            seeAllHref="/map?category=restaurant"
+            seeAllLabel={t(lang, "see_all")}
+          />
         )}
 
         {/* ---------------- Где остановиться ---------------- */}
@@ -559,6 +542,8 @@ export default async function HomePage() {
             </ul>
           </section>
         )}
+
+        <TaxiCard destinations={taxiSpots} lang={lang} />
 
         {/* ---------------- События и фестивали ---------------- */}
         {festivals.length > 0 && (
