@@ -52,7 +52,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     { href: "/", icon: "home" as const, label: t(lang, "cities") },
     { href: "/explore", icon: "explore" as const, label: "Исследовать" },
     { href: "/map", icon: "map" as const, label: t(lang, "map") },
-    { href: "/scan", icon: "qr" as const, label: t(lang, "scan") },
+    { href: "/audio", icon: "headphones" as const, label: t(lang, "audio_title") },
     { href: "/profile", icon: "user" as const, label: t(lang, "profile") },
   ];
 
