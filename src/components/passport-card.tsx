@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { useAppState } from "./app-state";
 import Icon from "./icon";
@@ -55,11 +56,21 @@ export default function PassportCard({
           </p>
           <h2 className="mt-1 text-xl font-semibold">{t(lang, "passport")}</h2>
         </div>
-        <span
-          className="shrink-0 rounded-full px-3 py-1 text-xs font-semibold"
-          style={{ background: "var(--accent)", color: "#2b2b2b" }}
-        >
-          {t(lang, "level")} {level}
+        <span className="flex shrink-0 items-center gap-2">
+          <span
+            className="rounded-full px-3 py-1 text-xs font-semibold"
+            style={{ background: "var(--accent)", color: "#2b2b2b" }}
+          >
+            {t(lang, "level")} {level}
+          </span>
+          <Link
+            href="/pro"
+            className="pressable inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold"
+            style={{ background: "rgba(255,255,255,0.2)", color: "#ffffff" }}
+          >
+            <Icon name="sparkle" size={13} filled />
+            Pro
+          </Link>
         </span>
       </div>
 

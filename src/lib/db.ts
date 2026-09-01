@@ -503,6 +503,13 @@ export function countAdClick(id: number): void {
   getDb().prepare(`UPDATE ad_banners SET clicks = clicks + 1 WHERE id = ?`).run(id);
 }
 
+/** Заявка на подписку: только способ связи, до подключения оплаты. */
+export function createProLead(contact: string, lang: Lang): void {
+  getDb()
+    .prepare(`INSERT INTO pro_leads (contact, lang) VALUES (?, ?)`)
+    .run(contact, lang);
+}
+
 export function analytics() {
   const db = getDb();
   const q = (sql: string) => db.prepare(sql).all() as Row[];

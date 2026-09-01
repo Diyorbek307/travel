@@ -77,6 +77,14 @@ export default async function HomePage() {
   // Витрины из макета: главные объекты страны и места, где поесть.
   // Берём только со снимками — карточка-витрина без фотографии теряет смысл.
   const topPois = allPois.filter((p) => p.cover).slice(0, 10);
+
+  /*
+   * Ночлег. Витрина показывается только начиная с трёх вариантов: в
+   * макете это была лента из семи отелей, а лента из одной карточки
+   * выглядит как ошибка загрузки. Пока гостиниц в базе меньше, раздел
+   * просто не выводится и появится сам, когда их внесут через админку.
+   */
+  const stays = allPois.filter((p) => p.category === "hotel");
   const topDining = allPois
     .filter((p) => DINING.includes(p.category))
     .slice(0, 10);
@@ -376,6 +384,24 @@ export default async function HomePage() {
             <SectionHead title={t(lang, "dining_title")} href="/map?category=restaurant" lang={lang} />
             <ul className="no-scrollbar -mx-4 flex gap-3 overflow-x-auto px-4 pb-1">
               {topDining.map((poi, i) => (
+                <li
+                  key={poi.id}
+                  className="w-44 shrink-0"
+                  style={{ "--tilt-delay": `${i * 70}ms` } as React.CSSProperties}
+                >
+                  <PoiCard poi={poi} lang={lang} variant="feature" />
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {/* ---------------- Где остановиться ---------------- */}
+        {stays.length >= 3 && (
+          <section className="mb-8">
+            <SectionHead title={t(lang, "stays_title")} href="/map?category=hotel" lang={lang} />
+            <ul className="no-scrollbar -mx-4 flex gap-3 overflow-x-auto px-4 pb-1">
+              {stays.slice(0, 10).map((poi, i) => (
                 <li
                   key={poi.id}
                   className="w-44 shrink-0"

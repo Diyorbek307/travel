@@ -214,6 +214,16 @@ export const SCHEMA_SQL = `
     );
     CREATE INDEX IF NOT EXISTS idx_ads_slot ON ad_banners(slot, is_active, weight);
 
+    -- Заявки на подписку: копим контакты до подключения платёжной системы,
+    -- чтобы было кому написать, когда оплата заработает. Ничего, кроме
+    -- способа связи, не храним.
+    CREATE TABLE IF NOT EXISTS pro_leads (
+      id         INTEGER PRIMARY KEY AUTOINCREMENT,
+      contact    TEXT NOT NULL,
+      lang       TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+
     -- Обезличенная аналитика (п. 17): только хэш сессии, без персональных данных.
     CREATE TABLE IF NOT EXISTS events (
       id           INTEGER PRIMARY KEY AUTOINCREMENT,
