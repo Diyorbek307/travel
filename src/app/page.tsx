@@ -6,7 +6,7 @@ import { listCities, listPois, listTours, cityCovers, tourCovers } from "@/lib/d
 import { t } from "@/lib/i18n";
 import { getCurrentBatch, getForecast, weatherIcon } from "@/lib/weather";
 import { currentLang } from "@/lib/server-lang";
-import type { Lang } from "@/lib/types";
+import type { Category, Lang } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
@@ -31,7 +31,30 @@ export default async function HomePage() {
   const lang = await currentLang();
   const cities = listCities(lang);
   const tours = listTours(lang).filter((x) => x.kind === "curated");
-  const totalPois = listPois({ lang }).length;
+  const allPois = listPois({ lang });
+  const totalPois = allPois.length;
+
+  // Плитки со счётчиками из макета. Числа считаются по базе, а не
+  // вписаны руками: в прототипе стояло «500+ мест» при реальных 108,
+  // и такая приписка — обещание, которого платформа не выполняет.
+  const countByCategories = (cats: Category[]) =>
+    allPois.filter((p) => cats.includes(p.category)).length;
+  const stats: { href: string; icon: IconName; key: string; value: number }[] = [
+    { href: "/map", icon: "landmark", key: "stat_places", value: totalPois },
+    { href: "/routes", icon: "explore", key: "stat_routes", value: tours.length },
+    {
+      href: "/map?category=restaurant",
+      icon: "restaurant",
+      key: "stat_dining",
+      value: countByCategories(["restaurant", "cafe", "rest_zone"]),
+    },
+    {
+      href: "/map?category=hotel",
+      icon: "hotel",
+      key: "stat_stays",
+      value: countByCategories(["hotel"]),
+    },
+  ];
 
   // Обложки берутся у главного объекта города и первой остановки маршрута:
   // отдельных снимков у них нет.
@@ -95,11 +118,26 @@ export default async function HomePage() {
       <div className="relative z-10">
         <header className="mx-auto max-w-3xl px-4 pt-4 text-white">
           <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <p className="text-lg font-semibold leading-tight">
-                {t(lang, "greeting")} <span aria-hidden>👋</span>
-              </p>
-              <p className="mt-0.5 text-xs opacity-80">{t(lang, "tagline_short")}</p>
+            {/* Логотип из макета: знак приложения в стеклянной плашке
+                поверх снимка. Имя платформы должно быть на первом экране —
+                иначе турист не запомнит, куда он вернулся. */}
+            <div className="flex min-w-0 items-center gap-2.5">
+              <span
+                className="grid h-10 w-10 shrink-0 place-items-center rounded-[var(--radius-sm)]"
+                style={{
+                  background: "rgba(255,255,255,0.18)",
+                  backdropFilter: "blur(14px)",
+                  border: "1px solid rgba(255,255,255,0.26)",
+                }}
+              >
+                <Icon name="landmark" size={22} />
+              </span>
+              <span className="min-w-0">
+                <span className="block text-lg font-semibold leading-tight">
+                  {t(lang, "app_name")}
+                </span>
+                <span className="block text-xs opacity-80">{t(lang, "tagline_short")}</span>
+              </span>
             </div>
 
             <div className="flex shrink-0 items-center gap-2">
@@ -166,14 +204,34 @@ export default async function HomePage() {
               >
                 <Icon name="search" size={20} />
                 <span className="flex-1 text-sm">{t(lang, "search_placeholder")}</span>
+                {/* Золотая кнопка из макета: на белом листе она заметнее
+                    зелёной, а зелёный в интерфейсе уже занят навигацией. */}
                 <span
-                  className="grid h-9 w-9 place-items-center rounded-full"
-                  style={{ background: "var(--primary)", color: "var(--on-primary)" }}
+                  className="rounded-full px-4 py-2 text-xs font-semibold"
+                  style={{ background: "var(--accent)", color: "#2b2b2b" }}
                 >
-                  <Icon name="chevron-right" size={18} />
+                  {t(lang, "search_action")}
                 </span>
               </Link>
             </div>
+
+            {/* Плитки со счётчиками — из макета. Число сверху, подпись под
+                ним: сначала видно масштаб платформы, потом что это. */}
+            <nav className="mb-8 grid grid-cols-4 gap-2">
+              {stats.map((s) => (
+                <Link
+                  key={s.key}
+                  href={s.href}
+                  className="pressable grid place-items-center gap-1 p-3 text-center card hover:shadow-[var(--shadow-2)]"
+                >
+                  <span style={{ color: "var(--primary-text)" }}>
+                    <Icon name={s.icon} size={20} />
+                  </span>
+                  <span className="text-base font-semibold leading-none">{s.value}</span>
+                  <span className="text-[0.65rem] leading-tight faint">{t(lang, s.key)}</span>
+                </Link>
+              ))}
+            </nav>
 
 
         {/* ---------------- Быстрые действия ---------------- */}

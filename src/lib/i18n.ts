@@ -194,6 +194,11 @@ const ru: Dict = {
   featured_badge: "Рекомендуем",
   ad_label: "Реклама",
   ad_hide: "Скрыть",
+  search_action: "Найти",
+  stat_places: "Места",
+  stat_routes: "Маршруты",
+  stat_dining: "Где поесть",
+  stat_stays: "Ночлег",
 };
 
 const uz: Dict = {
@@ -314,6 +319,11 @@ const uz: Dict = {
   featured_badge: "Tavsiya",
   ad_label: "Reklama",
   ad_hide: "Yashirish",
+  search_action: "Topish",
+  stat_places: "Joylar",
+  stat_routes: "Marshrutlar",
+  stat_dining: "Ovqatlanish",
+  stat_stays: "Tunash",
 };
 
 const en: Dict = {
@@ -434,6 +444,11 @@ const en: Dict = {
   featured_badge: "Featured",
   ad_label: "Ad",
   ad_hide: "Hide",
+  search_action: "Search",
+  stat_places: "Places",
+  stat_routes: "Routes",
+  stat_dining: "Eat",
+  stat_stays: "Stay",
 };
 
 const DICTS: Partial<Record<Lang, Dict>> = { ru, uz, en };
