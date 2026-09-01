@@ -41,9 +41,11 @@ export default async function MapPage({
       <>
         <Header
           lang={lang}
-          title={t(lang, "explore_title")}
+          eyebrow={t(lang, "explore_title")}
+          title={t(lang, "tagline_short")}
           subtitle={objectsCount(lang, shown.length)}
           back="/"
+          tone="brand"
         />
         <main className="mx-auto max-w-3xl px-4 py-4">
           <nav className="no-scrollbar -mx-4 mb-3 flex gap-2 overflow-x-auto px-4">

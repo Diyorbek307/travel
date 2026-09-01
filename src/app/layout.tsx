@@ -7,6 +7,8 @@ import Onboarding from "@/components/onboarding";
 import ServiceWorkerRegistrar from "@/components/service-worker";
 import { t } from "@/lib/i18n";
 import { currentLang } from "@/lib/server-lang";
+import { cityCovers, listPois } from "@/lib/db";
+import { MVP_LANGS } from "@/lib/types";
 
 /*
  * Manrope, а не Outfit из макета: у Outfit нет кириллицы — только латиница.
@@ -60,6 +62,11 @@ export const viewport: Viewport = {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const lang = await currentLang();
 
+  // Данные для заставки: снимок страны и настоящие цифры платформы.
+  const covers = cityCovers();
+  const splashCover = covers.samarkand ?? Object.values(covers)[0] ?? null;
+  const totalPlaces = listPois({ lang }).length;
+
   // Порядок важен: центральный пункт приподнят, туда ставим карту —
   // главный экран платформы.
   const nav = [
@@ -96,7 +103,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <AppStateProvider>
           {children}
           <BottomNav items={nav} />
-          <Onboarding lang={lang} />
+          <Onboarding
+            lang={lang}
+            cover={splashCover}
+            totalPlaces={totalPlaces}
+            langCount={MVP_LANGS.length}
+          />
           <ServiceWorkerRegistrar />
         </AppStateProvider>
       </body>

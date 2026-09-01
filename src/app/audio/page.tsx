@@ -31,7 +31,8 @@ export default async function AudioPage() {
     <>
       <Header
         lang={lang}
-        title={t(lang, "audio_title")}
+        eyebrow={t(lang, "audio_title")}
+        title={t(lang, "audio_listen")}
         subtitle={objectsCount(lang, voiced.length)}
         back="/"
       />

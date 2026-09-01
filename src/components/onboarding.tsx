@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
+import HeroPattern from "./hero-pattern";
 import { useAppState } from "./app-state";
 import Icon from "./icon";
 import { LANG_FLAG, LANG_LABEL, t, themeLabel } from "@/lib/i18n";
@@ -21,9 +23,21 @@ const LANG_COOKIE = "uz_lang";
  * компоненты читают её при рендере. Интересы — в localStorage, оттуда их
  * забирает планировщик маршрутов.
  */
-export default function Onboarding({ lang }: { lang: Lang }) {
+export default function Onboarding({
+  lang,
+  cover,
+  totalPlaces,
+  langCount,
+}: {
+  lang: Lang;
+  /** Снимок для заставки — главный объект страны. */
+  cover: string | null;
+  totalPlaces: number;
+  langCount: number;
+}) {
   const { ready, onboarded, completeOnboarding } = useAppState();
-  const [step, setStep] = useState<1 | 2>(1);
+  // Нулевой шаг — заставка из макета: её видят до всех вопросов.
+  const [step, setStep] = useState<0 | 1 | 2>(0);
   const [picked, setPicked] = useState<Lang>(lang);
   const [interests, setInterests] = useState<Theme[]>([]);
   const router = useRouter();
@@ -31,6 +45,83 @@ export default function Onboarding({ lang }: { lang: Lang }) {
   // Пока localStorage не прочитан, состояние неизвестно: показать экран
   // сразу — значит мигнуть им и тем, кто онбординг уже прошёл.
   if (!ready || onboarded) return null;
+
+  if (step === 0) {
+    return (
+      <div
+        className="fixed inset-0 z-50 flex flex-col overflow-hidden"
+        role="dialog"
+        aria-modal="true"
+        aria-label={t(lang, "splash_title")}
+      >
+        {cover ? (
+          <Image src={cover} alt="" fill priority sizes="100vw" className="object-cover" />
+        ) : (
+          <div className="absolute inset-0" style={{ background: "var(--primary)" }} />
+        )}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(45,123,87,0.5) 0%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.82) 100%)",
+          }}
+        />
+        <HeroPattern />
+
+        <div className="relative z-10 flex items-center gap-3 px-6 pt-14 text-white">
+          <Icon name="logo" size={42} />
+          <span>
+            <span className="display-font block text-2xl font-bold leading-none">
+              {t(lang, "app_name")}
+            </span>
+            <span className="mt-0.5 block text-xs text-white/70">
+              {t(lang, "tagline_short")}
+            </span>
+          </span>
+        </div>
+
+        <div className="relative z-10 mt-auto px-6 pb-12 text-white">
+          <h1 className="display-font mb-3 text-[36px] font-bold leading-tight">
+            {t(lang, "splash_title")}
+          </h1>
+          <p className="mb-8 text-sm leading-relaxed text-white/75">
+            {t(lang, "splash_lead")}
+          </p>
+
+          <button
+            onClick={() => setStep(1)}
+            className="pressable mb-3 flex min-h-14 w-full items-center justify-center gap-2 rounded-[var(--radius-md)] text-base font-bold"
+            style={{ background: "var(--primary)", color: "var(--on-primary)" }}
+            type="button"
+          >
+            {t(lang, "onb_start")}
+            <Icon name="chevron-right" size={16} />
+          </button>
+          <button
+            onClick={finish}
+            className="pressable min-h-12 w-full rounded-[var(--radius-md)] text-sm font-semibold text-white"
+            style={{ border: "1px solid rgba(255,255,255,0.3)" }}
+            type="button"
+          >
+            {t(lang, "onb_skip")}
+          </button>
+
+          {/* Цифры настоящие: сколько объектов и языков в платформе. */}
+          <div className="mt-8 flex justify-center gap-8">
+            {[
+              [String(totalPlaces), t(lang, "stat_places")],
+              [String(langCount), t(lang, "language")],
+            ].map(([value, label]) => (
+              <span key={label} className="text-center">
+                <span className="display-font block text-lg font-bold leading-none">{value}</span>
+                <span className="mt-0.5 block text-[10px] text-white/60">{label}</span>
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   function chooseLang(next: Lang) {
     setPicked(next);

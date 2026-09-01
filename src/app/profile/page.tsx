@@ -16,7 +16,7 @@ export default async function ProfilePage() {
 
   return (
     <>
-      <Header lang={lang} title={t(lang, "profile")} subtitle={t(lang, "passport")} back="/" />
+      <Header lang={lang} eyebrow={t(lang, "profile")} title={t(lang, "passport")} back="/" />
       <ProfileScreen pois={pois} cities={cities} lang={lang} />
     </>
   );
