@@ -2,7 +2,9 @@ import Link from "next/link";
 import AdBannerSlot from "@/components/ad-slot";
 import Header from "@/components/header";
 import Icon from "@/components/icon";
-import { listPois } from "@/lib/db";
+import NearbyAudio from "@/components/nearby-audio";
+import OfflineButton from "@/components/offline-button";
+import { listCities, listPois } from "@/lib/db";
 import { objectsCount, t } from "@/lib/i18n";
 import { currentLang } from "@/lib/server-lang";
 
@@ -26,6 +28,7 @@ export default async function AudioPage() {
   // Озвучены те объекты, у которых написана история: плеер читает её
   // синтезом, пока не загружена запись диктора.
   const voiced = listPois({ lang }).filter((p) => p.full_story);
+  const cities = listCities(lang);
 
   return (
     <>
@@ -57,6 +60,9 @@ export default async function AudioPage() {
 
         <AdBannerSlot slot="audio" lang={lang} className="mb-4" />
 
+        {/* Рядом с вами — из макета. Расстояние считает браузер. */}
+        <NearbyAudio pois={voiced} lang={lang} />
+
         <h2 className="mb-2 font-semibold">{t(lang, "audio_available")}</h2>
         <ul className="mb-5 grid gap-2">
           {voiced.slice(0, 40).map((poi) => (
@@ -81,22 +87,32 @@ export default async function AudioPage() {
           ))}
         </ul>
 
-        <Link
-          href="/offline"
-          className="pressable flex items-center gap-3 p-4 card hover:shadow-[var(--shadow-2)]"
-        >
-          <span
-            className="grid h-10 w-10 shrink-0 place-items-center rounded-[var(--radius-sm)]"
-            style={{ background: "var(--primary-tint)", color: "var(--primary-text)" }}
-          >
-            <Icon name="download" size={20} />
-          </span>
-          <span className="min-w-0 flex-1">
-            <span className="block font-medium">{t(lang, "offline")}</span>
-            <span className="block text-sm soft">{t(lang, "offline_lead")}</span>
-          </span>
-          <Icon name="chevron-right" size={18} />
-        </Link>
+        {/* Офлайн-пакеты списком, как в макете: сразу видно, что можно
+            скачать и сколько там озвученных объектов. */}
+        <h2 className="mb-2 font-semibold">{t(lang, "offline")}</h2>
+        <p className="mb-2 text-sm soft">{t(lang, "offline_lead")}</p>
+        <ul className="grid gap-2">
+          {cities.slice(0, 6).map((city) => {
+            const count = voiced.filter((p) => p.city_slug === city.slug).length;
+            return (
+              <li key={city.slug} className="flex items-center gap-3 p-3 card">
+                <span
+                  className="grid h-10 w-10 shrink-0 place-items-center rounded-[var(--radius-sm)]"
+                  style={{ background: "var(--primary-tint)", color: "var(--primary-text)" }}
+                >
+                  <Icon name="download" size={19} />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate font-medium">{city.name}</span>
+                  <span className="block text-xs faint">
+                    {count} {t(lang, "audio_available").toLowerCase()}
+                  </span>
+                </span>
+                <OfflineButton citySlug={city.slug} cityName={city.name} lang={lang} />
+              </li>
+            );
+          })}
+        </ul>
 
         <p className="mt-4 text-xs leading-relaxed soft">{t(lang, "audio_notice")}</p>
       </main>

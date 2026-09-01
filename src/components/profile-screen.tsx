@@ -47,6 +47,16 @@ export default function ProfileScreen({
 
   const bySlug = useMemo(() => new Map(pois.map((p) => [p.slug, p])), [pois]);
 
+  // Шесть целей коллекции: самые значимые объекты страны. Список
+  // стабильный, поэтому штампы не перескакивают между заходами.
+  const stampGoals = useMemo(
+    () => [...pois].sort((a, b) => b.popularity - a.popularity).slice(0, 6),
+    [pois],
+  );
+  const earnedCount = stampGoals.filter((p) =>
+    visits.some((v) => v.slug === p.slug),
+  ).length;
+
   // Пройденное расстояние оцениваем как сумму отрезков между посещёнными
   // объектами в порядке их посещения. Это приближение: реальный трек мы
   // не пишем, чтобы не собирать историю перемещений туриста.
@@ -106,69 +116,103 @@ export default function ProfileScreen({
 
       {tab === "passport" && (
       <>
-      {/* Туристический паспорт — п. 13 ТЗ */}
+      {/* Коллекция штампов из макета: сетка квадратных плиток, где видны
+          и полученные, и ещё не полученные. Показывать только собранные
+          было бы честно, но бессмысленно — турист не понимает, что ему
+          осталось. Цели берутся из самых значимых объектов страны. */}
       <section className="mb-5">
-        <h2 className="mb-2 font-semibold">
-          <Icon name="ticket" size={18} className="inline align-[-3px]" /> {t(lang, "passport")} · {visits.length} {t(lang, "stamps")}
+        <h2 className="mb-3 font-semibold">
+          {t(lang, "passport")} · {visits.length} {t(lang, "stamps")}
         </h2>
-        <div className="rounded-xl p-4 surface">
-          {visits.length === 0 ? (
-            <p className="text-sm soft">
-              Пока ни одного штампа. Отметьте посещение на странице объекта — или
-              отсканируйте QR-код на месте.
-            </p>
-          ) : (
-            <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-              {[...visits]
-                .sort((a, b) => b.ts - a.ts)
-                .map((visit) => {
-                  const poi = bySlug.get(visit.slug);
-                  const city = cities.find((c) => c.slug === visit.city);
-                  return (
-                    <li
-                      key={visit.slug}
-                      className="rounded-lg border-2 border-dashed px-3 py-2"
-                      style={{ borderColor: "var(--primary-soft)" }}
-                    >
-                      <span className="block text-sm font-medium" style={{ color: "var(--primary-text)" }}>
-                        {poi?.name ?? visit.name}
-                      </span>
-                      <span className="block text-[0.65rem] soft">
-                        {city?.name} · {new Date(visit.ts).toLocaleDateString("ru-RU")}
-                      </span>
-                    </li>
-                  );
-                })}
-            </ul>
-          )}
+        <ul className="grid grid-cols-3 gap-2.5">
+          {stampGoals.map((poi) => {
+            const visit = visits.find((v) => v.slug === poi.slug);
+            const earned = Boolean(visit);
+            return (
+              <li key={poi.slug}>
+                <Link
+                  href={`/poi/${poi.slug}`}
+                  className="pressable grid aspect-square place-items-center gap-1 rounded-[var(--radius-md)] p-3 text-center"
+                  style={
+                    earned
+                      ? { background: "var(--primary)", color: "#ffffff", boxShadow: "var(--shadow-1)" }
+                      : { background: "var(--surface)", border: "2px dashed var(--border)" }
+                  }
+                >
+                  <span style={{ color: earned ? "#ffffff" : "var(--text-faint)" }}>
+                    <Icon name={poi.category} size={22} />
+                  </span>
+                  <span className="line-clamp-2 text-[9px] font-bold leading-tight">
+                    {poi.name}
+                  </span>
+                  <span
+                    className="text-[8px]"
+                    style={{ color: earned ? "var(--accent)" : "var(--text-faint)" }}
+                  >
+                    {earned
+                      ? new Date(visit!.ts).toLocaleDateString("ru-RU", {
+                          day: "numeric",
+                          month: "short",
+                        })
+                      : t(lang, "stamp_not_visited")}
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+
+        {/* Полоса прогресса по этой же коллекции. */}
+        <div className="mt-3 p-4 card">
+          <div className="mb-2 flex items-center justify-between">
+            <span className="text-sm font-semibold">{t(lang, "progress")}</span>
+            <span className="text-sm font-bold" style={{ color: "var(--primary-text)" }}>
+              {earnedCount}/{stampGoals.length}
+            </span>
+          </div>
+          <div className="h-2 overflow-hidden rounded-full" style={{ background: "var(--bg)" }}>
+            <div
+              className="h-2 rounded-full transition-[width] duration-500"
+              style={{
+                width: `${stampGoals.length ? (earnedCount / stampGoals.length) * 100 : 0}%`,
+                background: "var(--primary)",
+              }}
+            />
+          </div>
         </div>
       </section>
 
+      {/* Достижения — сеткой, как в макете, а не списком строк. */}
       <section className="mb-5">
-        <h2 className="mb-2 font-semibold"><Icon name="star" size={18} className="inline align-[-3px]" /> {t(lang, "achievements")}</h2>
-        <ul className="grid gap-2">
+        <h2 className="mb-3 font-semibold">{t(lang, "achievements")}</h2>
+        <ul className="grid grid-cols-3 gap-2.5">
           {ACHIEVEMENTS.map((a) => {
             const { have, need } = a.progress(state);
             const done = have >= need;
             return (
-              <li key={a.id} className="rounded-xl p-3 surface">
-                <div className="flex items-center justify-between gap-2">
-                  <span className={done ? "" : "opacity-50"}>
-                    {a.title[lang] ?? a.title.en}
-                  </span>
-                  <span className="shrink-0 text-xs soft">
-                    {Math.min(have, need)} / {need}
-                  </span>
-                </div>
-                <div className="mt-2 h-1 overflow-hidden rounded-full bg-soft">
-                  <div
-                    className="h-full"
-                    style={{
-                      width: `${Math.min(100, (have / need) * 100)}%`,
-                      background: "var(--primary)",
-                    }}
-                  />
-                </div>
+              <li
+                key={a.id}
+                className="grid place-items-center gap-1.5 p-3 text-center card"
+                style={{ opacity: done ? 1 : 0.55 }}
+              >
+                <span
+                  className="grid h-10 w-10 place-items-center rounded-[var(--radius-sm)]"
+                  style={{
+                    background: done ? "var(--primary-tint)" : "var(--surface-alt)",
+                    color: done ? "var(--primary-text)" : "var(--text-faint)",
+                  }}
+                >
+                  <Icon name="star" size={20} filled={done} />
+                </span>
+                <span className="text-[9px] font-semibold leading-tight">
+                  {a.title[lang] ?? a.title.en}
+                </span>
+                <span
+                  className="text-[8px]"
+                  style={{ color: done ? "var(--primary-text)" : "var(--text-faint)" }}
+                >
+                  {done ? t(lang, "achievement_done") : `${Math.min(have, need)} / ${need}`}
+                </span>
               </li>
             );
           })}
