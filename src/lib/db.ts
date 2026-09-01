@@ -9,6 +9,7 @@ import type {
   Category,
   City,
   Exhibit,
+  Festival,
   Lang,
   OpeningHours,
   Poi,
@@ -397,6 +398,59 @@ export function createReservation(input: {
      VALUES (?, ?, ?, ?, ?, ?)`,
   ).run(input.poi_id, input.name, input.phone, input.party_size, input.requested_at, input.note);
   return Number((db.prepare(`SELECT last_insert_rowid() AS id`).get() as Row).id);
+}
+
+/**
+ * Праздники и фестивали, начиная с ближайшего.
+ *
+ * Порядок «от сегодня по кругу»: ежегодные праздники, что уже прошли в
+ * этом году, уезжают в конец списка, а не пропадают — турист, приехавший
+ * в апреле, должен видеть, что Навруз будет в марте следующего года,
+ * а не пустой раздел.
+ */
+export function listFestivals(lang: Lang, limit = 8): Festival[] {
+  const db = getDb();
+  const rows = db
+    .prepare(
+      `SELECT f.id, f.slug, f.month, f.day, f.year, f.days, f.cover,
+              c.slug AS city_slug,
+              COALESCE(${coalesceTr("ct", "name", lang)}) AS city_name,
+              COALESCE(${coalesceTr("t", "name", lang)}, f.slug) AS name,
+              COALESCE(${coalesceTr("t", "description", lang)})  AS description
+         FROM festivals f
+         LEFT JOIN cities c            ON c.id = f.city_id
+         LEFT JOIN city_translations ct ON ct.city_id = c.id
+         LEFT JOIN festival_translations t ON t.festival_id = f.id
+        WHERE f.is_active = 1
+        GROUP BY f.id
+        ORDER BY f.sort, f.month, f.day`,
+    )
+    .all() as Row[];
+
+  const now = new Date();
+  const today = (now.getMonth() + 1) * 100 + now.getDate();
+
+  const mapped = rows.map((r) => ({
+    id: Number(r.id),
+    slug: String(r.slug),
+    city_slug: (r.city_slug as string) ?? null,
+    city_name: (r.city_name as string) ?? null,
+    month: Number(r.month),
+    day: r.day == null ? null : Number(r.day),
+    year: r.year == null ? null : Number(r.year),
+    days: Number(r.days),
+    cover: (r.cover as string) ?? null,
+    name: String(r.name),
+    description: (r.description as string) ?? null,
+  }));
+
+  // Ключ сортировки — «сколько дней ждать»: прошедшие в этом году
+  // получают +1200 и оказываются позади предстоящих.
+  const key = (f: Festival) => {
+    const stamp = f.month * 100 + (f.day ?? 1);
+    return stamp >= today ? stamp : stamp + 1200;
+  };
+  return mapped.sort((a, b) => key(a) - key(b)).slice(0, limit);
 }
 
 /**

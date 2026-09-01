@@ -9,6 +9,7 @@ import { mediaDir } from "@/lib/paths.js";
 import {
   deleteAdBanner,
   deleteExhibit,
+  deleteFestival,
   deletePoi,
   deletePoiAudio,
   deleteQr,
@@ -21,6 +22,7 @@ import {
   upsertAdBanner,
   upsertCity,
   upsertExhibit,
+  upsertFestival,
   upsertPoi,
   upsertQr,
   upsertTour,
@@ -402,6 +404,67 @@ export async function removeExhibit(formData: FormData): Promise<void> {
   await requireAuth();
   deleteExhibit(num(formData, "id"));
   revalidatePath("/admin/museums");
+}
+
+/* ------------------------------------------------------------------ */
+/* Праздники и фестивали                                              */
+/* ------------------------------------------------------------------ */
+
+export async function saveFestival(
+  _prev: ActionResult | null,
+  formData: FormData,
+): Promise<ActionResult> {
+  await requireAuth();
+
+  const slug = str(formData, "slug");
+  if (!/^[a-z0-9-]{2,60}$/.test(slug)) {
+    return { ok: false, message: "Идентификатор: латиница, цифры и дефис" };
+  }
+
+  const month = num(formData, "month");
+  if (month < 1 || month > 12) return { ok: false, message: "Месяц — от 1 до 12" };
+
+  const dayRaw = str(formData, "day");
+  const day = dayRaw ? num(formData, "day") : null;
+  if (day !== null && (day < 1 || day > 31)) {
+    return { ok: false, message: "День — от 1 до 31 или пусто для плавающей даты" };
+  }
+
+  const translations: Partial<Record<Lang, { name: string; description: string }>> = {};
+  for (const lang of LANGS) {
+    const name = str(formData, `name_${lang}`);
+    if (name) translations[lang] = { name, description: str(formData, `desc_${lang}`) };
+  }
+  if (Object.keys(translations).length === 0) {
+    return { ok: false, message: "Нужно название хотя бы на одном языке" };
+  }
+
+  const yearRaw = str(formData, "year");
+  try {
+    upsertFestival({
+      slug,
+      citySlug: str(formData, "city") || null,
+      month,
+      day,
+      year: yearRaw ? num(formData, "year") : null,
+      days: Math.max(1, num(formData, "days", 1)),
+      sort: num(formData, "sort"),
+      isActive: str(formData, "is_active") === "on",
+      translations,
+    });
+  } catch (error) {
+    return { ok: false, message: (error as Error).message };
+  }
+
+  revalidatePath("/admin/festivals");
+  revalidatePath("/");
+  return { ok: true, message: `Событие «${slug}» сохранено` };
+}
+
+export async function removeFestival(formData: FormData): Promise<void> {
+  await requireAuth();
+  deleteFestival(str(formData, "slug"));
+  revalidatePath("/admin/festivals");
 }
 
 /* ------------------------------------------------------------------ */

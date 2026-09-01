@@ -99,6 +99,23 @@ export interface Poi {
   sponsored_priority?: number;
 }
 
+/** Праздник или фестиваль. */
+export interface Festival {
+  id: number;
+  slug: string;
+  city_slug: string | null;
+  city_name: string | null;
+  /** Месяц 1–12. День может быть не задан — тогда дата плавающая. */
+  month: number;
+  day: number | null;
+  /** Год для событий с плавающей датой; null — праздник ежегодный. */
+  year: number | null;
+  days: number;
+  cover: string | null;
+  name: string;
+  description: string | null;
+}
+
 /** Места, куда можно поставить рекламный блок. */
 export const AD_SLOTS = ["city", "explore", "audio", "profile"] as const;
 export type AdSlot = (typeof AD_SLOTS)[number];

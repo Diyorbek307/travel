@@ -421,6 +421,106 @@ for (const tour of MULTI_CITY_TOURS) {
   insertTour(tour, cityId);
 }
 
+/*
+ * Праздники с закреплённой датой. Здесь только те, чей день установлен
+ * законом или обычаем и не переносится: Навруз, День независимости,
+ * День Конституции. Фестивали с плавающей датой («Шарк тароналари»,
+ * гастрофесты) не сидируются — их дата меняется от года к году, и
+ * записать её сейчас значило бы отправить туриста в пустой день.
+ * Такие события вносятся через /admin/festivals, когда объявлены.
+ */
+const FESTIVALS = [
+  {
+    slug: "navruz",
+    city: null,
+    month: 3,
+    day: 21,
+    days: 1,
+    sort: 1,
+    tr: {
+      ru: {
+        n: "Навруз",
+        d: "Праздник весеннего равноденствия и начало года по солнечному календарю. Готовят сумаляк, накрывают столы во дворах, на площадях играет живая музыка.",
+      },
+      uz: {
+        n: "Navro'z",
+        d: "Bahorgi tengkunlik bayrami va quyosh taqvimi bo'yicha yil boshi. Sumalak pishiriladi, hovlilarda dasturxon yoziladi, maydonlarda jonli musiqa yangraydi.",
+      },
+      en: {
+        n: "Navruz",
+        d: "The spring equinox festival and start of the solar year. Families cook sumalak, lay tables in the courtyards, and squares fill with live music.",
+      },
+    },
+  },
+  {
+    slug: "independence-day",
+    city: null,
+    month: 9,
+    day: 1,
+    days: 1,
+    sort: 2,
+    tr: {
+      ru: {
+        n: "День независимости",
+        d: "Главный государственный праздник страны. Концерты и представления на площадях, вечером — салют в Ташкенте и областных центрах.",
+      },
+      uz: {
+        n: "Mustaqillik kuni",
+        d: "Mamlakatning asosiy davlat bayrami. Maydonlarda konsert va tomoshalar, kechqurun Toshkent va viloyat markazlarida salyut.",
+      },
+      en: {
+        n: "Independence Day",
+        d: "The country's main national holiday. Concerts and performances on the squares, with fireworks in Tashkent and regional capitals in the evening.",
+      },
+    },
+  },
+  {
+    slug: "constitution-day",
+    city: null,
+    month: 12,
+    day: 8,
+    days: 1,
+    sort: 3,
+    tr: {
+      ru: {
+        n: "День Конституции",
+        d: "Государственный праздник в честь принятия Конституции. Выходной день, музеи и памятники работают по праздничному расписанию.",
+      },
+      uz: {
+        n: "Konstitutsiya kuni",
+        d: "Konstitutsiya qabul qilingan kun sharafiga davlat bayrami. Dam olish kuni, muzey va yodgorliklar bayram jadvali bo'yicha ishlaydi.",
+      },
+      en: {
+        n: "Constitution Day",
+        d: "A public holiday marking the adoption of the Constitution. A day off, with museums and monuments on holiday hours.",
+      },
+    },
+  },
+];
+
+for (const f of FESTIVALS) {
+  const cityId = f.city ? Number(one(`SELECT id FROM cities WHERE slug = ?`, f.city).id) : null;
+  run(
+    `INSERT INTO festivals (slug, city_id, month, day, year, days, sort, is_active)
+     VALUES (?, ?, ?, ?, NULL, ?, ?, 1)
+     ON CONFLICT(slug) DO UPDATE SET
+       city_id = excluded.city_id, month = excluded.month, day = excluded.day,
+       days = excluded.days, sort = excluded.sort`,
+    f.slug, cityId, f.month, f.day, f.days, f.sort,
+  );
+  const fid = Number(one(`SELECT id FROM festivals WHERE slug = ?`, f.slug).id);
+  for (const [lang, tr] of Object.entries(f.tr)) {
+    run(
+      `INSERT INTO festival_translations (festival_id, lang, name, description)
+       VALUES (?, ?, ?, ?)
+       ON CONFLICT(festival_id, lang) DO UPDATE SET
+         name = excluded.name, description = excluded.description`,
+      fid, lang, tr.n, tr.d,
+    );
+    counts.translations++;
+  }
+}
+
 db.close();
 
 console.log("База заполнена:", DB_PATH);

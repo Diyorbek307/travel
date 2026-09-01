@@ -388,6 +388,73 @@ export function deleteExhibit(id: number): void {
 }
 
 /* ------------------------------------------------------------------ */
+/* Праздники и фестивали                                              */
+/* ------------------------------------------------------------------ */
+
+export function upsertFestival(input: {
+  slug: string;
+  citySlug: string | null;
+  month: number;
+  day: number | null;
+  year: number | null;
+  days: number;
+  sort: number;
+  isActive: boolean;
+  translations: Partial<Record<Lang, { name: string; description: string }>>;
+}): number {
+  const db = getDb();
+  let cityId: number | null = null;
+  if (input.citySlug) {
+    const row = db.prepare(`SELECT id FROM cities WHERE slug = ?`).get(input.citySlug) as Row | undefined;
+    if (!row) throw new Error(`Город «${input.citySlug}» не найден`);
+    cityId = Number(row.id);
+  }
+
+  db.prepare(
+    `INSERT INTO festivals (slug, city_id, month, day, year, days, sort, is_active)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+     ON CONFLICT(slug) DO UPDATE SET
+       city_id = excluded.city_id, month = excluded.month, day = excluded.day,
+       year = excluded.year, days = excluded.days, sort = excluded.sort,
+       is_active = excluded.is_active`,
+  ).run(
+    input.slug, cityId, input.month, input.day, input.year,
+    input.days, input.sort, input.isActive ? 1 : 0,
+  );
+
+  const id = Number((db.prepare(`SELECT id FROM festivals WHERE slug = ?`).get(input.slug) as Row).id);
+
+  for (const [lang, tr] of Object.entries(input.translations)) {
+    if (!tr?.name) continue;
+    db.prepare(
+      `INSERT INTO festival_translations (festival_id, lang, name, description)
+       VALUES (?, ?, ?, ?)
+       ON CONFLICT(festival_id, lang) DO UPDATE SET
+         name = excluded.name, description = excluded.description`,
+    ).run(id, lang, tr.name, tr.description || null);
+  }
+  return id;
+}
+
+export function deleteFestival(slug: string): void {
+  getDb().prepare(`DELETE FROM festivals WHERE slug = ?`).run(slug);
+}
+
+export function listFestivalsAdmin() {
+  return getDb()
+    .prepare(
+      `SELECT f.id, f.slug, f.month, f.day, f.year, f.days, f.sort, f.is_active,
+              c.slug AS city_slug,
+              COALESCE(t.name, f.slug) AS name
+         FROM festivals f
+         LEFT JOIN cities c ON c.id = f.city_id
+         LEFT JOIN festival_translations t ON t.festival_id = f.id AND t.lang = 'ru'
+        ORDER BY f.month, f.day`,
+    )
+    .all() as Row[];
+}
+
+/* ------------------------------------------------------------------ */
 /* Рекламные блоки                                                    */
 /* ------------------------------------------------------------------ */
 

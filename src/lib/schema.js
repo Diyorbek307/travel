@@ -164,6 +164,34 @@ export const SCHEMA_SQL = `
     );
     CREATE INDEX IF NOT EXISTS idx_reservations_poi ON reservations(poi_id, created_at);
 
+    -- Праздники и фестивали. Таблица названа festivals, а не events:
+    -- events уже занята обезличенной аналитикой.
+    --
+    -- Даты хранятся как месяц и день отдельно от года: Навруз — всегда
+    -- 21 марта, и записывать ему год значило бы каждый январь править
+    -- руками все ежегодные праздники. У фестивалей с плавающей датой год
+    -- указывается явно в year.
+    CREATE TABLE IF NOT EXISTS festivals (
+      id         INTEGER PRIMARY KEY AUTOINCREMENT,
+      slug       TEXT NOT NULL UNIQUE,
+      city_id    INTEGER REFERENCES cities(id) ON DELETE SET NULL,
+      month      INTEGER NOT NULL,
+      day        INTEGER,
+      year       INTEGER,
+      days       INTEGER NOT NULL DEFAULT 1,
+      cover      TEXT,
+      sort       INTEGER NOT NULL DEFAULT 0,
+      is_active  INTEGER NOT NULL DEFAULT 1
+    );
+
+    CREATE TABLE IF NOT EXISTS festival_translations (
+      festival_id INTEGER NOT NULL REFERENCES festivals(id) ON DELETE CASCADE,
+      lang        TEXT NOT NULL,
+      name        TEXT NOT NULL,
+      description TEXT,
+      PRIMARY KEY (festival_id, lang)
+    );
+
     -- Рекламные блоки. Переводов нет намеренно: креатив приходит от
     -- рекламодателя на конкретном языке, а не переводится нами. lang = NULL
     -- означает «показывать всем». Даты размещения обязательны для

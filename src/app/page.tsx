@@ -3,11 +3,11 @@ import Link from "next/link";
 import Icon, { type IconName } from "@/components/icon";
 import LangSwitcher from "@/components/lang-switcher";
 import PoiCard from "@/components/poi-card";
-import { listCities, listPois, listTours, cityCovers, tourCovers } from "@/lib/db";
+import { listCities, listFestivals, listPois, listTours, cityCovers, tourCovers } from "@/lib/db";
 import { t } from "@/lib/i18n";
 import { getCurrentBatch, getForecast, weatherIcon } from "@/lib/weather";
 import { currentLang } from "@/lib/server-lang";
-import type { Category, Lang } from "@/lib/types";
+import type { Category, Festival, Lang } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
@@ -52,6 +52,7 @@ export default async function HomePage() {
   const lang = await currentLang();
   const cities = listCities(lang);
   const tours = listTours(lang).filter((x) => x.kind === "curated");
+  const festivals = listFestivals(lang, 8);
   const allPois = listPois({ lang });
   const totalPois = allPois.length;
 
@@ -418,6 +419,37 @@ export default async function HomePage() {
           </section>
         )}
 
+        {/* ---------------- События и фестивали ---------------- */}
+        {festivals.length > 0 && (
+          <section className="mb-8">
+            <h2 className="mb-3 text-base font-semibold">{t(lang, "festivals_title")}</h2>
+            <ul className="no-scrollbar -mx-4 flex gap-3 overflow-x-auto px-4 pb-1">
+              {festivals.map((f) => (
+                <li key={f.id} className="w-64 shrink-0">
+                  <article className="flex h-full flex-col p-4 card">
+                    <span
+                      className="inline-flex w-fit items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium"
+                      style={{ background: "var(--accent)", color: "#2b2b2b" }}
+                    >
+                      <Icon name="clock" size={13} />
+                      {formatFestivalDate(f, lang)}
+                    </span>
+                    <h3 className="mt-2.5 font-semibold leading-snug">{f.name}</h3>
+                    {f.city_name && (
+                      <p className="mt-0.5 text-xs faint">{f.city_name}</p>
+                    )}
+                    {f.description && (
+                      <p className="mt-2 line-clamp-3 text-sm leading-relaxed soft">
+                        {f.description}
+                      </p>
+                    )}
+                  </article>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
         {/* ---------------- Полезно знать ---------------- */}
         <section className="mb-8">
           <h2 className="mb-3 text-base font-semibold">{t(lang, "practical_title")}</h2>
@@ -493,6 +525,22 @@ export default async function HomePage() {
       </div>
     </>
   );
+}
+
+/**
+ * Дата события словами. У ежегодных праздников год не показываем — он
+ * не задан в базе намеренно, иначе каждый январь пришлось бы править
+ * все записи руками. У события без дня остаётся только месяц.
+ */
+function formatFestivalDate(f: Festival, lang: Lang): string {
+  const locale = lang === "uz" ? "uz-UZ" : lang === "en" ? "en-GB" : "ru-RU";
+  const month = new Date(2000, f.month - 1, 1).toLocaleDateString(locale, { month: "long" });
+  if (f.day == null) return f.year ? `${month} ${f.year}` : month;
+  const day = new Date(2000, f.month - 1, f.day).toLocaleDateString(locale, {
+    day: "numeric",
+    month: "long",
+  });
+  return f.year ? `${day} ${f.year}` : day;
 }
 
 function SectionHead({
