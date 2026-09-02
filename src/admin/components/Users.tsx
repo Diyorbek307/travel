@@ -50,7 +50,11 @@ export default function Users() {
   const [скопирован, setСкопирован] = useState<string | null>(null);
   const [коды, setКоды] = useState<Verify[]>([]);
   const [почтаНастроена, setПочтаНастроена] = useState(true);
-  const [почта, setПочта] = useState<{ ok: boolean; detail: string } | null>(null);
+  const [почта, setПочта] = useState<{
+    ok: boolean;
+    detail: string;
+    настройки?: { host: string; port: number; user: string; from: string };
+  } | null>(null);
   const [проверяю, setПроверяю] = useState(false);
   const [кудаПробное, setКудаПробное] = useState("");
   const [пробноеИтог, setПробноеИтог] = useState<string | null>(null);
@@ -154,13 +158,34 @@ export default function Users() {
         </div>
 
         {почта && (
-          <p
-            className="mb-3 text-sm leading-relaxed"
-            style={{ color: почта.ok ? "var(--color-teal)" : "var(--color-rose)" }}
-          >
-            {почта.ok ? "✓ " : "✕ "}
-            {почта.detail}
-          </p>
+          <>
+            <p
+              className="mb-2 text-sm leading-relaxed"
+              style={{ color: почта.ok ? "var(--color-teal)" : "var(--color-rose)" }}
+            >
+              {почта.ok ? "✓ " : "✕ "}
+              {почта.detail}
+            </p>
+
+            {/* Что задано на сервере прямо сейчас. Пароль не показываем. */}
+            {почта.настройки && (
+              <dl className="mb-3 grid gap-1 text-xs">
+                {[
+                  ["SMTP_HOST", почта.настройки.host],
+                  ["SMTP_PORT", String(почта.настройки.port)],
+                  ["SMTP_USER", почта.настройки.user],
+                  ["MAIL_FROM", почта.настройки.from],
+                ].map(([k, v]) => (
+                  <div key={k} className="flex flex-wrap justify-between gap-2">
+                    <dt style={{ color: "var(--color-dim)", fontFamily: "var(--font-mono)" }}>{k}</dt>
+                    <dd className="min-w-0 truncate" style={{ color: "var(--color-muted)" }}>
+                      {v}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            )}
+          </>
         )}
 
         <div className="flex flex-wrap items-center gap-2">

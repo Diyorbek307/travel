@@ -106,14 +106,29 @@ export async function sendMail(letter: Letter): Promise<boolean> {
  * Позволяет убедиться, что переменные заданы верно, не рассылая ничего
  * живым людям.
  */
-export async function проверитьПочту(): Promise<{ ok: boolean; detail: string }> {
+export async function проверитьПочту(): Promise<{
+  ok: boolean;
+  detail: string;
+  /** Что сейчас задано — без пароля. */
+  настройки: { host: string; port: number; user: string; from: string };
+}> {
+  // Показываем настройки при любом исходе: чаще всего ошибка видна
+  // прямо в них, а искать её глазами среди девяти переменных на чужом
+  // экране невозможно. Пароль не отдаём никогда.
+  const настройки = {
+    host: HOST ?? "не задан",
+    port: PORT,
+    user: USER ?? "не задан",
+    from: FROM,
+  };
+
   if (!mailConfigured()) {
     const нет = [
       !HOST && "SMTP_HOST",
       !USER && "SMTP_USER",
       !PASS && "SMTP_PASSWORD",
     ].filter(Boolean);
-    return { ok: false, detail: `Не заданы переменные: ${нет.join(", ")}` };
+    return { ok: false, detail: `Не заданы переменные: ${нет.join(", ")}`, настройки };
   }
 
   /*
@@ -151,6 +166,7 @@ export async function проверитьПочту(): Promise<{ ok: boolean; det
       detail:
         `SMTP_HOST указывает на ${серверПочтовик.имя} (${HOST}), а ящик ${USER} — на ${ящикПочтовик.имя}. ` +
         `Чужой сервер такой адрес не пустит. Нужен ${ящикПочтовик === ПОЧТОВИКИ[1] ? "smtp.mail.ru" : ящикПочтовик === ПОЧТОВИКИ[0] ? "smtp.yandex.ru" : "smtp.gmail.com"}.`,
+      настройки,
     };
   }
 
@@ -161,15 +177,16 @@ export async function проверитьПочту(): Promise<{ ok: boolean; det
       detail:
         `MAIL_FROM указывает на ${адресОтправителя}, а вход выполняется под ${USER}. ` +
         `Почтовый сервер отвергнет такое письмо — адреса должны совпадать.`,
+      настройки,
     };
   }
 
   const t = getTransport();
-  if (!t) return { ok: false, detail: "Не удалось создать подключение" };
+  if (!t) return { ok: false, detail: "Не удалось создать подключение", настройки };
 
   try {
     await t.verify();
-    return { ok: true, detail: `Подключение к ${HOST}:${PORT} работает, вход выполнен` };
+    return { ok: true, detail: `Подключение к ${HOST}:${PORT} работает, вход выполнен`, настройки };
   } catch (error) {
     const текст = (error as Error).message;
     // Подсказываем по самым частым отказам, а не оставляем человека с
@@ -194,7 +211,7 @@ export async function проверитьПочту(): Promise<{ ok: boolean; det
           ? " — вход не принят. Нужен пароль приложения, а не пароль от почты, " +
             "и включённый доступ внешним программам в настройках ящика."
           : "";
-    return { ok: false, detail: текст + подсказка };
+    return { ok: false, detail: текст + подсказка, настройки };
   }
 }
 
