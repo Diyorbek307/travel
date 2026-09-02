@@ -6,13 +6,25 @@ import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE } from "@/lib/theme";
 import { WEATHER } from "@/data/content";
 import { useAppContent } from "@/components/content-provider";
 import { Badge } from "../ui";
-import { UzbekistanMap3D } from "@/components/map-3d";
+import UzMap from "@/components/uz-map";
+import { ГОРОДА } from "@/data/geo";
 
 
 export function MapScreen({ onRoute }:{ onRoute:(r:Route)=>void }) {
   const { ROUTES } = useAppContent();
   const [mode, setMode] = useState<"map"|"routes"|"ai">("map");
   const [city, setCity]   = useState("Самарканд");
+  /*
+   * Где человек. Разрешение спрашиваем по нажатию, а не при открытии
+   * экрана: непрошеный запрос геолокации почти всегда получает отказ,
+   * и второй раз система его уже не покажет.
+   */
+  const [где, setГде] = useState<{ lat:number; lon:number }|null>(null);
+  const определитьГде = () => navigator.geolocation?.getCurrentPosition(
+    p => setГде({ lat:p.coords.latitude, lon:p.coords.longitude }),
+    () => setГде(null),
+    { enableHighAccuracy:true, timeout:8000 },
+  );
   const [hours, setHours] = useState("6 ч");
   const [ints, setInts]   = useState<string[]>(["история"]);
   const [generating, setGenerating] = useState(false);
@@ -25,7 +37,7 @@ export function MapScreen({ onRoute }:{ onRoute:(r:Route)=>void }) {
         <p className="text-xs font-medium mb-0.5" style={{color:GREEN,letterSpacing:"0.1em"}}>МАРШРУТЫ И КАРТА</p>
         <h1 className="text-xl font-bold mb-3" style={{color:TEXT,fontFamily:"'Fraunces',serif"}}>Спланируй поездку</h1>
         <div className="flex gap-2">
-          {(["map","routes","ai"] as const).map(m=><button key={m} onClick={()=>setMode(m)} className="flex-1 py-2 rounded-xl text-xs font-semibold" style={mode===m?{background:GREEN,color:WHITE}:{background:CREAM,color:MUTED}}>{m==="map"?"🗺️ 3D Карта":m==="routes"?"📋 Маршруты":"✨ AI-гид"}</button>)}
+          {(["map","routes","ai"] as const).map(m=><button key={m} onClick={()=>setMode(m)} className="flex-1 py-2 rounded-xl text-xs font-semibold" style={mode===m?{background:GREEN,color:WHITE}:{background:CREAM,color:MUTED}}>{m==="map"?"🗺️ Карта":m==="routes"?"📋 Маршруты":"✨ AI-гид"}</button>)}
         </div>
       </div>
       <div className="flex-1 overflow-y-auto hide-scroll">
@@ -33,18 +45,33 @@ export function MapScreen({ onRoute }:{ onRoute:(r:Route)=>void }) {
           <div className="p-4 space-y-4">
             {/* Instruction */}
             <div className="rounded-2xl px-4 py-3 flex items-center gap-2" style={{background:GREEN+"15",border:`1px solid ${GREEN}30`}}>
-              <span className="text-lg">🌍</span>
-              <div className="flex-1"><p className="text-xs font-bold" style={{color:GREEN}}>3D карта Узбекистана</p><p className="text-[10px]" style={{color:MUTED}}>Тяните для поворота · Нажмите на город</p></div>
+              <span className="text-lg">🗺️</span>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-bold" style={{color:GREEN}}>Узбекистан и соседи</p>
+                <p className="text-[10px]" style={{color:MUTED}}>Нажмите город · синяя точка — вы</p>
+              </div>
+              <button
+                onClick={определитьГде}
+                className="shrink-0 rounded-full px-3 py-1 text-[10px] font-bold"
+                style={{background:GREEN,color:WHITE}}
+              >
+                {где ? "Обновить" : "Где я"}
+              </button>
             </div>
             {/* 3D Map */}
             <div className="bg-white rounded-2xl overflow-hidden shadow-sm border" style={{borderColor:BORDER}}>
-              <UzbekistanMap3D onCitySelect={c=>setCity(c)}/>
+              <UzMap
+                высота={320}
+                откуда={где}
+                выбрано={city ? ГОРОДА[city] ?? null : null}
+                onВыбор={(м)=>setCity(м.название)}
+              />
             </div>
             {/* Selected city info */}
             {city&&WEATHER[city]&&(
               <div className="bg-white rounded-2xl p-4 shadow-sm border" style={{borderColor:BORDER}}>
                 <div className="flex items-center justify-between">
-                  <div><p className="font-bold text-base" style={{color:TEXT,fontFamily:"'Fraunces',serif"}}>{city}</p><p className="text-xs" style={{color:MUTED}}>Нажата точка на карте</p></div>
+                  <div><p className="font-bold text-base" style={{color:TEXT,fontFamily:"'Fraunces',serif"}}>{city}</p><p className="text-xs" style={{color:MUTED}}>Выбранный город</p></div>
                   <div className="text-right"><span className="text-2xl">{WEATHER[city].icon}</span><p className="font-bold text-lg" style={{color:TEXT}}>{WEATHER[city].temp}°C</p><p className="text-[9px]" style={{color:MUTED}}>{WEATHER[city].cond}</p></div>
                 </div>
                 <div className="flex gap-2 mt-3">

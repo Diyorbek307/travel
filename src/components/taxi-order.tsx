@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { BORDER, GOLD, GREEN, MUTED, TEXT, WHITE } from "@/lib/theme";
 import { ГОРОДА, МЕСТА, точка } from "@/data/geo";
 import type { Geo } from "@/lib/types";
+import UzMap, { расстояниеКм } from "@/components/uz-map";
 
 /**
  * Заказ такси.
@@ -16,6 +17,10 @@ import type { Geo } from "@/lib/types";
  * Точка отправления берётся с устройства. Разрешение спрашиваем только
  * когда человек нажал «Отсюда»: просить геолокацию при открытии экрана
  * — верный способ получить отказ навсегда.
+ *
+ * Куда ехать, можно выбрать из списка мест или ткнуть в карту. Карта
+ * при этом приближена к городу — на масштабе всей страны палец
+ * промахивается на километры, и такси приедет не туда.
  */
 
 interface Оценка {
@@ -26,21 +31,31 @@ interface Оценка {
 }
 
 export default function TaxiOrder({
-  город = "Самарканд",
+  город: городСразу = "Ташкент",
   сразуКуда,
 }: {
+  /** С какого города начать. Дальше человек меняет его сам. */
   город?: string;
   /** Если экран открыт со страницы места — оно уже выбрано. */
   сразуКуда?: { название: string; geo: Geo | null };
 }) {
+  const [город, setГород] = useState(городСразу);
   const [откуда, setОткуда] = useState<Geo | null>(null);
   const [подписьОткуда, setПодписьОткуда] = useState("Моё местоположение");
   const [геоОшибка, setГеоОшибка] = useState<string | null>(null);
-  const [куда, setКуда] = useState<{ название: string; geo: Geo } | null>(() => {
+  const [куда, setКуда] = useState<{ название: string; geo: Geo; своя?: boolean } | null>(() => {
     if (сразуКуда?.geo) return { название: сразуКуда.название, geo: сразуКуда.geo };
     return null;
   });
   const [оценки, setОценки] = useState<Оценка[] | null>(null);
+  const [карта, setКарта] = useState(false);
+
+  function сменитьГород(н: string) {
+    setГород(н);
+    setКуда(null);
+    setОценки(null);
+    setЦенаДоступна(null);
+  }
   const [ценаДоступна, setЦенаДоступна] = useState<boolean | null>(null);
 
   // Куда можно поехать: известные места этого города плюс сам центр.
@@ -52,6 +67,12 @@ export default function TaxiOrder({
       return Math.abs(g.lat - центр.lat) < 0.5 && Math.abs(g.lon - центр.lon) < 0.5;
     })
     .map(([название, geo]) => ({ название, geo }));
+
+  // На карте показываем те же места плюс сам центр города — иначе при
+  // приближении не за что зацепиться глазом.
+  const местаГорода = ГОРОДА[город]
+    ? [...направления, { название: город, geo: ГОРОДА[город] }]
+    : направления;
 
   function определитьГде() {
     if (!navigator.geolocation) {
@@ -67,6 +88,27 @@ export default function TaxiOrder({
       () => setГеоОшибка("Не удалось определить — поедем от центра города"),
       { enableHighAccuracy: true, timeout: 8000 },
     );
+  }
+
+  /**
+   * Нажатие по карте. Если рядом известное место — берём его название:
+   * «Регистан» понятнее, чем пара чисел. Если нет — так и пишем, что это
+   * точка на карте, и показываем координаты, чтобы человек мог свериться.
+   */
+  function точкаНаКарте(g: Geo) {
+    const рядом = [...Object.entries(МЕСТА), ...Object.entries(ГОРОДА)]
+      .map(([название, geo]) => ({ название, geo, км: расстояниеКм(g, geo) }))
+      .sort((a, b) => a.км - b.км)[0];
+
+    if (рядом && рядом.км <= 1) {
+      setКуда({ название: рядом.название, geo: рядом.geo });
+    } else {
+      const подпись = рядом
+        ? `Точка на карте · ${рядом.км} км от «${рядом.название}»`
+        : "Точка на карте";
+      setКуда({ название: подпись, geo: g, своя: true });
+    }
+    setКарта(false);
   }
 
   // Спрашиваем цену, когда есть обе точки.
@@ -106,7 +148,10 @@ export default function TaxiOrder({
     }
     п.set("end-lat", куда.geo.lat.toFixed(6));
     п.set("end-lon", куда.geo.lon.toFixed(6));
-    п.set("end-name", куда.название);
+    // У своей точки имени нет — «Точка на карте · 8 км от…» в приложении
+    // такси выглядело бы адресом, которого не существует. Пусть Яндекс
+    // определит адрес по координатам сам.
+    if (!куда.своя) п.set("end-name", куда.название);
     const ref = process.env.NEXT_PUBLIC_YANDEX_TAXI_REF;
     if (ref) п.set("ref", ref);
     return `https://3.redirect.appmetrica.yandex.com/route?${п.toString()}`;
@@ -121,6 +166,24 @@ export default function TaxiOrder({
       </p>
 
       <div className="rounded-2xl border p-4" style={{ background: WHITE, borderColor: BORDER }}>
+        {/* Город. Места для выбора зависят от него, поэтому он первый. */}
+        <div className="hide-scroll mb-3 flex gap-2 overflow-x-auto pb-1">
+          {Object.keys(ГОРОДА).map((г) => (
+            <button
+              key={г}
+              onClick={() => сменитьГород(г)}
+              className="shrink-0 rounded-full border px-3 py-1.5 text-[11px] font-semibold"
+              style={{
+                borderColor: г === город ? GREEN : BORDER,
+                background: г === город ? GREEN : WHITE,
+                color: г === город ? WHITE : MUTED,
+              }}
+            >
+              {г}
+            </button>
+          ))}
+        </div>
+
         {/* Откуда */}
         <div className="mb-2 flex flex-wrap items-center gap-3 rounded-xl px-3 py-2.5" style={{ background: "#F0F8F4" }}>
           <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: GREEN }} />
@@ -142,7 +205,34 @@ export default function TaxiOrder({
           <span className="min-w-0 flex-1 truncate text-sm" style={{ color: куда ? TEXT : MUTED }}>
             {куда ? куда.название : "Куда едем"}
           </span>
+          <button
+            onClick={() => setКарта((в) => !в)}
+            className="shrink-0 rounded-full border px-3 py-1 text-xs font-semibold"
+            style={{ borderColor: карта ? GREEN : BORDER, color: карта ? GREEN : MUTED }}
+          >
+            {карта ? "Скрыть карту" : "На карте"}
+          </button>
         </div>
+
+        {карта && старт && (
+          <div className="mb-3 overflow-hidden rounded-xl border" style={{ borderColor: BORDER }}>
+            <UzMap
+              высота={240}
+              зона={{ центр: старт, радиусКм: 12 }}
+              откуда={старт}
+              выбрано={куда?.geo ?? null}
+              метки={местаГорода}
+              onВыбор={(м) => {
+                setКуда({ название: м.название, geo: м.geo });
+                setКарта(false);
+              }}
+              onТочка={точкаНаКарте}
+            />
+            <p className="px-3 py-2 text-[11px] leading-relaxed" style={{ color: MUTED }}>
+              Нажмите на карту — поставим точку назначения. Адрес по ней определит Яндекс Go.
+            </p>
+          </div>
+        )}
 
         {геоОшибка && (
           <p className="mb-2 text-xs" style={{ color: MUTED }}>

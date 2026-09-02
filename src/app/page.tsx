@@ -22,6 +22,7 @@ import AudioScreen from "@/components/screens/audio";
 import ProfileScreen from "@/components/screens/profile";
 import TransportScreen from "@/components/screens/transport";
 import PracticalScreen from "@/components/screens/practical";
+import RouteView from "@/components/route-view";
 import { MiniPlayer, Toast } from "@/components/widgets";
 import { ContentProvider } from "@/components/content-provider";
 import { AuthSplash, LoginScreen, RegisterScreen } from "@/components/auth-screens";
@@ -44,7 +45,9 @@ type Detail =
   | { kind: "place"; value: Place }
   | { kind: "hotel"; value: Hotel }
   | { kind: "restaurant"; value: Restaurant }
-  | { kind: "route"; value: Route };
+  | { kind: "route"; value: Route }
+  /** Дорога до выбранного места: своя карточка, а не всплывающая надпись. */
+  | { kind: "путь"; название: string; город: string };
 
 /**
  * «checking» — пока не пришёл ответ о сессии. Без него приложение
@@ -143,6 +146,7 @@ function App() {
 
   const openHotel = (value: Hotel) => setDetail({ kind: "hotel", value });
   const openRestaurant = (value: Restaurant) => setDetail({ kind: "restaurant", value });
+  const openПуть = (название: string, город: string) => setDetail({ kind: "путь", название, город });
   const closeDetail = () => setDetail(null);
 
   const switchTab = (next: Tab) => {
@@ -274,6 +278,7 @@ function App() {
                   onRoute={openRoute}
                   onHotel={openHotel}
                   onRestaurant={openRestaurant}
+                  onПуть={openПуть}
                   onTab={switchTab}
                   onToast={showToast}
                   onPlay={setMiniAudio}
@@ -307,6 +312,7 @@ interface ScreenProps {
   onRoute: (r: Route) => void;
   onHotel: (h: Hotel) => void;
   onRestaurant: (r: Restaurant) => void;
+  onПуть: (название: string, город: string) => void;
   onTab: (t: Tab) => void;
   onToast: (msg: string) => void;
   onPlay: (p: Place) => void;
@@ -335,14 +341,31 @@ function Screen({ tab, detail, ...p }: ScreenProps) {
             onBack={p.onCloseDetail}
             onPlay={p.onPlay}
             onToast={p.onToast}
+            onПуть={p.onПуть}
           />
         );
       case "hotel":
         return <HotelDetail hotel={detail.value} onBack={p.onCloseDetail} onToast={p.onToast} />;
       case "restaurant":
-        return <RestaurantDetail r={detail.value} onBack={p.onCloseDetail} onToast={p.onToast} />;
+        return (
+          <RestaurantDetail
+            r={detail.value}
+            onBack={p.onCloseDetail}
+            onToast={p.onToast}
+            onПуть={p.onПуть}
+          />
+        );
       case "route":
         return <RouteDetail route={detail.value} onBack={p.onCloseDetail} />;
+      case "путь":
+        return (
+          <RouteView
+            название={detail.название}
+            город={detail.город}
+            onBack={p.onCloseDetail}
+            onТакси={p.onTransport}
+          />
+        );
     }
   }
 

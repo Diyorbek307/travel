@@ -10,7 +10,7 @@ import { Badge, GeomPattern, StarRow } from "./ui";
 import { glass } from "@/lib/theme";
 
 
-export function PlaceDetail({ place, onBack, onPlay, onToast }:{ place:Place; onBack:()=>void; onPlay:(p:Place)=>void; onToast:(m:string)=>void }) {
+export function PlaceDetail({ place, onBack, onPlay, onToast, onПуть }:{ place:Place; onBack:()=>void; onPlay:(p:Place)=>void; onToast:(m:string)=>void; onПуть:(название:string,город:string)=>void }) {
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [fav, setFav] = useState(false);
@@ -67,7 +67,7 @@ export function PlaceDetail({ place, onBack, onPlay, onToast }:{ place:Place; on
           </div>
         )}
         <div className="flex gap-3 pb-6">
-          <button onClick={()=>onToast(`📍 Маршрут до «${place.name}» построен!`)} className="flex-1 py-3.5 rounded-2xl text-white text-sm font-bold active:scale-[0.98] transition-all" style={{background:GREEN}}>📍 Маршрут</button>
+          <button onClick={()=>onПуть(place.name, place.city)} className="flex-1 py-3.5 rounded-2xl text-white text-sm font-bold active:scale-[0.98] transition-all" style={{background:GREEN}}>📍 Маршрут</button>
           <button onClick={()=>onToast(`✅ «${place.name}» добавлено в маршрут!`)} className="flex-1 py-3.5 rounded-2xl text-sm font-bold border active:scale-[0.98] transition-all" style={{color:GREEN,borderColor:GREEN,background:WHITE}}>🗺️ В маршрут</button>
         </div>
       </div>
@@ -159,7 +159,7 @@ export function HotelDetail({ hotel, onBack, onToast }:{ hotel:Hotel; onBack:()=
 
 // ── Restaurant Detail ─────────────────────────────────────────────────────────
 
-export function RestaurantDetail({ r, onBack, onToast }:{ r:Restaurant; onBack:()=>void; onToast:(m:string)=>void }) {
+export function RestaurantDetail({ r, onBack, onToast, onПуть }:{ r:Restaurant; onBack:()=>void; onToast:(m:string)=>void; onПуть:(название:string,город:string)=>void }) {
   const [fav, setFav] = useState(false);
   return (
     <div className="flex flex-col h-full animate-slide-up" style={{background:CREAM}}>
@@ -193,7 +193,7 @@ export function RestaurantDetail({ r, onBack, onToast }:{ r:Restaurant; onBack:(
           </div>
         </div>
         <div className="flex gap-3 pb-6">
-          <button onClick={()=>onToast(`📍 Маршрут до «${r.name}» построен!`)} className="flex-1 py-3.5 rounded-2xl text-white text-sm font-bold active:scale-[0.98] transition-all" style={{background:"#C1603A"}}>📍 Маршрут</button>
+          <button onClick={()=>onПуть(r.name, r.city)} className="flex-1 py-3.5 rounded-2xl text-white text-sm font-bold active:scale-[0.98] transition-all" style={{background:"#C1603A"}}>📍 Маршрут</button>
           <button onClick={()=>onToast(`📞 Звонок в «${r.name}»...`)} className="flex-1 py-3.5 rounded-2xl text-sm font-bold border active:scale-[0.98] transition-all" style={{color:"#C1603A",borderColor:"#C1603A",background:WHITE}}>📞 Позвонить</button>
         </div>
       </div>
