@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import { httpПровайдер, отправитьПоHttp, проверитьHttp } from "./mail-http";
 
 /**
  * Отправка писем.
@@ -20,8 +21,15 @@ const PASS = process.env.SMTP_PASSWORD;
 
 const FROM = process.env.MAIL_FROM ?? `UzUp <${USER ?? "noreply@uzup.uz"}>`;
 
+/**
+ * Настроен ли хоть какой-то способ отправки.
+ *
+ * Их два. HTTPS через почтовый сервис — рабочий на хостинге. И SMTP,
+ * который на Render не работает вовсе: почтовые порты там закрыты,
+ * проверено таймаутом при исправных настройках и ключах.
+ */
 export function mailConfigured(): boolean {
-  return Boolean(HOST && USER && PASS);
+  return httpПровайдер() !== "нет" || Boolean(HOST && USER && PASS);
 }
 
 let transport: nodemailer.Transporter | null = null;
@@ -83,6 +91,15 @@ export interface Letter {
  * регистрацию. Вызывающий получает false и показывает запасной путь.
  */
 export async function sendMail(letter: Letter): Promise<boolean> {
+  // Сначала HTTPS: на хостинге это единственный способ, который
+  // действительно доходит. SMTP остаётся для своего сервера.
+  if (httpПровайдер() !== "нет") {
+    const итог = await отправитьПоHttp({ ...letter, from: FROM });
+    if (итог.ok) return true;
+    console.error("[почта] HTTP:", итог.detail);
+    // Не получилось — пробуем SMTP, вдруг он тут доступен.
+  }
+
   const t = getTransport();
   if (!t) {
     console.info(
@@ -122,13 +139,27 @@ export async function проверитьПочту(): Promise<{
     from: FROM,
   };
 
+  // HTTPS проверяем первым: если он настроен, письма идут через него, и
+  // состояние SMTP уже не имеет значения.
+  const провайдер = httpПровайдер();
+  if (провайдер !== "нет") {
+    const итог = await проверитьHttp();
+    return { ...итог, настройки: { ...настройки, host: `${провайдер} (по HTTPS)`, port: 443 } };
+  }
+
   if (!mailConfigured()) {
     const нет = [
       !HOST && "SMTP_HOST",
       !USER && "SMTP_USER",
       !PASS && "SMTP_PASSWORD",
     ].filter(Boolean);
-    return { ok: false, detail: `Не заданы переменные: ${нет.join(", ")}`, настройки };
+    return {
+      ok: false,
+      detail:
+        `Не заданы переменные: ${нет.join(", ")}. ` +
+        `На хостинге надёжнее BREVO_API_KEY — почтовые порты там закрыты.`,
+      настройки,
+    };
   }
 
   /*
@@ -205,8 +236,10 @@ export async function проверитьПочту(): Promise<{
 
     const подсказка =
       /timeout|ETIMEDOUT|ECONNREFUSED|ENOTFOUND|EAI_AGAIN/i.test(текст)
-        ? ` — сервер не отвечает. Проверьте SMTP_HOST и SMTP_PORT` +
-          (верно ? `: должно быть ${верно}.` : ". Порт 25 не подойдёт: хостинг его не пропускает.")
+        ? ` — сервер не отвечает. Если настройки верны, значит хостинг не выпускает почтовые порты наружу: ` +
+          `так делают почти все, чтобы через них не рассылали спам. Обойти это настройками SMTP нельзя — ` +
+          `задайте BREVO_API_KEY, и письма пойдут по HTTPS.` +
+          (верно ? ` Для своего сервера верно: ${верно}.` : "")
         : /auth|535|credentials|authentication/i.test(текст)
           ? " — вход не принят. Нужен пароль приложения, а не пароль от почты, " +
             "и включённый доступ внешним программам в настройках ящика."
