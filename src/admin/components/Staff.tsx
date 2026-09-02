@@ -159,7 +159,7 @@ export default function Staff() {
   };
 
   return (
-    <div className="p-4 sm:p-4 sm:p-7">
+    <div className="p-4 sm:p-7">
       <PageHeader
         title="Сотрудники"
         subtitle={`${staff.filter(s => s.status === "active").length} активных · ${staff.filter(s => s.status === "pending").length} ожидают`}
@@ -182,7 +182,7 @@ export default function Staff() {
       </div>
 
       {/* Filter */}
-      <div className="flex gap-1.5 mb-5">
+      <div className="flex flex-wrap gap-1.5 mb-5">
         {["все", "активные", "ожидание", "заблокированные"].map(f => (
           <button key={f} onClick={() => setFilter(f)}
             className="px-3 py-1.5 rounded text-xs cursor-pointer capitalize"
@@ -191,14 +191,14 @@ export default function Staff() {
         ))}
       </div>
 
-      <div className="flex gap-6">
+      <div className="flex flex-col gap-6 lg:flex-row">
         {/* Staff list */}
         <div className="flex-1 flex flex-col gap-2 min-w-0">
           {filtered.map(member => (
             <div
               key={member.id}
               onClick={() => openEdit(member)}
-              className="rounded-xl p-4 flex items-center gap-3 cursor-pointer transition-all"
+              className="rounded-xl p-4 flex flex-wrap items-center gap-3 cursor-pointer transition-all"
               style={{
                 background: selected?.id === member.id ? "var(--color-panel)" : "transparent",
                 border: `1px solid ${selected?.id === member.id ? "var(--color-amber)" : "var(--color-border)"}`,
@@ -228,10 +228,10 @@ export default function Staff() {
 
         {/* Detail / Permission editor */}
         {selected ? (
-          <div className="w-80 shrink-0">
+          <div className="w-full shrink-0 lg:w-80">
             <div className="rounded-2xl p-5 sticky top-0" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }}>
               {/* Header */}
-              <div className="flex items-center gap-3 mb-4">
+              <div className="flex flex-wrap items-center gap-3 mb-4">
                 <div
                   className="w-12 h-12 rounded-full flex items-center justify-center text-base font-bold shrink-0"
                   style={{ background: (DEPT_COLORS[selected.department] ?? "var(--color-muted)") + "33", color: DEPT_COLORS[selected.department] ?? "var(--color-muted)" }}
@@ -253,12 +253,12 @@ export default function Staff() {
               </div>
 
               {/* Permissions */}
-              <div className="flex items-center justify-between gap-2 mb-3">
+              <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
                 <SectionTitle>Доступы</SectionTitle>
                 {!editing ? (
                   <button onClick={() => setEditing(true)} className="text-xs cursor-pointer" style={{ color: "var(--color-amber)" }}>Изменить</button>
                 ) : (
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     <button onClick={() => setEditing(false)} className="text-xs cursor-pointer" style={{ color: "var(--color-muted)" }}>Отмена</button>
                     <button onClick={savePerms} className="text-xs cursor-pointer font-semibold" style={{ color: "var(--color-teal)" }}>Сохранить</button>
                   </div>
@@ -293,7 +293,7 @@ export default function Staff() {
               </div>
 
               {/* Actions */}
-              <div className="flex gap-2 mt-4 pt-4" style={{ borderTop: "1px solid var(--color-border)" }}>
+              <div className="flex flex-wrap gap-2 mt-4 pt-4" style={{ borderTop: "1px solid var(--color-border)" }}>
                 {selected.status === "pending" && <Btn small onClick={() => {
                   setStaff(prev => prev.map(s => s.id === selected.id ? { ...s, status: "active" as const } : s));
                   setSelected(prev => prev ? { ...prev, status: "active" as const } : null);
@@ -305,7 +305,7 @@ export default function Staff() {
             </div>
           </div>
         ) : (
-          <div className="w-80 shrink-0 rounded-2xl flex items-center justify-center text-center p-8" style={{ border: "1px dashed var(--color-border)" }}>
+          <div className="w-full shrink-0 rounded-2xl lg:w-80 flex items-center justify-center text-center p-8" style={{ border: "1px dashed var(--color-border)" }}>
             <p className="text-sm" style={{ color: "var(--color-dim)" }}>Выберите сотрудника для управления доступами</p>
           </div>
         )}
@@ -372,7 +372,7 @@ export default function Staff() {
               </div>
             </div>
 
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3">
               <Btn variant="ghost" onClick={() => setShowInvite(false)}>Отмена</Btn>
               <Btn onClick={sendInvite}>Отправить приглашение</Btn>
             </div>

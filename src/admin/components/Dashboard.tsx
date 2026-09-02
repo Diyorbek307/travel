@@ -51,7 +51,7 @@ export default function Dashboard({ onNavigate }: { onNavigate: (id: string) => 
   const maxRev = Math.max(...REVENUE_DATA.map(d => d.val));
 
   return (
-    <div className="p-4 sm:p-4 sm:p-7">
+    <div className="p-4 sm:p-7">
       <PageHeader
         title="Обзор"
         subtitle={`${new Date().toLocaleDateString("ru", { weekday: "long", month: "long", day: "numeric", year: "numeric" })} — активные операции`}
@@ -65,16 +65,16 @@ export default function Dashboard({ onNavigate }: { onNavigate: (id: string) => 
         <StatCard label="ЗАРЕГИСТРИРОВАННЫХ" value="18,562" change="2.3%" positive sub="темп роста" />
       </div>
 
-      <div className="grid gap-6 mb-6" style={{ gridTemplateColumns: "1fr 1fr" }}>
+      <div className="grid gap-6 mb-6" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(min(280px, 100%), 1fr))" }}>
         {/* Revenue chart */}
         <Card className="p-5">
-          <div className="flex items-start justify-between mb-4">
+          <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
             <SectionTitle>Выручка — 2026</SectionTitle>
             <div className="text-xs font-semibold" style={{ color: "var(--color-teal)", fontFamily: "var(--font-mono)" }}>
               +8.1% ↑
             </div>
           </div>
-          <div className="flex items-end gap-1.5" style={{ height: "120px" }}>
+          <div className="flex flex-wrap items-end gap-1.5" style={{ height: "120px" }}>
             {REVENUE_DATA.map((d, i) => {
               const pct = (d.val / maxRev) * 100;
               const isHovered = hoveredBar === i;
@@ -82,7 +82,7 @@ export default function Dashboard({ onNavigate }: { onNavigate: (id: string) => 
               return (
                 <div
                   key={d.month}
-                  className="flex-1 flex flex-col items-center gap-1.5 cursor-pointer group"
+                  className="min-w-0 flex-1 flex flex-col items-center gap-1.5 cursor-pointer group"
                   onMouseEnter={() => setHoveredBar(i)}
                   onMouseLeave={() => setHoveredBar(null)}
                 >
@@ -124,10 +124,10 @@ export default function Dashboard({ onNavigate }: { onNavigate: (id: string) => 
           <SectionTitle>Структура бронирований</SectionTitle>
           <div className="flex flex-col gap-2.5">
             {BOOKING_TYPES.map(t => (
-              <div key={t.label} className="flex items-center gap-3">
+              <div key={t.label} className="flex items-center gap-3 flex-wrap">
                 <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: t.color }} />
-                <div className="flex-1 text-sm" style={{ color: "var(--color-muted)" }}>{t.label}</div>
-                <div className="w-28 h-1.5 rounded-full overflow-hidden shrink-0" style={{ background: "var(--color-dim)" }}>
+                <div className="min-w-0 flex-1 text-sm" style={{ color: "var(--color-muted)" }}>{t.label}</div>
+                <div className="h-1.5 w-14 shrink-0 overflow-hidden rounded-full sm:w-28" style={{ background: "var(--color-dim)" }}>
                   <div className="h-full rounded-full" style={{ width: `${t.pct}%`, background: t.color }} />
                 </div>
                 <div className="text-xs w-7 text-right shrink-0" style={{ color: "var(--color-text)", fontFamily: "var(--font-mono)" }}>{t.pct}%</div>
@@ -146,34 +146,38 @@ export default function Dashboard({ onNavigate }: { onNavigate: (id: string) => 
 
       {/* Booking heatmap */}
       <Card className="p-5 mb-6">
-        <div className="flex items-center justify-between gap-2 mb-4">
+        <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
           <SectionTitle>Тепловая карта — этот месяц</SectionTitle>
-          <div className="flex items-center gap-2 text-xs" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
-            <span>Низко</span>
+          <div
+            className="flex flex-wrap shrink-0 items-center gap-1.5 text-xs sm:gap-2"
+            style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+          >
+            {/* На узком экране подписи прячем: шкала цветом читается и без них. */}
+            <span className="hidden sm:inline">Низко</span>
             {[0.2, 0.4, 0.6, 0.8, 1].map(o => (
               <div key={o} className="w-3 h-3 rounded-sm" style={{ background: `rgba(212,135,42,${o})` }} />
             ))}
-            <span>Высоко</span>
+            <span className="hidden sm:inline">Высоко</span>
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <div className="flex flex-col gap-1.5 justify-around pt-6">
             {HEATMAP_WEEKS.map(w => (
               <div key={w} className="text-xs h-5 flex items-center" style={{ color: "var(--color-dim)", fontFamily: "var(--font-mono)", width: "20px" }}>{w}</div>
             ))}
           </div>
-          <div className="flex-1">
-            <div className="flex gap-1.5 mb-1.5">
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap gap-1.5 mb-1.5">
               {HEATMAP_DAYS.map(d => (
-                <div key={d} className="flex-1 text-center text-xs" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)", fontSize: "10px" }}>{d}</div>
+                <div key={d} className="min-w-0 flex-1 text-center text-xs" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)", fontSize: "10px" }}>{d}</div>
               ))}
             </div>
             {HEATMAP.map((week, wi) => (
-              <div key={wi} className="flex gap-1.5 mb-1.5">
+              <div key={wi} className="flex flex-wrap gap-1.5 mb-1.5">
                 {week.map((val, di) => (
                   <div
                     key={di}
-                    className="flex-1 h-5 rounded-sm cursor-default transition-transform hover:scale-110"
+                    className="min-w-0 flex-1 h-5 rounded-sm cursor-default transition-transform hover:scale-110"
                     title={`${val} бронирований`}
                     style={{ background: `rgba(212,135,42,${val / 10})` }}
                   />
@@ -184,7 +188,7 @@ export default function Dashboard({ onNavigate }: { onNavigate: (id: string) => 
         </div>
       </Card>
 
-      <div className="grid gap-6" style={{ gridTemplateColumns: "1fr 320px" }}>
+      <div className="grid gap-6" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(min(320px, 100%), 1fr))" }}>
         {/* Recent bookings */}
         <Card>
           <div className="px-5 pt-5 pb-3 flex items-center justify-between">
@@ -200,7 +204,7 @@ export default function Dashboard({ onNavigate }: { onNavigate: (id: string) => 
           {recentBookings.map((b, i) => (
             <div
               key={i}
-              className="px-5 py-3 flex items-center gap-3 transition-colors cursor-pointer"
+              className="px-5 py-3 flex flex-wrap items-center gap-3 transition-colors cursor-pointer"
               style={{ borderTop: "1px solid var(--color-border)" }}
               onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,0.02)")}
               onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
@@ -229,7 +233,7 @@ export default function Dashboard({ onNavigate }: { onNavigate: (id: string) => 
             <SectionTitle>Топ направлений</SectionTitle>
             <div className="flex flex-col gap-3">
               {topDestinations.map((d, i) => (
-                <div key={d.name} className="flex items-center gap-3">
+                <div key={d.name} className="flex items-center gap-3 flex-wrap">
                   <img
                     src={d.img}
                     alt={d.name}
@@ -237,7 +241,7 @@ export default function Dashboard({ onNavigate }: { onNavigate: (id: string) => 
                     style={{ background: "var(--color-dim)" }}
                   />
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-2">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
                       <span className="text-sm font-medium" style={{ color: "var(--color-text)" }}>{d.name}</span>
                       <span className="text-xs" style={{ color: "var(--color-teal)", fontFamily: "var(--font-mono)" }}>{d.change}</span>
                     </div>
@@ -270,9 +274,9 @@ export default function Dashboard({ onNavigate }: { onNavigate: (id: string) => 
                 { icon: "▣", text: "Отель Малика заполнен на 92%", time: "4ч", color: "var(--color-rose)" },
                 { icon: "◉", text: "Рейс QX-88 задержан на 45 мин", time: "4ч", color: "var(--color-rose)" },
               ].map((a, i) => (
-                <div key={i} className="flex items-center gap-2.5 text-xs py-1.5" style={{ borderBottom: "1px solid var(--color-border)" }}>
+                <div key={i} className="flex flex-wrap items-center gap-2.5 text-xs py-1.5" style={{ borderBottom: "1px solid var(--color-border)" }}>
                   <span style={{ color: a.color, fontSize: "10px" }}>{a.icon}</span>
-                  <span className="flex-1 truncate" style={{ color: "var(--color-muted)" }}>{a.text}</span>
+                  <span className="min-w-0 flex-1 truncate" style={{ color: "var(--color-muted)" }}>{a.text}</span>
                   <span style={{ color: "var(--color-dim)", fontFamily: "var(--font-mono)" }}>{a.time}</span>
                 </div>
               ))}

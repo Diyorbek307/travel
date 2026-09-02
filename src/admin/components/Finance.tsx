@@ -66,14 +66,14 @@ export default function Finance() {
   });
 
   return (
-    <div className="p-4 sm:p-4 sm:p-7">
+    <div className="p-4 sm:p-7">
       <PageHeader
         title="Финансовые отчёты"
         subtitle="Выручка, выплаты, транзакции и счета"
         action={<Btn variant="ghost">Экспорт CSV</Btn>}
       />
 
-      <div className="flex gap-1 mb-7">
+      <div className="flex flex-wrap gap-1 mb-7">
         {([["overview", "Обзор"], ["transactions", "Транзакции"], ["payouts", "Выплаты гидам"], ["invoices", "Счета"]] as const).map(([id, label]) => (
           <button key={id} onClick={() => setTab(id)}
             className="px-4 py-2 rounded text-sm cursor-pointer transition-all"
@@ -100,14 +100,14 @@ export default function Finance() {
             ))}
           </div>
 
-          <div className="grid gap-6" style={{ gridTemplateColumns: "1fr 1fr" }}>
+          <div className="grid gap-6" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(min(280px, 100%), 1fr))" }}>
             {/* Revenue breakdown */}
             <Card className="p-5">
               <SectionTitle>Структура выручки — Сен 2026</SectionTitle>
               <div className="flex flex-col gap-3">
                 {MONTHLY_BREAKDOWN.map(b => (
                   <div key={b.category}>
-                    <div className="flex justify-between gap-2 text-xs mb-1">
+                    <div className="flex flex-wrap justify-between gap-2 text-xs mb-1">
                       <span style={{ color: "var(--color-muted)" }}>{b.category}</span>
                       <span style={{ color: "var(--color-text)", fontFamily: "var(--font-mono)" }}>
                         ${b.revenue.toLocaleString()} <span style={{ color: "var(--color-muted)" }}>({b.pct}%)</span>
@@ -118,7 +118,7 @@ export default function Finance() {
                     </div>
                   </div>
                 ))}
-                <div className="flex justify-between gap-2 text-sm font-semibold pt-2" style={{ borderTop: "1px solid var(--color-border)", color: "var(--color-text)" }}>
+                <div className="flex flex-wrap justify-between gap-2 text-sm font-semibold pt-2" style={{ borderTop: "1px solid var(--color-border)", color: "var(--color-text)" }}>
                   <span>Итого</span>
                   <span style={{ fontFamily: "var(--font-mono)", color: "var(--color-amber)" }}>$91,240</span>
                 </div>
@@ -136,15 +136,15 @@ export default function Finance() {
                   { method: "PayPal", pct: 8, amount: "$7,299" },
                   { method: "Amex", pct: 4, amount: "$3,650" },
                 ].map((m, i) => (
-                  <div key={m.method} className="flex items-center gap-3">
+                  <div key={m.method} className="flex items-center gap-3 flex-wrap">
                     <div
                       className="w-8 h-8 rounded flex items-center justify-center text-xs font-bold shrink-0"
                       style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
                     >
                       {m.method.slice(0, 2)}
                     </div>
-                    <div className="flex-1">
-                      <div className="flex justify-between gap-2 text-xs mb-1">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap justify-between gap-2 text-xs mb-1">
                         <span style={{ color: "var(--color-muted)" }}>{m.method}</span>
                         <span style={{ color: "var(--color-text)", fontFamily: "var(--font-mono)" }}>{m.amount}</span>
                       </div>
@@ -163,7 +163,7 @@ export default function Finance() {
 
       {tab === "transactions" && (
         <div>
-          <div className="flex gap-1.5 mb-5">
+          <div className="flex flex-wrap gap-1.5 mb-5">
             {([["all", "Все"], ["income", "Доходы"], ["payout", "Выплаты"], ["refund", "Возвраты"]] as [string, string][]).map(([f, label]) => (
               <button key={f} onClick={() => setTxFilter(f)}
                 className="px-3 py-1.5 rounded text-xs cursor-pointer transition-all"
@@ -173,7 +173,8 @@ export default function Finance() {
           </div>
 
           <div className="rounded-xl overflow-hidden" style={{ border: "1px solid var(--color-border)" }}>
-            <table className="w-full text-sm">
+            <div className="overflow-x-auto">
+<table className="w-full min-w-[34rem] text-sm">
               <thead>
                 <tr style={{ background: "var(--color-panel)", borderBottom: "1px solid var(--color-border)" }}>
                   {["ID", "ДАТА", "КЛИЕНТ / ОРГАНИЗАЦИЯ", "ТИП", "СУММА", "КОМИССИЯ", "ИТОГО", "МЕТОД", "СТАТУС"].map(c => (
@@ -213,6 +214,7 @@ export default function Finance() {
                 ))}
               </tbody>
             </table>
+</div>
           </div>
         </div>
       )}
@@ -228,14 +230,14 @@ export default function Finance() {
 
           <div className="flex flex-col gap-3">
             {payouts.map((p, i) => (
-              <div key={i} className="rounded-xl p-4 flex items-center gap-4" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }}>
+              <div key={i} className="rounded-xl p-4 flex flex-wrap items-center gap-4" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }}>
                 <div
                   className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold shrink-0"
                   style={{ background: "var(--color-dim)", color: "var(--color-amber)" }}
                 >
                   {p.guide[0]}
                 </div>
-                <div className="flex-1">
+                <div className="min-w-0 flex-1">
                   <div className="font-medium text-sm" style={{ color: "var(--color-text)" }}>{p.guide}</div>
                   <div className="text-xs" style={{ color: "var(--color-muted)" }}>{p.tours} туров в этом цикле</div>
                 </div>
@@ -252,7 +254,7 @@ export default function Finance() {
             ))}
           </div>
 
-          <div className="mt-5 flex gap-3">
+          <div className="mt-5 flex flex-wrap gap-3">
             <Btn onClick={payAllPending}>Провести все выплаты</Btn>
             <Btn variant="ghost">Экспорт отчёта</Btn>
           </div>
@@ -263,9 +265,9 @@ export default function Finance() {
         <div>
           <div className="grid gap-3">
             {invoices.map(inv => (
-              <div key={inv.id} className="rounded-xl p-4 flex items-center gap-4" style={{ background: "var(--color-panel)", border: `1px solid ${inv.status === "overdue" ? "rgba(196,90,66,0.3)" : "var(--color-border)"}` }}>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2.5 mb-1">
+              <div key={inv.id} className="rounded-xl p-4 flex flex-wrap items-center gap-4" style={{ background: "var(--color-panel)", border: `1px solid ${inv.status === "overdue" ? "rgba(196,90,66,0.3)" : "var(--color-border)"}` }}>
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2.5 mb-1">
                     <span className="font-medium text-sm" style={{ color: "var(--color-text)" }}>{inv.id}</span>
                     <span style={{ color: "var(--color-muted)", fontSize: "12px" }}>→</span>
                     <span style={{ color: "var(--color-text)", fontSize: "13px" }}>{inv.client}</span>
@@ -280,7 +282,7 @@ export default function Finance() {
                   label={inv.status === "paid" ? "оплачен" : inv.status === "overdue" ? "просрочен" : "не оплачен"}
                   color={inv.status === "paid" ? "teal" : inv.status === "overdue" ? "rose" : "amber"}
                 />
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   <Btn variant="ghost" small>Просмотр</Btn>
                   {inv.status !== "paid" && <Btn small onClick={() => markInvoicePaid(inv.id)}>Отметить оплаченным</Btn>}
                 </div>

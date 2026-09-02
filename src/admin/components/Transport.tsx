@@ -68,7 +68,7 @@ export default function Transport() {
   const activeTaxis = 8;
 
   return (
-    <div className="p-4 sm:p-4 sm:p-7">
+    <div className="p-4 sm:p-7">
       <PageHeader title="Транспорт" subtitle="Управление всеми транспортными интеграциями" />
 
       {/* Tab nav */}
@@ -104,14 +104,14 @@ export default function Transport() {
             ))}
           </div>
 
-          <div className="grid gap-5" style={{ gridTemplateColumns: "1fr 1fr" }}>
+          <div className="grid gap-5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(min(280px, 100%), 1fr))" }}>
             {/* Taxi widget */}
             <Card className="p-5">
               <SectionTitle>Яндекс Такси</SectionTitle>
               <div className={`rounded-lg p-4 mb-4 ${yandexConnected ? "" : ""}`}
                 style={{ background: yandexConnected ? "rgba(42,141,122,0.08)" : "rgba(212,135,42,0.08)", border: `1px solid ${yandexConnected ? "rgba(42,141,122,0.3)" : "rgba(212,135,42,0.3)"}` }}
               >
-                <div className="flex items-center gap-2 mb-1">
+                <div className="flex flex-wrap items-center gap-2 mb-1">
                   <div className="w-2 h-2 rounded-full" style={{ background: yandexConnected ? "var(--color-teal)" : "var(--color-amber)" }} />
                   <span className="text-sm font-medium" style={{ color: "var(--color-text)" }}>
                     {yandexConnected ? "Подключено к Яндекс" : "Не подключено"}
@@ -122,14 +122,14 @@ export default function Transport() {
                 </div>
               </div>
               {yandexConnected ? (
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   <Btn variant="ghost" small onClick={() => setYandexConnected(false)}>Отключить</Btn>
                   <Btn small>Управление поездками</Btn>
                 </div>
               ) : (
                 <button
                   onClick={() => { setYandexConnected(true); setYandexLogin("admin@uztravel"); }}
-                  className="w-full rounded-lg py-3 text-sm font-medium cursor-pointer transition-opacity hover:opacity-80 flex items-center justify-center gap-2"
+                  className="w-full rounded-lg py-3 text-sm font-medium cursor-pointer transition-opacity hover:opacity-80 flex flex-wrap items-center justify-center gap-2"
                   style={{ background: "#FC3F1D", color: "#fff", border: "none" }}
                 >
                   <span style={{ fontSize: "16px" }}>Y</span> Подключить аккаунт Яндекс
@@ -142,7 +142,7 @@ export default function Transport() {
               <SectionTitle>Статус рейсов сегодня</SectionTitle>
               <div className="flex flex-col gap-2">
                 {flights.slice(0, 4).map(f => (
-                  <div key={f.id} className="flex items-center gap-3 text-xs py-2" style={{ borderBottom: "1px solid var(--color-border)" }}>
+                  <div key={f.id} className="flex flex-wrap items-center gap-3 text-xs py-2" style={{ borderBottom: "1px solid var(--color-border)" }}>
                     <span style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)", width: "56px" }}>{f.id}</span>
                     <span style={{ color: "var(--color-text)" }}>{f.from} → {f.to}</span>
                     <span style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>{f.dep}</span>
@@ -157,7 +157,7 @@ export default function Transport() {
               <SectionTitle>Расписание поездов</SectionTitle>
               <div className="flex flex-col gap-2">
                 {trains.slice(0, 4).map(t => (
-                  <div key={t.id} className="flex items-center gap-3 text-xs py-2" style={{ borderBottom: "1px solid var(--color-border)" }}>
+                  <div key={t.id} className="flex flex-wrap items-center gap-3 text-xs py-2" style={{ borderBottom: "1px solid var(--color-border)" }}>
                     <span style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)", width: "56px" }}>{t.id}</span>
                     <span style={{ color: "var(--color-text)" }}>{t.from} → {t.to}</span>
                     <span style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>{t.dep}</span>
@@ -173,7 +173,7 @@ export default function Transport() {
               <SectionTitle>Маршруты автобусов</SectionTitle>
               <div className="flex flex-col gap-2">
                 {buses.map(b => (
-                  <div key={b.id} className="flex items-center gap-3 text-xs py-2" style={{ borderBottom: "1px solid var(--color-border)" }}>
+                  <div key={b.id} className="flex flex-wrap items-center gap-3 text-xs py-2" style={{ borderBottom: "1px solid var(--color-border)" }}>
                     <span style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)", width: "56px" }}>{b.id}</span>
                     <span style={{ color: "var(--color-text)" }}>{b.from} → {b.to}</span>
                     <span style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>{b.dep}</span>
@@ -196,7 +196,7 @@ export default function Transport() {
             <div className={`rounded-lg p-4 mb-5`}
               style={{ background: yandexConnected ? "rgba(42,141,122,0.08)" : "rgba(212,135,42,0.08)", border: `1px solid ${yandexConnected ? "rgba(42,141,122,0.3)" : "rgba(212,135,42,0.3)"}` }}
             >
-              <div className="flex items-center gap-3 mb-2">
+              <div className="flex flex-wrap items-center gap-3 mb-2">
                 <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-lg font-bold" style={{ background: "#FC3F1D" }}>Y</div>
                 <div>
                   <div className="font-medium text-sm" style={{ color: "var(--color-text)" }}>Yandex.Taxi</div>
@@ -223,7 +223,7 @@ export default function Transport() {
                 </div>
                 <button
                   onClick={() => setYandexConnected(true)}
-                  className="w-full rounded-lg py-3 text-sm font-medium cursor-pointer hover:opacity-80 transition-opacity flex items-center justify-center gap-2"
+                  className="w-full rounded-lg py-3 text-sm font-medium cursor-pointer hover:opacity-80 transition-opacity flex flex-wrap items-center justify-center gap-2"
                   style={{ background: "#FC3F1D", color: "#fff" }}
                 >
                   <span style={{ fontSize: "18px", fontWeight: "bold" }}>Y</span> Подключить через OAuth
@@ -243,7 +243,7 @@ export default function Transport() {
                     </div>
                   ))}
                 </div>
-                <div className="flex gap-3">
+                <div className="flex flex-wrap gap-3">
                   <Btn onClick={() => setShowYandexMgmt(true)}>Управление интеграцией</Btn>
                   <Btn variant="danger" onClick={() => setYandexConnected(false)}>Отключить</Btn>
                 </div>
@@ -260,7 +260,7 @@ export default function Transport() {
                   { user: "James Walker", from: "Bukhara Center", to: "Train Station", status: "arriving", driver: "S. Karimov" },
                   { user: "Yuki Tanaka", from: "Tashkent Airport", to: "Wyndham Hotel", status: "in_ride", driver: "F. Yusupov" },
                 ].map((r, i) => (
-                  <div key={i} className="flex items-center gap-3 py-2.5 text-sm" style={{ borderBottom: "1px solid var(--color-border)" }}>
+                  <div key={i} className="flex flex-wrap items-center gap-3 py-2.5 text-sm" style={{ borderBottom: "1px solid var(--color-border)" }}>
                     <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold shrink-0" style={{ background: "var(--color-dim)", color: "var(--color-amber)" }}>
                       {r.user[0]}
                     </div>
@@ -287,7 +287,8 @@ export default function Transport() {
       {tab === "flights" && (
         <div>
           <div className="rounded-lg overflow-hidden" style={{ border: "1px solid var(--color-border)" }}>
-            <table className="w-full text-sm">
+            <div className="overflow-x-auto">
+<table className="w-full min-w-[34rem] text-sm">
               <thead>
                 <tr style={{ background: "var(--color-panel)", borderBottom: "1px solid var(--color-border)" }}>
                   {["РЕЙС", "МАРШРУТ", "АВИАКОМПАНИЯ", "ДАТА", "ОТПР", "ПРИБЫТИЕ", "ЦЕНА", "МЕСТА", "СТАТУС"].map(c => (
@@ -313,8 +314,9 @@ export default function Transport() {
                 ))}
               </tbody>
             </table>
+</div>
           </div>
-          <div className="mt-4 flex gap-3">
+          <div className="mt-4 flex flex-wrap gap-3">
             <Btn onClick={() => setShowAddFlight(true)}>+ Добавить рейс</Btn>
             <Btn variant="ghost">Импорт из API</Btn>
           </div>
@@ -324,7 +326,8 @@ export default function Transport() {
       {tab === "trains" && (
         <div>
           <div className="rounded-lg overflow-hidden" style={{ border: "1px solid var(--color-border)" }}>
-            <table className="w-full text-sm">
+            <div className="overflow-x-auto">
+<table className="w-full min-w-[34rem] text-sm">
               <thead>
                 <tr style={{ background: "var(--color-panel)", borderBottom: "1px solid var(--color-border)" }}>
                   {["ПОЕЗД", "МАРШРУТ", "ДАТА", "ОТПР", "ПРИБЫТИЕ", "КЛАСС", "ЦЕНА", "МЕСТА", "СТАТУС"].map(c => (
@@ -348,8 +351,9 @@ export default function Transport() {
                 ))}
               </tbody>
             </table>
+</div>
           </div>
-          <div className="mt-4 flex gap-3">
+          <div className="mt-4 flex flex-wrap gap-3">
             <Btn onClick={() => setShowAddRoute("train")}>+ Добавить маршрут</Btn>
             <Btn variant="ghost">Синхронизация с ЖД Узбекистана</Btn>
           </div>
@@ -358,22 +362,22 @@ export default function Transport() {
 
       {tab === "buses" && (
         <div>
-          <div className="grid gap-4 mb-5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))" }}>
+          <div className="grid gap-4 mb-5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(min(300px, 100%), 1fr))" }}>
             {buses.map(b => (
               <div key={b.id} className="rounded-lg p-4" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }}>
-                <div className="flex items-start justify-between mb-2">
+                <div className="flex flex-wrap items-start justify-between gap-3 mb-2">
                   <div>
                     <div className="font-medium text-sm" style={{ color: "var(--color-text)" }}>{b.from} → {b.to}</div>
                     <div className="text-xs mt-0.5" style={{ color: "var(--color-muted)" }}>{b.company}</div>
                   </div>
                   <Badge label={b.seats === 0 ? "распродан" : STATUS_LABEL[b.status] ?? b.status} color={b.seats === 0 ? "rose" : STATUS_COLOR[b.status]} />
                 </div>
-                <div className="flex gap-4 text-xs" style={{ fontFamily: "var(--font-mono)", color: "var(--color-muted)" }}>
+                <div className="flex flex-wrap gap-4 text-xs" style={{ fontFamily: "var(--font-mono)", color: "var(--color-muted)" }}>
                   <span>{b.dep} → {b.arr}</span>
                   <span style={{ color: "var(--color-teal)" }}>${b.price}</span>
                   <span>{b.seats > 0 ? `${b.seats} мест` : "Нет мест"}</span>
                 </div>
-                <div className="mt-3 flex gap-2">
+                <div className="mt-3 flex flex-wrap gap-2">
                   <Btn variant="ghost" small>Изменить</Btn>
                   <Btn variant="ghost" small>Бронирования</Btn>
                 </div>
@@ -388,7 +392,7 @@ export default function Transport() {
       {showAddFlight && (
         <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: "rgba(0,0,0,0.7)" }} onClick={() => setShowAddFlight(false)}>
           <div className="rounded-2xl w-full max-w-lg p-6" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }} onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between gap-2 mb-5">
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-5">
               <h3 className="text-lg font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}>Добавить рейс</h3>
               <button onClick={() => setShowAddFlight(false)} className="opacity-50 hover:opacity-100 cursor-pointer text-xl" style={{ color: "var(--color-text)" }}>×</button>
             </div>
@@ -403,7 +407,7 @@ export default function Transport() {
                 </div>
               ))}
             </div>
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3">
               <Btn variant="ghost" onClick={() => setShowAddFlight(false)}>Отмена</Btn>
               <Btn onClick={() => {
                 if (!newFlight.id || !newFlight.from) return;
@@ -426,7 +430,7 @@ export default function Transport() {
       {showAddRoute && (
         <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: "rgba(0,0,0,0.7)" }} onClick={() => setShowAddRoute(null)}>
           <div className="rounded-2xl w-full max-w-lg p-6" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }} onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between gap-2 mb-5">
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-5">
               <h3 className="text-lg font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}>
                 {showAddRoute === "train" ? "Добавить маршрут поезда" : "Добавить маршрут автобуса"}
               </h3>
@@ -443,7 +447,7 @@ export default function Transport() {
                 </div>
               ))}
             </div>
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3">
               <Btn variant="ghost" onClick={() => setShowAddRoute(null)}>Отмена</Btn>
               <Btn onClick={() => {
                 if (!newRoute.id || !newRoute.from) return;
@@ -474,7 +478,7 @@ export default function Transport() {
       {showYandexMgmt && (
         <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: "rgba(0,0,0,0.7)" }} onClick={() => setShowYandexMgmt(false)}>
           <div className="rounded-2xl w-full max-w-md p-6" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }} onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between gap-2 mb-5">
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-5">
               <h3 className="text-lg font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}>Управление Яндекс Такси</h3>
               <button onClick={() => setShowYandexMgmt(false)} className="opacity-50 hover:opacity-100 cursor-pointer text-xl" style={{ color: "var(--color-text)" }}>×</button>
             </div>
@@ -485,13 +489,13 @@ export default function Transport() {
                 { label: "Бронирований сегодня", val: "23" },
                 { label: "Статус интеграции", val: "✓ Подключено" },
               ].map(s => (
-                <div key={s.label} className="flex justify-between gap-2 items-center py-2 text-sm" style={{ borderBottom: "1px solid var(--color-border)" }}>
+                <div key={s.label} className="flex flex-wrap justify-between gap-2 items-center py-2 text-sm" style={{ borderBottom: "1px solid var(--color-border)" }}>
                   <span style={{ color: "var(--color-muted)" }}>{s.label}</span>
                   <span style={{ color: "var(--color-text)", fontFamily: "var(--font-mono)" }}>{s.val}</span>
                 </div>
               ))}
             </div>
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3">
               <Btn variant="ghost" onClick={() => setShowYandexMgmt(false)}>Закрыть</Btn>
               <Btn variant="danger" onClick={() => { setYandexConnected(false); setShowYandexMgmt(false); }}>Отключить интеграцию</Btn>
             </div>

@@ -16,7 +16,7 @@ function HomeScreen() {
     <div className="flex flex-col h-full overflow-y-auto">
       {/* Header */}
       <div className="px-4 pt-12 pb-4" style={{ background: "linear-gradient(135deg, #0d0c0a 0%, #1c1a15 100%)" }}>
-        <div className="flex items-center justify-between gap-2 mb-4">
+        <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
           <div>
             <div className="text-xs opacity-60" style={{ color: "#f0ebe0" }}>Доброе утро,</div>
             <div className="text-base font-semibold" style={{ color: "#f0ebe0", fontFamily: "var(--font-display)" }}>Откройте Узбекистан</div>
@@ -24,7 +24,7 @@ function HomeScreen() {
           <div className="w-8 h-8 rounded-full" style={{ background: "var(--color-amber)" }} />
         </div>
         {/* Search bar */}
-        <div className="rounded-xl px-3 py-2.5 flex items-center gap-2" style={{ background: "rgba(255,255,255,0.08)" }}>
+        <div className="rounded-xl px-3 py-2.5 flex flex-wrap items-center gap-2" style={{ background: "rgba(255,255,255,0.08)" }}>
           <span style={{ color: "rgba(255,255,255,0.4)", fontSize: "12px" }}>⌕</span>
           <span className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>Поиск городов, туров, отелей…</span>
         </div>
@@ -45,7 +45,7 @@ function HomeScreen() {
       {/* Categories */}
       <div className="px-4 mt-4">
         <div className="text-xs font-medium mb-3" style={{ color: "var(--color-text)" }}>Категории</div>
-        <div className="flex gap-2 overflow-x-auto pb-1">
+        <div className="flex flex-wrap gap-2 overflow-x-auto pb-1">
           {["Туры", "Отели", "Еда", "События", "Транспорт", "Карты"].map((c, i) => (
             <div key={c} className="shrink-0 rounded-xl px-3 py-2 text-center" style={{ background: i === 0 ? "var(--color-amber)" : "var(--color-panel)", border: "1px solid var(--color-border)" }}>
               <div className="text-xs font-medium" style={{ color: i === 0 ? "#0d0c0a" : "var(--color-text)" }}>{c}</div>
@@ -56,11 +56,11 @@ function HomeScreen() {
 
       {/* Promoted restaurants */}
       <div className="px-4 mt-4">
-        <div className="flex items-center justify-between gap-2 mb-2.5">
+        <div className="flex flex-wrap items-center justify-between gap-2 mb-2.5">
           <div className="text-xs font-medium" style={{ color: "var(--color-text)" }}>Топ рестораны</div>
           <div className="text-xs" style={{ color: "var(--color-amber)", fontFamily: "var(--font-mono)" }}>Все</div>
         </div>
-        <div className="flex gap-2.5 overflow-x-auto pb-1">
+        <div className="flex flex-wrap gap-2.5 overflow-x-auto pb-1">
           {[
             { name: "Плов Центр", rating: "4.9", tag: "★ Top", img: "https://images.unsplash.com/photo-1664602078796-68ee76b3fc59?w=120&h=120&fit=crop&auto=format" },
             { name: "Samarkand Coffee", rating: "4.7", tag: "New", img: "https://images.unsplash.com/photo-1662468752704-f256cf5c6784?w=120&h=120&fit=crop&auto=format" },
@@ -87,7 +87,7 @@ function HomeScreen() {
           { name: "Ярмарка «Шёлк и специи»", date: "15–17 сен", city: "Самарканд" },
           { name: "Ферганский марафон", date: "5 ноя", city: "Фергана" },
         ].map(e => (
-          <div key={e.name} className="flex gap-3 rounded-xl p-3 mb-2" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }}>
+          <div key={e.name} className="flex flex-wrap gap-3 rounded-xl p-3 mb-2" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }}>
             <div className="w-10 h-10 rounded-lg flex flex-col items-center justify-center shrink-0" style={{ background: "var(--color-amber)" }}>
               <div className="text-xs font-bold" style={{ color: "#0d0c0a", fontFamily: "var(--font-mono)", fontSize: "10px" }}>SEP</div>
               <div className="text-sm font-bold" style={{ color: "#0d0c0a", fontFamily: "var(--font-display)" }}>15</div>
@@ -124,19 +124,19 @@ function DestinationScreen() {
         </div>
         <div className="absolute bottom-4 left-4 right-4">
           <div className="text-xl font-semibold" style={{ color: "#fff", fontFamily: "var(--font-display)" }}>Samarkand</div>
-          <div className="flex items-center gap-2 mt-1">
+          <div className="flex flex-wrap items-center gap-2 mt-1">
             <span className="text-xs" style={{ color: "var(--color-amber)" }}>★ 4.9</span>
             <span className="text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>4,820 visitors</span>
           </div>
         </div>
       </div>
 
-      <div className="flex-1 px-4 pt-4">
+      <div className="min-w-0 flex-1 px-4 pt-4">
         <p className="text-xs leading-relaxed mb-4" style={{ color: "var(--color-muted)" }}>
           Один из древнейших постоянно обитаемых городов мира. Жемчужина Шёлкового пути.
         </p>
 
-        <div className="flex gap-2 overflow-x-auto mb-4 pb-1">
+        <div className="flex flex-wrap gap-2 overflow-x-auto mb-4 pb-1">
           {["Обзор", "Туры", "Отели", "Еда", "Карта"].map((t, i) => (
             <div key={t} className="shrink-0 rounded-full px-3 py-1 text-xs" style={{ background: i === 0 ? "var(--color-amber)" : "var(--color-panel)", border: "1px solid var(--color-border)", color: i === 0 ? "#0d0c0a" : "var(--color-muted)" }}>
               {t}
@@ -185,9 +185,9 @@ function TransportScreen() {
           { type: "🚄", from: "Ташкент", to: "Самарканд", dep: "15:30", price: "$18", status: "Вовремя" },
           { type: "🚌", from: "Ташкент", to: "Бухара", dep: "16:00", price: "$8", status: "Задержан" },
         ].map((r, i) => (
-          <div key={i} className="rounded-xl p-3 mb-2 flex items-center gap-3" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }}>
+          <div key={i} className="rounded-xl p-3 mb-2 flex flex-wrap items-center gap-3" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }}>
             <span>{r.type}</span>
-            <div className="flex-1">
+            <div className="min-w-0 flex-1">
               <div className="text-xs font-medium" style={{ color: "var(--color-text)" }}>{r.from} → {r.to}</div>
               <div className="text-xs mt-0.5" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>{r.dep}</div>
             </div>
@@ -200,7 +200,7 @@ function TransportScreen() {
 
         {/* Yandex Taxi */}
         <div className="rounded-xl p-4 mt-2" style={{ background: "#FC3F1D10", border: "1px solid #FC3F1D30" }}>
-          <div className="flex items-center gap-2 mb-2">
+          <div className="flex flex-wrap items-center gap-2 mb-2">
             <div className="w-6 h-6 rounded flex items-center justify-center text-white text-sm font-bold" style={{ background: "#FC3F1D" }}>Y</div>
             <div className="text-xs font-medium" style={{ color: "var(--color-text)" }}>Яндекс Такси</div>
             <div className="ml-auto text-xs" style={{ color: "#FC3F1D", fontFamily: "var(--font-mono)" }}>Подключено</div>
@@ -251,15 +251,15 @@ export default function AppPreview() {
   };
 
   return (
-    <div className="p-4 sm:p-4 sm:p-7">
-      <div className="flex items-start justify-between mb-6">
+    <div className="p-4 sm:p-7">
+      <div className="flex flex-wrap items-start justify-between gap-3 mb-6">
         <div>
           <h1 className="text-2xl font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}>Превью приложения</h1>
           <p className="text-sm mt-1" style={{ color: "var(--color-muted)" }}>Живой предпросмотр отображения контента в мобильном приложении Uzbekistan Travel</p>
         </div>
       </div>
 
-      <div className="flex gap-8 items-start">
+      <div className="flex flex-col items-start gap-8 lg:flex-row">
         {/* Screen selector */}
         <div className="flex flex-col gap-1.5 w-44 shrink-0">
           <div className="text-xs mb-2 tracking-widest uppercase font-medium" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
@@ -267,7 +267,7 @@ export default function AppPreview() {
           </div>
           {SCREENS.map(s => (
             <button key={s.id} onClick={() => setScreen(s.id)}
-              className="flex items-center gap-2.5 px-3 py-2 rounded text-sm text-left cursor-pointer transition-all"
+              className="flex flex-wrap items-center gap-2.5 px-3 py-2 rounded text-sm text-left cursor-pointer transition-all"
               style={{
                 background: screen === s.id ? "var(--color-panel)" : "transparent",
                 color: screen === s.id ? "var(--color-amber)" : "var(--color-muted)",
@@ -292,7 +292,10 @@ export default function AppPreview() {
           <div
             className="relative rounded-[44px] overflow-hidden shadow-2xl"
             style={{
-              width: "320px",
+              // На телефоне рамка в 320 пикселей шире, чем остаётся
+              // места, — отдаём ей всю доступную ширину.
+              width: "min(320px, 100%)",
+              maxWidth: "320px",
               height: "640px",
               background: "var(--color-bg)",
               border: "6px solid #1a1814",
@@ -307,8 +310,8 @@ export default function AppPreview() {
             {/* Status bar */}
             <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-5 pt-2 z-10" style={{ height: "44px" }}>
               <span className="text-xs font-semibold" style={{ color: "var(--color-text)", fontFamily: "var(--font-mono)", fontSize: "10px" }}>9:41</span>
-              <div className="flex items-center gap-1">
-                <div className="flex gap-px">
+              <div className="flex items-center gap-1 flex-wrap">
+                <div className="flex flex-wrap gap-px">
                   {[3, 4, 5, 6].map(h => <div key={h} className="w-0.5 rounded-sm" style={{ background: "var(--color-text)", height: `${h}px` }} />)}
                 </div>
                 <div className="w-3.5 h-2.5 rounded-sm border" style={{ borderColor: "var(--color-text)" }}>
@@ -332,31 +335,31 @@ export default function AppPreview() {
         </div>
 
         {/* Notes panel */}
-        <div className="flex-1 flex flex-col gap-4">
+        <div className="min-w-0 flex-1 flex flex-col gap-4">
           <div className="rounded-lg p-4" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }}>
             <div className="text-xs font-medium mb-3 tracking-widest uppercase" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
               Заметки к экрану
             </div>
             {screen === "home" && (
               <div className="flex flex-col gap-2 text-xs" style={{ color: "var(--color-muted)" }}>
-                <div className="flex gap-2"><span style={{ color: "var(--color-amber)" }}>★</span> Главный баннер — направления с featured=true</div>
-                <div className="flex gap-2"><span style={{ color: "var(--color-teal)" }}>↑</span> Продвигаемые рестораны отображаются первыми (платное продвижение)</div>
-                <div className="flex gap-2"><span style={{ color: "var(--color-teal)" }}>↑</span> Предстоящие события из панели «События»</div>
-                <div className="flex gap-2"><span style={{ color: "var(--color-amber)" }}>◈</span> Строка поиска подключена к глобальному поиск API</div>
+                <div className="flex flex-wrap gap-2"><span style={{ color: "var(--color-amber)" }}>★</span> Главный баннер — направления с featured=true</div>
+                <div className="flex flex-wrap gap-2"><span style={{ color: "var(--color-teal)" }}>↑</span> Продвигаемые рестораны отображаются первыми (платное продвижение)</div>
+                <div className="flex flex-wrap gap-2"><span style={{ color: "var(--color-teal)" }}>↑</span> Предстоящие события из панели «События»</div>
+                <div className="flex flex-wrap gap-2"><span style={{ color: "var(--color-amber)" }}>◈</span> Строка поиска подключена к глобальному поиск API</div>
               </div>
             )}
             {screen === "transport" && (
               <div className="flex flex-col gap-2 text-xs" style={{ color: "var(--color-muted)" }}>
-                <div className="flex gap-2"><span style={{ color: "#FC3F1D" }}>Y</span> Виджет Яндекс Такси активен при подключённом аккаунте</div>
-                <div className="flex gap-2"><span style={{ color: "var(--color-teal)" }}>✈</span> Данные рейсов из панели «Транспорт»</div>
-                <div className="flex gap-2"><span style={{ color: "var(--color-amber)" }}>🚄</span> Расписание поездов синхронизировано с API Узбекских железных дорог</div>
+                <div className="flex flex-wrap gap-2"><span style={{ color: "#FC3F1D" }}>Y</span> Виджет Яндекс Такси активен при подключённом аккаунте</div>
+                <div className="flex flex-wrap gap-2"><span style={{ color: "var(--color-teal)" }}>✈</span> Данные рейсов из панели «Транспорт»</div>
+                <div className="flex flex-wrap gap-2"><span style={{ color: "var(--color-amber)" }}>🚄</span> Расписание поездов синхронизировано с API Узбекских железных дорог</div>
               </div>
             )}
             {screen === "destination" && (
               <div className="flex flex-col gap-2 text-xs" style={{ color: "var(--color-muted)" }}>
-                <div className="flex gap-2"><span style={{ color: "var(--color-amber)" }}>◈</span> Главное фото — из обложки в панели «Направления»</div>
-                <div className="flex gap-2"><span style={{ color: "var(--color-teal)" }}>↑</span> Туры отфильтрованы по текущему направлению</div>
-                <div className="flex gap-2"><span style={{ color: "var(--color-amber)" }}>★</span> Рейтинг агрегирован из панели «Отзывы»</div>
+                <div className="flex flex-wrap gap-2"><span style={{ color: "var(--color-amber)" }}>◈</span> Главное фото — из обложки в панели «Направления»</div>
+                <div className="flex flex-wrap gap-2"><span style={{ color: "var(--color-teal)" }}>↑</span> Туры отфильтрованы по текущему направлению</div>
+                <div className="flex flex-wrap gap-2"><span style={{ color: "var(--color-amber)" }}>★</span> Рейтинг агрегирован из панели «Отзывы»</div>
               </div>
             )}
             {!["home", "transport", "destination"].includes(screen) && (
@@ -376,7 +379,7 @@ export default function AppPreview() {
               { label: "Рейтинг App Store", val: "★ 4.8 (1 240 отзывов)" },
               { label: "Рейтинг Play Store", val: "★ 4.7 (890 отзывов)" },
             ].map(s => (
-              <div key={s.label} className="flex justify-between gap-2 text-xs py-1.5" style={{ borderBottom: "1px solid var(--color-border)" }}>
+              <div key={s.label} className="flex flex-wrap justify-between gap-2 text-xs py-1.5" style={{ borderBottom: "1px solid var(--color-border)" }}>
                 <span style={{ color: "var(--color-muted)" }}>{s.label}</span>
                 <span style={{ color: "var(--color-text)", fontFamily: "var(--font-mono)" }}>{s.val}</span>
               </div>

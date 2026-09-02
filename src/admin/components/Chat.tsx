@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useNarrow } from "../context/useNarrow";
 import { USERS, INITIAL_MESSAGES, Message } from "../data/mockData";
 
 type Props = {
@@ -9,6 +10,13 @@ type Props = {
 const chatUsers = USERS.filter((u) => INITIAL_MESSAGES[u.id] !== undefined || true);
 
 export default function Chat({ messages, setMessages }: Props) {
+  /*
+   * На телефоне список бесед и само окно рядом не помещаются: список
+   * занимает 280 пикселей из 304. Поэтому показываем что-то одно —
+   * выбор беседы открывает переписку, стрелка возвращает к списку.
+   */
+  const narrow = useNarrow();
+  const [showChat, setShowChat] = useState(false);
   const [activeUserId, setActiveUserId] = useState<number>(1);
   const [input, setInput] = useState("");
   const [search, setSearch] = useState("");
@@ -30,6 +38,7 @@ export default function Chat({ messages, setMessages }: Props) {
 
   const selectUser = (uid: number) => {
     setActiveUserId(uid);
+    setShowChat(true);
     markRead(uid);
   };
 
@@ -94,7 +103,8 @@ export default function Chat({ messages, setMessages }: Props) {
       <div
         className="flex flex-col shrink-0"
         style={{
-          width: "280px",
+          display: narrow && showChat ? "none" : undefined,
+          width: narrow ? "100%" : "280px",
           borderRight: "1px solid var(--color-border)",
           background: "var(--color-surface)",
         }}
@@ -121,7 +131,7 @@ export default function Chat({ messages, setMessages }: Props) {
           />
         </div>
 
-        <div className="flex-1 overflow-y-auto">
+        <div className="min-w-0 flex-1 overflow-y-auto">
           {filteredUsers.map((u) => {
             const unread = unreadFor(u.id);
             const last = lastMsg(u.id);
@@ -129,7 +139,7 @@ export default function Chat({ messages, setMessages }: Props) {
               <button
                 key={u.id}
                 onClick={() => selectUser(u.id)}
-                className="w-full flex items-center gap-3 px-4 py-3 text-left transition-colors cursor-pointer"
+                className="w-full flex flex-wrap items-center gap-3 px-4 py-3 text-left transition-colors cursor-pointer"
                 style={{
                   background: activeUserId === u.id ? "var(--color-panel)" : "transparent",
                   borderLeft: activeUserId === u.id ? "2px solid var(--color-amber)" : "2px solid transparent",
@@ -152,7 +162,7 @@ export default function Chat({ messages, setMessages }: Props) {
                   />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between gap-2">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
                     <span
                       className="text-sm font-medium truncate"
                       style={{ color: "var(--color-text)" }}
@@ -185,12 +195,25 @@ export default function Chat({ messages, setMessages }: Props) {
       </div>
 
       {/* Chat window */}
-      <div className="flex flex-col flex-1 min-w-0" style={{ background: "var(--color-bg)" }}>
+      <div
+        className="flex flex-col flex-1 min-w-0"
+        style={{ background: "var(--color-bg)", display: narrow && !showChat ? "none" : undefined }}
+      >
         {/* Header */}
         <div
-          className="flex items-center gap-3 px-5 py-3.5 shrink-0"
+          className="flex flex-wrap items-center gap-3 px-5 py-3.5 shrink-0"
           style={{ borderBottom: "1px solid var(--color-border)", background: "var(--color-surface)" }}
         >
+          {narrow && (
+            <button
+              onClick={() => setShowChat(false)}
+              aria-label="К списку бесед"
+              className="shrink-0 cursor-pointer rounded px-1 text-lg"
+              style={{ color: "var(--color-muted)" }}
+            >
+              ‹
+            </button>
+          )}
           <div className="relative">
             <div
               className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold"
@@ -212,7 +235,7 @@ export default function Chat({ messages, setMessages }: Props) {
               {activeUser.flag} {activeUser.country} · {activeUser.email} · Последний раз {activeUser.lastSeen}
             </div>
           </div>
-          <div className="ml-auto flex gap-2">
+          <div className="ml-auto flex flex-wrap gap-2">
             {[
               { label: `${activeUser.bookings} bookings`, color: "var(--color-teal)" },
               { label: activeUser.role, color: "var(--color-amber)" },
@@ -235,9 +258,9 @@ export default function Chat({ messages, setMessages }: Props) {
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto px-6 py-5 flex flex-col gap-3">
+        <div className="min-w-0 flex-1 overflow-y-auto px-6 py-5 flex flex-col gap-3">
           {thread.length === 0 && (
-            <div className="flex-1 flex items-center justify-center">
+            <div className="min-w-0 flex-1 flex items-center justify-center">
               <div className="text-center" style={{ color: "var(--color-muted)" }}>
                 <div className="text-3xl mb-2">◈</div>
                 <div className="text-sm">Нет сообщений. Начните переписку.</div>
@@ -277,7 +300,7 @@ export default function Chat({ messages, setMessages }: Props) {
         </div>
 
         {/* Quick replies */}
-        <div className="px-5 py-2 flex gap-2 overflow-x-auto shrink-0" style={{ borderTop: "1px solid var(--color-border)" }}>
+        <div className="px-5 py-2 flex flex-wrap gap-2 overflow-x-auto shrink-0" style={{ borderTop: "1px solid var(--color-border)" }}>
           {[
             "Здравствуйте! Чем могу помочь?",
             "Ваше бронирование подтверждено ✓",
@@ -303,7 +326,7 @@ export default function Chat({ messages, setMessages }: Props) {
 
         {/* Input */}
         <div
-          className="px-5 py-3 flex gap-3 items-end shrink-0"
+          className="px-5 py-3 flex flex-wrap gap-3 items-end shrink-0"
           style={{ borderTop: "1px solid var(--color-border)", background: "var(--color-surface)" }}
         >
           <textarea
@@ -317,7 +340,7 @@ export default function Chat({ messages, setMessages }: Props) {
             }}
             placeholder="Введите сообщение… (Enter для отправки)"
             rows={1}
-            className="flex-1 rounded-lg px-4 py-2.5 text-sm resize-none outline-none"
+            className="min-w-0 flex-1 rounded-lg px-4 py-2.5 text-sm resize-none outline-none"
             style={{
               background: "var(--color-panel)",
               border: "1px solid var(--color-border)",

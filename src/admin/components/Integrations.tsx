@@ -60,7 +60,7 @@ export default function Integrations() {
   const filteredIntegrations = catFilter === "Все" ? INTEGRATIONS : INTEGRATIONS.filter(i => i.category === catFilter);
 
   return (
-    <div className="p-4 sm:p-4 sm:p-7">
+    <div className="p-4 sm:p-7">
       <PageHeader
         title="API и интеграции"
         subtitle="API-ключи, сторонние сервисы и вебхуки"
@@ -68,7 +68,7 @@ export default function Integrations() {
       />
 
       {/* Tabs */}
-      <div className="flex gap-1 mb-6">
+      <div className="flex flex-wrap gap-1 mb-6">
         {([["keys", "API-ключи"], ["integrations", "Сервисы"], ["webhooks", "Вебхуки"]] as const).map(([id, label]) => (
           <button key={id} onClick={() => setTab(id)}
             className="px-4 py-2 rounded text-sm cursor-pointer transition-all"
@@ -81,7 +81,7 @@ export default function Integrations() {
         <div className="flex flex-col gap-3">
           {keys.map(k => (
             <div key={k.id} className="rounded-xl p-4" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)", opacity: k.status === "revoked" ? 0.5 : 1 }}>
-              <div className="flex items-start gap-4">
+              <div className="flex flex-wrap items-start gap-4">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                     <span className="font-medium text-sm" style={{ color: "var(--color-text)" }}>{k.name}</span>
@@ -90,11 +90,11 @@ export default function Integrations() {
 
                   {/* Key display */}
                   <div
-                    className="flex items-center gap-2 rounded px-3 py-2 mb-2 cursor-pointer"
+                    className="flex flex-wrap items-center gap-2 rounded px-3 py-2 mb-2 cursor-pointer"
                     style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", maxWidth: "400px" }}
                     onClick={() => setReveal(reveal === k.id ? null : k.id)}
                   >
-                    <span className="font-mono text-xs flex-1 truncate" style={{ color: reveal === k.id ? "var(--color-amber)" : "var(--color-muted)" }}>
+                    <span className="font-mono text-xs min-w-0 flex-1 truncate" style={{ color: reveal === k.id ? "var(--color-amber)" : "var(--color-muted)" }}>
                       {reveal === k.id ? k.key.replace("...", "••••••••••••") : k.key}
                     </span>
                     <span className="text-xs shrink-0" style={{ color: "var(--color-dim)" }}>{reveal === k.id ? "скрыть" : "показать"}</span>
@@ -115,7 +115,7 @@ export default function Integrations() {
                 </div>
 
                 {k.status === "active" && (
-                  <div className="flex gap-2 shrink-0">
+                  <div className="flex flex-wrap gap-2 shrink-0">
                     <Btn variant="ghost" small>Копировать</Btn>
                     <Btn variant="danger" small onClick={() => revoke(k.id)}>Отозвать</Btn>
                   </div>
@@ -139,7 +139,7 @@ export default function Integrations() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {filteredIntegrations.map(intg => (
-              <div key={intg.name} className="rounded-xl p-4 flex items-start gap-3" style={{ background: "var(--color-panel)", border: `1px solid ${intg.status === "error" ? "rgba(196,90,66,0.3)" : "var(--color-border)"}` }}>
+              <div key={intg.name} className="rounded-xl p-4 flex flex-wrap items-start gap-3" style={{ background: "var(--color-panel)", border: `1px solid ${intg.status === "error" ? "rgba(196,90,66,0.3)" : "var(--color-border)"}` }}>
                 <div className="text-2xl leading-none shrink-0 mt-0.5">{intg.logo}</div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-0.5 flex-wrap">
@@ -175,9 +175,9 @@ export default function Integrations() {
             { url: "https://slack-proxy.uztravel.uz/alerts", events: ["review.flagged", "guide.application", "booking.cancelled"], lastDelivery: "3h ago", success: false },
           ].map((wh, i) => (
             <div key={i} className="rounded-xl p-4" style={{ background: "var(--color-panel)", border: `1px solid ${wh.success ? "var(--color-border)" : "rgba(196,90,66,0.3)"}` }}>
-              <div className="flex items-start gap-3">
+              <div className="flex flex-wrap items-start gap-3">
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1.5">
+                  <div className="flex flex-wrap items-center gap-2 mb-1.5">
                     <span className="text-sm font-medium" style={{ color: "var(--color-text)", fontFamily: "var(--font-mono)", fontSize: "12px" }}>{wh.url}</span>
                     <Badge label={wh.success ? "работает" : "ошибка"} color={wh.success ? "teal" : "rose"} />
                   </div>
@@ -188,7 +188,7 @@ export default function Integrations() {
                   </div>
                   <div className="text-xs" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>Последняя доставка: {wh.lastDelivery}</div>
                 </div>
-                <div className="flex gap-2 shrink-0">
+                <div className="flex flex-wrap gap-2 shrink-0">
                   <Btn variant="ghost" small>Логи</Btn>
                   {!wh.success && <Btn small>Повторить</Btn>}
                 </div>
@@ -227,7 +227,7 @@ export default function Integrations() {
                 </div>
               </div>
             </div>
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3">
               <Btn variant="ghost" onClick={() => setShowNew(false)}>Отмена</Btn>
               <Btn onClick={() => setShowNew(false)}>Создать ключ</Btn>
             </div>

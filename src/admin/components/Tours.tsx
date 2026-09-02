@@ -36,7 +36,7 @@ export default function Tours() {
   const totalRevenue = filtered.reduce((s, t) => s + t.price * t.bookings, 0);
 
   return (
-    <div className="p-4 sm:p-4 sm:p-7">
+    <div className="p-4 sm:p-7">
       <PageHeader
         title="Туры"
         subtitle={`${filtered.length} туров · $${totalRevenue.toLocaleString()} общая выручка`}
@@ -104,7 +104,7 @@ export default function Tours() {
             <span style={{ color: "var(--color-muted)", fontSize: "11px" }}>/{t.maxGroup} max</span>
           </div>,
           <Badge label={t.status} color={statusColor(t.status) as any} />,
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <Btn variant="ghost" small onClick={() => setEditing(t)}>Изменить</Btn>
             <Btn variant={t.status === "active" ? "danger" : "ghost"} small onClick={() => toggleStatus(t.id)}>
               {t.status === "active" ? "Приостановить" : "Активировать"}
@@ -117,7 +117,7 @@ export default function Tours() {
       {showAdd && (
         <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: "rgba(0,0,0,0.7)" }} onClick={() => setShowAdd(false)}>
           <div className="rounded-2xl w-full max-w-md p-6" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }} onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between gap-2 mb-5">
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-5">
               <h3 className="text-lg font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}>Новый тур</h3>
               <button onClick={() => setShowAdd(false)} className="opacity-50 hover:opacity-100 cursor-pointer text-xl" style={{ color: "var(--color-text)" }}>×</button>
             </div>
@@ -143,7 +143,7 @@ export default function Tours() {
                 </div>
               </div>
             </div>
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3">
               <Btn variant="ghost" onClick={() => setShowAdd(false)}>Отмена</Btn>
               <Btn onClick={() => {
                 if (!newTour.title) return;
@@ -175,7 +175,7 @@ export default function Tours() {
             style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-start justify-between mb-5">
+            <div className="flex flex-wrap items-start justify-between gap-3 mb-5">
               <div>
                 <h3
                   className="text-lg font-semibold"
@@ -217,7 +217,7 @@ export default function Tours() {
               <div className="text-sm" style={{ color: "var(--color-text)" }}>{editing.guide}</div>
             </div>
 
-            <div className="flex gap-3 justify-end">
+            <div className="flex flex-wrap gap-3 justify-end">
               <Btn variant="ghost" onClick={() => setEditing(null)}>Отмена</Btn>
               <Btn onClick={() => setEditing(null)}>Сохранить</Btn>
             </div>

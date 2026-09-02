@@ -76,7 +76,7 @@ export default function PromoCodes() {
   const usagePct = (p: Promo) => Math.min(Math.round((p.used / p.limit) * 100), 100);
 
   return (
-    <div className="p-4 sm:p-4 sm:p-7">
+    <div className="p-4 sm:p-7">
       <PageHeader
         title="Промокоды и скидки"
         subtitle={`${activeCount} активных · ${totalUsed.toLocaleString()} использований · $${totalRevenue.toLocaleString()} влияние на выручку`}
@@ -99,7 +99,7 @@ export default function PromoCodes() {
       </div>
 
       {/* Filter */}
-      <div className="flex gap-1.5 mb-5">
+      <div className="flex flex-wrap gap-1.5 mb-5">
         {([["all", "Все"], ["active", "Активные"], ["paused", "Приостановлен"], ["expired", "Истёк"]] as [string, string][]).map(([f, label]) => (
           <button key={f} onClick={() => setFilter(f)}
             className="px-3 py-1.5 rounded text-xs cursor-pointer transition-all"
@@ -118,24 +118,24 @@ export default function PromoCodes() {
           const pct = usagePct(p);
           return (
             <div key={p.id} className="rounded-xl p-4" style={{ background: "var(--color-panel)", border: `1px solid ${p.status === "active" ? "var(--color-border)" : "var(--color-border)"}`, opacity: p.status === "expired" ? 0.6 : 1 }}>
-              <div className="flex items-start gap-4">
+              <div className="flex flex-wrap items-start gap-4">
                 {/* Code badge */}
                 <div
                   className="rounded-lg px-3 py-2 text-center shrink-0"
-                  style={{ background: "var(--color-surface)", border: "1px dashed var(--color-border)", minWidth: "100px" }}
+                  style={{ background: "var(--color-surface)", border: "1px dashed var(--color-border)", minWidth: "min(100px, 100%)" }}
                 >
                   <div className="font-bold tracking-widest" style={{ color: "var(--color-amber)", fontFamily: "var(--font-mono)", fontSize: "13px" }}>{p.code}</div>
                   <div className="text-xs mt-0.5 font-semibold" style={{ color: "var(--color-text)" }}>{valueLabel(p)}</div>
                 </div>
 
                 {/* Details */}
-                <div className="flex-1 min-w-0">
+                <div className="min-w-[11rem] flex-1">
                   <div className="flex items-center gap-2 flex-wrap mb-1">
                     <span className="font-medium text-sm" style={{ color: "var(--color-text)" }}>{p.description}</span>
                     <Badge label={p.status === "active" ? "активный" : p.status === "paused" ? "приостановлен" : "истёк"} color={p.status === "active" ? "teal" : p.status === "paused" ? "amber" : "dim"} />
                     <Badge label={p.category === "all" ? "всё" : p.category === "tours" ? "туры" : p.category === "hotels" ? "отели" : "транспорт"} color="dim" />
                   </div>
-                  <div className="text-xs flex gap-4 mb-2" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
+                  <div className="text-xs flex flex-wrap gap-4 mb-2" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
                     <span>Мин. заказ: ${p.minOrder}</span>
                     <span>Действует: {p.startDate} → {p.endDate}</span>
                     {p.revenue > 0 && <span style={{ color: "var(--color-teal)" }}>Выручка: ${p.revenue.toLocaleString()}</span>}
@@ -143,7 +143,7 @@ export default function PromoCodes() {
 
                   {/* Usage bar */}
                   <div>
-                    <div className="flex justify-between gap-2 text-xs mb-1" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
+                    <div className="flex flex-wrap justify-between gap-2 text-xs mb-1" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
                       <span>Использование</span>
                       <span style={{ color: pct === 100 ? "var(--color-rose)" : pct > 75 ? "var(--color-amber)" : "var(--color-muted)" }}>
                         {p.used} / {p.limit} ({pct}%)
@@ -163,7 +163,7 @@ export default function PromoCodes() {
 
                 {/* Actions */}
                 {p.status !== "expired" && (
-                  <div className="flex gap-2 shrink-0">
+                  <div className="flex flex-wrap gap-2 shrink-0">
                     <Btn variant={p.status === "active" ? "danger" : "ghost"} small onClick={() => toggle(p.id)}>
                       {p.status === "active" ? "Приостановить" : "Активировать"}
                     </Btn>
@@ -212,7 +212,7 @@ export default function PromoCodes() {
               </div>
               <div>
                 <label className="text-xs block mb-1" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>ПРИМЕНЯТЬ К</label>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   {([["all", "Всё"], ["tours", "Туры"], ["hotels", "Отели"], ["transport", "Транспорт"]] as [string, string][]).map(([c, cLabel]) => (
                     <button key={c} onClick={() => setNewCode(p => ({ ...p, category: c }))}
                       className="px-2.5 py-1 rounded text-xs cursor-pointer"
@@ -222,7 +222,7 @@ export default function PromoCodes() {
                 </div>
               </div>
             </div>
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3">
               <Btn variant="ghost" onClick={() => setShowNew(false)}>Отмена</Btn>
               <Btn onClick={addPromo}>Создать код</Btn>
             </div>

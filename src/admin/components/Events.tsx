@@ -46,7 +46,7 @@ export default function Events() {
   };
 
   return (
-    <div className="p-4 sm:p-4 sm:p-7">
+    <div className="p-4 sm:p-7">
       <PageHeader
         title="События"
         subtitle={`${filtered.length} событий · ${events.filter(e => e.featured).length} рекомендуемых`}
@@ -69,7 +69,7 @@ export default function Events() {
         ))}
       </div>
 
-      <div className="grid gap-5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))" }}>
+      <div className="grid gap-5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(min(340px, 100%), 1fr))" }}>
         {filtered.map(e => {
           const soldPct = Math.round((e.ticketsSold / e.capacity) * 100);
           return (
@@ -79,7 +79,7 @@ export default function Events() {
               <div className="relative h-40 overflow-hidden" style={{ background: "var(--color-dim)" }}>
                 <img src={e.img} alt={e.name} className="w-full h-full object-cover" />
                 <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(13,12,10,0.85) 0%, transparent 50%)" }} />
-                <div className="absolute top-3 left-3 flex gap-1.5">
+                <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
                   <span className="text-xs px-2 py-0.5 rounded font-medium" style={{ background: catColors[e.category] + "22", color: catColors[e.category], border: `1px solid ${catColors[e.category]}44`, fontFamily: "var(--font-mono)" }}>
                     {catLabels[e.category] ?? e.category}
                   </span>
@@ -95,7 +95,7 @@ export default function Events() {
               </div>
 
               <div className="p-4">
-                <div className="text-xs mb-2 flex gap-3" style={{ color: "var(--color-muted)" }}>
+                <div className="text-xs mb-2 flex flex-wrap gap-3" style={{ color: "var(--color-muted)" }}>
                   <span>📍 {e.venue}, {e.city}</span>
                   <span>{e.price === 0 ? "Бесплатно" : `$${e.price}/билет`}</span>
                 </div>
@@ -103,7 +103,7 @@ export default function Events() {
 
                 {/* Ticket progress */}
                 <div className="mb-3">
-                  <div className="flex justify-between gap-2 text-xs mb-1" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
+                  <div className="flex flex-wrap justify-between gap-2 text-xs mb-1" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
                     <span>Билетов продано</span>
                     <span style={{ color: soldPct > 80 ? "var(--color-rose)" : "var(--color-teal)" }}>
                       {e.ticketsSold.toLocaleString()} / {e.capacity.toLocaleString()} ({soldPct}%)
@@ -114,7 +114,7 @@ export default function Events() {
                   </div>
                 </div>
 
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   <Btn variant={e.featured ? "danger" : "ghost"} small onClick={() => toggleFeatured(e.id)}>
                     {e.featured ? "Убрать из рек." : "Рекомендовать ★"}
                   </Btn>
@@ -165,7 +165,7 @@ export default function Events() {
                 </div>
               </div>
             </div>
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3">
               <Btn variant="ghost" onClick={() => setShowForm(false)}>Отмена</Btn>
               <Btn onClick={addEvent}>Создать событие</Btn>
             </div>

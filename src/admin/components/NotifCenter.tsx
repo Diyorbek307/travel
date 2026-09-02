@@ -64,7 +64,7 @@ export default function NotifCenter({ onNavigate }: { onNavigate?: (page: string
   const unreadCount = notifs.filter(n => !n.read).length;
 
   return (
-    <div className="p-4 sm:p-4 sm:p-7">
+    <div className="p-4 sm:p-7">
       <PageHeader
         title="Уведомления"
         subtitle={`${unreadCount} непрочитанных`}
@@ -87,7 +87,7 @@ export default function NotifCenter({ onNavigate }: { onNavigate?: (page: string
         ))}
       </div>
 
-      <div className="flex gap-6">
+      <div className="flex flex-col gap-6 lg:flex-row">
         {/* List */}
         <div className="flex-1 flex flex-col gap-2 min-w-0">
           {filtered.length === 0 && (
@@ -97,7 +97,7 @@ export default function NotifCenter({ onNavigate }: { onNavigate?: (page: string
             <div
               key={n.id}
               onClick={() => { setSelected(n); markRead(n.id); }}
-              className="rounded-xl p-4 flex gap-3 cursor-pointer transition-all"
+              className="rounded-xl p-4 flex flex-wrap gap-3 cursor-pointer transition-all"
               style={{
                 background: selected?.id === n.id ? "var(--color-panel)" : n.read ? "transparent" : "rgba(212,135,42,0.04)",
                 border: `1px solid ${selected?.id === n.id ? "var(--color-amber)" : n.read ? "var(--color-border)" : "rgba(212,135,42,0.2)"}`,
@@ -112,7 +112,7 @@ export default function NotifCenter({ onNavigate }: { onNavigate?: (page: string
               </div>
 
               <div className="flex-1 min-w-0">
-                <div className="flex items-start justify-between gap-2">
+                <div className="flex flex-wrap items-start justify-between gap-2">
                   <span className="text-sm font-medium" style={{ color: n.read ? "var(--color-muted)" : "var(--color-text)" }}>{n.title}</span>
                   <span className="text-xs shrink-0" style={{ color: "var(--color-dim)", fontFamily: "var(--font-mono)" }}>{n.time}</span>
                 </div>
@@ -128,7 +128,7 @@ export default function NotifCenter({ onNavigate }: { onNavigate?: (page: string
 
         {/* Detail panel */}
         {selected ? (
-          <div className="w-72 shrink-0">
+          <div className="w-full shrink-0 lg:w-72">
             <div className="rounded-2xl p-5 sticky top-0" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }}>
               <div
                 className="w-12 h-12 rounded-full flex items-center justify-center text-xl mb-4"
@@ -159,7 +159,7 @@ export default function NotifCenter({ onNavigate }: { onNavigate?: (page: string
             </div>
           </div>
         ) : (
-          <div className="w-72 shrink-0 rounded-2xl flex items-center justify-center text-center p-8" style={{ border: "1px dashed var(--color-border)" }}>
+          <div className="w-full shrink-0 rounded-2xl lg:w-72 flex items-center justify-center text-center p-8" style={{ border: "1px dashed var(--color-border)" }}>
             <p className="text-sm" style={{ color: "var(--color-dim)" }}>Выберите уведомление для просмотра</p>
           </div>
         )}

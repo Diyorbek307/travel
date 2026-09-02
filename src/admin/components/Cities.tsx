@@ -19,14 +19,14 @@ export default function Cities() {
   };
 
   return (
-    <div className="p-4 sm:p-4 sm:p-7">
+    <div className="p-4 sm:p-7">
       <PageHeader
         title="Города"
         subtitle={`${cities.length} городов · ${cities.filter(c => c.featured).length} на главной`}
         action={<Btn onClick={() => setShowAdd(true)}>+ Добавить город</Btn>}
       />
 
-      <div className="flex gap-1.5 mb-6">
+      <div className="flex flex-wrap gap-1.5 mb-6">
         {[["all", "все"], ["featured", "на главной"], ["active", "активные"], ["draft", "черновик"]].map(([f, label]) => (
           <button key={f} onClick={() => setFilter(f)}
             className="px-3 py-1.5 rounded text-xs cursor-pointer capitalize transition-all"
@@ -35,7 +35,7 @@ export default function Cities() {
         ))}
       </div>
 
-      <div className="grid gap-5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(360px, 1fr))" }}>
+      <div className="grid gap-5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(min(360px, 100%), 1fr))" }}>
         {filtered.map(city => (
           <div key={city.id}
             className="rounded-xl overflow-hidden cursor-pointer transition-all hover:translate-y-[-2px]"
@@ -45,7 +45,7 @@ export default function Cities() {
             <div className="relative h-44 overflow-hidden" style={{ background: "var(--color-dim)" }}>
               <img src={city.img} alt={city.name} className="w-full h-full object-cover" />
               <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(13,12,10,0.9) 0%, transparent 60%)" }} />
-              <div className="absolute top-3 right-3 flex gap-1.5">
+              <div className="absolute top-3 right-3 flex flex-wrap gap-1.5">
                 {city.featured && <span className="text-xs px-2 py-0.5 rounded font-medium" style={{ background: "var(--color-amber)", color: "#0d0c0a", fontFamily: "var(--font-mono)" }}>★ На главной</span>}
                 <Badge label={city.status} color={city.status === "active" ? "teal" : "dim"} />
               </div>
@@ -56,7 +56,7 @@ export default function Cities() {
             </div>
             <div className="p-4">
               <p className="text-xs leading-relaxed mb-3 line-clamp-2" style={{ color: "var(--color-muted)" }}>{city.description}</p>
-              <div className="flex gap-4 text-xs mb-3" style={{ fontFamily: "var(--font-mono)", color: "var(--color-muted)" }}>
+              <div className="flex flex-wrap gap-4 text-xs mb-3" style={{ fontFamily: "var(--font-mono)", color: "var(--color-muted)" }}>
                 <span>{city.population.toLocaleString()} жит.</span>
                 <span style={{ color: "var(--color-teal)" }}>{city.tourists.toLocaleString()} туристов/год</span>
               </div>
@@ -68,7 +68,7 @@ export default function Cities() {
                   <span className="text-xs px-2 py-0.5 rounded" style={{ background: "var(--color-dim)", color: "var(--color-dim)", fontFamily: "var(--font-mono)" }}>+{city.highlights.length - 3}</span>
                 )}
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 <Btn variant={city.featured ? "danger" : "ghost"} small onClick={e => { e.stopPropagation(); toggleFeatured(city.id); }}>
                   {city.featured ? "Убрать с главной" : "На главную ★"}
                 </Btn>
@@ -82,7 +82,7 @@ export default function Cities() {
       {showAdd && (
         <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: "rgba(0,0,0,0.7)" }} onClick={() => setShowAdd(false)}>
           <div className="rounded-2xl w-full max-w-md p-6" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }} onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between gap-2 mb-5">
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-5">
               <h3 className="text-lg font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}>Добавить город</h3>
               <button onClick={() => setShowAdd(false)} className="opacity-50 hover:opacity-100 cursor-pointer text-xl" style={{ color: "var(--color-text)" }}>×</button>
             </div>
@@ -104,7 +104,7 @@ export default function Cities() {
                 />
               </div>
             </div>
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3">
               <Btn variant="ghost" onClick={() => setShowAdd(false)}>Отмена</Btn>
               <Btn onClick={() => {
                 if (!newCity.name) return;
@@ -159,7 +159,7 @@ export default function Cities() {
                   ))}
                 </div>
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 <Btn variant={selected.featured ? "danger" : "ghost"} onClick={() => { toggleFeatured(selected.id); setSelected(null); }}>
                   {selected.featured ? "Убрать с главной" : "На главную ★"}
                 </Btn>

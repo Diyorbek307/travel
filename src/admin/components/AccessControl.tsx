@@ -74,7 +74,7 @@ export default function AccessControl() {
   const roleColor = (roleName: string) => ROLES.find(r => r.name === roleName)?.color ?? "var(--color-muted)";
 
   return (
-    <div className="p-4 sm:p-4 sm:p-7">
+    <div className="p-4 sm:p-7">
       <PageHeader
         title="Управление доступом"
         subtitle="Роли, права и управление командой администраторов"
@@ -82,7 +82,7 @@ export default function AccessControl() {
       />
 
       {/* Tabs */}
-      <div className="flex gap-1 mb-6">
+      <div className="flex flex-wrap gap-1 mb-6">
         {([["roles", "Роли и права"], ["users", "Администраторы"], ["audit", "Журнал аудита"]] as const).map(([id, label]) => (
           <button key={id} onClick={() => setTab(id)}
             className="px-4 py-2 rounded text-sm cursor-pointer transition-all"
@@ -92,7 +92,7 @@ export default function AccessControl() {
       </div>
 
       {tab === "roles" && (
-        <div className="flex gap-6">
+        <div className="flex flex-col gap-6 lg:flex-row">
           {/* Role list */}
           <div className="flex flex-col gap-2 w-60 shrink-0">
             {ROLES.map(r => (
@@ -103,7 +103,7 @@ export default function AccessControl() {
                   border: `1px solid ${selectedRole?.id === r.id ? r.color : "var(--color-border)"}`,
                 }}
               >
-                <div className="flex items-center gap-2 mb-1">
+                <div className="flex flex-wrap items-center gap-2 mb-1">
                   <div className="w-2 h-2 rounded-full shrink-0" style={{ background: r.color }} />
                   <span className="text-sm font-medium" style={{ color: "var(--color-text)" }}>{r.name}</span>
                 </div>
@@ -114,8 +114,8 @@ export default function AccessControl() {
 
           {/* Permission matrix */}
           {selectedRole && (
-            <div className="flex-1 rounded-2xl overflow-hidden" style={{ border: "1px solid var(--color-border)" }}>
-              <div className="p-4 flex items-center gap-3" style={{ background: "var(--color-panel)", borderBottom: "1px solid var(--color-border)" }}>
+            <div className="min-w-0 flex-1 rounded-2xl overflow-hidden" style={{ border: "1px solid var(--color-border)" }}>
+              <div className="p-4 flex flex-wrap items-center gap-3" style={{ background: "var(--color-panel)", borderBottom: "1px solid var(--color-border)" }}>
                 <div className="w-3 h-3 rounded-full shrink-0" style={{ background: selectedRole.color }} />
                 <div>
                   <div className="font-semibold text-sm" style={{ color: "var(--color-text)" }}>{selectedRole.name}</div>
@@ -124,7 +124,8 @@ export default function AccessControl() {
                 <Btn variant="ghost" small>Изменить</Btn>
               </div>
 
-              <table className="w-full">
+              <div className="overflow-x-auto">
+<table className="w-full min-w-[34rem]">
                 <thead>
                   <tr style={{ background: "var(--color-surface)", borderBottom: "1px solid var(--color-border)" }}>
                     <th className="text-left px-4 py-2.5 text-xs font-medium" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>МОДУЛЬ</th>
@@ -147,7 +148,7 @@ export default function AccessControl() {
                           </span>
                         </td>
                         <td className="px-4 py-2.5 text-center">
-                          <div className="flex justify-center gap-1">
+                          <div className="flex flex-wrap justify-center gap-1">
                             {(["full", "read", "none"] as const).map(level => (
                               <div key={level} className="w-2 h-2 rounded-full cursor-pointer" style={{ background: perm === level ? PERM_COLORS[level] : "var(--color-dim)" }} />
                             ))}
@@ -158,6 +159,7 @@ export default function AccessControl() {
                   })}
                 </tbody>
               </table>
+</div>
             </div>
           )}
         </div>
@@ -166,7 +168,7 @@ export default function AccessControl() {
       {tab === "users" && (
         <div className="flex flex-col gap-3">
           {adminUsers.map(u => (
-            <div key={u.id} className="rounded-xl p-4 flex items-center gap-4" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)", opacity: u.status === "suspended" ? 0.6 : 1 }}>
+            <div key={u.id} className="rounded-xl p-4 flex flex-wrap items-center gap-4" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)", opacity: u.status === "suspended" ? 0.6 : 1 }}>
               <div
                 className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shrink-0"
                 style={{ background: roleColor(u.role) + "33", color: roleColor(u.role) }}
@@ -183,7 +185,7 @@ export default function AccessControl() {
                 <div className="text-xs" style={{ color: "var(--color-muted)" }}>{u.email} · {u.lastActive}</div>
               </div>
               <Badge label={u.status} color={u.status === "active" ? "teal" : "rose"} />
-              <div className="flex gap-2 shrink-0">
+              <div className="flex flex-wrap gap-2 shrink-0">
                 <Btn variant="ghost" small>Изменить</Btn>
                 <Btn variant={u.status === "active" ? "danger" : "ghost"} small onClick={() => toggleSuspend(u.id)}>
                   {u.status === "active" ? "Заблокировать" : "Восстановить"}
@@ -197,7 +199,7 @@ export default function AccessControl() {
       {showInvite && (
         <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: "rgba(0,0,0,0.7)" }} onClick={() => setShowInvite(false)}>
           <div className="rounded-2xl w-full max-w-md p-6" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }} onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between gap-2 mb-5">
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-5">
               <h3 className="text-lg font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}>Пригласить администратора</h3>
               <button onClick={() => setShowInvite(false)} className="opacity-50 hover:opacity-100 cursor-pointer text-xl" style={{ color: "var(--color-text)" }}>×</button>
             </div>
@@ -219,7 +221,7 @@ export default function AccessControl() {
                       className="rounded-lg px-3 py-2.5 text-left cursor-pointer transition-all"
                       style={{ background: inviteForm.role === r.name ? r.color + "22" : "var(--color-surface)", border: `1px solid ${inviteForm.role === r.name ? r.color : "var(--color-border)"}` }}
                     >
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <div className="w-2 h-2 rounded-full shrink-0" style={{ background: r.color }} />
                         <span className="text-sm font-medium" style={{ color: "var(--color-text)" }}>{r.name}</span>
                       </div>
@@ -229,7 +231,7 @@ export default function AccessControl() {
                 </div>
               </div>
             </div>
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3">
               <Btn variant="ghost" onClick={() => setShowInvite(false)}>Отмена</Btn>
               <Btn onClick={() => {
                 if (!inviteForm.name || !inviteForm.email) return;
@@ -250,7 +252,8 @@ export default function AccessControl() {
 
       {tab === "audit" && (
         <div className="rounded-xl overflow-hidden" style={{ border: "1px solid var(--color-border)" }}>
-          <table className="w-full text-sm">
+          <div className="overflow-x-auto">
+<table className="w-full min-w-[34rem] text-sm">
             <thead>
               <tr style={{ background: "var(--color-panel)", borderBottom: "1px solid var(--color-border)" }}>
                 {["ВРЕМЯ", "АДМИНИСТРАТОР", "ДЕЙСТВИЕ", "ОБЪЕКТ", "IP"].map(c => (
@@ -282,6 +285,7 @@ export default function AccessControl() {
               ))}
             </tbody>
           </table>
+</div>
         </div>
       )}
     </div>

@@ -28,7 +28,7 @@ export default function Restaurants() {
   };
 
   return (
-    <div className="p-4 sm:p-4 sm:p-7">
+    <div className="p-4 sm:p-7">
       <PageHeader
         title="Рестораны"
         subtitle={`${filtered.length} заведений · ${items.filter(r => r.promoted).length} продвигается`}
@@ -37,7 +37,7 @@ export default function Restaurants() {
 
       {items.filter(r => r.status === "pending").length > 0 && (
         <div
-          className="rounded-lg px-4 py-3 mb-6 text-sm flex items-center gap-2"
+          className="rounded-lg px-4 py-3 mb-6 text-sm flex flex-wrap items-center gap-2"
           style={{ background: "rgba(212,135,42,0.08)", border: "1px solid rgba(212,135,42,0.2)", color: "var(--color-amber-light)" }}
         >
           ⚠ {items.filter(r => r.status === "pending").length} ресторан(ов) на рассмотрении
@@ -45,7 +45,7 @@ export default function Restaurants() {
         </div>
       )}
 
-      <div className="flex items-center justify-between gap-2 mb-6">
+      <div className="flex flex-wrap items-center justify-between gap-2 mb-6">
         <div className="flex gap-2 flex-wrap">
           {[["all", "все"], ["active", "активные"], ["pending", "на рассмотрении"], ["suspended", "приостановлены"]].map(([f, label]) => (
             <button key={f} onClick={() => setFilter(f)}
@@ -70,7 +70,7 @@ export default function Restaurants() {
             >{c}</button>
           ))}
         </div>
-        <div className="flex gap-1">
+        <div className="flex flex-wrap gap-1">
           {(["cards", "table"] as const).map(v => (
             <button key={v} onClick={() => setView(v)}
               className="px-3 py-1.5 rounded text-xs cursor-pointer"
@@ -81,16 +81,16 @@ export default function Restaurants() {
       </div>
 
       {view === "cards" ? (
-        <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))" }}>
+        <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(min(340px, 100%), 1fr))" }}>
           {filtered.map(r => (
             <div key={r.id} className="rounded-lg overflow-hidden cursor-pointer transition-all hover:translate-y-[-1px]"
               style={{ background: "var(--color-panel)", border: `1px solid ${r.promoted ? "rgba(212,135,42,0.5)" : "var(--color-border)"}` }}
               onClick={() => setSelected(r)}
             >
-              <div className="flex gap-0">
+              <div className="flex flex-wrap gap-0">
                 <img src={r.img} alt={r.name} className="w-24 h-24 object-cover shrink-0" style={{ background: "var(--color-dim)" }} />
                 <div className="flex-1 p-3 min-w-0">
-                  <div className="flex items-start justify-between gap-1">
+                  <div className="flex flex-wrap items-start justify-between gap-1">
                     <div className="min-w-0">
                       <div className="font-medium text-sm truncate" style={{ color: "var(--color-text)" }}>
                         {r.promoted && <span style={{ color: "var(--color-amber)" }}>★ </span>}
@@ -100,7 +100,7 @@ export default function Restaurants() {
                     </div>
                     <Badge label={r.status} color={r.status === "active" ? "teal" : r.status === "pending" ? "amber" : "rose"} />
                   </div>
-                  <div className="flex gap-3 mt-2 text-xs" style={{ fontFamily: "var(--font-mono)", color: "var(--color-muted)" }}>
+                  <div className="flex flex-wrap gap-3 mt-2 text-xs" style={{ fontFamily: "var(--font-mono)", color: "var(--color-muted)" }}>
                     <span style={{ color: "var(--color-amber)" }}>★ {r.rating}</span>
                     <span>{r.seats} мест</span>
                     <span>{r.open}</span>
@@ -108,7 +108,7 @@ export default function Restaurants() {
                   <div className="text-xs mt-1.5" style={{ color: "var(--color-muted)" }}>{r.monthlyViews.toLocaleString()} просмотров/мес</div>
                 </div>
               </div>
-              <div className="px-3 py-2 flex gap-2" style={{ borderTop: "1px solid var(--color-border)" }}>
+              <div className="px-3 py-2 flex flex-wrap gap-2" style={{ borderTop: "1px solid var(--color-border)" }}>
                 <Btn variant={r.promoted ? "danger" : "ghost"} small onClick={e => { e.stopPropagation(); togglePromote(r.id); }}>
                   {r.promoted ? "Убрать продвижение" : "Продвигать ★"}
                 </Btn>
@@ -131,7 +131,7 @@ export default function Restaurants() {
             <span style={{ fontFamily: "var(--font-mono)" }}>{r.monthlyViews.toLocaleString()}</span>,
             <Badge label={r.status} color={r.status === "active" ? "teal" : r.status === "pending" ? "amber" : "rose"} />,
             <span style={{ color: r.promoted ? "var(--color-amber)" : "var(--color-dim)" }}>{r.promoted ? "★ Да" : "—"}</span>,
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <Btn variant="ghost" small onClick={() => setSelected(r)}>Изменить</Btn>
               <Btn variant={r.promoted ? "danger" : "ghost"} small onClick={() => togglePromote(r.id)}>
                 {r.promoted ? "Убрать" : "Продвинуть"}
@@ -144,7 +144,7 @@ export default function Restaurants() {
       {showAdd && (
         <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: "rgba(0,0,0,0.7)" }} onClick={() => setShowAdd(false)}>
           <div className="rounded-2xl w-full max-w-lg p-6" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }} onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between gap-2 mb-5">
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-5">
               <h3 className="text-lg font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}>Добавить ресторан</h3>
               <button onClick={() => setShowAdd(false)} className="opacity-50 hover:opacity-100 cursor-pointer text-xl" style={{ color: "var(--color-text)" }}>×</button>
             </div>
@@ -166,7 +166,7 @@ export default function Restaurants() {
                 />
               </div>
             </div>
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3">
               <Btn variant="ghost" onClick={() => setShowAdd(false)}>Отмена</Btn>
               <Btn onClick={() => {
                 if (!newRest.name) return;
@@ -191,7 +191,7 @@ export default function Restaurants() {
       {selected && (
         <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: "rgba(0,0,0,0.7)" }} onClick={() => setSelected(null)}>
           <div className="rounded-xl w-full max-w-md p-6" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }} onClick={e => e.stopPropagation()}>
-            <div className="flex items-start justify-between mb-4">
+            <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
               <h3 className="text-lg font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}>{selected.name}</h3>
               <button className="text-xl opacity-50 hover:opacity-100 cursor-pointer" style={{ color: "var(--color-text)" }} onClick={() => setSelected(null)}>×</button>
             </div>
@@ -211,7 +211,7 @@ export default function Restaurants() {
                 </div>
               ))}
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               {selected.status === "pending" && <Btn onClick={() => approveRestaurant(selected.id)}>Одобрить</Btn>}
               <Btn variant={selected.promoted ? "danger" : "ghost"} onClick={() => { togglePromote(selected.id); setSelected(null); }}>
                 {selected.promoted ? "Убрать продвижение" : "Продвигать ★"}

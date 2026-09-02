@@ -132,7 +132,7 @@ export default function Guides() {
   };
 
   return (
-    <div className="p-4 sm:p-4 sm:p-7">
+    <div className="p-4 sm:p-7">
       <PageHeader
         title="Гиды"
         subtitle={`${guides.length} гидов · ${onTour} в туре · ${available} доступно`}
@@ -164,7 +164,7 @@ export default function Guides() {
           className="rounded px-3 py-1.5 text-sm outline-none"
           style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)", color: "var(--color-text)", width: "220px", fontFamily: "var(--font-body)" }}
         />
-        <div className="flex gap-1.5">
+        <div className="flex flex-wrap gap-1.5">
           {["all", "available", "on_tour", "off_duty", "suspended"].map(f => (
             <button key={f} onClick={() => setFilter(f)}
               className="px-3 py-1.5 rounded text-xs cursor-pointer capitalize transition-all"
@@ -176,7 +176,7 @@ export default function Guides() {
             >{{ all: "все", available: "активен", on_tour: "в туре", off_duty: "не в туре", suspended: "отстранён" }[f]}</button>
           ))}
         </div>
-        <div className="flex gap-1.5">
+        <div className="flex flex-wrap gap-1.5">
           {cities.slice(0, 6).map(c => (
             <button key={c} onClick={() => setCityFilter(c)}
               className="px-3 py-1.5 rounded text-xs cursor-pointer transition-all"
@@ -192,7 +192,7 @@ export default function Guides() {
       </div>
 
       {/* Guide cards */}
-      <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))" }}>
+      <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(min(340px, 100%), 1fr))" }}>
         {filtered.map(g => (
           <div
             key={g.id}
@@ -205,7 +205,7 @@ export default function Guides() {
             onMouseLeave={e => (e.currentTarget.style.borderColor = g.status === "on_tour" ? "rgba(212,135,42,0.3)" : "var(--color-border)")}
             onClick={() => setSelected(g)}
           >
-            <div className="flex items-start gap-3 mb-3">
+            <div className="flex flex-wrap items-start gap-3 mb-3">
               <div
                 className="w-10 h-10 rounded-full flex items-center justify-center font-semibold text-base shrink-0"
                 style={{ background: "var(--color-dim)", color: "var(--color-amber)" }}
@@ -217,7 +217,7 @@ export default function Guides() {
                   <span className="font-semibold text-sm" style={{ color: "var(--color-text)", fontFamily: "var(--font-display)" }}>{g.name}</span>
                   <Badge label={g.status.replace("_", " ")} color={STATUS_COLOR[g.status]} />
                 </div>
-                <div className="text-xs mt-0.5 flex items-center gap-2" style={{ color: "var(--color-muted)" }}>
+                <div className="text-xs mt-0.5 flex flex-wrap items-center gap-2" style={{ color: "var(--color-muted)" }}>
                   <span style={{ color: "var(--color-amber)", fontFamily: "var(--font-mono)" }}>★ {g.rating}</span>
                   <span>·</span>
                   <span>{g.totalTours} туров проведено</span>
@@ -249,7 +249,7 @@ export default function Guides() {
               ))}
             </div>
 
-            <div className="flex items-center justify-between gap-2 text-xs" style={{ borderTop: "1px solid var(--color-border)", paddingTop: "10px" }}>
+            <div className="flex flex-wrap items-center justify-between gap-2 text-xs" style={{ borderTop: "1px solid var(--color-border)", paddingTop: "10px" }}>
               <div style={{ color: "var(--color-muted)" }}>
                 Следующий: <span style={{ color: "var(--color-text)" }}>{g.nextTour}</span>
               </div>
@@ -265,7 +265,7 @@ export default function Guides() {
       {showAdd && (
         <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: "rgba(0,0,0,0.75)", backdropFilter: "blur(4px)" }} onClick={() => setShowAdd(false)}>
           <div className="rounded-2xl w-full max-w-lg p-6 overflow-y-auto" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)", maxHeight: "85vh" }} onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between gap-2 mb-5">
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-5">
               <h3 className="text-lg font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}>Добавить гида</h3>
               <button onClick={() => setShowAdd(false)} className="opacity-50 hover:opacity-100 cursor-pointer text-xl" style={{ color: "var(--color-text)" }}>×</button>
             </div>
@@ -291,7 +291,7 @@ export default function Guides() {
                 />
               </div>
             </div>
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3">
               <Btn variant="ghost" onClick={() => setShowAdd(false)}>Отмена</Btn>
               <Btn onClick={() => {
                 if (!newGuide.name || !newGuide.email) return;
@@ -330,8 +330,8 @@ export default function Guides() {
           >
             {/* Header */}
             <div className="p-6" style={{ borderBottom: "1px solid var(--color-border)" }}>
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-4">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="flex items-center gap-4 flex-wrap">
                   <div
                     className="w-14 h-14 rounded-full flex items-center justify-center text-2xl font-semibold"
                     style={{ background: "var(--color-dim)", color: "var(--color-amber)" }}
@@ -342,7 +342,7 @@ export default function Guides() {
                     <h3 className="text-xl font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}>
                       {selected.name}
                     </h3>
-                    <div className="flex items-center gap-2 mt-1">
+                    <div className="flex flex-wrap items-center gap-2 mt-1">
                       <Badge label={selected.status.replace("_", " ")} color={STATUS_COLOR[selected.status]} />
                       <span style={{ color: "var(--color-amber)", fontFamily: "var(--font-mono)", fontSize: "13px" }}>★ {selected.rating}</span>
                       <span style={{ color: "var(--color-muted)", fontSize: "12px" }}>Вступил {selected.joinedDate}</span>
@@ -398,7 +398,7 @@ export default function Guides() {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between gap-2 text-sm mb-5 p-3 rounded-lg" style={{ background: "var(--color-surface)" }}>
+              <div className="flex flex-wrap items-center justify-between gap-2 text-sm mb-5 p-3 rounded-lg" style={{ background: "var(--color-surface)" }}>
                 <span style={{ color: "var(--color-muted)" }}>Следующий тур:</span>
                 <span style={{ color: "var(--color-text)", fontFamily: "var(--font-mono)" }}>{selected.nextTour}</span>
               </div>

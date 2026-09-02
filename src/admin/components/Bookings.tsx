@@ -63,7 +63,7 @@ export default function Bookings() {
   };
 
   return (
-    <div className="p-4 sm:p-4 sm:p-7">
+    <div className="p-4 sm:p-7">
       <PageHeader
         title="Бронирования"
         subtitle={`${filtered.length} бронирований · $${totalRev.toLocaleString()} получено`}
@@ -72,7 +72,7 @@ export default function Bookings() {
 
       {pendingCount > 0 && (
         <div
-          className="rounded-lg px-4 py-3 mb-6 flex items-center gap-3 text-sm"
+          className="rounded-lg px-4 py-3 mb-6 flex flex-wrap items-center gap-3 text-sm"
           style={{
             background: "rgba(212,135,42,0.1)",
             border: "1px solid rgba(212,135,42,0.25)",
@@ -90,7 +90,7 @@ export default function Bookings() {
         </div>
       )}
 
-      <div className="flex gap-1.5 mb-6">
+      <div className="flex flex-wrap gap-1.5 mb-6">
         {["all", "confirmed", "pending", "completed", "cancelled"].map((f) => (
           <button
             key={f}
@@ -148,7 +148,7 @@ export default function Bookings() {
             style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-start justify-between mb-5">
+            <div className="flex flex-wrap items-start justify-between gap-3 mb-5">
               <div>
                 <h3
                   className="text-lg font-semibold"
@@ -182,14 +182,14 @@ export default function Bookings() {
                 { label: "Долг", val: `$${(selected.total - selected.paid).toLocaleString()}` },
                 { label: "Создано", val: selected.created },
               ].map((row) => (
-                <div key={row.label} className="flex justify-between gap-2 text-sm py-1.5" style={{ borderBottom: "1px solid var(--color-border)" }}>
+                <div key={row.label} className="flex flex-wrap justify-between gap-2 text-sm py-1.5" style={{ borderBottom: "1px solid var(--color-border)" }}>
                   <span style={{ color: "var(--color-muted)" }}>{row.label}</span>
                   <span style={{ color: "var(--color-text)", fontFamily: "var(--font-mono)", fontSize: "13px" }}>{row.val}</span>
                 </div>
               ))}
             </div>
 
-            <div className="flex gap-3 justify-end">
+            <div className="flex flex-wrap gap-3 justify-end">
               {selected.status !== "cancelled" && selected.status !== "completed" && (
                 <Btn variant="danger" onClick={() => cancelBooking(selected.id)}>Отменить</Btn>
               )}
@@ -205,7 +205,7 @@ export default function Bookings() {
       {showAdd && (
         <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: "rgba(0,0,0,0.7)" }} onClick={() => setShowAdd(false)}>
           <div className="rounded-2xl w-full max-w-md p-6" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }} onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between gap-2 mb-5">
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-5">
               <h3 className="text-lg font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}>Новое бронирование</h3>
               <button onClick={() => setShowAdd(false)} className="opacity-50 hover:opacity-100 cursor-pointer text-xl" style={{ color: "var(--color-text)" }}>×</button>
             </div>
@@ -220,7 +220,7 @@ export default function Bookings() {
                 </div>
               ))}
             </div>
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3">
               <Btn variant="ghost" onClick={() => setShowAdd(false)}>Отмена</Btn>
               <Btn onClick={() => {
                 if (!newBooking.customer || !newBooking.tour) return;

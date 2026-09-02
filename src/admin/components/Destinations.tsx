@@ -27,7 +27,7 @@ export default function Destinations() {
   };
 
   return (
-    <div className="p-4 sm:p-4 sm:p-7">
+    <div className="p-4 sm:p-7">
       <PageHeader
         title="Направления"
         subtitle={`${filtered.length} направлений`}
@@ -35,8 +35,8 @@ export default function Destinations() {
       />
 
       {/* Filters + view toggle */}
-      <div className="flex items-center justify-between gap-2 mb-6">
-        <div className="flex gap-1.5">
+      <div className="flex flex-wrap items-center justify-between gap-2 mb-6">
+        <div className="flex flex-wrap gap-1.5">
           {(["all", "active", "seasonal", "draft"] as const).map((f) => {
             const filterLabel: Record<string, string> = { all: "Все", active: "Активные", seasonal: "Сезонные", draft: "Черновик" };
             return (
@@ -56,7 +56,7 @@ export default function Destinations() {
             );
           })}
         </div>
-        <div className="flex gap-1">
+        <div className="flex flex-wrap gap-1">
           {(["grid", "table"] as const).map((v) => (
             <button
               key={v}
@@ -75,7 +75,7 @@ export default function Destinations() {
       </div>
 
       {view === "grid" ? (
-        <div className="grid gap-5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))" }}>
+        <div className="grid gap-5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(min(280px, 100%), 1fr))" }}>
           {filtered.map((d) => (
             <div
               key={d.id}
@@ -100,7 +100,7 @@ export default function Destinations() {
                 </div>
               </div>
               <div className="p-4">
-                <div className="flex items-start justify-between">
+                <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <div
                       className="font-semibold text-base"
@@ -119,7 +119,7 @@ export default function Destinations() {
                 <p className="text-xs mt-2 leading-relaxed line-clamp-2" style={{ color: "var(--color-muted)" }}>
                   {d.desc}
                 </p>
-                <div className="flex items-center gap-4 mt-3 text-xs" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
+                <div className="flex flex-wrap items-center gap-4 mt-3 text-xs" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
                   <span>{d.visits.toLocaleString()} посещений</span>
                   <span>{d.tours} туров</span>
                 </div>
@@ -137,7 +137,7 @@ export default function Destinations() {
             <span style={{ fontFamily: "var(--font-mono)" }}>{d.visits.toLocaleString()}</span>,
             <span style={{ fontFamily: "var(--font-mono)" }}>{d.tours}</span>,
             <Badge label={d.status} color={statusColor(d.status) as any} />,
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <Btn variant="ghost" small onClick={() => toggleStatus(d.id)}>Статус</Btn>
               <Btn variant="ghost" small onClick={() => setSelected(d)}>Изменить</Btn>
             </div>,
@@ -201,7 +201,7 @@ export default function Destinations() {
                   </div>
                 ))}
               </div>
-              <div className="flex gap-3 justify-end">
+              <div className="flex flex-wrap gap-3 justify-end">
                 <Btn variant="ghost" onClick={() => setSelected(null)}>Закрыть</Btn>
                 <Btn onClick={() => setSelected(null)}>Сохранить</Btn>
               </div>

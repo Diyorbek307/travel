@@ -67,7 +67,7 @@ export default function Users() {
   const totalSpend = users.filter(u => u.role === "traveler").reduce((s, u) => s + u.spent, 0);
 
   return (
-    <div className="p-4 sm:p-4 sm:p-7">
+    <div className="p-4 sm:p-7">
       <PageHeader
         title="Пользователи"
         subtitle={`${users.length} зарегистрировано · $${totalSpend.toLocaleString()} lifetime value`}
@@ -111,7 +111,7 @@ export default function Users() {
             width: "220px",
           }}
         />
-        <div className="flex gap-1.5">
+        <div className="flex flex-wrap gap-1.5">
           {["all", "active", "unverified", "suspended"].map((f) => {
             const statusLabel: Record<string, string> = { all: "Все", active: "Активные", unverified: "Не верифицированы", suspended: "Заблокированы" };
             return (
@@ -131,7 +131,7 @@ export default function Users() {
             );
           })}
         </div>
-        <div className="flex gap-1.5">
+        <div className="flex flex-wrap gap-1.5">
           {["all", "traveler", "guide", "hotel_manager", "admin"].map((r) => {
             const roleLabel: Record<string, string> = { all: "Все", traveler: "Путешественник", guide: "Гид", hotel_manager: "Менеджер отеля", admin: "Админ" };
             return (
@@ -156,7 +156,7 @@ export default function Users() {
       <Table
         cols={["ПОЛЬЗОВАТЕЛЬ", "СТРАНА", "РОЛЬ", "ДАТА", "БРОНИ", "ВСЕГО ПОТРАЧЕНО", "СТАТУС", ""]}
         rows={filtered.map((u) => [
-          <div className="flex items-center gap-2.5">
+          <div className="flex flex-wrap items-center gap-2.5">
             <div
               className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold shrink-0"
               style={{ background: "var(--color-dim)", color: "var(--color-amber)" }}
@@ -176,7 +176,7 @@ export default function Users() {
             {u.spent > 0 ? `$${u.spent.toLocaleString()}` : "—"}
           </span>,
           <Badge label={u.status} color={statusColor(u.status) as any} />,
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <Btn variant="ghost" small onClick={() => setViewing(u)}>Просмотр</Btn>
             {u.role !== "admin" && (
               <Btn variant={u.status === "active" ? "danger" : "ghost"} small onClick={() => toggleStatus(u.id)}>
@@ -190,11 +190,11 @@ export default function Users() {
       {viewing && (
         <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: "rgba(0,0,0,0.7)" }} onClick={() => setViewing(null)}>
           <div className="rounded-2xl w-full max-w-md p-6" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }} onClick={e => e.stopPropagation()}>
-            <div className="flex items-start gap-4 mb-5">
+            <div className="flex flex-wrap items-start gap-4 mb-5">
               <div className="w-14 h-14 rounded-full flex items-center justify-center text-xl font-bold shrink-0" style={{ background: "var(--color-amber)", color: "#0d0c0a" }}>
                 {viewing.name[0]}
               </div>
-              <div className="flex-1">
+              <div className="min-w-0 flex-1">
                 <div className="text-lg font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}>{viewing.name}</div>
                 <div className="text-sm" style={{ color: "var(--color-muted)" }}>{viewing.email}</div>
                 <div className="flex gap-2 mt-2 flex-wrap">
@@ -217,7 +217,7 @@ export default function Users() {
                 </div>
               ))}
             </div>
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3">
               <Btn variant="ghost" onClick={() => setViewing(null)}>Закрыть</Btn>
               {viewing.role !== "admin" && (
                 <Btn variant={viewing.status === "active" ? "danger" : "ghost"} onClick={() => { toggleStatus(viewing.id); setViewing(null); }}>
@@ -233,7 +233,7 @@ export default function Users() {
       {showAdd && (
         <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: "rgba(0,0,0,0.7)" }} onClick={() => setShowAdd(false)}>
           <div className="rounded-2xl w-full max-w-md p-6" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }} onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between gap-2 mb-5">
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-5">
               <h3 className="text-lg font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}>Добавить пользователя</h3>
               <button onClick={() => setShowAdd(false)} className="opacity-50 hover:opacity-100 cursor-pointer text-xl" style={{ color: "var(--color-text)" }}>×</button>
             </div>
@@ -262,7 +262,7 @@ export default function Users() {
                 </div>
               </div>
             </div>
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3">
               <Btn variant="ghost" onClick={() => setShowAdd(false)}>Отмена</Btn>
               <Btn onClick={() => {
                 if (!newUser.name || !newUser.email) return;

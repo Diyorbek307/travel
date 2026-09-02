@@ -27,18 +27,18 @@ export default function Settings({ onNavigate }: { onNavigate?: (page: string) =
   };
 
   return (
-    <div className="p-4 sm:p-4 sm:p-7">
+    <div className="p-4 sm:p-7">
       <PageHeader
         title="Настройки"
         subtitle="Аккаунт, уведомления и системные параметры"
         action={<Btn onClick={save}>{saved ? "✓ Сохранено" : "Сохранить"}</Btn>}
       />
 
-      <div className="grid gap-6" style={{ gridTemplateColumns: "1fr 1fr", maxWidth: "900px" }}>
+      <div className="grid gap-6 lg:grid-cols-2">
         {/* Профиль */}
         <Card className="p-5">
           <SectionTitle>Профиль</SectionTitle>
-          <div className="flex items-center gap-4 mb-5">
+          <div className="flex flex-wrap items-center gap-4 mb-5">
             <div className="w-14 h-14 rounded-full flex items-center justify-center text-xl font-bold" style={{ background: "var(--color-amber)", color: "#0d0c0a" }}>
               АД
             </div>
@@ -90,8 +90,8 @@ export default function Settings({ onNavigate }: { onNavigate?: (page: string) =
               { key: "chatAlerts", label: "Оповещения из чата", desc: "Сигнал при новом сообщении" },
               { key: "weeklyReport", label: "Еженедельный отчёт", desc: "Сводка каждый понедельник" },
             ].map(item => (
-              <div key={item.key} className="flex items-center justify-between gap-4">
-                <div>
+              <div key={item.key} className="flex flex-wrap items-center justify-between gap-4">
+                <div className="min-w-0">
                   <div className="text-sm font-medium" style={{ color: "var(--color-text)" }}>{item.label}</div>
                   <div className="text-xs" style={{ color: "var(--color-muted)" }}>{item.desc}</div>
                 </div>
@@ -126,7 +126,7 @@ export default function Settings({ onNavigate }: { onNavigate?: (page: string) =
           <SectionTitle>Тема оформления</SectionTitle>
 
           {/* Dark/Light toggle */}
-          <div className="flex items-center justify-between gap-2 mb-4 p-3 rounded-xl" style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }}>
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-4 p-3 rounded-xl" style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }}>
             <div>
               <div className="text-sm font-medium" style={{ color: "var(--color-text)" }}>
                 {isDark ? "Тёмная тема" : "Светлая тема"}
@@ -136,7 +136,7 @@ export default function Settings({ onNavigate }: { onNavigate?: (page: string) =
               </div>
             </div>
             <button onClick={toggleMode}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg cursor-pointer transition-all font-medium text-sm"
+              className="flex flex-wrap items-center gap-2 px-4 py-2 rounded-lg cursor-pointer transition-all font-medium text-sm"
               style={{ background: "var(--color-amber)", color: "#0d0c0a", fontFamily: "var(--font-body)" }}
             >
               {isDark ? "☀ Светлая" : "☾ Тёмная"}
@@ -197,7 +197,7 @@ export default function Settings({ onNavigate }: { onNavigate?: (page: string) =
               { label: "SMS-шлюз", val: "Eskiz.uz — активен" },
               { label: "Аналитика", val: "Google Analytics 4" },
             ].map(s => (
-              <div key={s.label} className="flex justify-between gap-2 text-sm py-1.5" style={{ borderBottom: "1px solid var(--color-border)" }}>
+              <div key={s.label} className="flex flex-wrap justify-between gap-2 text-sm py-1.5" style={{ borderBottom: "1px solid var(--color-border)" }}>
                 <span style={{ color: "var(--color-muted)" }}>{s.label}</span>
                 <span style={{ color: "var(--color-text)", fontFamily: "var(--font-mono)", fontSize: "12px" }}>{s.val}</span>
               </div>
@@ -210,17 +210,17 @@ export default function Settings({ onNavigate }: { onNavigate?: (page: string) =
           <Card className="p-5" style={{ border: "1px solid rgba(196,90,66,0.3)" } as React.CSSProperties}>
             <SectionTitle>Опасная зона</SectionTitle>
             <div className="flex gap-4 flex-wrap">
-              <div className="flex-1 min-w-60">
+              <div className="flex-1 min-w-0 sm:min-w-60">
                 <div className="text-sm font-medium mb-0.5" style={{ color: "var(--color-text)" }}>Очистить кэш</div>
                 <div className="text-xs mb-3" style={{ color: "var(--color-muted)" }}>Принудительное обновление всех кэшированных страниц и CDN</div>
                 <Btn variant="ghost">Очистить кэш</Btn>
               </div>
-              <div className="flex-1 min-w-60">
+              <div className="flex-1 min-w-0 sm:min-w-60">
                 <div className="text-sm font-medium mb-0.5" style={{ color: "var(--color-text)" }}>Экспорт данных</div>
                 <div className="text-xs mb-3" style={{ color: "var(--color-muted)" }}>Скачать полный дамп базы данных в ZIP-архиве</div>
                 <Btn variant="ghost">Экспортировать</Btn>
               </div>
-              <div className="flex-1 min-w-60">
+              <div className="flex-1 min-w-0 sm:min-w-60">
                 <div className="text-sm font-medium mb-0.5" style={{ color: "var(--color-rose)" }}>Удалить аккаунт</div>
                 <div className="text-xs mb-3" style={{ color: "var(--color-muted)" }}>Навсегда удалить этот администраторский аккаунт</div>
                 <Btn variant="danger" onClick={() => setShowDeleteConfirm(true)}>Удалить аккаунт</Btn>
@@ -242,7 +242,7 @@ export default function Settings({ onNavigate }: { onNavigate?: (page: string) =
               style={{ background: "var(--color-surface)", border: "1px solid rgba(196,90,66,0.4)", color: "var(--color-text)", fontFamily: "var(--font-mono)" }}
               id="delete-confirm-input"
             />
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3">
               <Btn variant="ghost" onClick={() => setShowDeleteConfirm(false)}>Отмена</Btn>
               <Btn variant="danger" onClick={() => {
                 const val = (document.getElementById("delete-confirm-input") as HTMLInputElement)?.value;

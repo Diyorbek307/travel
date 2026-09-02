@@ -55,14 +55,14 @@ export default function Reviews() {
   }));
 
   return (
-    <div className="p-4 sm:p-4 sm:p-7">
+    <div className="p-4 sm:p-7">
       <PageHeader
         title="Отзывы"
         subtitle={`${reviews.length} отзывов · средн. ${avgRating} ★`}
       />
 
       {/* Rating distribution + summary */}
-      <div className="grid gap-6 mb-7" style={{ gridTemplateColumns: "280px 1fr" }}>
+      <div className="grid gap-6 mb-7" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(min(280px, 100%), 1fr))" }}>
         {/* Distribution */}
         <div
           className="rounded-lg p-5"
@@ -84,10 +84,10 @@ export default function Reviews() {
           </div>
           <div className="flex flex-col gap-2">
             {distrib.map((d) => (
-              <div key={d.star} className="flex items-center gap-2 text-xs">
+              <div key={d.star} className="flex flex-wrap items-center gap-2 text-xs">
                 <span style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)", width: "14px", textAlign: "right" }}>{d.star}</span>
                 <span style={{ color: "var(--color-amber)", fontSize: "10px" }}>★</span>
-                <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: "var(--color-dim)" }}>
+                <div className="min-w-0 flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: "var(--color-dim)" }}>
                   <div
                     className="h-full rounded-full"
                     style={{
@@ -126,7 +126,7 @@ export default function Reviews() {
       </div>
 
       {/* Filter bar */}
-      <div className="flex gap-1.5 mb-5">
+      <div className="flex flex-wrap gap-1.5 mb-5">
         {(["all", "published", "pending", "flagged", "rejected"] as const).map((f) => {
           const filterLabel: Record<string, string> = { all: "Все", published: "Опубликованы", pending: "На модерации", flagged: "Отмечены", rejected: "Отклонены" };
           return (
@@ -165,8 +165,8 @@ export default function Reviews() {
               (e.currentTarget as HTMLDivElement).style.background = "var(--color-panel)";
             }}
           >
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex items-start gap-3 min-w-0">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div className="flex flex-wrap items-start gap-3 min-w-0">
                 <div
                   className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold shrink-0 mt-0.5"
                   style={{ background: "var(--color-dim)", color: "var(--color-amber)" }}
@@ -179,7 +179,7 @@ export default function Reviews() {
                     <span style={{ color: "var(--color-muted)", fontSize: "12px" }}>{r.flag} {r.country}</span>
                     <span style={{ color: "var(--color-amber)", fontSize: "12px" }}>{"★".repeat(r.rating)}{"☆".repeat(5 - r.rating)}</span>
                   </div>
-                  <div className="text-xs mt-0.5 flex gap-2" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
+                  <div className="text-xs mt-0.5 flex flex-wrap gap-2" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
                     <span>{r.tour}</span>
                     <span>·</span>
                     <span>{r.destination}</span>
@@ -188,7 +188,7 @@ export default function Reviews() {
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-2 shrink-0">
+              <div className="flex flex-wrap items-center gap-2 shrink-0">
                 <Badge label={r.status} color={statusColor(r.status) as any} />
               </div>
             </div>
@@ -200,7 +200,7 @@ export default function Reviews() {
 
             {r.status === "flagged" && (
               <div
-                className="mt-3 mx-0 rounded px-3 py-2 text-xs flex gap-4"
+                className="mt-3 mx-0 rounded px-3 py-2 text-xs flex flex-wrap gap-4"
                 style={{ background: "rgba(196,90,66,0.08)", border: "1px solid rgba(196,90,66,0.2)", color: "var(--color-rose)" }}
                 onClick={(e) => e.stopPropagation()}
               >
@@ -212,7 +212,7 @@ export default function Reviews() {
 
             {r.status === "pending" && (
               <div
-                className="mt-3 flex gap-2 ml-11"
+                className="mt-3 flex flex-wrap gap-2 ml-11"
                 onClick={(e) => e.stopPropagation()}
               >
                 <Btn variant="ghost" small onClick={() => setStatus(r.id, "published")}>Опубликовать</Btn>
@@ -235,9 +235,9 @@ export default function Reviews() {
             style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)", maxHeight: "90vh", overflowY: "auto" }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-start justify-between mb-4">
+            <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
               <div>
-                <div className="flex items-center gap-2 mb-0.5">
+                <div className="flex flex-wrap items-center gap-2 mb-0.5">
                   <span className="font-semibold text-base" style={{ color: "var(--color-text)", fontFamily: "var(--font-display)" }}>{selected.author}</span>
                   <span style={{ color: "var(--color-muted)", fontSize: "13px" }}>{selected.flag}</span>
                   <Badge label={selected.status} color={statusColor(selected.status) as any} />
@@ -255,7 +255,7 @@ export default function Reviews() {
               </button>
             </div>
 
-            <div className="text-xs mb-4 flex gap-3" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
+            <div className="text-xs mb-4 flex flex-wrap gap-3" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
               <span>{selected.tour}</span>
               <span>·</span>
               <span>{selected.destination}</span>

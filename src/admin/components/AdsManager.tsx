@@ -84,7 +84,7 @@ export default function AdsManager() {
   };
 
   return (
-    <div className="p-4 sm:p-4 sm:p-7">
+    <div className="p-4 sm:p-7">
       <PageHeader
         title="Реклама"
         subtitle={`$${totalRevenue}/мес от продвижений · ${activeAds} активных кампаний`}
@@ -107,7 +107,7 @@ export default function AdsManager() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 mb-6">
+      <div className="flex flex-wrap gap-1 mb-6">
         {([["ads", "Кампании"], ["promotions", "Продвижение листинга"], ["new", "+ Новая кампания"]] as const).map(([id, label]) => (
           <button
             key={id}
@@ -135,7 +135,7 @@ export default function AdsManager() {
                 className="rounded-lg p-4"
                 style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }}
               >
-                <div className="flex items-start justify-between gap-4">
+                <div className="flex flex-wrap items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2.5 flex-wrap">
                       <span className="font-medium text-sm" style={{ color: "var(--color-text)" }}>{ad.advertiser}</span>
@@ -152,7 +152,7 @@ export default function AdsManager() {
                       Цель: {ad.target} · {ad.startDate} → {ad.endDate} · Ставка: ${ad.bid}/клик
                     </div>
                   </div>
-                  <div className="flex gap-2 shrink-0">
+                  <div className="flex flex-wrap gap-2 shrink-0">
                     {ad.status !== "ended" && (
                       <Btn variant={ad.status === "active" ? "danger" : "ghost"} small onClick={() => toggleAd(ad.id)}>
                         {ad.status === "active" ? "Приостановить" : "Активировать"}
@@ -176,7 +176,7 @@ export default function AdsManager() {
                 </div>
 
                 <div className="mt-3">
-                  <div className="flex justify-between gap-2 text-xs mb-1" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
+                  <div className="flex flex-wrap justify-between gap-2 text-xs mb-1" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
                     <span>Использовано бюджета</span>
                     <span>{pct}%</span>
                   </div>
@@ -209,7 +209,7 @@ export default function AdsManager() {
             {promos.map((p, idx) => (
               <div
                 key={p.id}
-                className="rounded-lg p-4 flex items-center gap-4"
+                className="rounded-lg p-4 flex flex-wrap items-center gap-4"
                 style={{
                   background: "var(--color-panel)",
                   border: `1px solid ${p.active ? "rgba(212,135,42,0.3)" : "var(--color-border)"}`,
@@ -227,7 +227,7 @@ export default function AdsManager() {
                     <Badge label={p.category} color="dim" />
                     <span className="text-xs" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>📍 {p.city}</span>
                   </div>
-                  <div className="text-xs mt-0.5 flex gap-3" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
+                  <div className="text-xs mt-0.5 flex flex-wrap gap-3" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
                     <span>Органическая позиция: #{p.currentRank}</span>
                     <span style={{ color: "var(--color-amber)" }}>→ Продвинутая: #{p.boostedRank}</span>
                     <span>С {p.since}</span>
@@ -241,7 +241,7 @@ export default function AdsManager() {
                     {p.active ? "Активна" : "Приостановлена"}
                   </div>
                 </div>
-                <div className="flex gap-2 shrink-0">
+                <div className="flex flex-wrap gap-2 shrink-0">
                   <Btn variant={p.active ? "danger" : "ghost"} small onClick={() => togglePromo(p.id)}>
                     {p.active ? "Приостановить" : "Активировать"}
                   </Btn>
@@ -314,7 +314,7 @@ export default function AdsManager() {
                 ))}
               </div>
             </div>
-            <div className="flex gap-3 pt-2">
+            <div className="flex flex-wrap gap-3 pt-2">
               <Btn variant="ghost" onClick={() => setTab("ads")}>Отмена</Btn>
               <Btn onClick={submitAd}>Запустить кампанию</Btn>
             </div>
@@ -325,7 +325,7 @@ export default function AdsManager() {
       {showAddPromo && (
         <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: "rgba(0,0,0,0.7)" }} onClick={() => setShowAddPromo(false)}>
           <div className="rounded-2xl w-full max-w-md p-6" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }} onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between gap-2 mb-5">
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-5">
               <h3 className="text-lg font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}>Добавить продвижение</h3>
               <button onClick={() => setShowAddPromo(false)} className="opacity-50 hover:opacity-100 cursor-pointer text-xl" style={{ color: "var(--color-text)" }}>×</button>
             </div>
@@ -366,7 +366,7 @@ export default function AdsManager() {
                 />
               </div>
             </div>
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3">
               <Btn variant="ghost" onClick={() => setShowAddPromo(false)}>Отмена</Btn>
               <Btn onClick={() => {
                 if (!newPromo.business) return;

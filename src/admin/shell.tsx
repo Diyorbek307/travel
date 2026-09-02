@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useTheme } from "./context/ThemeContext";
+import { useNarrow } from "./context/useNarrow";
 import Header from "./components/Header";
 import Dashboard from "./components/Dashboard";
 import Destinations from "./components/Destinations";
@@ -102,19 +103,6 @@ const NAV_GROUPS = [
   },
 ];
 
-/** Следит за шириной окна: панель ведёт себя иначе на телефоне. */
-function useNarrowScreen() {
-  const [narrow, setNarrow] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia("(max-width: 899px)");
-    const sync = () => setNarrow(mq.matches);
-    sync();
-    mq.addEventListener("change", sync);
-    return () => mq.removeEventListener("change", sync);
-  }, []);
-  return narrow;
-}
-
 export default function AdminShell() {
   const [active, setActive] = useState("dashboard");
   const [messages, setMessages] = useState(INITIAL_MESSAGES);
@@ -124,7 +112,7 @@ export default function AdminShell() {
    * экране она свёрнута, а раскрытая ложится поверх содержимого, а не
    * отжимает его.
    */
-  const narrow = useNarrowScreen();
+  const narrow = useNarrow();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() =>
     typeof window !== "undefined" ? window.innerWidth < 900 : false,
   );
@@ -180,18 +168,32 @@ export default function AdminShell() {
         />
       )}
 
+      {/*
+        Позицию меняет обёртка, а не сама колонка.
+        Раньше колонка на узком экране переключалась со static на fixed
+        одновременно с шириной — переход обрывался на полпути, и она
+        застревала раскрытой шириной в 56 пикселей. Теперь у неё
+        меняется только ширина, и анимации нечего срывать.
+      */}
+      <div
+        className="shrink-0"
+        style={
+          overlay
+            ? { position: "fixed", insetBlock: 0, left: 0, zIndex: 50 }
+            : undefined
+        }
+      >
       <aside
-        /* Переход только по ширине. С transition-all он срывался: на
-           узком экране панель одновременно меняет position со static на
-           fixed, анимация обрывается на полпути, и панель застревала
-           раскрытой шириной в 56 пикселей. */
-        className="flex flex-col h-full shrink-0 overflow-hidden transition-[width] duration-200"
+        /*
+          Плавного изменения ширины здесь нет намеренно. На узком экране
+          вместе с шириной меняется позиционирование обёртки, у колонки
+          сбрасывается содержащий блок, и переход обрывается на полпути —
+          раскрытая колонка застревала шириной в 56 пикселей. Мгновенная
+          и верная смена лучше плавной и сломанной.
+        */
+        className="flex h-full flex-col overflow-hidden"
         style={{
           width: sidebarWidth,
-          position: overlay ? "fixed" : undefined,
-          insetBlock: overlay ? 0 : undefined,
-          left: overlay ? 0 : undefined,
-          zIndex: overlay ? 50 : undefined,
           background: "var(--color-surface)",
           borderRight: "1px solid var(--color-border)",
         }}
@@ -317,6 +319,7 @@ export default function AdminShell() {
           </div>
         )}
       </aside>
+      </div>
 
       {/* Main content area */}
       <div className="flex flex-col flex-1 min-w-0 h-full overflow-hidden">

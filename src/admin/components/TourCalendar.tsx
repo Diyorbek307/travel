@@ -69,12 +69,12 @@ export default function TourCalendar() {
   const confirmedCount = events.filter(e => e.status === "confirmed").length;
 
   return (
-    <div className="p-4 sm:p-4 sm:p-7">
+    <div className="p-4 sm:p-7">
       <PageHeader
         title="Расписание туров"
         subtitle="Сентябрь 2026 — все отправления"
         action={
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <Btn variant="ghost" onClick={() => setView(v => v === "month" ? "list" : "month")}>
               {view === "month" ? "Список" : "Календарь"}
             </Btn>
@@ -157,7 +157,7 @@ export default function TourCalendar() {
           {events.slice().sort((a, b) => a.start - b.start).map(ev => (
             <div
               key={ev.id}
-              className="rounded-xl p-4 flex items-center gap-4 cursor-pointer transition-all"
+              className="rounded-xl p-4 flex flex-wrap items-center gap-4 cursor-pointer transition-all"
               style={{ background: "var(--color-panel)", border: `1px solid var(--color-border)`, opacity: ev.status === "cancelled" ? 0.5 : 1 }}
               onClick={() => setSelected(ev)}
             >
@@ -166,7 +166,7 @@ export default function TourCalendar() {
                 <div className="text-xs" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>СЕН</div>
                 <div className="text-lg font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}>{ev.start}–{ev.end}</div>
               </div>
-              <div className="flex-1">
+              <div className="min-w-0 flex-1">
                 <div className="font-medium text-sm mb-0.5" style={{ color: "var(--color-text)" }}>{ev.title}</div>
                 <div className="text-xs" style={{ color: "var(--color-muted)" }}>{ev.destination} · Гид: {ev.guide}</div>
               </div>
@@ -187,7 +187,7 @@ export default function TourCalendar() {
       {selected && (
         <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)" }} onClick={() => setSelected(null)}>
           <div className="rounded-2xl w-full max-w-md p-6" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }} onClick={e => e.stopPropagation()}>
-            <div className="flex items-start gap-3 mb-5">
+            <div className="flex flex-wrap items-start gap-3 mb-5">
               <div className="w-2 h-full rounded-full self-stretch shrink-0" style={{ background: selected.color, minHeight: "24px" }} />
               <div>
                 <h3 className="text-xl font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}>{selected.title}</h3>
@@ -212,7 +212,7 @@ export default function TourCalendar() {
 
             {/* Occupancy bar */}
             <div className="mb-5">
-              <div className="flex justify-between gap-2 text-xs mb-1.5">
+              <div className="flex flex-wrap justify-between gap-2 text-xs mb-1.5">
                 <span style={{ color: "var(--color-muted)" }}>Заполненность</span>
                 <span style={{ color: "var(--color-text)", fontFamily: "var(--font-mono)" }}>{Math.round(selected.booked / selected.seats * 100)}%</span>
               </div>
@@ -221,7 +221,7 @@ export default function TourCalendar() {
               </div>
             </div>
 
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3">
               <Btn variant="ghost" onClick={() => setSelected(null)}>Закрыть</Btn>
               {selected.status === "pending" && <Btn onClick={() => confirmEvent(selected.id)}>Подтвердить</Btn>}
             </div>
@@ -233,7 +233,7 @@ export default function TourCalendar() {
       {showAdd && (
         <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: "rgba(0,0,0,0.7)" }} onClick={() => setShowAdd(false)}>
           <div className="rounded-2xl w-full max-w-md p-6" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }} onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between gap-2 mb-5">
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-5">
               <h3 className="text-lg font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}>Новый тур</h3>
               <button onClick={() => setShowAdd(false)} className="opacity-50 hover:opacity-100 cursor-pointer text-xl" style={{ color: "var(--color-text)" }}>×</button>
             </div>
@@ -262,7 +262,7 @@ export default function TourCalendar() {
                 />
               </div>
             </div>
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3">
               <Btn variant="ghost" onClick={() => setShowAdd(false)}>Отмена</Btn>
               <Btn onClick={() => {
                 if (!newTour.title) return;

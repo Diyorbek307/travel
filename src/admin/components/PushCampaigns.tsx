@@ -46,7 +46,7 @@ export default function PushCampaigns() {
   const totalClicked = campaigns.filter(c => c.status === "sent").reduce((s, c) => s + c.clicked, 0);
 
   return (
-    <div className="p-4 sm:p-4 sm:p-7">
+    <div className="p-4 sm:p-7">
       <PageHeader
         title="Push-уведомления"
         subtitle="Мобильные кампании, сегменты и аналитика доставки"
@@ -69,7 +69,7 @@ export default function PushCampaigns() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 mb-6">
+      <div className="flex flex-wrap gap-1 mb-6">
         {([["campaigns", "Кампании"], ["compose", "Создать"], ["segments", "Сегменты"]] as const).map(([id, label]) => (
           <button key={id} onClick={() => setTab(id)}
             className="px-4 py-2 rounded text-sm cursor-pointer transition-all"
@@ -80,7 +80,7 @@ export default function PushCampaigns() {
 
       {tab === "campaigns" && (
         <div>
-          <div className="flex gap-1.5 mb-4">
+          <div className="flex flex-wrap gap-1.5 mb-4">
             {["all", "sent", "scheduled", "draft"].map(f => (
               <button key={f} onClick={() => setFilter(f)}
                 className="px-3 py-1.5 rounded text-xs cursor-pointer"
@@ -92,7 +92,7 @@ export default function PushCampaigns() {
           <div className="flex flex-col gap-3">
             {filtered.map(c => (
               <div key={c.id} className="rounded-xl p-4" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }}>
-                <div className="flex items-start gap-3">
+                <div className="flex flex-wrap items-start gap-3">
                   <div className="text-2xl shrink-0 leading-none mt-0.5">{c.emoji}</div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap mb-1">
@@ -103,14 +103,14 @@ export default function PushCampaigns() {
                       />
                     </div>
                     <p className="text-xs mb-2 truncate" style={{ color: "var(--color-muted)" }}>{c.body}</p>
-                    <div className="text-xs flex gap-4" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
+                    <div className="text-xs flex flex-wrap gap-4" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
                       <span>Сегмент: {c.segment}</span>
                       <span>{c.status === "scheduled" ? "Запланировано: " : "Отправлено: "}{c.date}</span>
                     </div>
                   </div>
 
                   {c.status === "sent" && (
-                    <div className="flex gap-4 shrink-0 text-right text-xs" style={{ fontFamily: "var(--font-mono)" }}>
+                    <div className="flex flex-wrap gap-4 shrink-0 text-right text-xs" style={{ fontFamily: "var(--font-mono)" }}>
                       <div>
                         <div style={{ color: "var(--color-text)" }}>{c.sent.toLocaleString()}</div>
                         <div style={{ color: "var(--color-muted)" }}>отправлено</div>
@@ -127,7 +127,7 @@ export default function PushCampaigns() {
                   )}
 
                   {c.status !== "sent" && (
-                    <div className="flex gap-2 shrink-0">
+                    <div className="flex flex-wrap gap-2 shrink-0">
                       {c.status === "draft" && <Btn small onClick={() => setCampaigns(prev => prev.map(x => x.id === c.id ? { ...x, status: "sent" as const, sent: SEGMENTS.find(s => s.name === x.segment)?.count ?? 0, date: new Date().toLocaleDateString("ru", { day: "numeric", month: "short", year: "numeric" }) } : x))}>Отправить</Btn>}
                       {c.status === "scheduled" && <Btn variant="ghost" small>Изменить</Btn>}
                     </div>
@@ -140,7 +140,7 @@ export default function PushCampaigns() {
       )}
 
       {tab === "compose" && (
-        <div className="grid gap-6" style={{ gridTemplateColumns: "1fr 320px" }}>
+        <div className="grid gap-6" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(min(320px, 100%), 1fr))" }}>
           <Card className="p-5">
             <SectionTitle>Создать уведомление</SectionTitle>
             <div className="flex flex-col gap-4">
@@ -191,7 +191,7 @@ export default function PushCampaigns() {
 
               <div>
                 <label className="text-xs block mb-1.5" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>ДОСТАВКА</label>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   {["now", "schedule"].map(s => (
                     <button key={s} onClick={() => setCompose(p => ({ ...p, schedule: s }))}
                       className="px-3 py-1.5 rounded text-xs cursor-pointer capitalize"
@@ -201,7 +201,7 @@ export default function PushCampaigns() {
                 </div>
               </div>
 
-              <div className="flex gap-3 pt-2">
+              <div className="flex flex-wrap gap-3 pt-2">
                 <Btn onClick={() => {
                   if (!compose.title) return;
                   const seg = SEGMENTS.find(s => s.name === compose.segment);
@@ -235,12 +235,12 @@ export default function PushCampaigns() {
               <div className="rounded-2xl p-4 mb-4" style={{ background: "linear-gradient(135deg, #1a1a2e, #16213e)", border: "1px solid rgba(255,255,255,0.1)" }}>
                 {/* Notification bubble */}
                 <div className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.12)", backdropFilter: "blur(12px)" }}>
-                  <div className="flex items-center gap-2 mb-1.5">
+                  <div className="flex flex-wrap items-center gap-2 mb-1.5">
                     <div className="w-5 h-5 rounded-md flex items-center justify-center text-xs" style={{ background: "var(--color-amber)", color: "#0d0c0a" }}>UZ</div>
                     <span className="text-xs font-medium text-white">Uzbekistan Travel</span>
                     <span className="text-xs ml-auto" style={{ color: "rgba(255,255,255,0.5)" }}>сейчас</span>
                   </div>
-                  <div className="flex items-start gap-2">
+                  <div className="flex flex-wrap items-start gap-2">
                     <span className="text-xl leading-none">{compose.emoji}</span>
                     <div>
                       <div className="text-xs font-semibold text-white mb-0.5">{compose.title || "Заголовок уведомления"}</div>
@@ -260,8 +260,8 @@ export default function PushCampaigns() {
       {tab === "segments" && (
         <div className="flex flex-col gap-3">
           {SEGMENTS.map(s => (
-            <div key={s.name} className="rounded-xl p-4 flex items-center gap-4" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }}>
-              <div className="flex-1">
+            <div key={s.name} className="rounded-xl p-4 flex flex-wrap items-center gap-4" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }}>
+              <div className="min-w-0 flex-1">
                 <div className="font-medium text-sm mb-0.5" style={{ color: "var(--color-text)" }}>{s.name}</div>
                 <div className="text-xs" style={{ color: "var(--color-muted)" }}>{s.desc}</div>
               </div>

@@ -42,8 +42,8 @@ export default function UserTracking() {
   const displayUsers = selectedUser ? [selectedUser] : (showAll ? activeUsers : []);
 
   return (
-    <div className="p-4 sm:p-4 sm:p-7">
-      <div className="flex items-start justify-between mb-6">
+    <div className="p-4 sm:p-7">
+      <div className="flex flex-wrap items-start justify-between gap-3 mb-6">
         <div>
           <h1
             className="text-2xl font-semibold"
@@ -55,7 +55,7 @@ export default function UserTracking() {
             Позиции пользователей и история передвижений по Узбекистану в реальном времени
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <button
             onClick={() => { setShowAll(!showAll); setSelectedUser(null); }}
             className="px-3 py-1.5 rounded text-xs cursor-pointer transition-all"
@@ -71,7 +71,7 @@ export default function UserTracking() {
         </div>
       </div>
 
-      <div className="grid gap-5" style={{ gridTemplateColumns: "1fr 280px" }}>
+      <div className="grid gap-5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(min(280px, 100%), 1fr))" }}>
         {/* Map */}
         <div
           className="rounded-xl overflow-hidden relative"
@@ -243,7 +243,7 @@ export default function UserTracking() {
             style={{ background: "rgba(13,12,10,0.85)", border: "1px solid var(--color-border)" }}
           >
             {displayUsers.map((u) => (
-              <div key={u.id} className="flex items-center gap-1.5 text-xs" style={{ fontFamily: "var(--font-mono)" }}>
+              <div key={u.id} className="flex flex-wrap items-center gap-1.5 text-xs" style={{ fontFamily: "var(--font-mono)" }}>
                 <div className="w-2.5 h-2.5 rounded-full" style={{ background: getUserColor(u.id) }} />
                 <span style={{ color: "var(--color-muted)" }}>{u.name.split(" ")[0]}</span>
               </div>
@@ -258,7 +258,7 @@ export default function UserTracking() {
         >
           {selectedUser ? (
             /* User detail */
-            <div className="p-4 flex-1 overflow-y-auto">
+            <div className="p-4 min-w-0 flex-1 overflow-y-auto">
               <button
                 onClick={() => setSelectedUser(null)}
                 className="text-xs mb-4 cursor-pointer hover:opacity-70 transition-opacity"
@@ -267,7 +267,7 @@ export default function UserTracking() {
                 ← Назад
               </button>
 
-              <div className="flex items-center gap-3 mb-4">
+              <div className="flex flex-wrap items-center gap-3 mb-4">
                 <div
                   className="w-10 h-10 rounded-full flex items-center justify-center font-semibold"
                   style={{ background: getUserColor(selectedUser.id), color: "#0d0c0a" }}
@@ -282,7 +282,7 @@ export default function UserTracking() {
 
               <div className="mb-4 p-3 rounded-lg" style={{ background: "var(--color-surface)" }}>
                 <div className="text-xs mb-1" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>ТЕКУЩАЯ ЛОКАЦИЯ</div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <div className="w-2 h-2 rounded-full" style={{ background: "var(--color-teal)" }} />
                   <span className="text-sm font-medium" style={{ color: "var(--color-text)" }}>{selectedUser.location.city}</span>
                 </div>
@@ -296,7 +296,7 @@ export default function UserTracking() {
               </div>
               <div className="flex flex-col gap-0">
                 {selectedUser.locationHistory.map((h, i) => (
-                  <div key={i} className="flex gap-3 items-start pb-3 relative">
+                  <div key={i} className="flex flex-wrap gap-3 items-start pb-3 relative">
                     <div className="flex flex-col items-center">
                       <div
                         className="w-2.5 h-2.5 rounded-full shrink-0 mt-0.5"
@@ -306,7 +306,7 @@ export default function UserTracking() {
                         }}
                       />
                       {i < selectedUser.locationHistory.length - 1 && (
-                        <div className="w-px flex-1 mt-1" style={{ background: "var(--color-border)", minHeight: "20px" }} />
+                        <div className="w-px min-w-0 flex-1 mt-1" style={{ background: "var(--color-border)", minHeight: "20px" }} />
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -328,20 +328,20 @@ export default function UserTracking() {
                   Активные пользователи ({activeUsers.length})
                 </div>
               </div>
-              <div className="flex-1 overflow-y-auto">
+              <div className="min-w-0 flex-1 overflow-y-auto">
                 {activeUsers.map((u) => {
                   const color = getUserColor(u.id);
                   return (
                     <button
                       key={u.id}
                       onClick={() => setSelectedUser(u)}
-                      className="w-full flex items-center gap-3 px-4 py-3 text-left cursor-pointer transition-colors hover:opacity-80"
+                      className="w-full flex flex-wrap items-center gap-3 px-4 py-3 text-left cursor-pointer transition-colors hover:opacity-80"
                       style={{ borderBottom: "1px solid var(--color-border)" }}
                     >
                       <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: color }} />
                       <div className="flex-1 min-w-0">
                         <div className="text-sm font-medium truncate" style={{ color: "var(--color-text)" }}>{u.name}</div>
-                        <div className="text-xs flex items-center gap-1.5" style={{ color: "var(--color-muted)" }}>
+                        <div className="text-xs flex flex-wrap items-center gap-1.5" style={{ color: "var(--color-muted)" }}>
                           <span style={{ fontFamily: "var(--font-mono)" }}>📍</span>
                           <span>{u.location.city}</span>
                           <span style={{ fontFamily: "var(--font-mono)", color: "var(--color-dim)" }}>·</span>

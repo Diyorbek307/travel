@@ -74,7 +74,7 @@ function SparkLine({ data, color }: { data: number[]; color: string }) {
   }).join(" ");
   const area = `0,${h} ` + pts + ` ${w},${h}`;
   return (
-    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} style={{ overflow: "visible" }}>
+    <svg viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" style={{ width: "100%", height: h }}>
       <defs>
         <linearGradient id={`sg-${color.replace(/[^a-z0-9]/gi, "")}`} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor={color} stopOpacity="0.3" />
@@ -135,7 +135,7 @@ export default function Analytics() {
   const change = (((current - prev) / prev) * 100).toFixed(1);
 
   return (
-    <div className="p-4 sm:p-4 sm:p-7">
+    <div className="p-4 sm:p-7">
       <PageHeader
         title="Аналитика"
         subtitle="Привлечение, удержание, выручка и вовлечённость"
@@ -158,7 +158,7 @@ export default function Analytics() {
                 boxShadow: metric === key ? `0 0 0 1px ${c.color}33` : "none",
               }}
             >
-              <div className="flex items-start justify-between mb-3">
+              <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
                 <div>
                   <div className="text-xs mb-1" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>{c.label.toUpperCase()}</div>
                   <div className="text-2xl font-semibold" style={{ fontFamily: "var(--font-display)", color: metric === key ? c.color : "var(--color-text)" }}>
@@ -177,10 +177,10 @@ export default function Analytics() {
 
       {/* Main trend chart */}
       <Card className="p-5 mb-6">
-        <div className="flex items-center justify-between gap-2 mb-5">
+        <div className="flex flex-wrap items-center justify-between gap-2 mb-5">
           <div>
             <SectionTitle>{cfg.label} — динамика</SectionTitle>
-            <div className="flex items-baseline gap-2 -mt-2">
+            <div className="flex flex-wrap items-baseline gap-2 -mt-2">
               <span className="text-3xl font-semibold" style={{ fontFamily: "var(--font-display)", color: cfg.color }}>
                 {cfg.format(current)}
               </span>
@@ -189,7 +189,7 @@ export default function Analytics() {
               </span>
             </div>
           </div>
-          <div className="flex gap-1">
+          <div className="flex flex-wrap gap-1">
             {["3M", "6M", "9M", "1Y"].map(p => (
               <button key={p} onClick={() => setPeriod(p)}
                 className="px-3 py-1.5 rounded text-xs cursor-pointer transition-all"
@@ -206,7 +206,7 @@ export default function Analytics() {
 
         <div style={{ position: "relative" }}>
           <LineChart data={cfg.data} color={cfg.color} height={140} />
-          <div className="flex justify-between gap-2 mt-2 px-1">
+          <div className="flex flex-wrap justify-between gap-2 mt-2 px-1">
             {MONTHS.map(m => (
               <span key={m} className="text-xs" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)", fontSize: "10px" }}>{m}</span>
             ))}
@@ -215,14 +215,14 @@ export default function Analytics() {
       </Card>
 
       {/* Middle row */}
-      <div className="grid gap-6 mb-6" style={{ gridTemplateColumns: "1fr 1fr 1fr" }}>
+      <div className="grid gap-6 mb-6" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(min(240px, 100%), 1fr))" }}>
         {/* Conversion funnel */}
         <Card className="p-5">
           <SectionTitle>Воронка конверсии</SectionTitle>
           <div className="flex flex-col gap-2">
             {FUNNEL.map((step, i) => (
               <div key={step.label}>
-                <div className="flex justify-between gap-2 text-xs mb-1">
+                <div className="flex flex-wrap justify-between gap-2 text-xs mb-1">
                   <span style={{ color: "var(--color-muted)" }}>{step.label}</span>
                   <span style={{ color: "var(--color-text)", fontFamily: "var(--font-mono)" }}>
                     {step.val.toLocaleString()} <span style={{ color: "var(--color-muted)" }}>({step.pct}%)</span>
@@ -273,9 +273,9 @@ export default function Analytics() {
             />
             <div className="flex flex-col gap-2 w-full">
               {DEVICES.map(d => (
-                <div key={d.label} className="flex items-center gap-3">
+                <div key={d.label} className="flex items-center gap-3 flex-wrap">
                   <div className="w-2.5 h-2.5 rounded-sm shrink-0" style={{ background: d.color }} />
-                  <span className="flex-1 text-sm" style={{ color: "var(--color-muted)" }}>{d.label}</span>
+                  <span className="min-w-0 flex-1 text-sm" style={{ color: "var(--color-muted)" }}>{d.label}</span>
                   <div className="w-20 h-1.5 rounded-full overflow-hidden" style={{ background: "var(--color-dim)" }}>
                     <div className="h-full rounded-full" style={{ width: `${d.pct}%`, background: d.color }} />
                   </div>
@@ -291,10 +291,10 @@ export default function Analytics() {
           <SectionTitle>Пользователи по странам</SectionTitle>
           <div className="flex flex-col gap-2.5">
             {GEO.map(g => (
-              <div key={g.country} className="flex items-center gap-2.5">
+              <div key={g.country} className="flex flex-wrap items-center gap-2.5">
                 <span className="text-base shrink-0">{g.flag}</span>
                 <div className="flex-1 min-w-0">
-                  <div className="flex justify-between gap-2 text-xs mb-1">
+                  <div className="flex flex-wrap justify-between gap-2 text-xs mb-1">
                     <span style={{ color: "var(--color-muted)" }}>{g.country}</span>
                     <span style={{ color: "var(--color-text)", fontFamily: "var(--font-mono)" }}>{g.users.toLocaleString()}</span>
                   </div>
@@ -310,12 +310,13 @@ export default function Analytics() {
       </div>
 
       {/* Bottom row */}
-      <div className="grid gap-6" style={{ gridTemplateColumns: "1fr 1fr" }}>
+      <div className="grid gap-6" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(min(280px, 100%), 1fr))" }}>
         {/* Retention heatmap */}
         <Card className="p-5">
           <SectionTitle>Когорты удержания</SectionTitle>
           <div className="overflow-x-auto">
-            <table className="w-full text-xs">
+            <div className="overflow-x-auto">
+<table className="w-full min-w-[34rem] text-xs">
               <thead>
                 <tr>
                   <th className="text-left py-1 pr-3 font-medium" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)", fontSize: "10px" }}>Когорта</th>
@@ -356,13 +357,15 @@ export default function Analytics() {
                 ))}
               </tbody>
             </table>
+</div>
           </div>
         </Card>
 
         {/* Top pages */}
         <Card className="p-5">
           <SectionTitle>Топ страниц</SectionTitle>
-          <table className="w-full text-xs">
+          <div className="overflow-x-auto">
+<table className="w-full min-w-[34rem] text-xs">
             <thead>
               <tr style={{ borderBottom: "1px solid var(--color-border)" }}>
                 {["Страница", "Просмотры", "Отказы", "Ср. время"].map(h => (
@@ -383,6 +386,7 @@ export default function Analytics() {
               ))}
             </tbody>
           </table>
+</div>
         </Card>
       </div>
     </div>

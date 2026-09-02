@@ -1,7 +1,7 @@
 export function PageHeader({ title, subtitle, action }: { title: string; subtitle?: string; action?: React.ReactNode }) {
   return (
-    <div className="flex items-start justify-between mb-7">
-      <div>
+    <div className="mb-7 flex flex-wrap items-start justify-between gap-3">
+      <div className="min-w-0">
         <h1
           className="text-2xl font-semibold leading-tight"
           style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}
@@ -14,7 +14,7 @@ export function PageHeader({ title, subtitle, action }: { title: string; subtitl
           </p>
         )}
       </div>
-      {action && <div>{action}</div>}
+      {action && <div className="flex flex-wrap gap-2">{action}</div>}
     </div>
   );
 }
@@ -52,7 +52,7 @@ export function StatCard({
         {value}
       </div>
       {(change || sub) && (
-        <div className="text-xs mt-1.5 flex items-center gap-1.5">
+        <div className="text-xs mt-1.5 flex flex-wrap items-center gap-1.5">
           {change && (
             <span style={{ color: positive ? "var(--color-teal)" : "var(--color-rose)" }}>
               {positive ? "↑" : "↓"} {change}
@@ -130,11 +130,19 @@ export function Table({
   rows: React.ReactNode[][];
 }) {
   return (
+    /*
+     * Таблица прокручивается вбок, а не сжимается.
+     *
+     * Шесть-восемь колонок на телефоне дают по сорок пикселей на
+     * ячейку, и содержимое просто пропадало под overflow-hidden.
+     * Минимальная ширина держит колонки читаемыми, а лишнее уезжает
+     * под палец.
+     */
     <div
-      className="rounded-lg overflow-hidden"
+      className="overflow-x-auto rounded-lg"
       style={{ border: "1px solid var(--color-border)" }}
     >
-      <table className="w-full text-sm">
+      <table className="w-full min-w-[46rem] text-sm">
         <thead>
           <tr style={{ background: "var(--color-panel)", borderBottom: "1px solid var(--color-border)" }}>
             {cols.map((c) => (

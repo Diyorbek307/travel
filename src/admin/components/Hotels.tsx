@@ -62,7 +62,7 @@ export default function Hotels() {
   const avgOccupancy = Math.round((totalOccupied / totalRooms) * 100);
 
   return (
-    <div className="p-4 sm:p-4 sm:p-7">
+    <div className="p-4 sm:p-7">
       <PageHeader
         title="Отели"
         subtitle={`${filtered.length} объектов · ${avgOccupancy}% средн. заполненность`}
@@ -93,7 +93,7 @@ export default function Hotels() {
         ))}
       </div>
 
-      <div className="flex items-center justify-between gap-2 mb-6">
+      <div className="flex flex-wrap items-center justify-between gap-2 mb-6">
         <div className="flex gap-1.5 flex-wrap">
           {cities.map((c) => (
             <button
@@ -111,7 +111,7 @@ export default function Hotels() {
             </button>
           ))}
         </div>
-        <div className="flex gap-1">
+        <div className="flex flex-wrap gap-1">
           {(["cards", "table"] as const).map((v) => (
             <button
               key={v}
@@ -130,14 +130,14 @@ export default function Hotels() {
       </div>
 
       {view === "cards" ? (
-        <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))" }}>
+        <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(min(320px, 100%), 1fr))" }}>
           {filtered.map((h) => (
             <div
               key={h.id}
               className="rounded-lg overflow-hidden"
               style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }}
             >
-              <div className="flex gap-0">
+              <div className="flex flex-wrap gap-0">
                 <img
                   src={h.img}
                   alt={h.name}
@@ -145,7 +145,7 @@ export default function Hotels() {
                   style={{ background: "var(--color-dim)" }}
                 />
                 <div className="flex-1 p-3 min-w-0">
-                  <div className="flex items-start justify-between gap-2">
+                  <div className="flex flex-wrap items-start justify-between gap-2">
                     <div className="min-w-0">
                       <div className="font-medium text-sm truncate" style={{ color: "var(--color-text)" }}>
                         {h.name}
@@ -156,13 +156,13 @@ export default function Hotels() {
                     </div>
                     <Badge label={h.status} color={statusColor(h.status) as any} />
                   </div>
-                  <div className="flex gap-4 mt-2 text-xs" style={{ fontFamily: "var(--font-mono)", color: "var(--color-muted)" }}>
+                  <div className="flex flex-wrap gap-4 mt-2 text-xs" style={{ fontFamily: "var(--font-mono)", color: "var(--color-muted)" }}>
                     <span style={{ color: "var(--color-amber)" }}>★ {h.rating}</span>
                     <span>От ${h.priceFrom}/ночь</span>
                   </div>
                   {/* Occupancy bar */}
                   <div className="mt-2">
-                    <div className="flex justify-between gap-2 text-xs mb-1" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
+                    <div className="flex flex-wrap justify-between gap-2 text-xs mb-1" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
                       <span>Заполненность</span>
                       <span style={{ color: occupancy(h) > 80 ? "var(--color-teal)" : occupancy(h) > 50 ? "var(--color-amber)" : "var(--color-rose)" }}>
                         {occupancy(h)}% ({h.occupied}/{h.rooms})
@@ -193,7 +193,7 @@ export default function Hotels() {
                     {a}
                   </span>
                 ))}
-                <div className="ml-auto flex gap-2">
+                <div className="ml-auto flex flex-wrap gap-2">
                   <Btn variant="ghost" small onClick={() => openEdit(h)}>Изменить</Btn>
                   <Btn variant={h.status === "active" ? "danger" : "ghost"} small onClick={() => toggleSuspend(h.id)}>
                     {h.status === "active" ? "Откл." : "Вкл."}
@@ -211,7 +211,7 @@ export default function Hotels() {
             <span style={{ color: "var(--color-muted)" }}>{h.city}</span>,
             <span style={{ color: "var(--color-amber)" }}>{"★".repeat(h.stars)}</span>,
             <span style={{ fontFamily: "var(--font-mono)" }}>{h.rooms}</span>,
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <div className="w-20 h-1 rounded-full overflow-hidden" style={{ background: "var(--color-dim)" }}>
                 <div
                   className="h-full rounded-full"
@@ -226,7 +226,7 @@ export default function Hotels() {
             <span style={{ fontFamily: "var(--font-mono)" }}>${h.priceFrom}</span>,
             <span style={{ color: "var(--color-amber)", fontFamily: "var(--font-mono)" }}>★ {h.rating}</span>,
             <Badge label={h.status} color={statusColor(h.status) as any} />,
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <Btn variant="ghost" small onClick={() => openEdit(h)}>Изменить</Btn>
               <Btn variant={h.status === "active" ? "danger" : "ghost"} small onClick={() => toggleSuspend(h.id)}>
                 {h.status === "active" ? "Откл." : "Вкл."}
@@ -239,7 +239,7 @@ export default function Hotels() {
       {editing && (
         <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: "rgba(0,0,0,0.7)" }} onClick={() => setEditing(null)}>
           <div className="rounded-2xl w-full max-w-md p-6" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }} onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between gap-2 mb-5">
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-5">
               <h3 className="text-lg font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}>Редактировать отель</h3>
               <button onClick={() => setEditing(null)} className="opacity-50 hover:opacity-100 cursor-pointer text-xl" style={{ color: "var(--color-text)" }}>×</button>
             </div>
@@ -254,7 +254,7 @@ export default function Hotels() {
                 </div>
               ))}
             </div>
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3">
               <Btn variant="ghost" onClick={() => setEditing(null)}>Отмена</Btn>
               <Btn onClick={saveEdit}>Сохранить</Btn>
             </div>
@@ -266,7 +266,7 @@ export default function Hotels() {
       {showAdd && (
         <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: "rgba(0,0,0,0.7)" }} onClick={() => setShowAdd(false)}>
           <div className="rounded-2xl w-full max-w-md p-6" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }} onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between gap-2 mb-5">
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-5">
               <h3 className="text-lg font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}>Добавить отель</h3>
               <button onClick={() => setShowAdd(false)} className="opacity-50 hover:opacity-100 cursor-pointer text-xl" style={{ color: "var(--color-text)" }}>×</button>
             </div>
@@ -282,7 +282,7 @@ export default function Hotels() {
                 </div>
               ))}
             </div>
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3">
               <Btn variant="ghost" onClick={() => setShowAdd(false)}>Отмена</Btn>
               <Btn onClick={saveNew}>Добавить</Btn>
             </div>

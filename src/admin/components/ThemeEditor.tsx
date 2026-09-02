@@ -114,12 +114,12 @@ export default function ThemeEditor() {
   const fontDisplayLabel = (val: string) => val.split(",")[0].replace(/'/g, "").trim();
 
   return (
-    <div className="p-4 sm:p-4 sm:p-7">
+    <div className="p-4 sm:p-7">
       <PageHeader
         title="Визуальный редактор"
         subtitle="Нажмите на любое свойство для изменения — изменения применяются мгновенно"
         action={
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <Btn variant="ghost" onClick={resetTheme}>Сбросить</Btn>
             <Btn onClick={() => {
               const blob = new Blob([JSON.stringify(theme, null, 2)], { type: "application/json" });
@@ -133,7 +133,7 @@ export default function ThemeEditor() {
       />
 
       {/* Tabs */}
-      <div className="flex gap-1 mb-7">
+      <div className="flex flex-wrap gap-1 mb-7">
         {([["editor", "Редактор"], ["presets", "Пресеты"], ["history", `История (${history.length})`]] as const).map(([id, label]) => (
           <button key={id} onClick={() => setTab(id)}
             className="px-4 py-2 rounded text-sm cursor-pointer transition-all"
@@ -143,7 +143,7 @@ export default function ThemeEditor() {
       </div>
 
       {tab === "editor" && (
-        <div className="grid gap-6" style={{ gridTemplateColumns: "260px 1fr" }}>
+        <div className="grid gap-6" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(min(260px, 100%), 1fr))" }}>
           {/* Left: property panel */}
           <div className="flex flex-col gap-4">
             {/* Group tabs */}
@@ -170,7 +170,7 @@ export default function ThemeEditor() {
                 {currentGroup.props.map(prop => (
                   <div
                     key={prop.key}
-                    className="flex items-center gap-2 rounded p-2 cursor-pointer transition-all"
+                    className="flex flex-wrap items-center gap-2 rounded p-2 cursor-pointer transition-all"
                     style={{
                       background: selected === prop.key ? "var(--color-surface)" : "transparent",
                       border: `1px solid ${selected === prop.key ? "var(--color-amber)" : "transparent"}`,
@@ -210,7 +210,7 @@ export default function ThemeEditor() {
                 <Card className="p-5">
                   <SectionTitle>Изменить: {prop.label}</SectionTitle>
                   {prop.type === "color" && (
-                    <div className="flex items-start gap-4">
+                    <div className="flex flex-wrap items-start gap-4">
                       <input
                         type="color"
                         value={theme[selected]}
@@ -218,7 +218,7 @@ export default function ThemeEditor() {
                         className="w-16 h-16 rounded cursor-pointer border-none outline-none"
                         style={{ background: "transparent", border: "none" }}
                       />
-                      <div className="flex-1">
+                      <div className="min-w-0 flex-1">
                         <input
                           type="text"
                           value={theme[selected]}
@@ -258,7 +258,7 @@ export default function ThemeEditor() {
                       ))}
                     </div>
                   )}
-                  <div className="mt-3 flex gap-2">
+                  <div className="mt-3 flex flex-wrap gap-2">
                     <Btn variant="ghost" small onClick={() => setVar(selected, (DEFAULTS as ThemeVars)[selected])}>
                       Сбросить
                     </Btn>
@@ -301,7 +301,7 @@ export default function ThemeEditor() {
                     <p className="text-sm leading-relaxed" style={{ color: "var(--color-muted)", fontFamily: "var(--font-body)" }}>
                       The Registan was the ancient heart of the Silk Road city of Samarkand, now in Uzbekistan.
                     </p>
-                    <div className="flex gap-2 mt-3">
+                    <div className="flex flex-wrap gap-2 mt-3">
                       <span className="text-xs px-2 py-0.5 rounded" style={{ background: "rgba(212,135,42,0.15)", color: "var(--color-amber)", fontFamily: "var(--font-mono)" }}>active</span>
                       <span className="text-xs px-2 py-0.5 rounded" style={{ background: "rgba(42,141,122,0.15)", color: "var(--color-teal)", fontFamily: "var(--font-mono)" }}>featured</span>
                     </div>
@@ -355,7 +355,7 @@ export default function ThemeEditor() {
       )}
 
       {tab === "presets" && (
-        <div className="grid gap-5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))" }}>
+        <div className="grid gap-5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(min(280px, 100%), 1fr))" }}>
           {PRESETS.map(preset => (
             <div key={preset.name}
               className="rounded-xl overflow-hidden cursor-pointer transition-all hover:translate-y-[-2px]"
@@ -374,9 +374,9 @@ export default function ThemeEditor() {
                 {/* Mock content */}
                 <div className="absolute left-20 top-3 right-3">
                   <div className="h-3 w-24 rounded mb-2" style={{ background: preset.theme.colorText ?? "#f0ebe0", opacity: 0.9 }} />
-                  <div className="flex gap-2 mb-2">
+                  <div className="flex flex-wrap gap-2 mb-2">
                     {[preset.theme.colorAmber, preset.theme.colorTeal, preset.theme.colorRose].map((c, i) => (
-                      <div key={i} className="h-10 flex-1 rounded" style={{ background: preset.theme.colorPanel ?? "#1c1a15", border: `1px solid ${preset.theme.colorBorder ?? "#2a261e"}` }}>
+                      <div key={i} className="h-10 min-w-0 flex-1 rounded" style={{ background: preset.theme.colorPanel ?? "#1c1a15", border: `1px solid ${preset.theme.colorBorder ?? "#2a261e"}` }}>
                         <div className="h-1 mt-3 mx-2 rounded" style={{ background: c ?? "#d4872a", opacity: 0.8 }} />
                       </div>
                     ))}
@@ -386,7 +386,7 @@ export default function ThemeEditor() {
 
               <div className="p-4" style={{ background: "var(--color-panel)" }}>
                 <div className="font-medium text-sm mb-1" style={{ color: "var(--color-text)", fontFamily: "var(--font-display)" }}>{preset.name}</div>
-                <div className="flex gap-1.5 mb-3">
+                <div className="flex flex-wrap gap-1.5 mb-3">
                   {[preset.theme.colorAmber, preset.theme.colorTeal, preset.theme.colorRose, preset.theme.colorPanel, preset.theme.colorBg].map((c, i) => (
                     <div key={i} className="w-4 h-4 rounded-sm" style={{ background: c ?? "#000" }} />
                   ))}
@@ -409,7 +409,7 @@ export default function ThemeEditor() {
                 const prop = GROUPS.flatMap(g => g.props).find(p => p.key === h.key);
                 const isColor = prop?.type === "color";
                 return (
-                  <div key={i} className="flex items-center gap-3 py-2.5 text-sm" style={{ borderBottom: "1px solid var(--color-border)" }}>
+                  <div key={i} className="flex flex-wrap items-center gap-3 py-2.5 text-sm" style={{ borderBottom: "1px solid var(--color-border)" }}>
                     <div
                       className="text-xs rounded px-2 py-0.5 shrink-0"
                       style={{ background: "var(--color-surface)", color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
@@ -421,13 +421,13 @@ export default function ThemeEditor() {
                       <span className="mx-2" style={{ color: "var(--color-muted)" }}>изменено</span>
                     </div>
                     {isColor ? (
-                      <div className="flex items-center gap-1.5 shrink-0">
+                      <div className="flex flex-wrap items-center gap-1.5 shrink-0">
                         <div className="w-4 h-4 rounded-sm border" style={{ background: h.from, border: "1px solid var(--color-border)" }} />
                         <span style={{ color: "var(--color-dim)" }}>→</span>
                         <div className="w-4 h-4 rounded-sm border" style={{ background: h.to, border: "1px solid var(--color-border)" }} />
                       </div>
                     ) : (
-                      <div className="text-xs flex gap-1.5 items-center shrink-0" style={{ fontFamily: "var(--font-mono)", color: "var(--color-muted)" }}>
+                      <div className="text-xs flex flex-wrap gap-1.5 items-center shrink-0" style={{ fontFamily: "var(--font-mono)", color: "var(--color-muted)" }}>
                         <span>{h.from}</span>
                         <span style={{ color: "var(--color-dim)" }}>→</span>
                         <span style={{ color: "var(--color-amber)" }}>{h.to}</span>

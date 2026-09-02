@@ -95,7 +95,7 @@ export default function Header({ active, onNavigate, sidebarCollapsed, onToggleS
   return (
     <>
       <header
-        className="flex items-center gap-3 px-4 shrink-0"
+        className="flex flex-wrap items-center gap-3 px-4 shrink-0"
         style={{
           height: "var(--header-height, 52px)",
           background: "var(--color-surface)",
@@ -125,7 +125,7 @@ export default function Header({ active, onNavigate, sidebarCollapsed, onToggleS
         </button>
 
         {/* Breadcrumb */}
-        <div className="flex items-center gap-1.5 text-sm min-w-0">
+        <div className="flex flex-wrap items-center gap-1.5 text-sm min-w-0">
           <span className="hidden md:inline" style={{ color: "var(--color-dim)" }}>Узбекистан Админ</span>
           <span style={{ color: "var(--color-dim)" }}>›</span>
           <span className="font-medium truncate" style={{ color: "var(--color-text)" }}>
@@ -133,12 +133,12 @@ export default function Header({ active, onNavigate, sidebarCollapsed, onToggleS
           </span>
         </div>
 
-        <div className="flex-1" />
+        <div className="min-w-0 flex-1" />
 
         {/* Search trigger */}
         <button
           onClick={() => { setShowSearch(true); setTimeout(() => searchRef.current?.focus(), 50); }}
-          className="flex items-center gap-2 px-3 py-1.5 rounded text-sm cursor-pointer hover:opacity-80 transition-opacity"
+          className="flex flex-wrap items-center gap-2 px-3 py-1.5 rounded text-sm cursor-pointer hover:opacity-80 transition-opacity"
           style={{
             background: "var(--color-panel)",
             border: "1px solid var(--color-border)",
@@ -148,7 +148,7 @@ export default function Header({ active, onNavigate, sidebarCollapsed, onToggleS
           }}
         >
           <span style={{ fontSize: "12px" }}>⌕</span>
-          <span className="flex-1 text-left text-xs">Поиск…</span>
+          <span className="min-w-0 flex-1 text-left text-xs">Поиск…</span>
           <kbd className="text-xs px-1.5 py-0.5 rounded" style={{ background: "var(--color-dim)", color: "var(--color-muted)", fontFamily: "var(--font-mono)", fontSize: "9px" }}>
             ⌘K
           </kbd>
@@ -184,7 +184,7 @@ export default function Header({ active, onNavigate, sidebarCollapsed, onToggleS
                 flexDirection: "column",
               }}
             >
-              <div className="flex items-center justify-between gap-2 px-4 py-3" style={{ borderBottom: "1px solid var(--color-border)" }}>
+              <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3" style={{ borderBottom: "1px solid var(--color-border)" }}>
                 <div className="font-medium text-sm" style={{ color: "var(--color-text)", fontFamily: "var(--font-display)" }}>
                   Уведомления
                   {unreadCount > 0 && (
@@ -198,11 +198,11 @@ export default function Header({ active, onNavigate, sidebarCollapsed, onToggleS
                 </button>
               </div>
 
-              <div className="overflow-y-auto flex-1">
+              <div className="overflow-y-auto min-w-0 flex-1">
                 {notifs.map(n => (
                   <div
                     key={n.id}
-                    className="flex gap-3 px-4 py-3 cursor-pointer transition-colors"
+                    className="flex flex-wrap gap-3 px-4 py-3 cursor-pointer transition-colors"
                     style={{
                       borderBottom: "1px solid var(--color-border)",
                       background: n.read ? "transparent" : "rgba(212,135,42,0.04)",
@@ -221,7 +221,7 @@ export default function Header({ active, onNavigate, sidebarCollapsed, onToggleS
                       {ICON[n.type]}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-2">
+                      <div className="flex flex-wrap items-start justify-between gap-2">
                         <div className="text-sm font-medium leading-tight" style={{ color: n.read ? "var(--color-muted)" : "var(--color-text)" }}>
                           {n.title}
                         </div>
@@ -240,7 +240,7 @@ export default function Header({ active, onNavigate, sidebarCollapsed, onToggleS
         {/* Profile avatar */}
         <button
           onClick={() => onNavigate("settings")}
-          className="flex items-center gap-2 rounded-full cursor-pointer hover:opacity-80 transition-opacity"
+          className="flex flex-wrap items-center gap-2 rounded-full cursor-pointer hover:opacity-80 transition-opacity"
         >
           <div
             className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold"
@@ -263,7 +263,7 @@ export default function Header({ active, onNavigate, sidebarCollapsed, onToggleS
             style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }}
             onClick={e => e.stopPropagation()}
           >
-            <div className="flex items-center gap-3 px-4 py-3" style={{ borderBottom: "1px solid var(--color-border)" }}>
+            <div className="flex flex-wrap items-center gap-3 px-4 py-3" style={{ borderBottom: "1px solid var(--color-border)" }}>
               <span style={{ color: "var(--color-muted)", fontSize: "16px" }}>⌕</span>
               <input
                 ref={searchRef}
@@ -271,7 +271,7 @@ export default function Header({ active, onNavigate, sidebarCollapsed, onToggleS
                 placeholder="Поиск страниц, пользователей, туров…"
                 value={query}
                 onChange={e => setQuery(e.target.value)}
-                className="flex-1 outline-none bg-transparent text-sm"
+                className="min-w-0 flex-1 outline-none bg-transparent text-sm"
                 style={{ color: "var(--color-text)", fontFamily: "var(--font-body)" }}
               />
               <kbd className="text-xs px-2 py-1 rounded" style={{ background: "var(--color-dim)", color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>ESC</kbd>
@@ -286,7 +286,7 @@ export default function Header({ active, onNavigate, sidebarCollapsed, onToggleS
                     <button
                       key={item.id}
                       onClick={() => { onNavigate(item.id); setShowSearch(false); setQuery(""); }}
-                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-left cursor-pointer transition-colors hover:opacity-80"
+                      className="w-full flex flex-wrap items-center gap-3 px-4 py-2.5 text-sm text-left cursor-pointer transition-colors hover:opacity-80"
                       style={{
                         background: active === item.id ? "rgba(212,135,42,0.1)" : "transparent",
                         color: active === item.id ? "var(--color-amber)" : "var(--color-text)",
