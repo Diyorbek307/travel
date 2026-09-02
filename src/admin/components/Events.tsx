@@ -1,44 +1,22 @@
 import { useState } from "react";
 import { PageHeader, Badge, Btn } from "./shared";
+import { useEntity } from "../context/useEntity";
+import type { ManagedEvent as Event } from "@/lib/types";
 
-type Event = {
-  id: number;
-  title: string;
-  city: string;
-  category: "Festival" | "Concert" | "Exhibition" | "Sport" | "Cultural" | "Food";
-  date: string;
-  endDate: string;
-  venue: string;
-  capacity: number;
-  ticketsSold: number;
-  price: number;
-  status: "upcoming" | "ongoing" | "past" | "cancelled";
-  featured: boolean;
-  description: string;
-  img: string;
-};
 
-const EVENTS: Event[] = [
-  { id: 1, title: "Navruz Festival 2027", city: "Tashkent", category: "Festival", date: "Mar 21, 2027", endDate: "Mar 23, 2027", venue: "Mustakillik Square", capacity: 50000, ticketsSold: 31200, price: 0, status: "upcoming", featured: true, description: "Uzbekistan's biggest spring festival celebrating Persian New Year with music, dance, traditional crafts and food.", img: "https://images.unsplash.com/photo-1664602078796-68ee76b3fc59?w=400&h=220&fit=crop&auto=format" },
-  { id: 2, title: "Silk & Spice International Food Fair", city: "Samarkand", category: "Food", date: "Sep 15, 2026", endDate: "Sep 17, 2026", venue: "Registan Square", capacity: 8000, ticketsSold: 5400, price: 15, status: "upcoming", featured: true, description: "Three-day culinary festival showcasing Uzbek cuisine and dishes from 40+ countries along the historical Silk Road.", img: "https://images.unsplash.com/photo-1662468752704-f256cf5c6784?w=400&h=220&fit=crop&auto=format" },
-  { id: 3, title: "Sharq Taronalari Music Festival", city: "Samarkand", category: "Concert", date: "Aug 21, 2026", endDate: "Aug 25, 2026", venue: "Registan Square", capacity: 10000, ticketsSold: 10000, price: 25, status: "past", featured: false, description: "Biennial international music festival featuring artists from over 50 countries performing traditional and classical music.", img: "https://images.unsplash.com/photo-1677156811762-842312963ecd?w=400&h=220&fit=crop&auto=format" },
-  { id: 4, title: "Bukhara Handicraft Fair", city: "Bukhara", category: "Exhibition", date: "Oct 10, 2026", endDate: "Oct 14, 2026", venue: "Ark Citadel", capacity: 3000, ticketsSold: 800, price: 10, status: "upcoming", featured: false, description: "Annual exhibition of traditional Uzbek crafts — carpets, ceramics, woodwork and silk embroidery.", img: "https://images.unsplash.com/photo-1557841621-d9f6673405ed?w=400&h=220&fit=crop&auto=format" },
-  { id: 5, title: "Tashkent International Film Festival", city: "Tashkent", category: "Cultural", date: "Oct 25, 2026", endDate: "Nov 1, 2026", venue: "Ishtirok Cinema", capacity: 1500, ticketsSold: 420, price: 20, status: "upcoming", featured: false, description: "Central Asia's premier film festival screening over 100 films from 60 countries.", img: "https://images.unsplash.com/photo-1653023102302-247f5f0fbdd1?w=400&h=220&fit=crop&auto=format" },
-  { id: 6, title: "Fergana Valley Marathon", city: "Fergana", category: "Sport", date: "Nov 5, 2026", endDate: "Nov 5, 2026", venue: "City Center", capacity: 2000, ticketsSold: 1240, price: 30, status: "upcoming", featured: false, description: "Annual marathon through the scenic Fergana Valley. Routes: 5km, 10km, half-marathon, full marathon.", img: "https://images.unsplash.com/photo-1728565721798-cf65c7bf1efe?w=400&h=220&fit=crop&auto=format" },
-];
 
 export default function Events() {
-  const [events, setEvents] = useState<Event[]>(EVENTS);
+  const [events, setEvents] = useEntity("events");
   const [filter, setFilter] = useState("all");
   const [cityFilter, setCityFilter] = useState("all");
   const [showForm, setShowForm] = useState(false);
-  const [newEvent, setNewEvent] = useState({ title: "", city: "", category: "Festival", date: "", venue: "", price: "", capacity: "" });
+  const [newEvent, setNewEvent] = useState({ name: "", city: "", category: "Festival", date: "", venue: "", price: "", capacity: "" });
 
   const cities = ["all", ...Array.from(new Set(events.map(e => e.city)))];
   let filtered = filter === "all" ? events : events.filter(e => e.status === filter);
   if (cityFilter !== "all") filtered = filtered.filter(e => e.city === cityFilter);
 
-  const toggleFeatured = (id: number) => {
+  const toggleFeatured = (id: string) => {
     setEvents(prev => prev.map(e => e.id === id ? { ...e, featured: !e.featured } : e));
   };
 
@@ -56,14 +34,15 @@ export default function Events() {
 
   const addEvent = () => {
     setEvents(prev => [{
-      id: Date.now(), title: newEvent.title || "New Event", city: newEvent.city || "Tashkent",
+      id: `new-${Date.now()}`, emoji: "🎫", color: "#2E7D5A",
+      name: newEvent.name || "New Event", city: newEvent.city || "Tashkent",
       category: newEvent.category as Event["category"], date: newEvent.date || "TBD", endDate: newEvent.date || "TBD",
       venue: newEvent.venue || "TBD", capacity: Number(newEvent.capacity) || 500, ticketsSold: 0,
       price: Number(newEvent.price) || 0, status: "upcoming", featured: false,
-      description: "New event description.", img: "https://images.unsplash.com/photo-1664602078796-68ee76b3fc59?w=400&h=220&fit=crop&auto=format",
+      desc: "New event description.", img: "https://images.unsplash.com/photo-1664602078796-68ee76b3fc59?w=400&h=220&fit=crop&auto=format",
     }, ...prev]);
     setShowForm(false);
-    setNewEvent({ title: "", city: "", category: "Festival", date: "", venue: "", price: "", capacity: "" });
+    setNewEvent({ name: "", city: "", category: "Festival", date: "", venue: "", price: "", capacity: "" });
   };
 
   return (
@@ -98,7 +77,7 @@ export default function Events() {
               style={{ background: "var(--color-panel)", border: `1px solid ${e.featured ? "rgba(212,135,42,0.5)" : "var(--color-border)"}` }}
             >
               <div className="relative h-40 overflow-hidden" style={{ background: "var(--color-dim)" }}>
-                <img src={e.img} alt={e.title} className="w-full h-full object-cover" />
+                <img src={e.img} alt={e.name} className="w-full h-full object-cover" />
                 <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(13,12,10,0.85) 0%, transparent 50%)" }} />
                 <div className="absolute top-3 left-3 flex gap-1.5">
                   <span className="text-xs px-2 py-0.5 rounded font-medium" style={{ background: catColors[e.category] + "22", color: catColors[e.category], border: `1px solid ${catColors[e.category]}44`, fontFamily: "var(--font-mono)" }}>
@@ -110,7 +89,7 @@ export default function Events() {
                   <Badge label={e.status} color={statusColor(e.status) as any} />
                 </div>
                 <div className="absolute bottom-3 left-3">
-                  <div className="font-semibold text-sm text-white" style={{ fontFamily: "var(--font-display)" }}>{e.title}</div>
+                  <div className="font-semibold text-sm text-white" style={{ fontFamily: "var(--font-display)" }}>{e.name}</div>
                   <div className="text-xs text-white opacity-70 mt-0.5">{e.date}{e.endDate !== e.date ? ` → ${e.endDate}` : ""}</div>
                 </div>
               </div>
@@ -120,7 +99,7 @@ export default function Events() {
                   <span>📍 {e.venue}, {e.city}</span>
                   <span>{e.price === 0 ? "Бесплатно" : `$${e.price}/билет`}</span>
                 </div>
-                <p className="text-xs leading-relaxed line-clamp-2 mb-3" style={{ color: "var(--color-muted)" }}>{e.description}</p>
+                <p className="text-xs leading-relaxed line-clamp-2 mb-3" style={{ color: "var(--color-muted)" }}>{e.desc}</p>
 
                 {/* Ticket progress */}
                 <div className="mb-3">

@@ -1,31 +1,12 @@
 import { useState } from "react";
 import { PageHeader, Badge, Btn } from "./shared";
+import { useEntity } from "../context/useEntity";
+import type { ManagedCity as City } from "@/lib/types";
 
-type City = {
-  id: number;
-  name: string;
-  region: string;
-  population: number;
-  tourists: number;
-  highlights: string[];
-  description: string;
-  status: "active" | "draft";
-  featured: boolean;
-  coverImg: string;
-};
 
-const CITIES: City[] = [
-  { id: 1, name: "Tashkent", region: "Tashkent", population: 2800000, tourists: 42000, highlights: ["Chorsu Bazaar", "Hazrat Imam", "Tashkent Metro", "Independence Square"], description: "The capital and largest city of Uzbekistan, blending Soviet architecture with ancient Islamic monuments. A vibrant metropolis and gateway to the Silk Road.", status: "active", featured: true, coverImg: "https://images.unsplash.com/photo-1653023102302-247f5f0fbdd1?w=600&h=300&fit=crop&auto=format" },
-  { id: 2, name: "Samarkand", region: "Samarkand", population: 550000, tourists: 38000, highlights: ["Registan Square", "Shah-i-Zinda", "Bibi-Khanym Mosque", "Gur-e-Amir"], description: "One of the world's oldest continuously inhabited cities. The crown jewel of the Silk Road with incomparable Timurid architecture.", status: "active", featured: true, coverImg: "https://images.unsplash.com/photo-1664602078796-68ee76b3fc59?w=600&h=300&fit=crop&auto=format" },
-  { id: 3, name: "Bukhara", region: "Bukhara", population: 280000, tourists: 29000, highlights: ["Ark Citadel", "Kalon Minaret", "Lyab-i Hauz", "Chor Minor"], description: "A living museum with over 140 architectural monuments. Bukhara's old city has been continuously inhabited for 2,500 years.", status: "active", featured: true, coverImg: "https://images.unsplash.com/photo-1662468752704-f256cf5c6784?w=600&h=300&fit=crop&auto=format" },
-  { id: 4, name: "Khiva", region: "Khorezm", population: 92000, tourists: 18000, highlights: ["Itchan Kala", "Kalta Minor", "Islam Khoja Minaret", "Pakhlavan Mahmoud"], description: "A UNESCO World Heritage walled inner city — arguably the best-preserved ancient city in Central Asia.", status: "active", featured: false, coverImg: "https://images.unsplash.com/photo-1557841621-d9f6673405ed?w=600&h=300&fit=crop&auto=format" },
-  { id: 5, name: "Fergana", region: "Fergana", population: 320000, tourists: 12000, highlights: ["Kuva Museum", "Yodgorlik Silk Factory", "Regional Museum", "Central Park"], description: "Heart of the fertile Fergana Valley, renowned for silk production, handcraft traditions and dried fruits.", status: "active", featured: false, coverImg: "https://images.unsplash.com/photo-1677156811762-842312963ecd?w=600&h=300&fit=crop&auto=format" },
-  { id: 6, name: "Nukus", region: "Karakalpakstan", population: 320000, tourists: 4200, highlights: ["Savitsky Museum", "Mizdakhan Necropolis", "Berdakh Museum"], description: "Home to the world-famous Savitsky Collection — an extraordinary collection of Soviet avant-garde art rescued from censorship.", status: "active", featured: false, coverImg: "https://images.unsplash.com/photo-1728565721798-cf65c7bf1efe?w=600&h=300&fit=crop&auto=format" },
-  { id: 7, name: "Termez", region: "Surxondaryo", population: 140000, tourists: 2100, highlights: ["Kara-Tepe Buddhist Complex", "Fayaz Tepe", "Sultan Saodat Ensemble"], description: "Southernmost city on the Afghan border with remarkable Buddhist ruins dating to the 1st-2nd century CE.", status: "draft", featured: false, coverImg: "https://images.unsplash.com/photo-1662468716982-d9007fe74b1b?w=600&h=300&fit=crop&auto=format" },
-];
 
 export default function Cities() {
-  const [cities, setCities] = useState<City[]>(CITIES);
+  const [cities, setCities] = useEntity("cities");
   const [selected, setSelected] = useState<City | null>(null);
   const [filter, setFilter] = useState("all");
   const [showAdd, setShowAdd] = useState(false);
@@ -33,7 +14,7 @@ export default function Cities() {
 
   const filtered = filter === "all" ? cities : filter === "featured" ? cities.filter(c => c.featured) : cities.filter(c => c.status === filter);
 
-  const toggleFeatured = (id: number) => {
+  const toggleFeatured = (id: string) => {
     setCities(prev => prev.map(c => c.id === id ? { ...c, featured: !c.featured } : c));
   };
 
@@ -62,7 +43,7 @@ export default function Cities() {
             onClick={() => setSelected(city)}
           >
             <div className="relative h-44 overflow-hidden" style={{ background: "var(--color-dim)" }}>
-              <img src={city.coverImg} alt={city.name} className="w-full h-full object-cover" />
+              <img src={city.img} alt={city.name} className="w-full h-full object-cover" />
               <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(13,12,10,0.9) 0%, transparent 60%)" }} />
               <div className="absolute top-3 right-3 flex gap-1.5">
                 {city.featured && <span className="text-xs px-2 py-0.5 rounded font-medium" style={{ background: "var(--color-amber)", color: "#0d0c0a", fontFamily: "var(--font-mono)" }}>★ На главной</span>}
@@ -128,11 +109,12 @@ export default function Cities() {
               <Btn onClick={() => {
                 if (!newCity.name) return;
                 setCities(prev => [...prev, {
-                  id: prev.length + 1, name: newCity.name, region: newCity.region || "—",
+                  id: `new-${Date.now()}`, name: newCity.name, region: newCity.region || "—",
                   population: Number(newCity.population) || 0, tourists: Number(newCity.tourists) || 0,
                   highlights: [], description: newCity.description || "",
                   status: "draft" as const, featured: false,
-                  coverImg: "https://images.unsplash.com/photo-1728565721798-cf65c7bf1efe?w=600&h=300&fit=crop&auto=format",
+                  sub: newCity.region || "Узбекистан", rating: 0,
+                  img: "https://images.unsplash.com/photo-1728565721798-cf65c7bf1efe?w=600&h=300&fit=crop&auto=format",
                 }]);
                 setShowAdd(false);
                 setNewCity({ name: "", region: "", population: "", tourists: "", description: "" });
@@ -146,7 +128,7 @@ export default function Cities() {
         <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: "rgba(0,0,0,0.7)" }} onClick={() => setSelected(null)}>
           <div className="rounded-xl w-full max-w-lg overflow-hidden" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }} onClick={e => e.stopPropagation()}>
             <div className="relative h-44" style={{ background: "var(--color-dim)" }}>
-              <img src={selected.coverImg} alt={selected.name} className="w-full h-full object-cover" />
+              <img src={selected.img} alt={selected.name} className="w-full h-full object-cover" />
               <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(13,12,10,0.85) 0%, transparent 60%)" }} />
               <div className="absolute bottom-4 left-5">
                 <h2 className="text-2xl font-semibold text-white" style={{ fontFamily: "var(--font-display)" }}>{selected.name}</h2>

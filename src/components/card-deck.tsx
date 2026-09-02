@@ -3,9 +3,11 @@
 import { useRef, useState } from "react";
 import type { DeckItem, Place } from "@/lib/types";
 import { BORDER, GOLD, GREEN, TEXT, WHITE } from "@/lib/theme";
-import { POPULAR_CITIES, WEATHER } from "@/data/content";
+import { WEATHER } from "@/data/content";
+import { useAppContent } from "./content-provider";
 
 export function CardDeckBase({ items, title, onSelect }:{ items:DeckItem[]; title:string; onSelect:(i:number)=>void }) {
+  const { POPULAR_CITIES } = useAppContent();
   const [cur, setCur] = useState(0);
   const drag = useRef(0);
   const n = items.length;
@@ -98,6 +100,7 @@ export function CardDeckBase({ items, title, onSelect }:{ items:DeckItem[]; titl
 }
 
 export function CardDeck({ places, onPlace }:{ places:Place[]; onPlace:(p:Place)=>void }) {
+  const { POPULAR_CITIES } = useAppContent();
   const items: DeckItem[] = places.map(p=>({
     img:      p.img,
     title:    p.name,
@@ -113,6 +116,7 @@ export function CardDeck({ places, onPlace }:{ places:Place[]; onPlace:(p:Place)
 }
 
 export function CityDeck({ onSearch }:{ onSearch:()=>void }) {
+  const { POPULAR_CITIES } = useAppContent();
   const CITY_ITEMS: DeckItem[] = POPULAR_CITIES.map(c=>({
     img:      c.img,
     title:    c.name,

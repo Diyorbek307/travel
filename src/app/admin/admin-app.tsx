@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import AdminShell from "@/admin/shell";
 import { NotifProvider } from "@/admin/context/NotifContext";
 import { ThemeProvider } from "@/admin/context/ThemeContext";
+import { ContentProvider } from "@/admin/context/ContentContext";
 
 /**
  * Панель целиком клиентская.
@@ -22,9 +23,11 @@ export default function AdminApp() {
   return (
     <ThemeProvider>
       <NotifProvider>
-        <div className="admin-root">
-          <AdminShell />
-        </div>
+        <ContentProvider>
+          <div className="admin-root">
+            <AdminShell />
+          </div>
+        </ContentProvider>
       </NotifProvider>
     </ThemeProvider>
   );

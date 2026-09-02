@@ -1,40 +1,17 @@
 import { useState } from "react";
 import { PageHeader, Badge, Btn, Table, Card, SectionTitle } from "./shared";
+import { useEntity } from "../context/useEntity";
+import type { ManagedRoute as Tour } from "@/lib/types";
 
-type Tour = {
-  id: number;
-  name: string;
-  duration: string;
-  price: number;
-  difficulty: "Easy" | "Moderate" | "Challenging";
-  category: string;
-  bookings: number;
-  maxGroup: number;
-  status: "active" | "draft" | "paused";
-  nextDep: string;
-  guide: string;
-  rating: number;
-};
 
-const TOURS: Tour[] = [
-  { id: 1, name: "Silk Road Classic", duration: "10 days", price: 1890, difficulty: "Easy", category: "Cultural", bookings: 124, maxGroup: 16, status: "active", nextDep: "Sep 8, 2026", guide: "Bobur Tashkentov", rating: 4.9 },
-  { id: 2, name: "Registan Sunrise Experience", duration: "3 days", price: 450, difficulty: "Easy", category: "Cultural", bookings: 89, maxGroup: 12, status: "active", nextDep: "Sep 3, 2026", guide: "Malika Yusupova", rating: 4.8 },
-  { id: 3, name: "Fergana Artisan Trail", duration: "5 days", price: 780, difficulty: "Easy", category: "Craft", bookings: 67, maxGroup: 10, status: "active", nextDep: "Sep 10, 2026", guide: "Jasur Karimov", rating: 4.7 },
-  { id: 4, name: "Nurata Trek & Yurt Stay", duration: "4 days", price: 620, difficulty: "Moderate", category: "Adventure", bookings: 45, maxGroup: 8, status: "active", nextDep: "Sep 12, 2026", guide: "Sherzod Nazarov", rating: 4.8 },
-  { id: 5, name: "Khiva UNESCO Night Tour", duration: "2 days", price: 320, difficulty: "Easy", category: "Cultural", bookings: 112, maxGroup: 20, status: "active", nextDep: "Sep 4, 2026", guide: "Dilnoza Ergasheva", rating: 4.6 },
-  { id: 6, name: "Aral Sea Expedition", duration: "6 days", price: 1240, difficulty: "Challenging", category: "Expedition", bookings: 23, maxGroup: 6, status: "active", nextDep: "Oct 1, 2026", guide: "Amir Akhmedov", rating: 4.9 },
-  { id: 7, name: "Tashkent Modern & Ancient", duration: "2 days", price: 290, difficulty: "Easy", category: "Urban", bookings: 78, maxGroup: 15, status: "active", nextDep: "Sep 5, 2026", guide: "Nodira Abdullayeva", rating: 4.5 },
-  { id: 8, name: "Bukhara Jewish Heritage", duration: "3 days", price: 540, difficulty: "Easy", category: "Cultural", bookings: 34, maxGroup: 10, status: "paused", nextDep: "TBD", guide: "Rafael Nektalov", rating: 4.7 },
-  { id: 9, name: "Wine Route Samarkand", duration: "2 days", price: 380, difficulty: "Easy", category: "Food & Wine", bookings: 29, maxGroup: 12, status: "draft", nextDep: "TBD", guide: "Unassigned", rating: 0 },
-];
 
 export default function Tours() {
-  const [tours, setTours] = useState<Tour[]>(TOURS);
+  const [tours, setTours] = useEntity("routes");
   const [filter, setFilter] = useState("all");
   const [catFilter, setCatFilter] = useState("all");
   const [editing, setEditing] = useState<Tour | null>(null);
   const [showAdd, setShowAdd] = useState(false);
-  const [newTour, setNewTour] = useState({ name: "", duration: "", price: "", category: "Cultural", guide: "", maxGroup: "" });
+  const [newTour, setNewTour] = useState({ title: "", duration: "", price: "", category: "Cultural", guide: "", maxGroup: "" });
 
   const categories = ["all", ...Array.from(new Set(tours.map((t) => t.category)))];
   const statusFilter = filter === "all" ? tours : tours.filter((t) => t.status === filter);
@@ -46,7 +23,7 @@ export default function Tours() {
   const statusColor = (s: string) =>
     s === "active" ? "teal" : s === "draft" ? "dim" : "rose";
 
-  const toggleStatus = (id: number) => {
+  const toggleStatus = (id: string) => {
     setTours((prev) =>
       prev.map((t) =>
         t.id === id
@@ -114,7 +91,7 @@ export default function Tours() {
         cols={["НАЗВАНИЕ", "ДЛИТЕЛЬНОСТЬ", "ЦЕНА", "СЛОЖНОСТЬ", "ОТПРАВЛЕНИЕ", "ГИД", "БРОНИ", "СТАТУС", ""]}
         rows={filtered.map((t) => [
           <div>
-            <div className="font-medium text-sm" style={{ color: "var(--color-text)" }}>{t.name}</div>
+            <div className="font-medium text-sm" style={{ color: "var(--color-text)" }}>{t.title}</div>
             <div className="text-xs mt-0.5" style={{ color: "var(--color-muted)" }}>{t.category}</div>
           </div>,
           <span style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)", fontSize: "12px" }}>{t.duration}</span>,
@@ -169,15 +146,17 @@ export default function Tours() {
             <div className="flex gap-3">
               <Btn variant="ghost" onClick={() => setShowAdd(false)}>Отмена</Btn>
               <Btn onClick={() => {
-                if (!newTour.name) return;
+                if (!newTour.title) return;
                 setTours(prev => [...prev, {
-                  id: prev.length + 1, name: newTour.name, duration: newTour.duration || "1 day",
+                  id: `new-${Date.now()}`, title: newTour.title, duration: newTour.duration || "1 day",
                   price: Number(newTour.price) || 100, difficulty: "Easy" as const, category: newTour.category,
                   bookings: 0, maxGroup: Number(newTour.maxGroup) || 12, status: "draft" as const,
                   nextDep: "TBD", guide: newTour.guide || "Не назначен", rating: 0,
+                  sub: newTour.category, icon: "🗺️", color: "#2E7D5A",
+                  badge: newTour.category, stops: [],
                 }]);
                 setShowAdd(false);
-                setNewTour({ name: "", duration: "", price: "", category: "Cultural", guide: "", maxGroup: "" });
+                setNewTour({ title: "", duration: "", price: "", category: "Cultural", guide: "", maxGroup: "" });
               }}>Создать</Btn>
             </div>
           </div>
@@ -202,7 +181,7 @@ export default function Tours() {
                   className="text-lg font-semibold"
                   style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}
                 >
-                  {editing.name}
+                  {editing.title}
                 </h3>
                 <div className="text-xs mt-0.5" style={{ color: "var(--color-muted)" }}>
                   Тур ID #{editing.id}

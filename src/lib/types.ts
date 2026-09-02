@@ -84,3 +84,135 @@ export interface ChatMessage {
   text: string;
   time: string;
 }
+
+/* ------------------------------------------------------------------ */
+/* Общие записи                                                       */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Витрина и управление — одна запись.
+ *
+ * У приложения и админки разный интерес к одному отелю: турист смотрит
+ * фотографии, описание и удобства, администратор — номерной фонд,
+ * занятость и статус. Держать это двумя списками значит однажды
+ * разойтись, поэтому поля лежат вместе, а каждая сторона берёт своё.
+ */
+
+export type EntityStatus = "active" | "draft" | "suspended";
+
+export interface ManagedHotel extends Hotel {
+  stars: number;
+  rooms: number;
+  occupied: number;
+  /** Цена числом — для сортировок и отчётов; витрине идёт `price`. */
+  priceFrom: number;
+  status: EntityStatus | "maintenance";
+}
+
+export interface ManagedRestaurant extends Restaurant {
+  priceRange: "$" | "$$" | "$$$";
+  seats: number;
+  status: EntityStatus | "pending";
+  /** Платное размещение поднимает заведение в списках приложения. */
+  promoted: boolean;
+  monthlyViews: number;
+  phone: string;
+  address: string;
+}
+
+export interface ManagedPlace extends Place {
+  region: string;
+  visits: number;
+  /** Сколько маршрутов ведут сюда. */
+  tours: number;
+  status: EntityStatus | "seasonal";
+}
+
+export interface ManagedRoute extends Route {
+  price: number;
+  difficulty: string;
+  category: string;
+  bookings: number;
+  maxGroup: number;
+  guide: string;
+  /** Ближайший выход группы. */
+  nextDep: string;
+  rating: number;
+  status: EntityStatus | "paused";
+}
+
+export interface ManagedCity {
+  id: string;
+  name: string;
+  sub: string;
+  region: string;
+  img: string;
+  rating: number;
+  population: number;
+  tourists: number;
+  highlights: string[];
+  description: string;
+  featured: boolean;
+  status: EntityStatus;
+}
+
+export interface ManagedEvent {
+  id: string;
+  name: string;
+  city: string;
+  date: string;
+  endDate: string;
+  venue: string;
+  category: string;
+  capacity: number;
+  ticketsSold: number;
+  emoji: string;
+  color: string;
+  desc: string;
+  img: string;
+  price: number;
+  featured: boolean;
+  status: EntityStatus | "upcoming" | "cancelled" | "past";
+}
+
+/**
+ * Рекламное объявление.
+ *
+ * Креатив (что видит турист) и кампания (бюджет, показы, ставка) — одна
+ * запись: иначе остановленная в панели кампания продолжала бы крутить
+ * баннер в приложении.
+ */
+export interface ManagedAd {
+  id: string;
+  advertiser: string;
+  type: "banner" | "spotlight" | "top_listing" | "push";
+  target: string;
+  budget: number;
+  spent: number;
+  clicks: number;
+  impressions: number;
+  status: "active" | "paused" | "ended" | "pending";
+  startDate: string;
+  endDate: string;
+  bid: number;
+  /* Креатив для приложения. */
+  emoji: string;
+  label: string;
+  title: string;
+  sub: string;
+  cta: string;
+  color: string;
+}
+
+/** Всё содержимое платформы одним объектом — его отдаёт и принимает API. */
+export interface Content {
+  cities: ManagedCity[];
+  places: ManagedPlace[];
+  hotels: ManagedHotel[];
+  restaurants: ManagedRestaurant[];
+  routes: ManagedRoute[];
+  events: ManagedEvent[];
+  ads: ManagedAd[];
+}
+
+export type ContentKey = keyof Content;

@@ -18,7 +18,10 @@ export async function login(_prev: LoginResult | null, formData: FormData): Prom
   (await cookies()).set(ADMIN_COOKIE, makeToken(), {
     httpOnly: true,
     sameSite: "lax",
-    path: "/admin",
+    // Область действия — весь сайт, а не /admin: панель сохраняет
+    // содержимое через /api/content, и с узкой областью браузер просто
+    // не приложил бы куку к этому запросу.
+    path: "/",
     maxAge: 12 * 60 * 60,
     secure: process.env.NODE_ENV === "production",
   });
@@ -28,6 +31,6 @@ export async function login(_prev: LoginResult | null, formData: FormData): Prom
 }
 
 export async function logout(): Promise<void> {
-  (await cookies()).delete(ADMIN_COOKIE);
+  (await cookies()).delete({ name: ADMIN_COOKIE, path: "/" });
   revalidatePath("/admin");
 }

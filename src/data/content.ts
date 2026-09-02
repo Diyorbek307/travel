@@ -181,3 +181,12 @@ export const PRACTICAL = [
 ];
 
 // ── Atoms ─────────────────────────────────────────────────────────────────────
+
+/** Рекламные креативы: то, что видит турист в баннере. */
+export const ADS = [
+  { id:"a1", emoji:"🏨", label:"РЕКЛАМА", title:"Registan Plaza Hotel",     sub:"Скидка 20% при бронировании через UzUp",  cta:"Забронировать", color:"#1B6B8A" },
+  { id:"a2", emoji:"🍽️", label:"РЕКЛАМА", title:"Плов-центр Ташкента",      sub:"Лучший плов с 1978 года. Откройте для себя!", cta:"Смотреть меню", color:"#C1603A" },
+  { id:"a3", emoji:"✈️", label:"РЕКЛАМА", title:"Uzbekistan Airways",        sub:"Прямые рейсы из Самарканда. От $149",         cta:"Купить билет",  color:"#1A5C3A" },
+  { id:"a4", emoji:"🛍️", label:"РЕКЛАМА", title:"Silk & Spice Bazaar",       sub:"Аутентичные сувениры прямо от мастеров",      cta:"Перейти",       color:"#7B4F9E" },
+  { id:"a5", emoji:"🚌", label:"РЕКЛАМА", title:"Samarkand Tour Transfers",  sub:"Трансфер аэропорт–город от $8",               cta:"Заказать",      color:"#2E7D5A" },
+];

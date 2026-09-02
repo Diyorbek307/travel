@@ -3,13 +3,15 @@
 import { useState } from "react";
 import type { Hotel, Place, Restaurant } from "@/lib/types";
 import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE } from "@/lib/theme";
-import { FILTER_TABS, HOTELS, PLACES, RESTAURANTS, WEATHER } from "@/data/content";
+import { FILTER_TABS, WEATHER } from "@/data/content";
+import { useAppContent } from "@/components/content-provider";
 import { Badge, StarRow } from "../ui";
 import { AnimatedBg } from "@/components/animated-bg";
 import { AdBanner } from "@/components/widgets";
 
 
 export function ExploreScreen({ onPlace, onHotel, onRestaurant, isPremium }:{ onPlace:(p:Place)=>void; onHotel:(h:Hotel)=>void; onRestaurant:(r:Restaurant)=>void; isPremium:boolean }) {
+  const { HOTELS, PLACES, RESTAURANTS } = useAppContent();
   const [filter, setFilter] = useState("Всё");
   const showHotels = filter==="Отели";
   const showRests  = filter==="Рестораны";

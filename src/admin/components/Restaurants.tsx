@@ -1,52 +1,28 @@
 import { useState } from "react";
 import { PageHeader, Badge, Btn, Table } from "./shared";
+import { useEntity } from "../context/useEntity";
+import type { ManagedRestaurant as Restaurant } from "@/lib/types";
 
-type Restaurant = {
-  id: number;
-  name: string;
-  city: string;
-  cuisine: string;
-  rating: number;
-  priceRange: "$" | "$$" | "$$$";
-  seats: number;
-  status: "active" | "pending" | "suspended";
-  promoted: boolean;
-  phone: string;
-  address: string;
-  openHours: string;
-  monthlyViews: number;
-  img: string;
-  description: string;
-};
 
-const RESTAURANTS: Restaurant[] = [
-  { id: 1, name: "Плов Центр Тошкент", city: "Tashkent", cuisine: "Uzbek", rating: 4.9, priceRange: "$$", seats: 200, status: "active", promoted: true, phone: "+998 71 123 4567", address: "7 Navoi St, Tashkent", openHours: "11:00–22:00", monthlyViews: 12400, img: "https://images.unsplash.com/photo-1664602078796-68ee76b3fc59?w=80&h=60&fit=crop&auto=format", description: "Legendary plov center, cooking since 1943. Traditional Uzbek cuisine at its finest." },
-  { id: 2, name: "Samarkand Coffee House", city: "Samarkand", cuisine: "Café", rating: 4.7, priceRange: "$", seats: 40, status: "active", promoted: true, phone: "+998 66 234 5678", address: "12 Registan Sq, Samarkand", openHours: "08:00–20:00", monthlyViews: 8200, img: "https://images.unsplash.com/photo-1662468752704-f256cf5c6784?w=80&h=60&fit=crop&auto=format", description: "Artisan coffee and Uzbek pastries with a view of Registan square." },
-  { id: 3, name: "Bukhara Pilaf Club", city: "Bukhara", cuisine: "Uzbek", rating: 4.8, priceRange: "$$", seats: 80, status: "active", promoted: true, phone: "+998 65 345 6789", address: "3 Ark St, Bukhara", openHours: "12:00–23:00", monthlyViews: 6100, img: "https://images.unsplash.com/photo-1557841621-d9f6673405ed?w=80&h=60&fit=crop&auto=format", description: "Authentic Bukhara-style pilaf cooked in an open courtyard with live music." },
-  { id: 4, name: "Khiva Bazaar Kitchen", city: "Khiva", cuisine: "Street Food", rating: 4.5, priceRange: "$", seats: 30, status: "active", promoted: false, phone: "+998 62 456 7890", address: "Itchan Kala Market", openHours: "09:00–21:00", monthlyViews: 3400, img: "https://images.unsplash.com/photo-1557841621-d9f6673405ed?w=80&h=60&fit=crop&auto=format", description: "Street food stalls inside the ancient walled city serving somsa and lagman." },
-  { id: 5, name: "Fergana Valley Grill", city: "Fergana", cuisine: "Grill", rating: 4.6, priceRange: "$$", seats: 60, status: "active", promoted: true, phone: "+998 73 567 8901", address: "45 Istiqlol Ave, Fergana", openHours: "13:00–23:00", monthlyViews: 4800, img: "https://images.unsplash.com/photo-1653023102302-247f5f0fbdd1?w=80&h=60&fit=crop&auto=format", description: "Best grilled shashlik in the Fergana Valley. Family-run since 1989." },
-  { id: 6, name: "Tashkent Night Market", city: "Tashkent", cuisine: "Mixed", rating: 4.4, priceRange: "$", seats: 150, status: "active", promoted: false, phone: "+998 71 678 9012", address: "Chorsu Bazaar, Tashkent", openHours: "18:00–02:00", monthlyViews: 7600, img: "https://images.unsplash.com/photo-1664602078796-68ee76b3fc59?w=80&h=60&fit=crop&auto=format", description: "Evening food market near Chorsu with dozens of stalls and live entertainment." },
-  { id: 7, name: "Registan Fine Dining", city: "Samarkand", cuisine: "International", rating: 4.3, priceRange: "$$$", seats: 50, status: "pending", promoted: false, phone: "+998 66 789 0123", address: "1 Registan View, Samarkand", openHours: "19:00–23:00", monthlyViews: 0, img: "https://images.unsplash.com/photo-1662468752704-f256cf5c6784?w=80&h=60&fit=crop&auto=format", description: "New fine dining concept with a view of Registan. Currently awaiting approval." },
-];
 
 export default function Restaurants() {
-  const [items, setItems] = useState<Restaurant[]>(RESTAURANTS);
+  const [items, setItems] = useEntity("restaurants");
   const [filter, setFilter] = useState("all");
   const [cityFilter, setCityFilter] = useState("all");
   const [selected, setSelected] = useState<Restaurant | null>(null);
   const [view, setView] = useState<"cards" | "table">("cards");
   const [showAdd, setShowAdd] = useState(false);
-  const [newRest, setNewRest] = useState({ name: "", city: "", cuisine: "", seats: "", phone: "", address: "", openHours: "", description: "" });
+  const [newRest, setNewRest] = useState({ name: "", city: "", cuisine: "", seats: "", phone: "", address: "", open: "", desc: "" });
 
   const cities = ["all", ...Array.from(new Set(items.map(r => r.city)))];
   let filtered = filter === "all" ? items : items.filter(r => r.status === filter);
   if (cityFilter !== "all") filtered = filtered.filter(r => r.city === cityFilter);
 
-  const togglePromote = (id: number) => {
+  const togglePromote = (id: string) => {
     setItems(prev => prev.map(r => r.id === id ? { ...r, promoted: !r.promoted } : r));
   };
 
-  const approveRestaurant = (id: number) => {
+  const approveRestaurant = (id: string) => {
     setItems(prev => prev.map(r => r.id === id ? { ...r, status: "active" } : r));
     setSelected(null);
   };
@@ -127,7 +103,7 @@ export default function Restaurants() {
                   <div className="flex gap-3 mt-2 text-xs" style={{ fontFamily: "var(--font-mono)", color: "var(--color-muted)" }}>
                     <span style={{ color: "var(--color-amber)" }}>★ {r.rating}</span>
                     <span>{r.seats} мест</span>
-                    <span>{r.openHours}</span>
+                    <span>{r.open}</span>
                   </div>
                   <div className="text-xs mt-1.5" style={{ color: "var(--color-muted)" }}>{r.monthlyViews.toLocaleString()} просмотров/мес</div>
                 </div>
@@ -184,7 +160,7 @@ export default function Restaurants() {
               ))}
               <div className="col-span-2">
                 <label className="text-xs block mb-1" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>ОПИСАНИЕ</label>
-                <textarea rows={2} value={newRest.description} onChange={e => setNewRest(p => ({ ...p, description: e.target.value }))}
+                <textarea rows={2} value={newRest.desc} onChange={e => setNewRest(p => ({ ...p, desc: e.target.value }))}
                   className="w-full rounded px-3 py-2 text-sm outline-none resize-none"
                   style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", color: "var(--color-text)", fontFamily: "var(--font-body)" }}
                 />
@@ -195,16 +171,17 @@ export default function Restaurants() {
               <Btn onClick={() => {
                 if (!newRest.name) return;
                 setItems(prev => [...prev, {
-                  id: prev.length + 1, name: newRest.name, city: newRest.city || "Tashkent",
+                  id: `new-${Date.now()}`, name: newRest.name, city: newRest.city || "Tashkent",
                   cuisine: newRest.cuisine || "Uzbek", rating: 0, priceRange: "$$" as const,
                   seats: Number(newRest.seats) || 0, status: "pending" as const, promoted: false,
                   phone: newRest.phone || "", address: newRest.address || "",
-                  openHours: newRest.openHours || "", monthlyViews: 0,
+                  open: newRest.open || "", monthlyViews: 0,
                   img: "https://images.unsplash.com/photo-1664602078796-68ee76b3fc59?w=80&h=60&fit=crop&auto=format",
-                  description: newRest.description || "",
+                  desc: newRest.desc || "", reviews: 0,
+                  price: "$$",
                 }]);
                 setShowAdd(false);
-                setNewRest({ name: "", city: "", cuisine: "", seats: "", phone: "", address: "", openHours: "", description: "" });
+                setNewRest({ name: "", city: "", cuisine: "", seats: "", phone: "", address: "", open: "", desc: "" });
               }}>Добавить</Btn>
             </div>
           </div>
@@ -218,14 +195,14 @@ export default function Restaurants() {
               <h3 className="text-lg font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}>{selected.name}</h3>
               <button className="text-xl opacity-50 hover:opacity-100 cursor-pointer" style={{ color: "var(--color-text)" }} onClick={() => setSelected(null)}>×</button>
             </div>
-            <p className="text-sm leading-relaxed mb-4" style={{ color: "var(--color-muted)" }}>{selected.description}</p>
+            <p className="text-sm leading-relaxed mb-4" style={{ color: "var(--color-muted)" }}>{selected.desc}</p>
             <div className="grid grid-cols-2 gap-3 mb-4">
               {[
                 { label: "Город", val: selected.city },
                 { label: "Кухня", val: selected.cuisine },
                 { label: "Рейтинг", val: `★ ${selected.rating}` },
                 { label: "Мест", val: String(selected.seats) },
-                { label: "Часы работы", val: selected.openHours },
+                { label: "Часы работы", val: selected.open },
                 { label: "Телефон", val: selected.phone },
               ].map(s => (
                 <div key={s.label} className="rounded p-2" style={{ background: "var(--color-surface)" }}>

@@ -3,12 +3,14 @@
 import { useState } from "react";
 import type { Route } from "@/lib/types";
 import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE } from "@/lib/theme";
-import { ROUTES, WEATHER } from "@/data/content";
+import { WEATHER } from "@/data/content";
+import { useAppContent } from "@/components/content-provider";
 import { Badge } from "../ui";
 import { UzbekistanMap3D } from "@/components/map-3d";
 
 
 export function MapScreen({ onRoute }:{ onRoute:(r:Route)=>void }) {
+  const { ROUTES } = useAppContent();
   const [mode, setMode] = useState<"map"|"routes"|"ai">("map");
   const [city, setCity]   = useState("Самарканд");
   const [hours, setHours] = useState("6 ч");

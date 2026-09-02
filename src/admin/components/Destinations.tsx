@@ -1,32 +1,13 @@
 import { useState } from "react";
 import { PageHeader, Badge, Btn, Table, Card } from "./shared";
+import { useEntity } from "../context/useEntity";
+import type { ManagedPlace as Dest } from "@/lib/types";
 
-type Dest = {
-  id: number;
-  name: string;
-  region: string;
-  rating: number;
-  visits: number;
-  tours: number;
-  status: "active" | "seasonal" | "draft";
-  img: string;
-  desc: string;
-};
 
-const INITIAL: Dest[] = [
-  { id: 1, name: "Samarkand", region: "Samarkand", rating: 4.9, visits: 4820, tours: 12, status: "active", img: "https://images.unsplash.com/photo-1664602078796-68ee76b3fc59?w=400&h=240&fit=crop&auto=format", desc: "Ancient Silk Road city home to the Registan ensemble and Shah-i-Zinda necropolis." },
-  { id: 2, name: "Bukhara", region: "Bukhara", rating: 4.8, visits: 3640, tours: 9, status: "active", img: "https://images.unsplash.com/photo-1662468752704-f256cf5c6784?w=400&h=240&fit=crop&auto=format", desc: "Medieval trading hub with over 140 architectural monuments spanning millennia." },
-  { id: 3, name: "Khiva", region: "Khorezm", rating: 4.7, visits: 2910, tours: 7, status: "active", img: "https://images.unsplash.com/photo-1557841621-d9f6673405ed?w=400&h=240&fit=crop&auto=format", desc: "Walled Itchan Kala — a UNESCO World Heritage open-air museum city." },
-  { id: 4, name: "Tashkent", region: "Tashkent", rating: 4.5, visits: 2100, tours: 6, status: "active", img: "https://images.unsplash.com/photo-1653023102302-247f5f0fbdd1?w=400&h=240&fit=crop&auto=format", desc: "Vibrant capital blending Soviet modernism, ancient mosques and bazaars." },
-  { id: 5, name: "Fergana Valley", region: "Fergana", rating: 4.6, visits: 1840, tours: 5, status: "active", img: "https://images.unsplash.com/photo-1677156811762-842312963ecd?w=400&h=240&fit=crop&auto=format", desc: "Fertile valley renowned for silk weaving, pomegranates and traditional crafts." },
-  { id: 6, name: "Nurata Mountains", region: "Navoi", rating: 4.4, visits: 890, tours: 3, status: "seasonal", img: "https://images.unsplash.com/photo-1728565721798-cf65c7bf1efe?w=400&h=240&fit=crop&auto=format", desc: "Remote highland villages offering yurt stays and trekking above 2,000m." },
-  { id: 7, name: "Aral Sea Ruins", region: "Karakalpakstan", rating: 4.2, visits: 420, tours: 2, status: "seasonal", img: "https://images.unsplash.com/photo-1662468716982-d9007fe74b1b?w=400&h=240&fit=crop&auto=format", desc: "Post-apocalyptic landscape of stranded ships — one of Earth's most haunting sites." },
-  { id: 8, name: "Termez", region: "Surxondaryo", rating: 4.1, visits: 310, tours: 2, status: "draft", img: "https://images.unsplash.com/photo-1664602078796-68ee76b3fc59?w=400&h=240&fit=crop&auto=format", desc: "Southernmost city on the Amu Darya — Buddhist ruins and Greco-Bactrian artifacts." },
-];
 
 export default function Destinations() {
   const [view, setView] = useState<"grid" | "table">("grid");
-  const [dests, setDests] = useState<Dest[]>(INITIAL);
+  const [dests, setDests] = useEntity("places");
   const [filter, setFilter] = useState("all");
   const [selected, setSelected] = useState<Dest | null>(null);
 
@@ -35,7 +16,7 @@ export default function Destinations() {
   const statusColor = (s: string) =>
     s === "active" ? "teal" : s === "seasonal" ? "amber" : "dim";
 
-  const toggleStatus = (id: number) => {
+  const toggleStatus = (id: string) => {
     setDests((prev) =>
       prev.map((d) =>
         d.id === id
@@ -50,7 +31,7 @@ export default function Destinations() {
       <PageHeader
         title="Направления"
         subtitle={`${filtered.length} направлений`}
-        action={<Btn onClick={() => setSelected({ id: 0, name: "", region: "", rating: 0, visits: 0, tours: 0, status: "draft", img: "", desc: "" })}>+ Добавить</Btn>}
+        action={<Btn onClick={() => setSelected({ id: "", name: "", city: "", type: "", region: "", rating: 0, reviews: 0, distance: "", entry: "", hours: "", visits: 0, tours: 0, status: "draft", img: "", desc: "", audio: false, qr: false })}>+ Добавить</Btn>}
       />
 
       {/* Filters + view toggle */}

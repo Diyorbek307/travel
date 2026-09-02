@@ -3,12 +3,14 @@
 import { useEffect, useRef, useState } from "react";
 import type { Place } from "@/lib/types";
 import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE } from "@/lib/theme";
-import { NOTIFS, PLACES, POPULAR_CITIES, SEARCH_POPULAR } from "@/data/content";
+import { NOTIFS, SEARCH_POPULAR } from "@/data/content";
+import { useAppContent } from "./content-provider";
 import { GeomPattern, LogoMark, StarRow } from "./ui";
 import { AnimatedBg } from "@/components/animated-bg";
 
 
 export function NotifsPanel({ onClose }:{ onClose:()=>void }) {
+  const { PLACES, POPULAR_CITIES } = useAppContent();
   const [notifs, setNotifs] = useState(NOTIFS);
   const unread = notifs.filter(n=>n.unread).length;
   return (
@@ -39,6 +41,7 @@ export function NotifsPanel({ onClose }:{ onClose:()=>void }) {
 }
 
 export function SearchModal({ onClose, onPlace }:{ onClose:()=>void; onPlace:(p:Place)=>void }) {
+  const { PLACES, POPULAR_CITIES } = useAppContent();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Place[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -95,6 +98,7 @@ export function SearchModal({ onClose, onPlace }:{ onClose:()=>void; onPlace:(p:
 // ── Mini Audio Player ──────────────────────────────────────────────────────────
 
 export function LoginModal({ onClose, onLogin }:{ onClose:()=>void; onLogin:()=>void }) {
+  const { PLACES, POPULAR_CITIES } = useAppContent();
   const PROVIDERS = [
     { e:"🌐", label:"Продолжить с Google",    color:"#4285F4" },
     { e:"🍎", label:"Продолжить с Apple",     color:TEXT      },
@@ -142,6 +146,7 @@ export function LoginModal({ onClose, onLogin }:{ onClose:()=>void; onLogin:()=>
 // ── Currency Converter ─────────────────────────────────────────────────────────
 
 export function PremiumModal({ onClose, onActivate }:{ onClose:()=>void; onActivate:()=>void }) {
+  const { PLACES, POPULAR_CITIES } = useAppContent();
   const [plan, setPlan] = useState<"month"|"year">("year");
   const PERKS=[
     {e:"🚫",t:"Без рекламы",s:"Никаких баннеров и объявлений"},

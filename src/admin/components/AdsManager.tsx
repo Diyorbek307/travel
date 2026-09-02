@@ -1,24 +1,11 @@
 import { useState } from "react";
 import { PageHeader, Badge, Btn, Card, SectionTitle } from "./shared";
+import { useEntity } from "../context/useEntity";
+import type { ManagedAd as Ad } from "@/lib/types";
 
-type Ad = {
-  id: number;
-  advertiser: string;
-  type: "banner" | "spotlight" | "top_listing" | "push";
-  target: string;
-  budget: number;
-  spent: number;
-  clicks: number;
-  impressions: number;
-  status: "active" | "paused" | "ended" | "pending";
-  startDate: string;
-  endDate: string;
-  bid: number;
-  position: number;
-};
 
 type Promotion = {
-  id: number;
+  id: string;
   business: string;
   category: "restaurant" | "hotel" | "tour" | "attraction";
   currentRank: number;
@@ -29,22 +16,14 @@ type Promotion = {
   city: string;
 };
 
-const ADS: Ad[] = [
-  { id: 1, advertiser: "Ориент Лукс Хотел", type: "banner", target: "Hotels page", budget: 500, spent: 287, clicks: 1240, impressions: 18400, status: "active", startDate: "Sep 1", endDate: "Sep 30", bid: 0.45, position: 1 },
-  { id: 2, advertiser: "Samarkand Tours LLC", type: "spotlight", target: "Dashboard hero", budget: 800, spent: 120, clicks: 890, impressions: 12000, status: "active", startDate: "Sep 1", endDate: "Sep 15", bid: 1.20, position: 1 },
-  { id: 3, advertiser: "Silk Road Carpets", type: "top_listing", target: "Shopping section", budget: 300, spent: 300, clicks: 2100, impressions: 31000, status: "ended", startDate: "Aug 1", endDate: "Aug 31", bid: 0.30, position: 2 },
-  { id: 4, advertiser: "Uzbekistan Airways", type: "banner", target: "Transport page", budget: 2000, spent: 450, clicks: 3400, impressions: 52000, status: "active", startDate: "Sep 1", endDate: "Oct 31", bid: 0.60, position: 1 },
-  { id: 5, advertiser: "Plov Centre Tashkent", type: "push", target: "All users in Tashkent", budget: 150, spent: 34, clicks: 520, impressions: 4800, status: "active", startDate: "Sep 2", endDate: "Sep 7", bid: 0.25, position: 3 },
-  { id: 6, advertiser: "Fergana Silk Factory", type: "top_listing", target: "Fergana destination", budget: 400, spent: 0, clicks: 0, impressions: 0, status: "pending", startDate: "Sep 5", endDate: "Oct 5", bid: 0.80, position: 0 },
-];
 
 const PROMOTIONS: Promotion[] = [
-  { id: 1, business: "Плов Центр Тошкент", category: "restaurant", currentRank: 1, boostedRank: 1, monthlyFee: 250, active: true, since: "Jan 2026", city: "Tashkent" },
-  { id: 2, business: "Samarkand Coffe House", category: "restaurant", currentRank: 8, boostedRank: 2, monthlyFee: 180, active: true, since: "Mar 2026", city: "Samarkand" },
-  { id: 3, business: "Bukhara Pilaf Club", category: "restaurant", currentRank: 15, boostedRank: 3, monthlyFee: 120, active: true, since: "Jun 2026", city: "Bukhara" },
-  { id: 4, business: "Khiva Bazaar Kitchen", category: "restaurant", currentRank: 22, boostedRank: 4, monthlyFee: 90, active: false, since: "Aug 2026", city: "Khiva" },
-  { id: 5, business: "Fergana Valley Grill", category: "restaurant", currentRank: 31, boostedRank: 5, monthlyFee: 75, active: true, since: "Jul 2026", city: "Fergana" },
-  { id: 6, business: "Tashkent Night Market", category: "attraction", currentRank: 12, boostedRank: 2, monthlyFee: 200, active: true, since: "Apr 2026", city: "Tashkent" },
+  { id: "1", business: "Плов Центр Тошкент", category: "restaurant", currentRank: 1, boostedRank: 1, monthlyFee: 250, active: true, since: "Jan 2026", city: "Tashkent" },
+  { id: "2", business: "Samarkand Coffe House", category: "restaurant", currentRank: 8, boostedRank: 2, monthlyFee: 180, active: true, since: "Mar 2026", city: "Samarkand" },
+  { id: "3", business: "Bukhara Pilaf Club", category: "restaurant", currentRank: 15, boostedRank: 3, monthlyFee: 120, active: true, since: "Jun 2026", city: "Bukhara" },
+  { id: "4", business: "Khiva Bazaar Kitchen", category: "restaurant", currentRank: 22, boostedRank: 4, monthlyFee: 90, active: false, since: "Aug 2026", city: "Khiva" },
+  { id: "5", business: "Fergana Valley Grill", category: "restaurant", currentRank: 31, boostedRank: 5, monthlyFee: 75, active: true, since: "Jul 2026", city: "Fergana" },
+  { id: "6", business: "Tashkent Night Market", category: "attraction", currentRank: 12, boostedRank: 2, monthlyFee: 200, active: true, since: "Apr 2026", city: "Tashkent" },
 ];
 
 const AD_TYPE_LABELS: Record<string, string> = {
@@ -55,7 +34,7 @@ const AD_TYPE_LABELS: Record<string, string> = {
 };
 
 export default function AdsManager() {
-  const [ads, setAds] = useState<Ad[]>(ADS);
+  const [ads, setAds] = useEntity("ads");
   const [promos, setPromos] = useState<Promotion[]>(PROMOTIONS);
   const [tab, setTab] = useState<"ads" | "promotions" | "new">("ads");
   const [newAd, setNewAd] = useState({
@@ -68,17 +47,17 @@ export default function AdsManager() {
   const activeAds = ads.filter(a => a.status === "active").length;
   const totalAdSpend = ads.reduce((s, a) => s + a.spent, 0);
 
-  const togglePromo = (id: number) => {
+  const togglePromo = (id: string) => {
     setPromos(prev => prev.map(p => p.id === id ? { ...p, active: !p.active } : p));
   };
 
-  const toggleAd = (id: number) => {
+  const toggleAd = (id: string) => {
     setAds(prev => prev.map(a => a.id === id ? { ...a, status: a.status === "active" ? "paused" : "active" } : a));
   };
 
   const submitAd = () => {
     const ad: Ad = {
-      id: Date.now(),
+      id: `new-${Date.now()}`,
       advertiser: newAd.advertiser || "New Advertiser",
       type: newAd.type as Ad["type"],
       target: newAd.target || "All pages",
@@ -90,7 +69,14 @@ export default function AdsManager() {
       startDate: newAd.startDate || "Sep 5",
       endDate: newAd.endDate || "Oct 5",
       bid: Number(newAd.bid) || 0.5,
-      position: 0,
+      // Креатив: то, что увидит турист. Без него объявление есть в
+      // отчётах, но в приложении показать нечего.
+      emoji: "📣",
+      label: "РЕКЛАМА",
+      title: newAd.advertiser || "Новый рекламодатель",
+      sub: newAd.target || "",
+      cta: "Подробнее",
+      color: "#1B6B8A",
     };
     setAds(prev => [ad, ...prev]);
     setTab("ads");
@@ -386,7 +372,7 @@ export default function AdsManager() {
                 if (!newPromo.business) return;
                 const maxRank = Math.max(...promos.map(p => p.boostedRank), 0);
                 setPromos(prev => [...prev, {
-                  id: prev.length + 1, business: newPromo.business,
+                  id: `new-${Date.now()}`, business: newPromo.business,
                   category: newPromo.category as Promotion["category"],
                   currentRank: 99, boostedRank: maxRank + 1,
                   monthlyFee: Number(newPromo.monthlyFee) || 100,

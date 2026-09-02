@@ -1,35 +1,15 @@
 import { useState } from "react";
 import { PageHeader, Badge, Btn, Table } from "./shared";
+import { useEntity } from "../context/useEntity";
+import type { ManagedHotel as Hotel } from "@/lib/types";
 
-type Hotel = {
-  id: number;
-  name: string;
-  city: string;
-  stars: number;
-  rooms: number;
-  occupied: number;
-  priceFrom: number;
-  rating: number;
-  status: "active" | "maintenance" | "suspended";
-  amenities: string[];
-  img: string;
-};
 
-const HOTELS: Hotel[] = [
-  { id: 1, name: "Malika Classic Hotel", city: "Samarkand", stars: 4, rooms: 72, occupied: 66, priceFrom: 89, rating: 4.7, status: "active", amenities: ["Pool", "Restaurant", "WiFi", "Spa"], img: "https://images.unsplash.com/photo-1664602078796-68ee76b3fc59?w=80&h=60&fit=crop&auto=format" },
-  { id: 2, name: "Ark Palace Boutique", city: "Bukhara", stars: 5, rooms: 28, occupied: 26, priceFrom: 180, rating: 4.9, status: "active", amenities: ["Courtyard", "Restaurant", "WiFi", "Bar"], img: "https://images.unsplash.com/photo-1662468752704-f256cf5c6784?w=80&h=60&fit=crop&auto=format" },
-  { id: 3, name: "Orient Star Khiva", city: "Khiva", stars: 4, rooms: 50, occupied: 38, priceFrom: 110, rating: 4.6, status: "active", amenities: ["Restaurant", "WiFi", "Tours"], img: "https://images.unsplash.com/photo-1557841621-d9f6673405ed?w=80&h=60&fit=crop&auto=format" },
-  { id: 4, name: "Wyndham Tashkent", city: "Tashkent", stars: 5, rooms: 243, occupied: 195, priceFrom: 150, rating: 4.5, status: "active", amenities: ["Pool", "Gym", "Restaurant", "Business", "Bar"], img: "https://images.unsplash.com/photo-1653023102302-247f5f0fbdd1?w=80&h=60&fit=crop&auto=format" },
-  { id: 5, name: "Fergana Grand", city: "Fergana", stars: 3, rooms: 45, occupied: 22, priceFrom: 55, rating: 4.2, status: "active", amenities: ["Restaurant", "WiFi"], img: "https://images.unsplash.com/photo-1677156811762-842312963ecd?w=80&h=60&fit=crop&auto=format" },
-  { id: 6, name: "Samarkand Palace", city: "Samarkand", stars: 5, rooms: 112, occupied: 98, priceFrom: 220, rating: 4.8, status: "active", amenities: ["Pool", "Spa", "Restaurant", "WiFi", "Bar", "Gym"], img: "https://images.unsplash.com/photo-1728565721798-cf65c7bf1efe?w=80&h=60&fit=crop&auto=format" },
-  { id: 7, name: "Sitorai Mohi Khosa", city: "Bukhara", stars: 3, rooms: 32, occupied: 12, priceFrom: 45, rating: 4.0, status: "maintenance", amenities: ["WiFi", "Garden"], img: "https://images.unsplash.com/photo-1662468716982-d9007fe74b1b?w=80&h=60&fit=crop&auto=format" },
-];
 
 type HotelForm = { name: string; city: string; stars: string; rooms: string; priceFrom: string };
 const EMPTY_FORM: HotelForm = { name: "", city: "", stars: "3", rooms: "", priceFrom: "" };
 
 export default function Hotels() {
-  const [hotels, setHotels] = useState<Hotel[]>(HOTELS);
+  const [hotels, setHotels] = useEntity("hotels");
   const [filter, setFilter] = useState("all");
   const [view, setView] = useState<"cards" | "table">("cards");
   const [editing, setEditing] = useState<Hotel | null>(null);
@@ -54,10 +34,11 @@ export default function Hotels() {
   const saveNew = () => {
     if (!form.name) return;
     const newHotel: Hotel = {
-      id: hotels.length + 1, name: form.name, city: form.city || "Tashkent",
+      id: `new-${Date.now()}`, name: form.name, city: form.city || "Tashkent",
       stars: Number(form.stars) || 3, rooms: Number(form.rooms) || 20,
       occupied: 0, priceFrom: Number(form.priceFrom) || 80,
-      rating: 0, status: "active", amenities: ["WiFi"],
+      rating: 0, reviews: 0, status: "active", facilities: ["WiFi"],
+      price: `$${Number(form.priceFrom) || 80}`, tag: "Новый", desc: "", imgs: [],
       img: "https://images.unsplash.com/photo-1664602078796-68ee76b3fc59?w=80&h=60&fit=crop&auto=format",
     };
     setHotels(prev => [...prev, newHotel]);
@@ -65,7 +46,7 @@ export default function Hotels() {
     setForm(EMPTY_FORM);
   };
 
-  const toggleSuspend = (id: number) => setHotels(prev => prev.map(h =>
+  const toggleSuspend = (id: string) => setHotels(prev => prev.map(h =>
     h.id === id ? { ...h, status: h.status === "active" ? "suspended" as const : "active" as const } : h
   ));
 
@@ -203,7 +184,7 @@ export default function Hotels() {
                 className="px-3 py-2.5 flex items-center gap-2 flex-wrap"
                 style={{ borderTop: "1px solid var(--color-border)" }}
               >
-                {h.amenities.map((a) => (
+                {h.facilities.map((a) => (
                   <span
                     key={a}
                     className="text-xs px-1.5 py-0.5 rounded"

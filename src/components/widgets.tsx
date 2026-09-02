@@ -1,5 +1,8 @@
 "use client";
 
+import { useAppContent } from "./content-provider";
+import { ADS } from "@/data/content";
+
 import { useEffect, useRef, useState } from "react";
 import type { Hotel, Place } from "@/lib/types";
 import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE } from "@/lib/theme";
@@ -96,19 +99,16 @@ export function OfflinePacks() {
   );
 }
 
-export const ADS = [
-  { id:"a1", emoji:"🏨", label:"РЕКЛАМА", title:"Registan Plaza Hotel",     sub:"Скидка 20% при бронировании через UzUp",  cta:"Забронировать", color:"#1B6B8A" },
-  { id:"a2", emoji:"🍽️", label:"РЕКЛАМА", title:"Плов-центр Ташкента",      sub:"Лучший плов с 1978 года. Откройте для себя!", cta:"Смотреть меню", color:"#C1603A" },
-  { id:"a3", emoji:"✈️", label:"РЕКЛАМА", title:"Uzbekistan Airways",        sub:"Прямые рейсы из Самарканда. От $149",         cta:"Купить билет",  color:"#1A5C3A" },
-  { id:"a4", emoji:"🛍️", label:"РЕКЛАМА", title:"Silk & Spice Bazaar",       sub:"Аутентичные сувениры прямо от мастеров",      cta:"Перейти",       color:"#7B4F9E" },
-  { id:"a5", emoji:"🚌", label:"РЕКЛАМА", title:"Samarkand Tour Transfers",  sub:"Трансфер аэропорт–город от $8",               cta:"Заказать",      color:"#2E7D5A" },
-];
 
 export function AdBanner({ isPremium }:{ isPremium:boolean }) {
-  const [idx, setIdx] = useState(()=>Math.floor(Math.random()*ADS.length));
+  const { ADS: live } = useAppContent();
+  // Пока сеть не ответила, показываем вшитые креативы: место под баннер
+  // уже занято вёрсткой, и пустая дыра выглядела бы поломкой.
+  const ads = live.length > 0 ? live : ADS;
+  const [idx, setIdx] = useState(()=>Math.floor(Math.random()*ads.length));
   const [dismissed, setDismissed] = useState(false);
   if(isPremium || dismissed) return null;
-  const ad = ADS[idx];
+  const ad = ads[idx % ads.length];
   return (
     <div className="mx-4 mb-3">
       <div className="rounded-2xl overflow-hidden border" style={{background:WHITE,borderColor:BORDER}}>
@@ -123,7 +123,7 @@ export function AdBanner({ isPremium }:{ isPremium:boolean }) {
           </div>
           <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
             <button onClick={()=>setDismissed(true)} className="text-[10px] font-medium px-1" style={{color:MUTED}}>✕</button>
-            <button onClick={()=>setIdx(i=>(i+1)%ADS.length)} className="text-[9px] font-bold px-2.5 py-1 rounded-lg text-white" style={{background:ad.color}}>{ad.cta}</button>
+            <button onClick={()=>setIdx(i => (i + 1) % ads.length)} className="text-[9px] font-bold px-2.5 py-1 rounded-lg text-white" style={{background:ad.color}}>{ad.cta}</button>
           </div>
         </div>
       </div>

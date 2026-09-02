@@ -3,11 +3,13 @@
 import { useState } from "react";
 import type { Place } from "@/lib/types";
 import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE } from "@/lib/theme";
-import { LANGS, PLACES, PRACTICAL } from "@/data/content";
+import { LANGS, PRACTICAL } from "@/data/content";
+import { useAppContent } from "@/components/content-provider";
 import { AdBanner, OfflinePacks } from "@/components/widgets";
 
 
 export function AudioScreen({ onPlay, isPremium }:{ onPlay:(p:Place)=>void; isPremium:boolean }) {
+  const { PLACES } = useAppContent();
   const [lang, setLang] = useState(1);
   const [scanning, setScanning] = useState(false);
   const [playing, setPlaying] = useState<number|null>(null);

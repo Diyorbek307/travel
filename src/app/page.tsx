@@ -24,6 +24,7 @@ import ProfileScreen from "@/components/screens/profile";
 import TransportScreen from "@/components/screens/transport";
 import PracticalScreen from "@/components/screens/practical";
 import { MiniPlayer, Toast } from "@/components/widgets";
+import { ContentProvider } from "@/components/content-provider";
 import { CREAM, GREEN } from "@/lib/theme";
 import type { Hotel, Place, Restaurant, Route, Tab } from "@/lib/types";
 
@@ -48,7 +49,15 @@ type Detail =
 
 type Phase = "splash" | "lang" | "interests" | "app";
 
-export default function App() {
+export default function Page() {
+  return (
+    <ContentProvider>
+      <App />
+    </ContentProvider>
+  );
+}
+
+function App() {
   const [phase, setPhase] = useState<Phase>("splash");
   const [lang, setLang] = useState("🇷🇺 Русский");
   const [tab, setTab] = useState<Tab>("home");

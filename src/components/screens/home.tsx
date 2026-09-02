@@ -1,6 +1,7 @@
 import type { Hotel, Place, Restaurant, Tab } from "@/lib/types";
 import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE } from "@/lib/theme";
-import { EVENTS, HOTELS, PLACES, RESTAURANTS, WEATHER } from "@/data/content";
+import { WEATHER } from "@/data/content";
+import { useAppContent } from "@/components/content-provider";
 import { GeomPattern, LogoMark } from "../ui";
 import { AnimatedBg } from "@/components/animated-bg";
 import { CardDeck, CityDeck } from "@/components/card-deck";
@@ -10,6 +11,7 @@ import { glass, glassLight } from "@/lib/theme";
 
 
 export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, onRestaurant, onMenu, onTab, onTransport, isPremium }:{ onPlace:(p:Place)=>void; onSearch:()=>void; onHotel:(h:Hotel)=>void; onNotifs:()=>void; onPractical:()=>void; onRestaurant:(r:Restaurant)=>void; onMenu:()=>void; onTab:(t:Tab)=>void; onTransport:()=>void; isPremium:boolean; }) {
+  const { EVENTS, HOTELS, PLACES, RESTAURANTS } = useAppContent();
   return (
     <div className="flex flex-col h-full overflow-y-auto hide-scroll" style={{background:CREAM}}>
 
