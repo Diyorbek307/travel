@@ -123,16 +123,21 @@ export default function Dashboard({ onNavigate }: { onNavigate: (id: string) => 
             <>
               <div className="mb-2 flex h-32 items-end gap-1">
                 {s.помесячно.map((m, i) => (
-                  <div key={i} className="flex min-w-0 flex-1 flex-col items-center gap-1">
-                    <div
-                      className="w-full rounded-t"
-                      style={{
-                        height: `${Math.max(2, (m.всего / пикРоста) * 100)}%`,
-                        background:
-                          i === s.помесячно.length - 1 ? "var(--color-amber)" : "var(--color-dim)",
-                      }}
-                      title={`${m.label}: ${m.всего}`}
-                    />
+                  <div key={i} className="flex h-full min-w-0 flex-1 flex-col items-center gap-1">
+                    {/* Обёртка с flex-1 задаёт колонке определённую
+                        высоту: без неё процент у полосы не от чего
+                        считать, и график выходил пустым. */}
+                    <div className="flex w-full flex-1 items-end">
+                      <div
+                        className="w-full rounded-t"
+                        style={{
+                          height: `${Math.max(2, (m.всего / пикРоста) * 100)}%`,
+                          background:
+                            i === s.помесячно.length - 1 ? "var(--color-amber)" : "var(--color-dim)",
+                        }}
+                        title={`${m.label}: ${m.всего}`}
+                      />
+                    </div>
                     <span className="truncate text-[9px]" style={{ color: "var(--color-dim)" }}>
                       {m.label}
                     </span>

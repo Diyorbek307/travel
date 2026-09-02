@@ -89,17 +89,21 @@ export default function Analytics() {
         ) : (
           <div className="flex h-40 items-end gap-1.5">
             {s.помесячно.map((m, i) => (
-              <div key={i} className="flex min-w-0 flex-1 flex-col items-center gap-1.5">
+              <div key={i} className="flex h-full min-w-0 flex-1 flex-col items-center gap-1.5">
                 <span className="text-[10px]" style={{ color: "var(--color-muted)" }}>
                   {m[метрика] || ""}
                 </span>
-                <div
-                  className="w-full rounded-t"
-                  style={{
-                    height: `${Math.max(2, (m[метрика] / пик) * 100)}%`,
-                    background: i === s.помесячно.length - 1 ? "var(--color-amber)" : "var(--color-dim)",
-                  }}
-                />
+                {/* Обёртка с flex-1 задаёт определённую высоту: иначе
+                    процент у полосы считать не от чего. */}
+                <div className="flex w-full flex-1 items-end">
+                  <div
+                    className="w-full rounded-t"
+                    style={{
+                      height: `${Math.max(2, (m[метрика] / пик) * 100)}%`,
+                      background: i === s.помесячно.length - 1 ? "var(--color-amber)" : "var(--color-dim)",
+                    }}
+                  />
+                </div>
                 <span className="truncate text-[9px]" style={{ color: "var(--color-dim)" }}>
                   {m.label}
                 </span>
