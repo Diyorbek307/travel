@@ -1,14 +1,17 @@
-import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { SEED } from "@/data/seed";
+import { createFileStore } from "./file-store";
 import type { Content } from "@/lib/types";
 
 /**
  * Хранилище содержимого платформы.
  *
- * Один файл JSON на диске: объём — сотни записей, и городить ради этого
- * базу незачем. Пока файла нет, отдаются семена, поэтому пустой
- * развёрнутый экземпляр сразу выглядит наполненным.
+ * Один файл JSON: объём — сотни записей, и городить ради этого базу
+ * незачем. Пока файла нет, отдаются семена, поэтому пустой развёрнутый
+ * экземпляр сразу выглядит наполненным.
+ *
+ * Запись идёт через общую очередь: два редактора, нажавшие «Сохранить»
+ * одновременно, иначе затёрли бы правки друг друга.
  *
  * ВАЖНО о сохранности. Каталог берётся из DATA_DIR, а на бесплатном
  * тарифе Render постоянного диска нет: файловая система контейнера
@@ -19,30 +22,14 @@ import type { Content } from "@/lib/types";
 const DATA_DIR = process.env.DATA_DIR ?? path.join(process.cwd(), "data");
 const FILE = path.join(DATA_DIR, "content.json");
 
-/** Кэш процесса: файл читается один раз, дальше живёт в памяти. */
-let cache: Content | null = null;
+const хранилище = createFileStore<Partial<Content>>(FILE, () => ({}));
 
 export async function readContent(): Promise<Content> {
-  if (cache) return cache;
-  try {
-    const raw = await readFile(FILE, "utf8");
-    // Семена подкладываются снизу: если в сохранённом файле не хватает
-    // раздела, добавленного позже, он не окажется пустым.
-    cache = { ...SEED, ...(JSON.parse(raw) as Partial<Content>) };
-  } catch {
-    cache = SEED;
-  }
-  return cache;
+  // Семена подкладываются снизу: если в сохранённом файле не хватает
+  // раздела, добавленного позже, он не окажется пустым.
+  return { ...SEED, ...(await хранилище.read()) };
 }
 
 export async function writeContent(next: Content): Promise<void> {
-  cache = next;
-  await mkdir(DATA_DIR, { recursive: true });
-
-  // Пишем во временный файл и переименовываем: если процесс упадёт на
-  // середине записи, на диске останется прошлая целая версия, а не
-  // обрезанный JSON, который потом не прочитается.
-  const tmp = `${FILE}.${process.pid}.tmp`;
-  await writeFile(tmp, JSON.stringify(next, null, 2), "utf8");
-  await rename(tmp, FILE);
+  await хранилище.update(() => [next, undefined]);
 }

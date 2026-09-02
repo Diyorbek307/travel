@@ -48,6 +48,13 @@ export async function POST(request: Request) {
     phone: str("phone"),
   });
 
+  // Занятость адреса окончательно решается внутри хранилища: проверка
+  // выше отсекает большинство случаев, но при двух одновременных
+  // запросах на один адрес оба прошли бы её.
+  if (user === "email_taken") {
+    return NextResponse.json({ error: "email_taken" }, { status: 409 });
+  }
+
   // Сессию не выдаём: сперва пусть подтвердит почту кодом из письма.
   // Иначе на чужой адрес можно завести аккаунт и пользоваться им.
   const code = await createVerification(user.email);

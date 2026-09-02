@@ -1,7 +1,7 @@
-import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import { createHmac, randomBytes, scrypt, timingSafeEqual } from "node:crypto";
 import { promisify } from "node:util";
 import path from "node:path";
+import { createFileStore } from "./file-store";
 
 /**
  * Учётные записи туристов.
@@ -50,26 +50,10 @@ export function publicUser(u: User): Omit<User, "passwordHash"> {
   return rest;
 }
 
-let cache: User[] | null = null;
+const хранилище = createFileStore<User[]>(FILE, () => []);
 
 async function readAll(): Promise<User[]> {
-  if (cache) return cache;
-  try {
-    cache = JSON.parse(await readFile(FILE, "utf8")) as User[];
-  } catch {
-    cache = [];
-  }
-  return cache;
-}
-
-async function writeAll(users: User[]): Promise<void> {
-  cache = users;
-  await mkdir(DATA_DIR, { recursive: true });
-  // Через временный файл: падение на середине записи не должно оставить
-  // обрезанный список учётных записей.
-  const tmp = `${FILE}.${process.pid}.tmp`;
-  await writeFile(tmp, JSON.stringify(users, null, 2), "utf8");
-  await rename(tmp, FILE);
+  return хранилище.read();
 }
 
 /* ------------------------------------------------------------------ */
@@ -158,26 +142,34 @@ export async function createUser(input: {
   photo: string | null;
   country: string;
   phone: string;
-}): Promise<User> {
-  const users = await readAll();
+}): Promise<User | "email_taken"> {
   const now = new Date().toISOString();
+  const email = input.email.trim().toLowerCase();
+  // Хеш считаем заранее: scrypt намеренно медленный, и держать на нём
+  // очередь записи значило бы блокировать всех остальных.
+  const passwordHash = await hashPassword(input.password);
 
-  const user: User = {
-    id: `u-${Date.now().toString(36)}-${randomBytes(4).toString("hex")}`,
-    email: input.email.trim().toLowerCase(),
-    passwordHash: await hashPassword(input.password),
-    firstName: input.firstName.trim(),
-    lastName: input.lastName.trim(),
-    photo: input.photo,
-    country: input.country.trim(),
-    phone: input.phone.trim(),
-    emailVerified: false,
-    createdAt: now,
-    lastSeenAt: now,
-  };
+  return хранилище.update<User | "email_taken">((users) => {
+    // Занятость адреса проверяется здесь же, внутри очереди. Снаружи
+    // двое могли бы пройти проверку одновременно и завести две записи
+    // на одну почту.
+    if (users.some((u) => u.email === email)) return [users, "email_taken" as const];
 
-  await writeAll([...users, user]);
-  return user;
+    const user: User = {
+      id: `u-${Date.now().toString(36)}-${randomBytes(4).toString("hex")}`,
+      email,
+      passwordHash,
+      firstName: input.firstName.trim(),
+      lastName: input.lastName.trim(),
+      photo: input.photo,
+      country: input.country.trim(),
+      phone: input.phone.trim(),
+      emailVerified: false,
+      createdAt: now,
+      lastSeenAt: now,
+    };
+    return [[...users, user], user];
+  });
 }
 
 /**
@@ -188,15 +180,17 @@ export async function createUser(input: {
  * постоянный пользователь не выпадает никогда.
  */
 export async function touchUser(id: string): Promise<void> {
-  const users = await readAll();
-  const i = users.findIndex((u) => u.id === id);
-  if (i === -1) return;
-  users[i] = { ...users[i], lastSeenAt: new Date().toISOString() };
-  await writeAll(users);
+  await хранилище.update((users) => {
+    const i = users.findIndex((u) => u.id === id);
+    if (i === -1) return [users, undefined];
+    const копия = [...users];
+    копия[i] = { ...копия[i], lastSeenAt: new Date().toISOString() };
+    return [копия, undefined];
+  });
 }
 
 export async function deleteUser(id: string): Promise<void> {
-  await writeAll((await readAll()).filter((u) => u.id !== id));
+  await хранилище.update((users) => [users.filter((u) => u.id !== id), undefined]);
 }
 
 /* ------------------------------------------------------------------ */
@@ -243,31 +237,17 @@ export const VERIFY_TTL_MS = 15 * 60 * 1000;
 /** Больше пяти попыток — код сгорает, нужен новый. */
 const MAX_ATTEMPTS = 5;
 
-async function readVerifications(): Promise<Verification[]> {
-  try {
-    return JSON.parse(await readFile(VERIFY_FILE, "utf8")) as Verification[];
-  } catch {
-    return [];
-  }
-}
-
-async function writeVerifications(list: Verification[]): Promise<void> {
-  await mkdir(DATA_DIR, { recursive: true });
-  const tmp = `${VERIFY_FILE}.${process.pid}.tmp`;
-  await writeFile(tmp, JSON.stringify(list, null, 2), "utf8");
-  await rename(tmp, VERIFY_FILE);
-}
+const коды = createFileStore<Verification[]>(VERIFY_FILE, () => []);
 
 export async function createVerification(email: string): Promise<string> {
   // Код из crypto, а не из Math.random: тот предсказуем по предыдущим
   // значениям, и коды подтверждения им генерировать нельзя.
   const code = String(randomBytes(4).readUInt32BE(0) % 1_000_000).padStart(6, "0");
-  const все = await readVerifications();
-  const прошлая = все.find((v) => v.email === email);
-  const прочие = все.filter((v) => v.email !== email);
-
-  await writeVerifications([
-    ...прочие,
+  await коды.update((все) => {
+    const прошлая = все.find((v) => v.email === email);
+    const прочие = все.filter((v) => v.email !== email);
+    return [[
+      ...прочие,
     {
       email,
       code,
@@ -277,8 +257,9 @@ export async function createVerification(email: string): Promise<string> {
       // Счётчик переживает выдачу нового кода: иначе пауза сбрасывалась
       // бы каждой отправкой и не росла никогда.
       resends: прошлая ? прошлая.resends + 1 : 0,
-    },
-  ]);
+      },
+    ], undefined];
+  });
   return code;
 }
 
@@ -289,7 +270,7 @@ export async function createVerification(email: string): Promise<string> {
  * интерфейсе: кнопку с обратным отсчётом обходят одним запросом.
  */
 export async function ждатьДоОтправки(email: string): Promise<number> {
-  const v = (await readVerifications()).find((x) => x.email === email);
+  const v = (await коды.read()).find((x) => x.email === email);
   if (!v) return 0;
   const прошло = (Date.now() - new Date(v.sentAt).getTime()) / 1000;
   return Math.max(0, Math.ceil(паузаПослеОтправок(v.resends) - прошло));
@@ -298,36 +279,39 @@ export async function ждатьДоОтправки(email: string): Promise<num
 export type VerifyResult = "ok" | "wrong" | "expired" | "none";
 
 export async function applyVerification(email: string, code: string): Promise<VerifyResult> {
-  const list = await readVerifications();
-  const i = list.findIndex((v) => v.email === email);
-  if (i === -1) return "none";
+  // Счётчик попыток меняется внутри очереди: иначе перебором в несколько
+  // потоков лимит обходится — все читают одно значение и пишут одно.
+  const итог = await коды.update<VerifyResult>((list) => {
+    const i = list.findIndex((v) => v.email === email);
+    if (i === -1) return [list, "none"];
 
-  const v = list[i];
-  if (new Date(v.expiresAt).getTime() < Date.now() || v.attempts >= MAX_ATTEMPTS) {
-    await writeVerifications(list.filter((_, k) => k !== i));
-    return "expired";
-  }
+    const v = list[i];
+    if (new Date(v.expiresAt).getTime() < Date.now() || v.attempts >= MAX_ATTEMPTS) {
+      return [list.filter((_, k) => k !== i), "expired"];
+    }
+    if (v.code !== code.trim()) {
+      const копия = [...list];
+      копия[i] = { ...v, attempts: v.attempts + 1 };
+      return [копия, "wrong"];
+    }
+    return [list.filter((_, k) => k !== i), "ok"];
+  });
 
-  if (v.code !== code.trim()) {
-    list[i] = { ...v, attempts: v.attempts + 1 };
-    await writeVerifications(list);
-    return "wrong";
-  }
+  if (итог !== "ok") return итог;
 
-  const users = await readAll();
-  const ui = users.findIndex((u) => u.email === email);
-  if (ui === -1) return "none";
-  users[ui] = { ...users[ui], emailVerified: true };
-  await writeAll(users);
-
-  await writeVerifications(list.filter((_, k) => k !== i));
-  return "ok";
+  return хранилище.update<VerifyResult>((users) => {
+    const ui = users.findIndex((u) => u.email === email);
+    if (ui === -1) return [users, "none"];
+    const копия = [...users];
+    копия[ui] = { ...копия[ui], emailVerified: true };
+    return [копия, "ok"];
+  });
 }
 
 /** Действующие коды — оператору, пока почта не подключена. */
 export async function listVerifications(): Promise<Verification[]> {
   const now = Date.now();
-  return (await readVerifications()).filter((v) => new Date(v.expiresAt).getTime() > now);
+  return (await коды.read()).filter((v) => new Date(v.expiresAt).getTime() > now);
 }
 
 /* ------------------------------------------------------------------ */
@@ -356,20 +340,7 @@ const RESETS_FILE = path.join(DATA_DIR, "resets.json");
 /** Час: ссылка на смену пароля не должна жить дольше нужного. */
 export const RESET_TTL_MS = 60 * 60 * 1000;
 
-async function readResets(): Promise<ResetRequest[]> {
-  try {
-    return JSON.parse(await readFile(RESETS_FILE, "utf8")) as ResetRequest[];
-  } catch {
-    return [];
-  }
-}
-
-async function writeResets(list: ResetRequest[]): Promise<void> {
-  await mkdir(DATA_DIR, { recursive: true });
-  const tmp = `${RESETS_FILE}.${process.pid}.tmp`;
-  await writeFile(tmp, JSON.stringify(list, null, 2), "utf8");
-  await rename(tmp, RESETS_FILE);
-}
+const сбросы = createFileStore<ResetRequest[]>(RESETS_FILE, () => []);
 
 export async function createReset(user: User): Promise<ResetRequest> {
   const now = Date.now();
@@ -383,36 +354,42 @@ export async function createReset(user: User): Promise<ResetRequest> {
   };
   // Прошлые заявки этого же человека гасим: иначе старая ссылка осталась
   // бы рабочей после запроса новой.
-  const прочие = (await readResets()).filter((r) => r.userId !== user.id);
-  await writeResets([...прочие, заявка]);
+  await сбросы.update((list) => [[...list.filter((r) => r.userId !== user.id), заявка], undefined]);
   return заявка;
 }
 
 export async function listResets(): Promise<ResetRequest[]> {
   const now = Date.now();
-  return (await readResets())
+  return (await сбросы.read())
     .filter((r) => !r.usedAt && new Date(r.expiresAt).getTime() > now)
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
 /** Меняет пароль по одноразовой ссылке. Токен после этого мёртв. */
 export async function applyReset(token: string, password: string): Promise<boolean> {
-  const заявки = await readResets();
-  const i = заявки.findIndex((r) => r.token === token);
-  if (i === -1) return false;
+  // Токен гасим первым и внутри очереди: иначе по одной ссылке успели бы
+  // пройти двое, отправив запросы одновременно.
+  const userId = await сбросы.update<string | null>((list) => {
+    const i = list.findIndex((r) => r.token === token);
+    if (i === -1) return [list, null];
 
-  const заявка = заявки[i];
-  if (заявка.usedAt) return false;
-  if (new Date(заявка.expiresAt).getTime() < Date.now()) return false;
+    const заявка = list[i];
+    if (заявка.usedAt) return [list, null];
+    if (new Date(заявка.expiresAt).getTime() < Date.now()) return [list, null];
 
-  const users = await readAll();
-  const ui = users.findIndex((u) => u.id === заявка.userId);
-  if (ui === -1) return false;
+    const копия = [...list];
+    копия[i] = { ...заявка, usedAt: new Date().toISOString() };
+    return [копия, заявка.userId];
+  });
 
-  users[ui] = { ...users[ui], passwordHash: await hashPassword(password) };
-  await writeAll(users);
+  if (!userId) return false;
 
-  заявки[i] = { ...заявка, usedAt: new Date().toISOString() };
-  await writeResets(заявки);
-  return true;
+  const passwordHash = await hashPassword(password);
+  return хранилище.update<boolean>((users) => {
+    const ui = users.findIndex((u) => u.id === userId);
+    if (ui === -1) return [users, false];
+    const копия = [...users];
+    копия[ui] = { ...копия[ui], passwordHash };
+    return [копия, true];
+  });
 }
