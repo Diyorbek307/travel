@@ -63,7 +63,16 @@ export async function POST(request: Request) {
   if (photo) await savePhoto(user.id, photo);
 
   const code = await createVerification(user.email);
-  const отправлено = await sendMail({ to: user.email, ...письмоСКодом(code) });
+
+  /*
+   * Письмо уходит в фоне.
+   *
+   * Ответ человеку не должен зависеть от чужого сервера: пока письмо
+   * ждали, регистрация висела две минуты и обрывалась. Код уже создан и
+   * лежит в хранилище, поэтому даже неушедшее письмо не ломает
+   * регистрацию — код виден оператору в панели.
+   */
+  void sendMail({ to: user.email, ...письмоСКодом(code) }).catch(() => undefined);
 
   return NextResponse.json({
     ok: true,
@@ -71,7 +80,9 @@ export async function POST(request: Request) {
     user: publicUser(user),
     // Честно говорим приложению, ушло ли письмо: если почта не
     // настроена, экран подскажет обратиться в поддержку.
-    mailSent: отправлено,
+    // Настроена ли почта, знаем сразу; дошло ли письмо — узнать за
+    // доли секунды невозможно, и врать об этом не будем.
+    mailSent: mailConfigured(),
     mailConfigured: mailConfigured(),
     waitSeconds: await ждатьДоОтправки(user.email),
   });

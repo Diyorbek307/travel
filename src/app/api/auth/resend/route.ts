@@ -26,7 +26,7 @@ export async function POST(request: Request) {
   // Ответ один на любой адрес: иначе форма показывает, кто у нас есть.
   if (user && !user.emailVerified) {
     const code = await createVerification(user.email);
-    await sendMail({ to: user.email, ...письмоСКодом(code) });
+    void sendMail({ to: user.email, ...письмоСКодом(code) }).catch(() => undefined);
   }
 
   const пауза = email ? await ждатьДоОтправки(email) : 0;

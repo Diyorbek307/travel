@@ -36,7 +36,7 @@ export async function POST(request: Request) {
   // Иначе аккаунт на чужой адрес работал бы как обычный.
   if (!user.emailVerified) {
     const code = await createVerification(user.email);
-    await sendMail({ to: user.email, ...письмоСКодом(code) });
+    void sendMail({ to: user.email, ...письмоСКодом(code) }).catch(() => undefined);
     return NextResponse.json({ error: "not_verified", email: user.email }, { status: 403 });
   }
 

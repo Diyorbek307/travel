@@ -26,10 +26,10 @@ export async function POST(request: Request) {
     // Адрес берём из запроса: за прокси домен известен только ему.
     const origin = new URL(request.url).origin;
     const base = process.env.APP_BASE_URL ?? process.env.RENDER_EXTERNAL_URL ?? origin;
-    await sendMail({
+    void sendMail({
       to: user.email,
       ...письмоСоСсылкой(`${base}/reset?token=${заявка.token}`),
-    });
+    }).catch(() => undefined);
   }
 
   return NextResponse.json({ ok: true });
