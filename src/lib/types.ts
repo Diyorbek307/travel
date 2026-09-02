@@ -100,7 +100,23 @@ export interface ChatMessage {
 
 export type EntityStatus = "active" | "draft" | "suspended";
 
+/**
+ * Точка на карте.
+ *
+ * Нужна для такси: маршрут в Яндекс Go строится по координатам, а не по
+ * названию — «Регистан» приложение такси не поймёт.
+ *
+ * Поле необязательное: у части записей координат нет, и тогда берётся
+ * центр города. Выдумывать точные координаты нельзя — по ним поедет
+ * машина.
+ */
+export interface Geo {
+  lat: number;
+  lon: number;
+}
+
 export interface ManagedHotel extends Hotel {
+  geo?: Geo;
   stars: number;
   rooms: number;
   occupied: number;
@@ -110,6 +126,7 @@ export interface ManagedHotel extends Hotel {
 }
 
 export interface ManagedRestaurant extends Restaurant {
+  geo?: Geo;
   priceRange: "$" | "$$" | "$$$";
   seats: number;
   status: EntityStatus | "pending";
@@ -121,6 +138,7 @@ export interface ManagedRestaurant extends Restaurant {
 }
 
 export interface ManagedPlace extends Place {
+  geo?: Geo;
   region: string;
   visits: number;
   /** Сколько маршрутов ведут сюда. */
@@ -144,6 +162,7 @@ export interface ManagedRoute extends Route {
 export interface ManagedCity {
   id: string;
   name: string;
+  geo?: Geo;
   sub: string;
   region: string;
   img: string;

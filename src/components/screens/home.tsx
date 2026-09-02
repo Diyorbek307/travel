@@ -5,9 +5,10 @@ import { useAppContent } from "@/components/content-provider";
 import { GeomPattern, LogoMark } from "../ui";
 import { AnimatedBg } from "@/components/animated-bg";
 import { CardDeck, CityDeck } from "@/components/card-deck";
-import { TaxiWidget } from "@/components/screens/transport";
+
 import { AdBanner } from "@/components/widgets";
 import { glass, glassLight } from "@/lib/theme";
+import TaxiOrder from "@/components/taxi-order";
 
 
 export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, onRestaurant, onMenu, onTab, onTransport, isPremium }:{ onPlace:(p:Place)=>void; onSearch:()=>void; onHotel:(h:Hotel)=>void; onNotifs:()=>void; onPractical:()=>void; onRestaurant:(r:Restaurant)=>void; onMenu:()=>void; onTab:(t:Tab)=>void; onTransport:()=>void; isPremium:boolean; }) {
@@ -145,7 +146,7 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
       </div>
 
       {/* ── Taxi ── */}
-      <TaxiWidget/>
+      <TaxiOrder/>
 
       {/* ── Ad ── */}
       <div className="pt-3"><AdBanner isPremium={isPremium}/></div>

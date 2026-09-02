@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import TaxiOrder from "@/components/taxi-order";
 import { BORDER, CREAM, GREEN, MUTED, TEXT, WHITE } from "@/lib/theme";
 import { FLIGHTS, INTERCITY, TRAINS, UZ_CITIES } from "@/data/content";
 import { EmptyRoute } from "../ui";
@@ -41,37 +42,6 @@ export function CityPicker({ value, onChange, label, icon }:{ value:string; onCh
   );
 }
 
-export function TaxiWidget() {
-  const [from, setFrom] = useState("Регистан");
-  const [to, setTo]   = useState("");
-  const [booked, setBooked] = useState(false);
-  const QUICK = ["Аэропорт","Ж/Д вокзал","Отель","Базар Сиаб","Шахи-Зинда"];
-  return (
-    <div className="px-4 pt-5">
-      <p className="font-bold text-base mb-3" style={{color:TEXT,fontFamily:"'Fraunces',serif"}}>🚖 Такси по городу</p>
-      {!booked?(
-        <div className="bg-white rounded-2xl p-4 shadow-sm border" style={{borderColor:BORDER}}>
-          <div className="space-y-2.5 mb-3">
-            <div className="flex items-center gap-3 rounded-xl px-3 py-2.5" style={{background:"#F0F8F4"}}><div className="w-2 h-2 rounded-full flex-shrink-0" style={{background:GREEN}}/><input value={from} onChange={e=>setFrom(e.target.value)} placeholder="Откуда" className="flex-1 text-sm bg-transparent outline-none font-medium" style={{color:TEXT}}/></div>
-            <div className="flex items-center gap-3 rounded-xl px-3 py-2.5 border" style={{background:WHITE,borderColor:BORDER}}><div className="w-2 h-2 rounded-full flex-shrink-0 bg-red-400"/><input value={to} onChange={e=>setTo(e.target.value)} placeholder="Куда едем?" className="flex-1 text-sm bg-transparent outline-none" style={{color:TEXT}}/></div>
-          </div>
-          <div className="flex gap-2 mb-3 overflow-x-auto hide-scroll">
-            {QUICK.map(d=><button key={d} onClick={()=>setTo(d)} className="flex-shrink-0 px-2.5 py-1.5 rounded-full border text-[10px] font-medium" style={to===d?{background:GREEN,color:WHITE,borderColor:GREEN}:{background:CREAM,color:TEXT,borderColor:BORDER}}>{d}</button>)}
-          </div>
-          <button onClick={()=>to&&setBooked(true)} className="w-full py-3 rounded-xl text-white text-sm font-bold disabled:opacity-40" style={{background:GREEN}} disabled={!to}>
-            Яндекс.Такси — ~$2
-          </button>
-        </div>
-      ):(
-        <div className="bg-white rounded-2xl p-4 shadow-sm border animate-slide-up" style={{borderColor:GREEN}}>
-          <div className="flex items-center gap-3"><div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl" style={{background:GREEN+"15"}}>🚖</div><div className="flex-1"><p className="font-bold text-sm" style={{color:TEXT}}>Такси найдено!</p><p className="text-xs" style={{color:MUTED}}>{from} → {to} · 3 мин · $2.40</p></div><button onClick={()=>{setBooked(false);setTo("");}} className="text-xs font-semibold px-3 py-1.5 rounded-lg" style={{background:CREAM,color:MUTED}}>Отмена</button></div>
-          <div className="mt-3 h-1.5 rounded-full overflow-hidden" style={{background:BORDER}}><div className="h-full rounded-full animate-pulse" style={{background:GREEN,width:"65%"}}/></div>
-          <p className="text-[10px] mt-1.5 text-center" style={{color:GREEN}}>Водитель Бахтиёр · Nexia 3 · К622АА · ⭐ 4.9</p>
-        </div>
-      )}
-    </div>
-  );
-}
 
 // ── Transport Screen ───────────────────────────────────────────────────────────
 
