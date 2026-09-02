@@ -1,5 +1,15 @@
 import { NextResponse } from "next/server";
-import { createUser, createVerification, findByEmail, publicUser, ждатьДоОтправки } from "@/lib/users";
+import {
+  createUser,
+  createVerification,
+  findByEmail,
+  makeSession,
+  markVerified,
+  publicUser,
+  SESSION_COOKIE,
+  SESSION_TTL_MS,
+  ждатьДоОтправки,
+} from "@/lib/users";
 import { mailConfigured, sendMail, письмоСКодом } from "@/lib/mail";
 import { savePhoto } from "@/lib/photos";
 
@@ -61,6 +71,37 @@ export async function POST(request: Request) {
   // Сессию не выдаём: сперва пусть подтвердит почту кодом из письма.
   // Иначе на чужой адрес можно завести аккаунт и пользоваться им.
   if (photo) await savePhoto(user.id, photo);
+
+  /*
+   * Почта не настроена — пускаем сразу.
+   *
+   * Требовать код, который физически некому отправить, значит запереть
+   * снаружи вообще всех: ни один человек не сможет войти. Подтверждение
+   * почты защищает от регистрации на чужой адрес, но когда письма не
+   * ходят, эта защита превращается в глухую дверь.
+   *
+   * Подключат почтовый сервис — подтверждение включится само, без
+   * единой правки.
+   */
+  if (!mailConfigured()) {
+    await markVerified(user.email);
+
+    const res = NextResponse.json({
+      ok: true,
+      needsVerification: false,
+      user: publicUser({ ...user, emailVerified: true }),
+      mailSent: false,
+      mailConfigured: false,
+    });
+    res.cookies.set(SESSION_COOKIE, makeSession(user.id), {
+      httpOnly: true,
+      sameSite: "lax",
+      path: "/",
+      maxAge: Math.floor(SESSION_TTL_MS / 1000),
+      secure: process.env.NODE_ENV === "production",
+    });
+    return res;
+  }
 
   const code = await createVerification(user.email);
 

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { sendMail, письмоСКодом } from "@/lib/mail";
+import { mailConfigured, sendMail, письмоСКодом } from "@/lib/mail";
 import {
   findByEmail,
   makeSession,
@@ -9,6 +9,7 @@ import {
   touchUser,
   verifyPassword,
   createVerification,
+  markVerified,
 } from "@/lib/users";
 
 export const dynamic = "force-dynamic";
@@ -34,7 +35,11 @@ export async function POST(request: Request) {
 
   // Почта не подтверждена — сессию не открываем, шлём новый код.
   // Иначе аккаунт на чужой адрес работал бы как обычный.
-  if (!user.emailVerified) {
+  // Почта не настроена — код прислать нечем, и держать человека
+  // снаружи не за что.
+  if (!user.emailVerified && !mailConfigured()) {
+    await markVerified(user.email);
+  } else if (!user.emailVerified) {
     const code = await createVerification(user.email);
     void sendMail({ to: user.email, ...письмоСКодом(code) }).catch(() => undefined);
     return NextResponse.json({ error: "not_verified", email: user.email }, { status: 403 });

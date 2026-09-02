@@ -325,6 +325,17 @@ export async function applyVerification(email: string, code: string): Promise<Ve
   });
 }
 
+/** Отмечает почту подтверждённой, минуя код. */
+export async function markVerified(email: string): Promise<void> {
+  await хранилище.update((users) => {
+    const i = users.findIndex((u) => u.email === email);
+    if (i === -1) return [users, undefined];
+    const копия = [...users];
+    копия[i] = { ...копия[i], emailVerified: true };
+    return [копия, undefined];
+  });
+}
+
 /** Действующие коды — оператору, пока почта не подключена. */
 export async function listVerifications(): Promise<Verification[]> {
   const now = Date.now();
