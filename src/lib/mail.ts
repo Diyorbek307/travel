@@ -32,6 +32,30 @@ export function mailConfigured(): boolean {
   return httpПровайдер() !== "нет" || Boolean(HOST && USER && PASS);
 }
 
+/**
+ * Помним, доходят ли письма на самом деле.
+ *
+ * «Настроено» и «работает» — разные вещи. На Render переменные SMTP
+ * заданы верно, ключи исправны, а порты закрыты хостингом: отправка
+ * молча проваливается. Требовать код подтверждения в такой обстановке
+ * значит запереть снаружи всех.
+ *
+ * null — ещё не пробовали.
+ */
+let последняяОтправка: boolean | null = null;
+
+/**
+ * Можно ли рассчитывать на доставку.
+ *
+ * Пока не пробовали — верим настройкам. Один раз не дошло — перестаём
+ * требовать код, иначе люди упрутся в дверь, которую нечем открыть.
+ * Заработает отправка — доверие вернётся само.
+ */
+export function mailWorking(): boolean {
+  if (!mailConfigured()) return false;
+  return последняяОтправка !== false;
+}
+
 let transport: nodemailer.Transporter | null = null;
 
 function getTransport(): nodemailer.Transporter | null {
@@ -95,7 +119,10 @@ export async function sendMail(letter: Letter): Promise<boolean> {
   // действительно доходит. SMTP остаётся для своего сервера.
   if (httpПровайдер() !== "нет") {
     const итог = await отправитьПоHttp({ ...letter, from: FROM });
-    if (итог.ok) return true;
+    if (итог.ok) {
+      последняяОтправка = true;
+      return true;
+    }
     console.error("[почта] HTTP:", итог.detail);
     // Не получилось — пробуем SMTP, вдруг он тут доступен.
   }
@@ -109,9 +136,11 @@ export async function sendMail(letter: Letter): Promise<boolean> {
   }
   try {
     await t.sendMail({ from: FROM, ...letter });
+    последняяОтправка = true;
     return true;
   } catch (error) {
     console.error("[почта] отправить не удалось:", error);
+    последняяОтправка = false;
     return false;
   }
 }

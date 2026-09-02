@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { mailConfigured, sendMail, письмоСКодом } from "@/lib/mail";
+import { mailConfigured, mailWorking, sendMail, письмоСКодом } from "@/lib/mail";
 import {
   findByEmail,
   makeSession,
@@ -37,7 +37,7 @@ export async function POST(request: Request) {
   // Иначе аккаунт на чужой адрес работал бы как обычный.
   // Почта не настроена — код прислать нечем, и держать человека
   // снаружи не за что.
-  if (!user.emailVerified && !mailConfigured()) {
+  if (!user.emailVerified && !mailWorking()) {
     await markVerified(user.email);
   } else if (!user.emailVerified) {
     const code = await createVerification(user.email);

@@ -10,7 +10,7 @@ import {
   SESSION_TTL_MS,
   ждатьДоОтправки,
 } from "@/lib/users";
-import { mailConfigured, sendMail, письмоСКодом } from "@/lib/mail";
+import { mailConfigured, mailWorking, sendMail, письмоСКодом } from "@/lib/mail";
 import { savePhoto } from "@/lib/photos";
 
 export const dynamic = "force-dynamic";
@@ -83,7 +83,7 @@ export async function POST(request: Request) {
    * Подключат почтовый сервис — подтверждение включится само, без
    * единой правки.
    */
-  if (!mailConfigured()) {
+  if (!mailWorking()) {
     await markVerified(user.email);
 
     const res = NextResponse.json({
