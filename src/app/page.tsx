@@ -2,7 +2,6 @@
 
 import { useCallback, useState } from "react";
 import BottomNav from "@/components/bottom-nav";
-import StatusBar from "@/components/status-bar";
 import SideMenu from "@/components/side-menu";
 import {
   HotelDetail,
@@ -106,13 +105,10 @@ function App() {
     setShowMenu(false);
   };
 
-  const onboarding = phase !== "app";
 
   return (
     <div className="device-shell">
       <div className="device">
-        <StatusBar transparent={onboarding} />
-
         {showLogin && (
           <div className="absolute inset-0 z-50">
             <LoginModal
