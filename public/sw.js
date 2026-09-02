@@ -54,6 +54,9 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
+  // Админ-панель не кэшируем вовсе: за паролем, и офлайн ей не нужен.
+  if (url.pathname.startsWith("/admin")) return;
+
   // Свои запросы: сначала сеть, кэш как запасной вариант в офлайне.
   if (url.origin === self.location.origin) {
     event.respondWith(networkFirst(request));

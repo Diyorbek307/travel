@@ -1,0 +1,57 @@
+/*
+ * Токены админ-панели.
+ *
+ * Имена не пересекаются с приложением (там --green, --gold, --cream),
+ * поэтому объявляем их на :root: визуальный редактор темы переписывает
+ * те же переменные на documentElement во время работы, и правило,
+ * привязанное к обёртке, перебивало бы его.
+ *
+ * Значения — тёмная тема из макета. До того как отработает эффект
+ * провайдера, интерфейс уже должен быть отрисован в своих цветах,
+ * иначе первый кадр выйдет белым.
+ */
+
+:root {
+  --color-bg: #09080a;
+  --color-surface: #110f14;
+  --color-panel: #181520;
+  --color-border: #26223a;
+  --color-amber: #e8a030;
+  --color-amber-light: #e8a84a;
+  --color-teal: #18b89a;
+  --color-rose: #e05a42;
+  --color-text: #f4eefc;
+  --color-muted: #8070a0;
+  --color-dim: #382e50;
+
+  --radius-card: 10px;
+  --radius-btn: 8px;
+  --header-height: 56px;
+  --sidebar-width: 224px;
+}
+
+.admin-root {
+  height: 100dvh;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+}
+
+/* Полоса прокрутки макета: тонкая, с янтарной подсветкой под курсором. */
+.admin-root ::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+.admin-root ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.admin-root ::-webkit-scrollbar-thumb {
+  background: var(--color-dim);
+  border-radius: 2px;
+}
+
+.admin-root ::-webkit-scrollbar-thumb:hover {
+  background: var(--color-amber);
+}
