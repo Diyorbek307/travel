@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import BookingForm from "./booking-form";
+import ReviewForm from "./review-form";
 import type { Hotel, Place, Restaurant, Route } from "@/lib/types";
 import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE } from "@/lib/theme";
 import { LANGS } from "@/data/content";
@@ -69,6 +71,7 @@ export function PlaceDetail({ place, onBack, onPlay, onToast }:{ place:Place; on
           <button onClick={()=>onToast(`✅ «${place.name}» добавлено в маршрут!`)} className="flex-1 py-3.5 rounded-2xl text-sm font-bold border active:scale-[0.98] transition-all" style={{color:GREEN,borderColor:GREEN,background:WHITE}}>🗺️ В маршрут</button>
         </div>
       </div>
+        <ReviewForm placeId={place.id} placeName={place.name} />
     </div>
   );
 }
@@ -148,6 +151,8 @@ export function HotelDetail({ hotel, onBack, onToast }:{ hotel:Hotel; onBack:()=
           ))}
         </div>
       </div>
+        <BookingForm kind="hotel" itemId={hotel.id} itemName={hotel.name} />
+        <ReviewForm placeId={hotel.id} placeName={hotel.name} />
     </div>
   );
 }
@@ -192,6 +197,8 @@ export function RestaurantDetail({ r, onBack, onToast }:{ r:Restaurant; onBack:(
           <button onClick={()=>onToast(`📞 Звонок в «${r.name}»...`)} className="flex-1 py-3.5 rounded-2xl text-sm font-bold border active:scale-[0.98] transition-all" style={{color:"#C1603A",borderColor:"#C1603A",background:WHITE}}>📞 Позвонить</button>
         </div>
       </div>
+        <BookingForm kind="restaurant" itemId={r.id} itemName={r.name} />
+        <ReviewForm placeId={r.id} placeName={r.name} />
     </div>
   );
 }
@@ -227,6 +234,7 @@ export function RouteDetail({ route, onBack }:{ route:Route; onBack:()=>void }) 
           <button className="flex-1 py-3.5 rounded-2xl text-sm font-bold border" style={{color:route.color,borderColor:route.color,background:WHITE}}>💾 Сохранить</button>
         </div>
       </div>
+        <BookingForm kind="tour" itemId={route.id} itemName={route.title} />
     </div>
   );
 }

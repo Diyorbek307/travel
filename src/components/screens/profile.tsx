@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { ChatMessage } from "@/lib/types";
 import { PremiumModal } from "@/components/modals";
+import SupportChat from "@/components/support-chat";
+import MyBookings from "@/components/my-bookings";
 import { BORDER, CREAM, GOLD, GREEN, GREEN_LIGHT, MUTED, TEXT, WHITE } from "@/lib/theme";
 import { ACHIEVEMENTS, AI_REPLIES, LANGS, STAMPS } from "@/data/content";
 import { Badge } from "../ui";
@@ -141,7 +143,7 @@ export function SettingsView({ isPremium, onUpgrade, onLogout }:{ isPremium:bool
 }
 
 export function ProfileScreen({ onLogout }:{ onLogout:()=>void }) {
-  const [view, setView] = useState<"passport"|"chat"|"stats"|"settings">("passport");
+  const [view, setView] = useState<"passport"|"bookings"|"support"|"chat"|"stats"|"settings">("passport");
   const [isPremium, setIsPremium] = useState(false);
   const [showPremium, setShowPremium] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([{role:"ai",text:"Assalomu alaykum! 👋 Я ваш AI-гид. Спрашивайте всё — история, маршруты, рестораны, транспорт, валюта!",time:"09:41"}]);
@@ -157,7 +159,7 @@ export function ProfileScreen({ onLogout }:{ onLogout:()=>void }) {
   },[]);
   useEffect(()=>{bottomRef.current?.scrollIntoView({behavior:"smooth"});},[messages,typing]);
 
-  const TABS:[string,string,string][] = [["passport","🪪","Паспорт"],["chat","🤖","AI-гид"],["stats","📊","Стат."],["settings","⚙️","Настройки"]];
+  const TABS:[string,string,string][] = [["passport","🪪","Паспорт"],["bookings","🎫","Заявки"],["support","💬","Поддержка"],["chat","🤖","AI-гид"],["stats","📊","Стат."],["settings","⚙️","Настройки"]];
 
   return (
     <div className="flex flex-col h-full" style={{background:CREAM}}>
@@ -239,6 +241,8 @@ export function ProfileScreen({ onLogout }:{ onLogout:()=>void }) {
           </div>
         </div>
       )}
+      {view==="bookings"&&<MyBookings/>}
+      {view==="support"&&<SupportChat onBack={()=>setView("passport")}/>}
       {view==="settings"&&<SettingsView isPremium={isPremium} onUpgrade={()=>setShowPremium(true)} onLogout={onLogout}/>}
     </div>
   );

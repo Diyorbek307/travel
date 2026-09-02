@@ -1,366 +1,254 @@
-import { useState, useRef, useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { PageHeader, Badge, Btn } from "./shared";
 import { useNarrow } from "../context/useNarrow";
-import { USERS, INITIAL_MESSAGES, Message } from "../data/mockData";
 
-type Props = {
-  messages: Record<number, Message[]>;
-  setMessages: React.Dispatch<React.SetStateAction<Record<number, Message[]>>>;
-};
+/**
+ * Переписка с туристами.
+ *
+ * Ветки настоящие: их пишут из приложения, из вкладки «Поддержка» в
+ * профиле. Обновляются опросом раз в несколько секунд — постоянное
+ * соединение здесь избыточно, а опрос переживает обрыв связи без всякой
+ * логики переподключения.
+ *
+ * На узком экране список и переписка не помещаются рядом, поэтому
+ * показывается что-то одно.
+ */
 
-const chatUsers = USERS.filter((u) => INITIAL_MESSAGES[u.id] !== undefined || true);
+interface Message {
+  id: string;
+  author: "user" | "staff";
+  text: string;
+  createdAt: string;
+}
 
-export default function Chat({ messages, setMessages }: Props) {
-  /*
-   * На телефоне список бесед и само окно рядом не помещаются: список
-   * занимает 280 пикселей из 304. Поэтому показываем что-то одно —
-   * выбор беседы открывает переписку, стрелка возвращает к списку.
-   */
+interface Thread {
+  userId: string;
+  name: string;
+  email: string;
+  photo: string | null;
+  country: string;
+  messages: Message[];
+  updatedAt: string;
+  unreadForStaff: number;
+}
+
+const ОПРОС_МС = 5000;
+
+function время(iso: string): string {
+  return new Date(iso).toLocaleString("ru", {
+    day: "numeric",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+export default function Chat() {
+  const [ветки, setВетки] = useState<Thread[]>([]);
+  const [активный, setАктивный] = useState<string | null>(null);
+  const [текст, setТекст] = useState("");
+  const [загрузка, setЗагрузка] = useState(true);
+  const [ошибка, setОшибка] = useState<string | null>(null);
   const narrow = useNarrow();
-  const [showChat, setShowChat] = useState(false);
-  const [activeUserId, setActiveUserId] = useState<number>(1);
-  const [input, setInput] = useState("");
-  const [search, setSearch] = useState("");
-  const endRef = useRef<HTMLDivElement>(null);
+  const [показатьПереписку, setПоказатьПереписку] = useState(false);
+  const низ = useRef<HTMLDivElement>(null);
 
-  const activeUser = USERS.find((u) => u.id === activeUserId)!;
-  const thread = messages[activeUserId] ?? [];
+  const подтянуть = useCallback(async () => {
+    try {
+      const res = await fetch("/api/admin/support");
+      if (!res.ok) throw new Error();
+      const d = (await res.json()) as { threads: Thread[] };
+      setВетки(d.threads);
+      setОшибка(null);
+    } catch {
+      setОшибка("Не удалось загрузить переписки");
+    }
+  }, []);
 
   useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [thread, activeUserId]);
+    подтянуть().finally(() => setЗагрузка(false));
+    const t = setInterval(подтянуть, ОПРОС_МС);
+    return () => clearInterval(t);
+  }, [подтянуть]);
 
-  const markRead = (uid: number) => {
-    setMessages((prev) => ({
-      ...prev,
-      [uid]: (prev[uid] ?? []).map((m) => ({ ...m, read: true })),
-    }));
-  };
+  const ветка = ветки.find((t) => t.userId === активный) ?? null;
 
-  const selectUser = (uid: number) => {
-    setActiveUserId(uid);
-    setShowChat(true);
-    markRead(uid);
-  };
+  useEffect(() => {
+    низ.current?.scrollIntoView({ block: "end" });
+  }, [ветка?.messages.length]);
 
-  const send = () => {
-    if (!input.trim()) return;
-    const msg: Message = {
-      id: Date.now(),
-      userId: activeUserId,
-      from: "admin",
-      text: input.trim(),
-      time: new Date().toLocaleTimeString("en", { hour: "2-digit", minute: "2-digit" }),
-      read: true,
-    };
-    setMessages((prev) => ({
-      ...prev,
-      [activeUserId]: [...(prev[activeUserId] ?? []), msg],
-    }));
-    setInput("");
+  async function открыть(userId: string) {
+    setАктивный(userId);
+    setПоказатьПереписку(true);
+    // Отмечаем прочитанным сразу: оператор открыл ветку, значит увидел.
+    await fetch("/api/admin/support", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId, markRead: true }),
+    }).catch(() => {});
+    подтянуть();
+  }
 
-    // Simulate reply after 2s for demo
-    if (Math.random() > 0.5) {
-      setTimeout(() => {
-        const replies = [
-          "Спасибо за быстрый ответ!",
-          "Отлично, оформлю бронирование.",
-          "Можете прислать подробный маршрут?",
-          "Прекрасно, увидимся в день отправления!",
-          "Ещё один вопрос — что взять с собой?",
-        ];
-        const reply: Message = {
-          id: Date.now() + 1,
-          userId: activeUserId,
-          from: "user",
-          text: replies[Math.floor(Math.random() * replies.length)],
-          time: new Date().toLocaleTimeString("en", { hour: "2-digit", minute: "2-digit" }),
-          read: false,
-        };
-        setMessages((prev) => ({
-          ...prev,
-          [activeUserId]: [...(prev[activeUserId] ?? []), reply],
-        }));
-      }, 2000);
-    }
-  };
+  async function ответить(e: React.FormEvent) {
+    e.preventDefault();
+    const значение = текст.trim();
+    if (!значение || !активный) return;
+    setТекст("");
+    await fetch("/api/admin/support", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId: активный, text: значение }),
+    }).catch(() => setТекст(значение));
+    подтянуть();
+  }
 
-  const unreadFor = (uid: number) =>
-    (messages[uid] ?? []).filter((m) => m.from === "user" && !m.read).length;
-
-  const lastMsg = (uid: number) => {
-    const msgs = messages[uid];
-    if (!msgs || msgs.length === 0) return "Нет сообщений";
-    return msgs[msgs.length - 1].text;
-  };
-
-  const filteredUsers = USERS.filter(
-    (u) => search === "" || u.name.toLowerCase().includes(search.toLowerCase()) || u.email.toLowerCase().includes(search.toLowerCase())
-  );
+  const всегоНепрочитанных = ветки.reduce((s, t) => s + t.unreadForStaff, 0);
 
   return (
-    <div className="flex h-full" style={{ height: "100%" }}>
-      {/* User list */}
-      <div
-        className="flex flex-col shrink-0"
-        style={{
-          display: narrow && showChat ? "none" : undefined,
-          width: narrow ? "100%" : "280px",
-          borderRight: "1px solid var(--color-border)",
-          background: "var(--color-surface)",
-        }}
-      >
-        <div className="p-4" style={{ borderBottom: "1px solid var(--color-border)" }}>
+    <div className="flex h-full flex-col p-4 sm:p-7">
+      <PageHeader
+        title="Чат поддержки"
+        subtitle={
+          загрузка
+            ? "Загружаем…"
+            : `${ветки.length} ${ветки.length === 1 ? "переписка" : "переписок"}` +
+              (всегоНепрочитанных ? ` · ${всегоНепрочитанных} новых` : "")
+        }
+      />
+
+      {ошибка && (
+        <p className="mb-4 text-sm" style={{ color: "var(--color-rose)" }}>
+          {ошибка}
+        </p>
+      )}
+
+      {!загрузка && ветки.length === 0 && (
+        <div
+          className="rounded-lg p-8 text-center text-sm leading-relaxed"
+          style={{ background: "var(--color-panel)", color: "var(--color-muted)" }}
+        >
+          Обращений пока нет. Они появятся здесь, когда турист напишет из приложения — вкладка
+          «Поддержка» в профиле.
+        </div>
+      )}
+
+      {ветки.length > 0 && (
+        <div className="flex min-h-0 flex-1 flex-col gap-4 lg:flex-row">
+          {/* Список переписок */}
           <div
-            className="text-base font-semibold mb-3"
-            style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}
-          >
-            Чат поддержки
-          </div>
-          <input
-            type="text"
-            placeholder="Поиск..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded px-3 py-2 text-sm outline-none"
+            className="min-h-0 shrink-0 overflow-y-auto rounded-lg lg:w-72"
             style={{
+              display: narrow && показатьПереписку ? "none" : undefined,
               background: "var(--color-panel)",
               border: "1px solid var(--color-border)",
-              color: "var(--color-text)",
-              fontFamily: "var(--font-body)",
             }}
-          />
-        </div>
-
-        <div className="min-w-0 flex-1 overflow-y-auto">
-          {filteredUsers.map((u) => {
-            const unread = unreadFor(u.id);
-            const last = lastMsg(u.id);
-            return (
-              <button
-                key={u.id}
-                onClick={() => selectUser(u.id)}
-                className="w-full flex flex-wrap items-center gap-3 px-4 py-3 text-left transition-colors cursor-pointer"
-                style={{
-                  background: activeUserId === u.id ? "var(--color-panel)" : "transparent",
-                  borderLeft: activeUserId === u.id ? "2px solid var(--color-amber)" : "2px solid transparent",
-                  borderBottom: "1px solid var(--color-border)",
-                }}
-              >
-                <div className="relative shrink-0">
-                  <div
-                    className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold"
-                    style={{ background: "var(--color-dim)", color: "var(--color-amber)" }}
-                  >
-                    {u.avatar}
+          >
+            {ветки.map((t) => {
+              const последнее = t.messages[t.messages.length - 1];
+              return (
+                <button
+                  key={t.userId}
+                  onClick={() => открыть(t.userId)}
+                  className="w-full cursor-pointer border-b px-4 py-3 text-left"
+                  style={{
+                    borderColor: "var(--color-border)",
+                    background: t.userId === активный ? "var(--color-bg)" : "transparent",
+                  }}
+                >
+                  <div className="mb-1 flex flex-wrap items-center gap-2">
+                    <span className="min-w-0 flex-1 truncate text-sm font-medium" style={{ color: "var(--color-text)" }}>
+                      {t.name}
+                    </span>
+                    {t.unreadForStaff > 0 && <Badge label={String(t.unreadForStaff)} color="rose" />}
                   </div>
-                  <div
-                    className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2"
+                  <p className="truncate text-xs" style={{ color: "var(--color-muted)" }}>
+                    {последнее ? последнее.text : "—"}
+                  </p>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Переписка */}
+          <div
+            className="flex min-h-0 flex-1 flex-col rounded-lg"
+            style={{
+              display: narrow && !показатьПереписку ? "none" : undefined,
+              background: "var(--color-panel)",
+              border: "1px solid var(--color-border)",
+            }}
+          >
+            {!ветка ? (
+              <p className="p-8 text-center text-sm" style={{ color: "var(--color-muted)" }}>
+                Выберите переписку слева.
+              </p>
+            ) : (
+              <>
+                <div
+                  className="flex shrink-0 flex-wrap items-center gap-3 border-b px-4 py-3"
+                  style={{ borderColor: "var(--color-border)" }}
+                >
+                  {narrow && (
+                    <button onClick={() => setПоказатьПереписку(false)} style={{ color: "var(--color-muted)" }}>
+                      ‹
+                    </button>
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium" style={{ color: "var(--color-text)" }}>
+                      {ветка.name}
+                    </p>
+                    <p className="truncate text-xs" style={{ color: "var(--color-muted)" }}>
+                      {ветка.email}
+                      {ветка.country ? ` · ${ветка.country}` : ""}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="min-h-0 flex-1 space-y-2 overflow-y-auto p-4">
+                  {ветка.messages.map((m) => {
+                    const оператор = m.author === "staff";
+                    return (
+                      <div key={m.id} className={`flex ${оператор ? "justify-end" : "justify-start"}`}>
+                        <div
+                          className="max-w-[80%] rounded-lg px-3 py-2 text-sm"
+                          style={{
+                            background: оператор ? "var(--color-amber)" : "var(--color-bg)",
+                            color: оператор ? "#0d0c0a" : "var(--color-text)",
+                          }}
+                        >
+                          <p className="whitespace-pre-wrap break-words">{m.text}</p>
+                          <p className="mt-1 text-[10px] opacity-70">{время(m.createdAt)}</p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                  <div ref={низ} />
+                </div>
+
+                <form
+                  onSubmit={ответить}
+                  className="flex shrink-0 flex-wrap items-center gap-2 border-t p-3"
+                  style={{ borderColor: "var(--color-border)" }}
+                >
+                  <input
+                    value={текст}
+                    onChange={(e) => setТекст(e.target.value)}
+                    placeholder="Ответ туристу"
+                    maxLength={2000}
+                    className="min-w-0 flex-1 rounded px-3 py-2 text-sm outline-none"
                     style={{
-                      background: u.status === "active" ? "var(--color-teal)" : u.status === "suspended" ? "var(--color-rose)" : "#888",
-                      borderColor: "var(--color-surface)",
+                      background: "var(--color-bg)",
+                      border: "1px solid var(--color-border)",
+                      color: "var(--color-text)",
                     }}
                   />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span
-                      className="text-sm font-medium truncate"
-                      style={{ color: "var(--color-text)" }}
-                    >
-                      {u.name}
-                    </span>
-                    {unread > 0 && (
-                      <span
-                        className="text-xs rounded-full px-1.5 py-0.5 font-bold shrink-0 ml-1"
-                        style={{ background: "var(--color-rose)", color: "#fff", fontSize: "10px" }}
-                      >
-                        {unread}
-                      </span>
-                    )}
-                  </div>
-                  <div
-                    className="text-xs truncate mt-0.5"
-                    style={{ color: unread > 0 ? "var(--color-text)" : "var(--color-muted)" }}
-                  >
-                    {last}
-                  </div>
-                  <div className="text-xs mt-0.5" style={{ color: "var(--color-dim)", fontFamily: "var(--font-mono)" }}>
-                    {u.flag} {u.country} · {u.lastSeen}
-                  </div>
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Chat window */}
-      <div
-        className="flex flex-col flex-1 min-w-0"
-        style={{ background: "var(--color-bg)", display: narrow && !showChat ? "none" : undefined }}
-      >
-        {/* Header */}
-        <div
-          className="flex flex-wrap items-center gap-3 px-5 py-3.5 shrink-0"
-          style={{ borderBottom: "1px solid var(--color-border)", background: "var(--color-surface)" }}
-        >
-          {narrow && (
-            <button
-              onClick={() => setShowChat(false)}
-              aria-label="К списку бесед"
-              className="shrink-0 cursor-pointer rounded px-1 text-lg"
-              style={{ color: "var(--color-muted)" }}
-            >
-              ‹
-            </button>
-          )}
-          <div className="relative">
-            <div
-              className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold"
-              style={{ background: "var(--color-dim)", color: "var(--color-amber)" }}
-            >
-              {activeUser.avatar}
-            </div>
-            <div
-              className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2"
-              style={{
-                background: activeUser.status === "active" ? "var(--color-teal)" : "#888",
-                borderColor: "var(--color-surface)",
-              }}
-            />
-          </div>
-          <div>
-            <div className="font-medium text-sm" style={{ color: "var(--color-text)" }}>{activeUser.name}</div>
-            <div className="text-xs" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
-              {activeUser.flag} {activeUser.country} · {activeUser.email} · Последний раз {activeUser.lastSeen}
-            </div>
-          </div>
-          <div className="ml-auto flex flex-wrap gap-2">
-            {[
-              { label: `${activeUser.bookings} bookings`, color: "var(--color-teal)" },
-              { label: activeUser.role, color: "var(--color-amber)" },
-              { label: activeUser.status, color: activeUser.status === "active" ? "var(--color-teal)" : "var(--color-rose)" },
-            ].map((b) => (
-              <span
-                key={b.label}
-                className="text-xs px-2 py-0.5 rounded"
-                style={{
-                  background: "rgba(255,255,255,0.05)",
-                  border: "1px solid var(--color-border)",
-                  color: b.color,
-                  fontFamily: "var(--font-mono)",
-                }}
-              >
-                {b.label}
-              </span>
-            ))}
+                  <Btn small>Отправить</Btn>
+                </form>
+              </>
+            )}
           </div>
         </div>
-
-        {/* Messages */}
-        <div className="min-w-0 flex-1 overflow-y-auto px-6 py-5 flex flex-col gap-3">
-          {thread.length === 0 && (
-            <div className="min-w-0 flex-1 flex items-center justify-center">
-              <div className="text-center" style={{ color: "var(--color-muted)" }}>
-                <div className="text-3xl mb-2">◈</div>
-                <div className="text-sm">Нет сообщений. Начните переписку.</div>
-              </div>
-            </div>
-          )}
-          {thread.map((msg) => (
-            <div
-              key={msg.id}
-              className={`flex ${msg.from === "admin" ? "justify-end" : "justify-start"}`}
-            >
-              <div
-                className="max-w-sm px-4 py-2.5 rounded-xl text-sm leading-relaxed"
-                style={{
-                  background: msg.from === "admin"
-                    ? "var(--color-amber)"
-                    : "var(--color-panel)",
-                  color: msg.from === "admin" ? "#0d0c0a" : "var(--color-text)",
-                  border: msg.from === "user" ? "1px solid var(--color-border)" : "none",
-                  borderRadius: msg.from === "admin" ? "16px 16px 4px 16px" : "16px 16px 16px 4px",
-                }}
-              >
-                {msg.text}
-                <div
-                  className="text-xs mt-1 opacity-60"
-                  style={{ fontFamily: "var(--font-mono)", fontSize: "10px" }}
-                >
-                  {msg.time}
-                  {msg.from === "admin" && (
-                    <span className="ml-1">{msg.read ? "✓✓" : "✓"}</span>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))}
-          <div ref={endRef} />
-        </div>
-
-        {/* Quick replies */}
-        <div className="px-5 py-2 flex flex-wrap gap-2 overflow-x-auto shrink-0" style={{ borderTop: "1px solid var(--color-border)" }}>
-          {[
-            "Здравствуйте! Чем могу помочь?",
-            "Ваше бронирование подтверждено ✓",
-            "Проверьте письмо на вашем email",
-            "Переключу вас на специалиста",
-          ].map((q) => (
-            <button
-              key={q}
-              onClick={() => setInput(q)}
-              className="shrink-0 text-xs px-3 py-1.5 rounded-full cursor-pointer transition-opacity hover:opacity-70"
-              style={{
-                background: "var(--color-panel)",
-                border: "1px solid var(--color-border)",
-                color: "var(--color-muted)",
-                fontFamily: "var(--font-body)",
-                whiteSpace: "nowrap",
-              }}
-            >
-              {q}
-            </button>
-          ))}
-        </div>
-
-        {/* Input */}
-        <div
-          className="px-5 py-3 flex flex-wrap gap-3 items-end shrink-0"
-          style={{ borderTop: "1px solid var(--color-border)", background: "var(--color-surface)" }}
-        >
-          <textarea
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                send();
-              }
-            }}
-            placeholder="Введите сообщение… (Enter для отправки)"
-            rows={1}
-            className="min-w-0 flex-1 rounded-lg px-4 py-2.5 text-sm resize-none outline-none"
-            style={{
-              background: "var(--color-panel)",
-              border: "1px solid var(--color-border)",
-              color: "var(--color-text)",
-              fontFamily: "var(--font-body)",
-              lineHeight: "1.5",
-            }}
-          />
-          <button
-            onClick={send}
-            className="rounded-lg px-4 py-2.5 text-sm font-medium cursor-pointer transition-opacity hover:opacity-80 shrink-0"
-            style={{
-              background: input.trim() ? "var(--color-amber)" : "var(--color-dim)",
-              color: input.trim() ? "#0d0c0a" : "var(--color-muted)",
-            }}
-          >
-            Отправить →
-          </button>
-        </div>
-      </div>
+      )}
     </div>
   );
 }

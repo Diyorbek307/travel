@@ -229,3 +229,5 @@ export interface PublicUser {
   createdAt: string;
   lastSeenAt: string;
 }
+
+export type BookingKind = "hotel" | "restaurant" | "tour";

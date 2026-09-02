@@ -31,7 +31,6 @@ import PushCampaigns from "./components/PushCampaigns";
 import Integrations from "./components/Integrations";
 import AccessControl from "./components/AccessControl";
 import Staff from "./components/Staff";
-import { INITIAL_MESSAGES } from "./data/mockData";
 
 const NAV_GROUPS = [
   {
@@ -105,7 +104,6 @@ const NAV_GROUPS = [
 
 export default function AdminShell() {
   const [active, setActive] = useState("dashboard");
-  const [messages, setMessages] = useState(INITIAL_MESSAGES);
   /*
    * На телефоне боковая панель шириной 224 пикселя оставляла контенту
    * 136 из 360 — работать в такой щели невозможно. Поэтому на узком
@@ -119,10 +117,22 @@ export default function AdminShell() {
   const overlay = narrow && !sidebarCollapsed;
   const { isDark, toggleMode } = useTheme();
 
-  const unreadCount = Object.values(messages).reduce(
-    (s, msgs) => s + msgs.filter((m) => m.from === "user" && !m.read).length,
-    0
-  );
+  // Сколько обращений ждут ответа. Значок в меню должен быть честным,
+  // поэтому число берётся с сервера, а не считается по локальному
+  // состоянию, которого больше нет.
+  const [unreadCount, setUnreadCount] = useState(0);
+  useEffect(() => {
+    const обновить = () =>
+      fetch("/api/admin/support")
+        .then((r) => (r.ok ? r.json() : { threads: [] }))
+        .then((d: { threads: { unreadForStaff: number }[] }) =>
+          setUnreadCount(d.threads.reduce((s, t) => s + t.unreadForStaff, 0)),
+        )
+        .catch(() => setUnreadCount(0));
+    обновить();
+    const t = setInterval(обновить, 15000);
+    return () => clearInterval(t);
+  }, []);
 
   const pages: Record<string, React.ReactElement> = {
     dashboard: <Dashboard onNavigate={setActive} />,
@@ -132,7 +142,7 @@ export default function AdminShell() {
     bookings: <Bookings />,
     users: <Users />,
     reviews: <Reviews />,
-    chat: <Chat messages={messages} setMessages={setMessages} />,
+    chat: <Chat />,
     tracking: <UserTracking />,
     ads: <AdsManager />,
     restaurants: <Restaurants />,
