@@ -6,6 +6,7 @@ import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { ADMIN_COOKIE, checkPassword, isAuthenticated, makeToken } from "@/lib/admin-auth";
 import { mediaDir } from "@/lib/paths.js";
+import { addSupportMessage } from "@/lib/db";
 import {
   deleteAdBanner,
   deleteExhibit,
@@ -536,6 +537,22 @@ export async function removeAd(formData: FormData): Promise<void> {
 /* ------------------------------------------------------------------ */
 /* Поддержка                                                          */
 /* ------------------------------------------------------------------ */
+
+/** Ответ оператора уходит в тот же чат, где пишет турист. */
+export async function replyToChat(
+  _prev: ActionResult | null,
+  formData: FormData,
+): Promise<ActionResult> {
+  await requireAuth();
+  const travellerId = str(formData, "traveller_id");
+  const text = str(formData, "text");
+  if (!travellerId) return { ok: false, message: "Не выбран чат" };
+  if (!text) return { ok: false, message: "Пустой ответ" };
+
+  addSupportMessage({ travellerId, author: "staff", text });
+  revalidatePath("/admin/chats");
+  return { ok: true, message: "Ответ отправлен" };
+}
 
 export async function setSupportStatus(formData: FormData): Promise<void> {
   await requireAuth();

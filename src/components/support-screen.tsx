@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Icon from "./icon";
+import SupportChat from "./support-chat";
 import { t } from "@/lib/i18n";
 import type { Lang } from "@/lib/types";
 
@@ -68,6 +69,14 @@ export default function SupportScreen({ lang }: { lang: Lang }) {
         </span>
         <Icon name="chevron-right" size={18} />
       </Link>
+
+      {/* Чат — основной способ связи: ответ приходит сюда же, а не на
+          почту, которую турист может не проверить в поездке. */}
+      <div className="mb-4">
+        <SupportChat lang={lang} />
+      </div>
+
+      <h2 className="mb-2 font-semibold">{t(lang, "support_form_title")}</h2>
 
       {status === "sent" ? (
         <section className="p-5 card">

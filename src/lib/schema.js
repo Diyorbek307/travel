@@ -237,6 +237,34 @@ export const SCHEMA_SQL = `
     );
     CREATE INDEX IF NOT EXISTS idx_support_status ON support_tickets(status, created_at);
 
+    -- Чат поддержки. Собеседник опознаётся по номеру паспорта из
+    -- localStorage: аккаунтов нет, а номер уже закреплён за устройством.
+    CREATE TABLE IF NOT EXISTS support_chats (
+      traveller_id TEXT PRIMARY KEY,
+      name         TEXT,
+      lang         TEXT,
+      -- Последняя переданная координата и до какого момента турист
+      -- разрешил трансляцию. Истёк срок — координату больше не показываем.
+      last_lat     REAL,
+      last_lon     REAL,
+      share_until  TEXT,
+      last_seen    TEXT,
+      created_at   TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+
+    CREATE TABLE IF NOT EXISTS support_messages (
+      id           INTEGER PRIMARY KEY AUTOINCREMENT,
+      traveller_id TEXT NOT NULL REFERENCES support_chats(traveller_id) ON DELETE CASCADE,
+      -- 'user' — от туриста, 'staff' — от оператора.
+      author       TEXT NOT NULL,
+      text         TEXT NOT NULL,
+      -- Координаты прикрепляются к сообщению, как точка в мессенджере.
+      lat          REAL,
+      lon          REAL,
+      created_at   TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+    CREATE INDEX IF NOT EXISTS idx_support_msg ON support_messages(traveller_id, id);
+
     -- Обезличенная аналитика (п. 17): только хэш сессии, без персональных данных.
     CREATE TABLE IF NOT EXISTS events (
       id           INTEGER PRIMARY KEY AUTOINCREMENT,

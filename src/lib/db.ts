@@ -524,6 +524,93 @@ export function createSupportTicket(input: {
   return Number((db.prepare(`SELECT last_insert_rowid() AS id`).get() as Row).id);
 }
 
+/* ------------------------------------------------------------------ */
+/* Чат поддержки                                                      */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Заводит или обновляет карточку собеседника.
+ *
+ * Опознаём по номеру паспорта из localStorage — аккаунтов в приложении
+ * нет, а номер уже закреплён за устройством. Имя турист вписывает сам в
+ * профиле; пока не вписал, в админке будет только номер.
+ */
+export function touchSupportChat(input: {
+  travellerId: string;
+  name: string | null;
+  lang: Lang;
+}): void {
+  getDb()
+    .prepare(
+      `INSERT INTO support_chats (traveller_id, name, lang, last_seen)
+       VALUES (?, ?, ?, datetime('now'))
+       ON CONFLICT(traveller_id) DO UPDATE SET
+         name = COALESCE(excluded.name, support_chats.name),
+         lang = excluded.lang,
+         last_seen = datetime('now')`,
+    )
+    .run(input.travellerId, input.name, input.lang);
+}
+
+export function addSupportMessage(input: {
+  travellerId: string;
+  author: "user" | "staff";
+  text: string;
+  lat?: number | null;
+  lon?: number | null;
+}): number {
+  const db = getDb();
+  db.prepare(
+    `INSERT INTO support_messages (traveller_id, author, text, lat, lon)
+     VALUES (?, ?, ?, ?, ?)`,
+  ).run(input.travellerId, input.author, input.text, input.lat ?? null, input.lon ?? null);
+  return Number((db.prepare(`SELECT last_insert_rowid() AS id`).get() as Row).id);
+}
+
+/** Переписка одного чата. afterId — чтобы дотягивать только новое. */
+export function listSupportMessages(travellerId: string, afterId = 0) {
+  return getDb()
+    .prepare(
+      `SELECT id, author, text, lat, lon, created_at
+         FROM support_messages
+        WHERE traveller_id = ? AND id > ?
+        ORDER BY id`,
+    )
+    .all(travellerId, afterId) as Row[];
+}
+
+/**
+ * Обновляет трансляцию геопозиции.
+ *
+ * shareUntil — момент, до которого турист разрешил показывать себя.
+ * Срок истёк — координаты в админке больше не показываются: разрешение
+ * даётся на время, а не навсегда.
+ */
+export function updateSupportLocation(input: {
+  travellerId: string;
+  lat: number;
+  lon: number;
+  shareUntil: string | null;
+}): void {
+  getDb()
+    .prepare(
+      `UPDATE support_chats
+          SET last_lat = ?, last_lon = ?, share_until = ?, last_seen = datetime('now')
+        WHERE traveller_id = ?`,
+    )
+    .run(input.lat, input.lon, input.shareUntil, input.travellerId);
+}
+
+/** Турист выключил трансляцию — забываем координаты немедленно. */
+export function stopSupportLocation(travellerId: string): void {
+  getDb()
+    .prepare(
+      `UPDATE support_chats SET last_lat = NULL, last_lon = NULL, share_until = NULL
+        WHERE traveller_id = ?`,
+    )
+    .run(travellerId);
+}
+
 export function analytics() {
   const db = getDb();
   const q = (sql: string) => db.prepare(sql).all() as Row[];

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import HeroPattern from "./hero-pattern";
 import { useAppState } from "./app-state";
 import Icon from "./icon";
@@ -41,9 +41,13 @@ export default function Onboarding({
   const [picked, setPicked] = useState<Lang>(lang);
   const [interests, setInterests] = useState<Theme[]>([]);
   const router = useRouter();
+  const pathname = usePathname();
 
   // Пока localStorage не прочитан, состояние неизвестно: показать экран
   // сразу — значит мигнуть им и тем, кто онбординг уже прошёл.
+  // В админ-панели заставка ни к чему: там работает сотрудник, а не
+  // турист, и приветственный экран поверх таблиц только мешает.
+  if (pathname.startsWith("/admin")) return null;
   if (!ready || onboarded) return null;
 
   if (step === 0) {

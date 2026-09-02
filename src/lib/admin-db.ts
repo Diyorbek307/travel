@@ -514,6 +514,39 @@ export function listAdBannersAdmin() {
 /* Поддержка                                                          */
 /* ------------------------------------------------------------------ */
 
+/**
+ * Список чатов для админки.
+ *
+ * Координаты отдаём только пока не истёк срок, на который турист
+ * разрешил трансляцию: разрешение даётся на время, и просроченная точка
+ * не должна показываться оператору.
+ */
+export function listSupportChats() {
+  return getDb()
+    .prepare(
+      `SELECT c.traveller_id, c.name, c.lang, c.last_seen, c.share_until,
+              CASE WHEN c.share_until > datetime('now') THEN c.last_lat END AS last_lat,
+              CASE WHEN c.share_until > datetime('now') THEN c.last_lon END AS last_lon,
+              (SELECT COUNT(*) FROM support_messages m WHERE m.traveller_id = c.traveller_id) AS total,
+              (SELECT text FROM support_messages m WHERE m.traveller_id = c.traveller_id
+                ORDER BY m.id DESC LIMIT 1) AS last_text,
+              (SELECT created_at FROM support_messages m WHERE m.traveller_id = c.traveller_id
+                ORDER BY m.id DESC LIMIT 1) AS last_at
+         FROM support_chats c
+        ORDER BY COALESCE(last_at, c.created_at) DESC`,
+    )
+    .all() as Row[];
+}
+
+export function listSupportChatMessages(travellerId: string) {
+  return getDb()
+    .prepare(
+      `SELECT id, author, text, lat, lon, created_at
+         FROM support_messages WHERE traveller_id = ? ORDER BY id`,
+    )
+    .all(travellerId) as Row[];
+}
+
 export function listSupportAdmin() {
   return getDb()
     .prepare(
