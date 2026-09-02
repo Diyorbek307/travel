@@ -54,3 +54,23 @@ export const МЕСТА: Record<string, Geo> = {
 export function точка(название: string, город: string): Geo | null {
   return МЕСТА[название] ?? ГОРОДА[город] ?? null;
 }
+
+/** Радиус Земли для расстояния по большому кругу, километры. */
+const РАДИУС_КМ = 6371;
+
+/**
+ * Расстояние по прямой между двумя точками.
+ *
+ * Это не длина дороги: по улицам всегда выходит длиннее. Дорогу считает
+ * движок маршрутизации, а прямая нужна там, где важен порядок величины —
+ * что ближе, что дальше.
+ */
+export function расстояниеКм(a: Geo, b: Geo): number {
+  const рад = (г: number) => (г * Math.PI) / 180;
+  const dф = рад(b.lat - a.lat);
+  const dл = рад(b.lon - a.lon);
+  const ф1 = рад(a.lat);
+  const ф2 = рад(b.lat);
+  const h = Math.sin(dф / 2) ** 2 + Math.cos(ф1) * Math.cos(ф2) * Math.sin(dл / 2) ** 2;
+  return Math.round(2 * РАДИУС_КМ * Math.asin(Math.sqrt(h)));
+}

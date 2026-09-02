@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import UzMap, { расстояниеКм } from "@/components/uz-map";
-import { ГОРОДА, МЕСТА, точка } from "@/data/geo";
+import RealMap from "@/components/real-map";
+import GoogleMap, { googleКлюч } from "@/components/google-map";
+import { ГОРОДА, МЕСТА, расстояниеКм, точка } from "@/data/geo";
 import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE } from "@/lib/theme";
 import type { Geo } from "@/lib/types";
 
@@ -213,15 +214,30 @@ export default function RouteView({
         ) : (
           <>
             <div className="overflow-hidden rounded-2xl border shadow-sm" style={{ background: WHITE, borderColor: BORDER }}>
-              <UzMap
-                высота={300}
-                зона={зона}
-                подписьРасстояния={false}
-                откуда={откуда}
-                выбрано={цель}
-                путь={дорога?.точки ?? null}
-                метки={[{ название, geo: цель }, ...рядом]}
-              />
+              {/*
+                Есть ключ Google — показываем его карту с его же маршрутом.
+                Нет ключа — карту OpenStreetMap с линией, которую посчитал
+                наш движок. Обе живут внутри приложения и никуда не уводят.
+              */}
+              {googleКлюч() ? (
+                <GoogleMap
+                  откуда={откуда}
+                  куда={цель}
+                  подпись={название}
+                  высота={300}
+                  пешком={способ === "пешком"}
+                />
+              ) : (
+                <RealMap
+                  высота={300}
+                  откуда={откуда}
+                  путь={дорога?.точки ?? null}
+                  точки={[
+                    { geo: цель, подпись: название, главная: true },
+                    ...рядом.map((р) => ({ geo: р.geo, подпись: р.название })),
+                  ]}
+                />
+              )}
             </div>
 
             {способы.length > 1 && (

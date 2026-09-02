@@ -6,7 +6,7 @@ import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE } from "@/lib/theme";
 import { WEATHER } from "@/data/content";
 import { useAppContent } from "@/components/content-provider";
 import { Badge } from "../ui";
-import UzMap from "@/components/uz-map";
+import RealMap from "@/components/real-map";
 import { ГОРОДА } from "@/data/geo";
 
 
@@ -47,7 +47,7 @@ export function MapScreen({ onRoute }:{ onRoute:(r:Route)=>void }) {
             <div className="rounded-2xl px-4 py-3 flex items-center gap-2" style={{background:GREEN+"15",border:`1px solid ${GREEN}30`}}>
               <span className="text-lg">🗺️</span>
               <div className="min-w-0 flex-1">
-                <p className="text-xs font-bold" style={{color:GREEN}}>Узбекистан и соседи</p>
+                <p className="text-xs font-bold" style={{color:GREEN}}>Карта Узбекистана</p>
                 <p className="text-[10px]" style={{color:MUTED}}>Нажмите город · синяя точка — вы</p>
               </div>
               <button
@@ -60,11 +60,16 @@ export function MapScreen({ onRoute }:{ onRoute:(r:Route)=>void }) {
             </div>
             {/* 3D Map */}
             <div className="bg-white rounded-2xl overflow-hidden shadow-sm border" style={{borderColor:BORDER}}>
-              <UzMap
+              <RealMap
                 высота={320}
                 откуда={где}
-                выбрано={city ? ГОРОДА[city] ?? null : null}
-                onВыбор={(м)=>setCity(м.название)}
+                приблизить={false}
+                точки={Object.entries(ГОРОДА).map(([название,geo])=>({
+                  geo,
+                  подпись: название,
+                  главная: название===city,
+                }))}
+                onВыбор={(т)=>{ if(т.подпись) setCity(т.подпись); }}
               />
             </div>
             {/* Selected city info */}

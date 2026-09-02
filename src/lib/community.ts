@@ -1,6 +1,6 @@
 import { randomBytes } from "node:crypto";
 import path from "node:path";
-import { createFileStore } from "./file-store";
+import { создатьХранилище } from "./storage";
 
 /**
  * Всё, что создают сами пользователи: переписка с поддержкой, брони и
@@ -40,7 +40,7 @@ export interface SupportThread {
   unreadForStaff: number;
 }
 
-const поддержка = createFileStore<SupportThread[]>(
+const поддержка = создатьХранилище<SupportThread[]>(
   path.join(DATA_DIR, "support.json"),
   () => [],
 );
@@ -118,7 +118,7 @@ export interface Booking {
   createdAt: string;
 }
 
-const брони = createFileStore<Booking[]>(path.join(DATA_DIR, "bookings.json"), () => []);
+const брони = создатьХранилище<Booking[]>(path.join(DATA_DIR, "bookings.json"), () => []);
 
 export async function listBookings(): Promise<Booking[]> {
   return [...(await брони.read())].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
@@ -166,7 +166,7 @@ export interface Review {
   createdAt: string;
 }
 
-const отзывы = createFileStore<Review[]>(path.join(DATA_DIR, "reviews.json"), () => []);
+const отзывы = создатьХранилище<Review[]>(path.join(DATA_DIR, "reviews.json"), () => []);
 
 export async function listReviews(): Promise<Review[]> {
   return [...(await отзывы.read())].sort((a, b) => b.createdAt.localeCompare(a.createdAt));

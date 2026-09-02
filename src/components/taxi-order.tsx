@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { BORDER, GOLD, GREEN, MUTED, TEXT, WHITE } from "@/lib/theme";
-import { ГОРОДА, МЕСТА, точка } from "@/data/geo";
+import { ГОРОДА, МЕСТА, расстояниеКм, точка } from "@/data/geo";
 import type { Geo } from "@/lib/types";
-import UzMap, { расстояниеКм } from "@/components/uz-map";
+import RealMap from "@/components/real-map";
 
 /**
  * Заказ такси.
@@ -216,14 +216,17 @@ export default function TaxiOrder({
 
         {карта && старт && (
           <div className="mb-3 overflow-hidden rounded-xl border" style={{ borderColor: BORDER }}>
-            <UzMap
-              высота={240}
-              зона={{ центр: старт, радиусКм: 12 }}
+            <RealMap
+              высота={260}
               откуда={старт}
-              выбрано={куда?.geo ?? null}
-              метки={местаГорода}
-              onВыбор={(м) => {
-                setКуда({ название: м.название, geo: м.geo });
+              точки={местаГорода.map((м) => ({
+                geo: м.geo,
+                подпись: м.название,
+                главная: куда?.название === м.название,
+              }))}
+              onВыбор={(т) => {
+                if (!т.подпись) return;
+                setКуда({ название: т.подпись, geo: т.geo });
                 setКарта(false);
               }}
               onТочка={точкаНаКарте}

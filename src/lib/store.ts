@@ -1,6 +1,6 @@
 import path from "node:path";
 import { SEED } from "@/data/seed";
-import { createFileStore } from "./file-store";
+import { создатьХранилище } from "./storage";
 import type { Content } from "@/lib/types";
 
 /**
@@ -13,16 +13,15 @@ import type { Content } from "@/lib/types";
  * Запись идёт через общую очередь: два редактора, нажавшие «Сохранить»
  * одновременно, иначе затёрли бы правки друг друга.
  *
- * ВАЖНО о сохранности. Каталог берётся из DATA_DIR, а на бесплатном
- * тарифе Render постоянного диска нет: файловая система контейнера
- * обнуляется при перезапуске и выкате, и правки редакторов пропадут.
- * Чтобы они жили, нужен тариф с диском и DATA_DIR, указывающий на него.
+ * О сохранности заботится storage.ts: при заданном DATABASE_URL всё
+ * ложится во внешнюю базу и переживает перезапуски, иначе — в файлы, что
+ * годится только для своей машины.
  */
 
 const DATA_DIR = process.env.DATA_DIR ?? path.join(process.cwd(), "data");
 const FILE = path.join(DATA_DIR, "content.json");
 
-const хранилище = createFileStore<Partial<Content>>(FILE, () => ({}));
+const хранилище = создатьХранилище<Partial<Content>>(FILE, () => ({}));
 
 export async function readContent(): Promise<Content> {
   // Семена подкладываются снизу: если в сохранённом файле не хватает

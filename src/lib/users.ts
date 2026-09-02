@@ -1,7 +1,7 @@
 import { createHmac, randomBytes, scrypt, timingSafeEqual } from "node:crypto";
 import { promisify } from "node:util";
 import path from "node:path";
-import { createFileStore } from "./file-store";
+import { создатьХранилище } from "./storage";
 
 /**
  * Учётные записи туристов.
@@ -54,7 +54,7 @@ export function publicUser(u: User): Omit<User, "passwordHash"> {
   return rest;
 }
 
-const хранилище = createFileStore<User[]>(FILE, () => []);
+const хранилище = создатьХранилище<User[]>(FILE, () => []);
 
 async function readAll(): Promise<User[]> {
   return хранилище.read();
@@ -254,7 +254,7 @@ export const VERIFY_TTL_MS = 15 * 60 * 1000;
 /** Больше пяти попыток — код сгорает, нужен новый. */
 const MAX_ATTEMPTS = 5;
 
-const коды = createFileStore<Verification[]>(VERIFY_FILE, () => []);
+const коды = создатьХранилище<Verification[]>(VERIFY_FILE, () => []);
 
 export async function createVerification(email: string): Promise<string> {
   // Код из crypto, а не из Math.random: тот предсказуем по предыдущим
@@ -368,7 +368,7 @@ const RESETS_FILE = path.join(DATA_DIR, "resets.json");
 /** Час: ссылка на смену пароля не должна жить дольше нужного. */
 export const RESET_TTL_MS = 60 * 60 * 1000;
 
-const сбросы = createFileStore<ResetRequest[]>(RESETS_FILE, () => []);
+const сбросы = создатьХранилище<ResetRequest[]>(RESETS_FILE, () => []);
 
 export async function createReset(user: User): Promise<ResetRequest> {
   const now = Date.now();
