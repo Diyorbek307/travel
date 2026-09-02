@@ -20,7 +20,7 @@ export async function GET() {
         return {
           ...r,
           name: u ? `${u.firstName} ${u.lastName}`.trim() : "Аккаунт удалён",
-          photo: u?.photo ?? null,
+          photoUrl: u?.hasPhoto ? `/api/photo/${u.id}` : null,
         };
       }),
     },

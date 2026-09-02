@@ -223,7 +223,8 @@ export interface PublicUser {
   email: string;
   firstName: string;
   lastName: string;
-  photo: string | null;
+  /** Снимок отдаётся отдельно, по /api/photo/<id>. */
+  hasPhoto: boolean;
   country: string;
   phone: string;
   createdAt: string;

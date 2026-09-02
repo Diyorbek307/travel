@@ -73,7 +73,7 @@ export async function GET() {
         всего: users.length,
         активные: активные.length,
         подтверждённые: users.filter((u) => u.emailVerified).length,
-        сФотографией: users.filter((u) => u.photo).length,
+        сФотографией: users.filter((u) => u.hasPhoto).length,
       },
       брони: {
         всего: брони.length,

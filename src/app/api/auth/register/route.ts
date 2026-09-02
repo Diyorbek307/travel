@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createUser, createVerification, findByEmail, publicUser, ждатьДоОтправки } from "@/lib/users";
 import { mailConfigured, sendMail, письмоСКодом } from "@/lib/mail";
+import { savePhoto } from "@/lib/photos";
 
 export const dynamic = "force-dynamic";
 
@@ -48,6 +49,8 @@ export async function POST(request: Request) {
     phone: str("phone"),
   });
 
+  // Снимок кладём отдельным файлом: в учётной записи остаётся только
+  // отметка, что он есть.
   // Занятость адреса окончательно решается внутри хранилища: проверка
   // выше отсекает большинство случаев, но при двух одновременных
   // запросах на один адрес оба прошли бы её.
@@ -57,6 +60,8 @@ export async function POST(request: Request) {
 
   // Сессию не выдаём: сперва пусть подтвердит почту кодом из письма.
   // Иначе на чужой адрес можно завести аккаунт и пользоваться им.
+  if (photo) await savePhoto(user.id, photo);
+
   const code = await createVerification(user.email);
   const отправлено = await sendMail({ to: user.email, ...письмоСКодом(code) });
 

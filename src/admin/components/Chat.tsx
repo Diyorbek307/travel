@@ -25,7 +25,7 @@ interface Thread {
   userId: string;
   name: string;
   email: string;
-  photo: string | null;
+  photoUrl: string | null;
   country: string;
   messages: Message[];
   updatedAt: string;

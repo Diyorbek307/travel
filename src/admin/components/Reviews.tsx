@@ -17,7 +17,7 @@ interface Review {
   status: "published" | "hidden";
   createdAt: string;
   name: string;
-  photo: string | null;
+  photoUrl: string | null;
 }
 
 function Звёзды({ n }: { n: number }) {
@@ -107,8 +107,8 @@ export default function Reviews() {
             }}
           >
             <div className="mb-2 flex flex-wrap items-center gap-2">
-              {r.photo ? (
-                <img src={r.photo} alt="" className="h-8 w-8 shrink-0 rounded-full object-cover" />
+              {r.photoUrl ? (
+                <img src={r.photoUrl} alt="" className="h-8 w-8 shrink-0 rounded-full object-cover" />
               ) : (
                 <span
                   className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold"

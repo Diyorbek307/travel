@@ -28,7 +28,7 @@ export async function GET() {
           ...t,
           name: u ? `${u.firstName} ${u.lastName}`.trim() : "Аккаунт удалён",
           email: u?.email ?? "",
-          photo: u?.photo ?? null,
+          photoUrl: u?.hasPhoto ? `/api/photo/${u.id}` : null,
           country: u?.country ?? "",
         };
       }),

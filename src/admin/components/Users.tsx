@@ -19,7 +19,7 @@ type User = {
   email: string;
   country: string;
   phone: string;
-  photo: string | null;
+  photoUrl: string | null;
   createdAt: string;
   lastSeenAt: string;
 };
@@ -135,7 +135,7 @@ export default function Users() {
       <div className="mb-7 grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard label="ВСЕГО" value={String(users.length)} />
         <StatCard label="АКТИВНЫЕ" value={String(users.filter(активен).length)} sub="за 3 месяца" />
-        <StatCard label="С ФОТОГРАФИЕЙ" value={String(users.filter((u) => u.photo).length)} />
+        <StatCard label="С ФОТОГРАФИЕЙ" value={String(users.filter((u) => u.photoUrl).length)} />
         <StatCard label="СТРАН" value={String(new Set(users.map((u) => u.country).filter(Boolean)).size)} />
       </div>
 
@@ -305,8 +305,8 @@ export default function Users() {
           cols={["ТУРИСТ", "ПОЧТА", "СТРАНА", "РЕГИСТРАЦИЯ", "БЫЛ В СЕТИ", ""]}
           rows={список.map((u) => [
             <span key="n" className="flex items-center gap-2.5">
-              {u.photo ? (
-                <img src={u.photo} alt="" className="h-7 w-7 shrink-0 rounded-full object-cover" />
+              {u.photoUrl ? (
+                <img src={u.photoUrl} alt="" className="h-7 w-7 shrink-0 rounded-full object-cover" />
               ) : (
                 <span
                   className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold"
@@ -343,8 +343,8 @@ export default function Users() {
             style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }}
           >
             <div className="mb-4 flex items-center gap-3">
-              {открыт.photo ? (
-                <img src={открыт.photo} alt="" className="h-14 w-14 rounded-full object-cover" />
+              {открыт.photoUrl ? (
+                <img src={открыт.photoUrl} alt="" className="h-14 w-14 rounded-full object-cover" />
               ) : (
                 <span
                   className="flex h-14 w-14 items-center justify-center rounded-full text-lg font-semibold"

@@ -32,8 +32,12 @@ export interface User {
   passwordHash: string;
   firstName: string;
   lastName: string;
-  /** Фотография как data-URL. Паспорт и документы не хранятся. */
-  photo: string | null;
+  /**
+   * Есть ли снимок. Сам он лежит отдельным файлом и отдаётся по
+   * /api/photo/<id>: раньше data-URL хранился прямо здесь и раздувал
+   * users.json, который переписывается на каждой записи.
+   */
+  hasPhoto: boolean;
   country: string;
   phone: string;
   /** Почта подтверждена кодом из письма. */
@@ -161,7 +165,7 @@ export async function createUser(input: {
       passwordHash,
       firstName: input.firstName.trim(),
       lastName: input.lastName.trim(),
-      photo: input.photo,
+      hasPhoto: Boolean(input.photo),
       country: input.country.trim(),
       phone: input.phone.trim(),
       emailVerified: false,
@@ -179,10 +183,23 @@ export async function createUser(input: {
  * входи заново»: срок отсчитывается от последнего появления, поэтому
  * постоянный пользователь не выпадает никогда.
  */
+/**
+ * Как часто обновляем отметку «был в сети».
+ *
+ * Приложение спрашивает «кто вошёл» при каждом открытии, а запись
+ * переписывает весь файл. Обновлять дату по сто раз в день незачем: для
+ * правила «не заходил три месяца» хватает точности в час.
+ */
+const ОТМЕТКА_НЕ_ЧАЩЕ_МС = 60 * 60 * 1000;
+
 export async function touchUser(id: string): Promise<void> {
   await хранилище.update((users) => {
     const i = users.findIndex((u) => u.id === id);
     if (i === -1) return [users, undefined];
+
+    const прошло = Date.now() - new Date(users[i].lastSeenAt).getTime();
+    if (прошло < ОТМЕТКА_НЕ_ЧАЩЕ_МС) return [users, undefined];
+
     const копия = [...users];
     копия[i] = { ...копия[i], lastSeenAt: new Date().toISOString() };
     return [копия, undefined];
