@@ -50,6 +50,10 @@ export default function Users() {
   const [скопирован, setСкопирован] = useState<string | null>(null);
   const [коды, setКоды] = useState<Verify[]>([]);
   const [почтаНастроена, setПочтаНастроена] = useState(true);
+  const [почта, setПочта] = useState<{ ok: boolean; detail: string } | null>(null);
+  const [проверяю, setПроверяю] = useState(false);
+  const [кудаПробное, setКудаПробное] = useState("");
+  const [пробноеИтог, setПробноеИтог] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/admin/users")
@@ -69,6 +73,32 @@ export default function Users() {
       })
       .catch(() => setЗаявки([]));
   }, []);
+
+  async function проверитьПочту() {
+    setПроверяю(true);
+    setПробноеИтог(null);
+    try {
+      const res = await fetch("/api/admin/mail");
+      setПочта(await res.json());
+    } catch {
+      setПочта({ ok: false, detail: "Сервер не ответил" });
+    } finally {
+      setПроверяю(false);
+    }
+  }
+
+  async function отправитьПробное() {
+    setПробноеИтог(null);
+    const res = await fetch("/api/admin/mail", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ to: кудаПробное }),
+    });
+    const d = await res.json();
+    setПробноеИтог(
+      d.ok ? "Письмо отправлено — проверьте ящик и папку «Спам»" : "Отправить не удалось",
+    );
+  }
 
   async function удалить(id: string) {
     const res = await fetch(`/api/admin/users?id=${encodeURIComponent(id)}`, { method: "DELETE" });
@@ -107,6 +137,54 @@ export default function Users() {
         <StatCard label="АКТИВНЫЕ" value={String(users.filter(активен).length)} sub="за 3 месяца" />
         <StatCard label="С ФОТОГРАФИЕЙ" value={String(users.filter((u) => u.photo).length)} />
         <StatCard label="СТРАН" value={String(new Set(users.map((u) => u.country).filter(Boolean)).size)} />
+      </div>
+
+      {/* Проверка почты: подключается и авторизуется, писем не шлёт. */}
+      <div
+        className="mb-4 rounded-lg p-4"
+        style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }}
+      >
+        <div className="mb-3 flex flex-wrap items-center gap-2">
+          <p className="min-w-0 flex-1 text-sm font-medium" style={{ color: "var(--color-text)" }}>
+            Почтовый сервис
+          </p>
+          <Btn variant="ghost" small onClick={проверитьПочту}>
+            {проверяю ? "Проверяем…" : "Проверить подключение"}
+          </Btn>
+        </div>
+
+        {почта && (
+          <p
+            className="mb-3 text-sm leading-relaxed"
+            style={{ color: почта.ok ? "var(--color-teal)" : "var(--color-rose)" }}
+          >
+            {почта.ok ? "✓ " : "✕ "}
+            {почта.detail}
+          </p>
+        )}
+
+        <div className="flex flex-wrap items-center gap-2">
+          <input
+            value={кудаПробное}
+            onChange={(e) => setКудаПробное(e.target.value)}
+            placeholder="Куда отправить пробное письмо"
+            className="min-w-0 flex-1 rounded px-3 py-1.5 text-sm outline-none"
+            style={{
+              background: "var(--color-bg)",
+              border: "1px solid var(--color-border)",
+              color: "var(--color-text)",
+            }}
+          />
+          <Btn variant="ghost" small onClick={отправитьПробное}>
+            Отправить пробное
+          </Btn>
+        </div>
+
+        {пробноеИтог && (
+          <p className="mt-2 text-sm" style={{ color: "var(--color-muted)" }}>
+            {пробноеИтог}
+          </p>
+        )}
       </div>
 
       {!почтаНастроена && (коды.length > 0 || заявки.length > 0) && (

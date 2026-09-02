@@ -70,6 +70,47 @@ export async function sendMail(letter: Letter): Promise<boolean> {
   }
 }
 
+/**
+ * Проверка настроек почты.
+ *
+ * Подключается к серверу и проходит авторизацию, но письма не шлёт.
+ * Позволяет убедиться, что переменные заданы верно, не рассылая ничего
+ * живым людям.
+ */
+export async function проверитьПочту(): Promise<{ ok: boolean; detail: string }> {
+  if (!mailConfigured()) {
+    const нет = [
+      !HOST && "SMTP_HOST",
+      !USER && "SMTP_USER",
+      !PASS && "SMTP_PASSWORD",
+    ].filter(Boolean);
+    return { ok: false, detail: `Не заданы переменные: ${нет.join(", ")}` };
+  }
+
+  const t = getTransport();
+  if (!t) return { ok: false, detail: "Не удалось создать подключение" };
+
+  try {
+    await t.verify();
+    return { ok: true, detail: `Подключение к ${HOST}:${PORT} работает, вход выполнен` };
+  } catch (error) {
+    return { ok: false, detail: (error as Error).message };
+  }
+}
+
+/** Пробное письмо — чтобы увидеть, как оно выглядит и дошло ли. */
+export async function пробноеПисьмо(to: string): Promise<boolean> {
+  return sendMail({
+    to,
+    subject: "Проверка почты UzUp",
+    text: "Если вы это читаете, отправка писем настроена верно.",
+    html: каркас(
+      "Почта настроена",
+      `<p style="margin:0;font-size:14px;line-height:1.6">Если вы это читаете, отправка писем работает: коды подтверждения и ссылки на смену пароля будут доходить.</p>`,
+    ),
+  });
+}
+
 /* ------------------------------------------------------------------ */
 /* Шаблоны                                                            */
 /* ------------------------------------------------------------------ */
