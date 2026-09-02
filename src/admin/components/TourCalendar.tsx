@@ -69,7 +69,7 @@ export default function TourCalendar() {
   const confirmedCount = events.filter(e => e.status === "confirmed").length;
 
   return (
-    <div className="p-7">
+    <div className="p-4 sm:p-4 sm:p-7">
       <PageHeader
         title="Расписание туров"
         subtitle="Сентябрь 2026 — все отправления"
@@ -84,7 +84,7 @@ export default function TourCalendar() {
       />
 
       {/* KPIs */}
-      <div className="grid grid-cols-4 gap-4 mb-7">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-7">
         {[
           { label: "ВСЕГО ТУРОВ", val: String(events.length), color: "var(--color-text)" },
           { label: "ПОДТВЕРЖДЁННЫХ", val: String(confirmedCount), color: "var(--color-teal)" },
@@ -196,7 +196,7 @@ export default function TourCalendar() {
               <Badge label={{ confirmed: "подтверждён", pending: "ожидание", cancelled: "отменён" }[selected.status] ?? selected.status} color={selected.status === "confirmed" ? "teal" : selected.status === "pending" ? "amber" : "rose"} />
             </div>
 
-            <div className="grid grid-cols-2 gap-3 mb-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
               {[
                 { label: "ДАТЫ", val: `Sep ${selected.start}–${selected.end}, 2026` },
                 { label: "ГИД", val: selected.guide },
@@ -212,7 +212,7 @@ export default function TourCalendar() {
 
             {/* Occupancy bar */}
             <div className="mb-5">
-              <div className="flex justify-between text-xs mb-1.5">
+              <div className="flex justify-between gap-2 text-xs mb-1.5">
                 <span style={{ color: "var(--color-muted)" }}>Заполненность</span>
                 <span style={{ color: "var(--color-text)", fontFamily: "var(--font-mono)" }}>{Math.round(selected.booked / selected.seats * 100)}%</span>
               </div>
@@ -233,11 +233,11 @@ export default function TourCalendar() {
       {showAdd && (
         <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: "rgba(0,0,0,0.7)" }} onClick={() => setShowAdd(false)}>
           <div className="rounded-2xl w-full max-w-md p-6" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }} onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center justify-between gap-2 mb-5">
               <h3 className="text-lg font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}>Новый тур</h3>
               <button onClick={() => setShowAdd(false)} className="opacity-50 hover:opacity-100 cursor-pointer text-xl" style={{ color: "var(--color-text)" }}>×</button>
             </div>
-            <div className="grid grid-cols-2 gap-3 mb-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
               {([["title","Название","text"],["destination","Направление","text"],["guide","Гид","text"],["seats","Мест","number"]] as [string,string,string][]).map(([k,label,type]) => (
                 <div key={k} className={k === "title" || k === "guide" ? "col-span-2" : ""}>
                   <label className="text-xs block mb-1" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>{label.toUpperCase()}</label>

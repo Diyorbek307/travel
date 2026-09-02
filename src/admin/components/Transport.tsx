@@ -68,7 +68,7 @@ export default function Transport() {
   const activeTaxis = 8;
 
   return (
-    <div className="p-7">
+    <div className="p-4 sm:p-4 sm:p-7">
       <PageHeader title="Транспорт" subtitle="Управление всеми транспортными интеграциями" />
 
       {/* Tab nav */}
@@ -89,7 +89,7 @@ export default function Transport() {
 
       {tab === "overview" && (
         <div>
-          <div className="grid grid-cols-4 gap-4 mb-7">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-7">
             {[
               { label: "ПОЕЗДОК СЕГОДНЯ", val: String(activeTaxis), sub: "через Яндекс", color: "var(--color-amber)" },
               { label: "АВИАРЕЙСОВ", val: String(flights.length), sub: "сегодня", color: "var(--color-teal)" },
@@ -231,7 +231,7 @@ export default function Transport() {
               </div>
             ) : (
               <div>
-                <div className="grid grid-cols-3 gap-3 mb-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
                   {[
                     { label: "Активных поездок", val: String(activeTaxis) },
                     { label: "Бронирований сегодня", val: "23" },
@@ -388,11 +388,11 @@ export default function Transport() {
       {showAddFlight && (
         <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: "rgba(0,0,0,0.7)" }} onClick={() => setShowAddFlight(false)}>
           <div className="rounded-2xl w-full max-w-lg p-6" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }} onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center justify-between gap-2 mb-5">
               <h3 className="text-lg font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}>Добавить рейс</h3>
               <button onClick={() => setShowAddFlight(false)} className="opacity-50 hover:opacity-100 cursor-pointer text-xl" style={{ color: "var(--color-text)" }}>×</button>
             </div>
-            <div className="grid grid-cols-2 gap-3 mb-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
               {([["id","Номер рейса","text"],["from","Откуда (код)","text"],["to","Куда (код)","text"],["airline","Авиакомпания","text"],["dep","Отправление","text"],["arr","Прибытие","text"],["price","Цена ($)","number"],["seats","Мест","number"]] as [string,string,string][]).map(([k,label,type]) => (
                 <div key={k}>
                   <label className="text-xs block mb-1" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>{label.toUpperCase()}</label>
@@ -426,13 +426,13 @@ export default function Transport() {
       {showAddRoute && (
         <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: "rgba(0,0,0,0.7)" }} onClick={() => setShowAddRoute(null)}>
           <div className="rounded-2xl w-full max-w-lg p-6" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }} onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center justify-between gap-2 mb-5">
               <h3 className="text-lg font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}>
                 {showAddRoute === "train" ? "Добавить маршрут поезда" : "Добавить маршрут автобуса"}
               </h3>
               <button onClick={() => setShowAddRoute(null)} className="opacity-50 hover:opacity-100 cursor-pointer text-xl" style={{ color: "var(--color-text)" }}>×</button>
             </div>
-            <div className="grid grid-cols-2 gap-3 mb-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
               {([["id","Номер","text"],["from","Откуда","text"],["to","Куда","text"],["dep","Отправление","text"],["arr","Прибытие","text"],["price","Цена ($)","number"],["seats","Мест","number"]] as [string,string,string][]).map(([k,label,type]) => (
                 <div key={k}>
                   <label className="text-xs block mb-1" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>{label.toUpperCase()}</label>
@@ -474,7 +474,7 @@ export default function Transport() {
       {showYandexMgmt && (
         <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: "rgba(0,0,0,0.7)" }} onClick={() => setShowYandexMgmt(false)}>
           <div className="rounded-2xl w-full max-w-md p-6" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }} onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center justify-between gap-2 mb-5">
               <h3 className="text-lg font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}>Управление Яндекс Такси</h3>
               <button onClick={() => setShowYandexMgmt(false)} className="opacity-50 hover:opacity-100 cursor-pointer text-xl" style={{ color: "var(--color-text)" }}>×</button>
             </div>
@@ -485,7 +485,7 @@ export default function Transport() {
                 { label: "Бронирований сегодня", val: "23" },
                 { label: "Статус интеграции", val: "✓ Подключено" },
               ].map(s => (
-                <div key={s.label} className="flex justify-between items-center py-2 text-sm" style={{ borderBottom: "1px solid var(--color-border)" }}>
+                <div key={s.label} className="flex justify-between gap-2 items-center py-2 text-sm" style={{ borderBottom: "1px solid var(--color-border)" }}>
                   <span style={{ color: "var(--color-muted)" }}>{s.label}</span>
                   <span style={{ color: "var(--color-text)", fontFamily: "var(--font-mono)" }}>{s.val}</span>
                 </div>

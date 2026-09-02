@@ -132,7 +132,7 @@ export default function Guides() {
   };
 
   return (
-    <div className="p-7">
+    <div className="p-4 sm:p-4 sm:p-7">
       <PageHeader
         title="Гиды"
         subtitle={`${guides.length} гидов · ${onTour} в туре · ${available} доступно`}
@@ -140,7 +140,7 @@ export default function Guides() {
       />
 
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-4 mb-7">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-7">
         {[
           { label: "ВСЕГО ГИДОВ", val: String(guides.length), color: "var(--color-text)" },
           { label: "В ТУРЕ СЕЙЧАС", val: String(onTour), color: "var(--color-amber)" },
@@ -249,7 +249,7 @@ export default function Guides() {
               ))}
             </div>
 
-            <div className="flex items-center justify-between text-xs" style={{ borderTop: "1px solid var(--color-border)", paddingTop: "10px" }}>
+            <div className="flex items-center justify-between gap-2 text-xs" style={{ borderTop: "1px solid var(--color-border)", paddingTop: "10px" }}>
               <div style={{ color: "var(--color-muted)" }}>
                 Следующий: <span style={{ color: "var(--color-text)" }}>{g.nextTour}</span>
               </div>
@@ -265,11 +265,11 @@ export default function Guides() {
       {showAdd && (
         <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: "rgba(0,0,0,0.75)", backdropFilter: "blur(4px)" }} onClick={() => setShowAdd(false)}>
           <div className="rounded-2xl w-full max-w-lg p-6 overflow-y-auto" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)", maxHeight: "85vh" }} onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center justify-between gap-2 mb-5">
               <h3 className="text-lg font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}>Добавить гида</h3>
               <button onClick={() => setShowAdd(false)} className="opacity-50 hover:opacity-100 cursor-pointer text-xl" style={{ color: "var(--color-text)" }}>×</button>
             </div>
-            <div className="grid grid-cols-2 gap-3 mb-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
               {([
                 ["name","Полное имя","text"],["email","Email","email"],["phone","Телефон","tel"],
                 ["cities","Города (через запятую)","text"],["languages","Языки (через запятую)","text"],
@@ -355,7 +355,7 @@ export default function Guides() {
 
             <div className="p-6">
               {/* Stats row */}
-              <div className="grid grid-cols-3 gap-3 mb-5">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
                 {[
                   { label: "Туров проведено", val: String(selected.totalTours) },
                   { label: "В этом месяце", val: String(selected.thisMonth) },
@@ -370,7 +370,7 @@ export default function Guides() {
 
               <p className="text-sm leading-relaxed mb-4" style={{ color: "var(--color-muted)" }}>{selected.bio}</p>
 
-              <div className="grid grid-cols-2 gap-4 mb-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                 <div>
                   <div className="text-xs mb-2" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>ЯЗЫКИ</div>
                   <div className="flex flex-wrap gap-1">
@@ -398,7 +398,7 @@ export default function Guides() {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between text-sm mb-5 p-3 rounded-lg" style={{ background: "var(--color-surface)" }}>
+              <div className="flex items-center justify-between gap-2 text-sm mb-5 p-3 rounded-lg" style={{ background: "var(--color-surface)" }}>
                 <span style={{ color: "var(--color-muted)" }}>Следующий тур:</span>
                 <span style={{ color: "var(--color-text)", fontFamily: "var(--font-mono)" }}>{selected.nextTour}</span>
               </div>

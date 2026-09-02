@@ -27,7 +27,7 @@ export default function Settings({ onNavigate }: { onNavigate?: (page: string) =
   };
 
   return (
-    <div className="p-7">
+    <div className="p-4 sm:p-4 sm:p-7">
       <PageHeader
         title="Настройки"
         subtitle="Аккаунт, уведомления и системные параметры"
@@ -126,7 +126,7 @@ export default function Settings({ onNavigate }: { onNavigate?: (page: string) =
           <SectionTitle>Тема оформления</SectionTitle>
 
           {/* Dark/Light toggle */}
-          <div className="flex items-center justify-between mb-4 p-3 rounded-xl" style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }}>
+          <div className="flex items-center justify-between gap-2 mb-4 p-3 rounded-xl" style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }}>
             <div>
               <div className="text-sm font-medium" style={{ color: "var(--color-text)" }}>
                 {isDark ? "Тёмная тема" : "Светлая тема"}
@@ -197,7 +197,7 @@ export default function Settings({ onNavigate }: { onNavigate?: (page: string) =
               { label: "SMS-шлюз", val: "Eskiz.uz — активен" },
               { label: "Аналитика", val: "Google Analytics 4" },
             ].map(s => (
-              <div key={s.label} className="flex justify-between text-sm py-1.5" style={{ borderBottom: "1px solid var(--color-border)" }}>
+              <div key={s.label} className="flex justify-between gap-2 text-sm py-1.5" style={{ borderBottom: "1px solid var(--color-border)" }}>
                 <span style={{ color: "var(--color-muted)" }}>{s.label}</span>
                 <span style={{ color: "var(--color-text)", fontFamily: "var(--font-mono)", fontSize: "12px" }}>{s.val}</span>
               </div>

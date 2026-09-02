@@ -19,7 +19,7 @@ export default function Cities() {
   };
 
   return (
-    <div className="p-7">
+    <div className="p-4 sm:p-4 sm:p-7">
       <PageHeader
         title="Города"
         subtitle={`${cities.length} городов · ${cities.filter(c => c.featured).length} на главной`}
@@ -82,7 +82,7 @@ export default function Cities() {
       {showAdd && (
         <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: "rgba(0,0,0,0.7)" }} onClick={() => setShowAdd(false)}>
           <div className="rounded-2xl w-full max-w-md p-6" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }} onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center justify-between gap-2 mb-5">
               <h3 className="text-lg font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}>Добавить город</h3>
               <button onClick={() => setShowAdd(false)} className="opacity-50 hover:opacity-100 cursor-pointer text-xl" style={{ color: "var(--color-text)" }}>×</button>
             </div>
@@ -138,7 +138,7 @@ export default function Cities() {
             </div>
             <div className="p-5">
               <p className="text-sm leading-relaxed mb-4" style={{ color: "var(--color-muted)" }}>{selected.description}</p>
-              <div className="grid grid-cols-2 gap-3 mb-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
                 {[
                   { label: "Население", val: selected.population.toLocaleString() },
                   { label: "Туристов в год", val: selected.tourists.toLocaleString() },

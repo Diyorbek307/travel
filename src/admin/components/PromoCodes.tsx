@@ -76,7 +76,7 @@ export default function PromoCodes() {
   const usagePct = (p: Promo) => Math.min(Math.round((p.used / p.limit) * 100), 100);
 
   return (
-    <div className="p-7">
+    <div className="p-4 sm:p-4 sm:p-7">
       <PageHeader
         title="Промокоды и скидки"
         subtitle={`${activeCount} активных · ${totalUsed.toLocaleString()} использований · $${totalRevenue.toLocaleString()} влияние на выручку`}
@@ -84,7 +84,7 @@ export default function PromoCodes() {
       />
 
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-4 mb-7">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-7">
         {[
           { label: "АКТИВНЫХ КОДОВ", val: String(activeCount), color: "var(--color-teal)" },
           { label: "ВСЕГО ИСПОЛЬЗОВАНИЙ", val: totalUsed.toLocaleString(), color: "var(--color-text)" },
@@ -143,7 +143,7 @@ export default function PromoCodes() {
 
                   {/* Usage bar */}
                   <div>
-                    <div className="flex justify-between text-xs mb-1" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
+                    <div className="flex justify-between gap-2 text-xs mb-1" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
                       <span>Использование</span>
                       <span style={{ color: pct === 100 ? "var(--color-rose)" : pct > 75 ? "var(--color-amber)" : "var(--color-muted)" }}>
                         {p.used} / {p.limit} ({pct}%)

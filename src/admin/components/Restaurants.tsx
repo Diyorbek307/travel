@@ -28,7 +28,7 @@ export default function Restaurants() {
   };
 
   return (
-    <div className="p-7">
+    <div className="p-4 sm:p-4 sm:p-7">
       <PageHeader
         title="Рестораны"
         subtitle={`${filtered.length} заведений · ${items.filter(r => r.promoted).length} продвигается`}
@@ -45,7 +45,7 @@ export default function Restaurants() {
         </div>
       )}
 
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between gap-2 mb-6">
         <div className="flex gap-2 flex-wrap">
           {[["all", "все"], ["active", "активные"], ["pending", "на рассмотрении"], ["suspended", "приостановлены"]].map(([f, label]) => (
             <button key={f} onClick={() => setFilter(f)}
@@ -144,11 +144,11 @@ export default function Restaurants() {
       {showAdd && (
         <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: "rgba(0,0,0,0.7)" }} onClick={() => setShowAdd(false)}>
           <div className="rounded-2xl w-full max-w-lg p-6" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }} onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center justify-between gap-2 mb-5">
               <h3 className="text-lg font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}>Добавить ресторан</h3>
               <button onClick={() => setShowAdd(false)} className="opacity-50 hover:opacity-100 cursor-pointer text-xl" style={{ color: "var(--color-text)" }}>×</button>
             </div>
-            <div className="grid grid-cols-2 gap-3 mb-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
               {([["name","Название","text","col-span-2"],["city","Город","text",""],["cuisine","Кухня","text",""],["seats","Мест","number",""],["phone","Телефон","text",""],["address","Адрес","text","col-span-2"],["openHours","Часы работы","text",""]] as [string,string,string,string][]).map(([k,label,type,cls]) => (
                 <div key={k} className={cls}>
                   <label className="text-xs block mb-1" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>{label.toUpperCase()}</label>
@@ -196,7 +196,7 @@ export default function Restaurants() {
               <button className="text-xl opacity-50 hover:opacity-100 cursor-pointer" style={{ color: "var(--color-text)" }} onClick={() => setSelected(null)}>×</button>
             </div>
             <p className="text-sm leading-relaxed mb-4" style={{ color: "var(--color-muted)" }}>{selected.desc}</p>
-            <div className="grid grid-cols-2 gap-3 mb-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
               {[
                 { label: "Город", val: selected.city },
                 { label: "Кухня", val: selected.cuisine },

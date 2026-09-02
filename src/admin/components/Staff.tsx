@@ -159,7 +159,7 @@ export default function Staff() {
   };
 
   return (
-    <div className="p-7">
+    <div className="p-4 sm:p-4 sm:p-7">
       <PageHeader
         title="Сотрудники"
         subtitle={`${staff.filter(s => s.status === "active").length} активных · ${staff.filter(s => s.status === "pending").length} ожидают`}
@@ -167,7 +167,7 @@ export default function Staff() {
       />
 
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-4 mb-7">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-7">
         {[
           { label: "ВСЕГО СОТРУДНИКОВ", val: String(staff.length), color: "var(--color-text)" },
           { label: "АКТИВНЫХ", val: String(staff.filter(s => s.status === "active").length), color: "var(--color-teal)" },
@@ -253,7 +253,7 @@ export default function Staff() {
               </div>
 
               {/* Permissions */}
-              <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center justify-between gap-2 mb-3">
                 <SectionTitle>Доступы</SectionTitle>
                 {!editing ? (
                   <button onClick={() => setEditing(true)} className="text-xs cursor-pointer" style={{ color: "var(--color-amber)" }}>Изменить</button>
@@ -317,7 +317,7 @@ export default function Staff() {
           <div className="rounded-2xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }} onClick={e => e.stopPropagation()}>
             <h3 className="text-lg font-semibold mb-5" style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}>Пригласить сотрудника</h3>
 
-            <div className="grid grid-cols-2 gap-3 mb-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
               {[
                 { key: "name", label: "ФИО", ph: "Камола Ташкентова" },
                 { key: "email", label: "Email", ph: "kamola@uztravel.uz" },

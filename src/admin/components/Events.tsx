@@ -46,7 +46,7 @@ export default function Events() {
   };
 
   return (
-    <div className="p-7">
+    <div className="p-4 sm:p-4 sm:p-7">
       <PageHeader
         title="События"
         subtitle={`${filtered.length} событий · ${events.filter(e => e.featured).length} рекомендуемых`}
@@ -103,7 +103,7 @@ export default function Events() {
 
                 {/* Ticket progress */}
                 <div className="mb-3">
-                  <div className="flex justify-between text-xs mb-1" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
+                  <div className="flex justify-between gap-2 text-xs mb-1" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
                     <span>Билетов продано</span>
                     <span style={{ color: soldPct > 80 ? "var(--color-rose)" : "var(--color-teal)" }}>
                       {e.ticketsSold.toLocaleString()} / {e.capacity.toLocaleString()} ({soldPct}%)

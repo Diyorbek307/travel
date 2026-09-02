@@ -69,7 +69,7 @@ export default function BottomNav({
 }) {
   return (
     <nav
-      className="absolute bottom-0 left-0 right-0 flex h-16 items-center border-t"
+      className="device-nav absolute bottom-0 left-0 right-0 flex items-center border-t"
       style={{ background: "#FFFFFF", borderColor: "var(--border)" }}
     >
       {ITEMS.map(({ key, label, icon }) => {

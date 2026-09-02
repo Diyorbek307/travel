@@ -135,14 +135,14 @@ export default function Analytics() {
   const change = (((current - prev) / prev) * 100).toFixed(1);
 
   return (
-    <div className="p-7">
+    <div className="p-4 sm:p-4 sm:p-7">
       <PageHeader
         title="Аналитика"
         subtitle="Привлечение, удержание, выручка и вовлечённость"
       />
 
       {/* KPI sparklines */}
-      <div className="grid grid-cols-4 gap-4 mb-7">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-7">
         {(Object.entries(METRIC_CONFIG) as Array<[Metric, typeof cfg]>).map(([key, c]) => {
           const cur = c.data[c.data.length - 1];
           const prv = c.data[c.data.length - 2];
@@ -177,7 +177,7 @@ export default function Analytics() {
 
       {/* Main trend chart */}
       <Card className="p-5 mb-6">
-        <div className="flex items-center justify-between mb-5">
+        <div className="flex items-center justify-between gap-2 mb-5">
           <div>
             <SectionTitle>{cfg.label} — динамика</SectionTitle>
             <div className="flex items-baseline gap-2 -mt-2">
@@ -206,7 +206,7 @@ export default function Analytics() {
 
         <div style={{ position: "relative" }}>
           <LineChart data={cfg.data} color={cfg.color} height={140} />
-          <div className="flex justify-between mt-2 px-1">
+          <div className="flex justify-between gap-2 mt-2 px-1">
             {MONTHS.map(m => (
               <span key={m} className="text-xs" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)", fontSize: "10px" }}>{m}</span>
             ))}
@@ -222,7 +222,7 @@ export default function Analytics() {
           <div className="flex flex-col gap-2">
             {FUNNEL.map((step, i) => (
               <div key={step.label}>
-                <div className="flex justify-between text-xs mb-1">
+                <div className="flex justify-between gap-2 text-xs mb-1">
                   <span style={{ color: "var(--color-muted)" }}>{step.label}</span>
                   <span style={{ color: "var(--color-text)", fontFamily: "var(--font-mono)" }}>
                     {step.val.toLocaleString()} <span style={{ color: "var(--color-muted)" }}>({step.pct}%)</span>
@@ -294,7 +294,7 @@ export default function Analytics() {
               <div key={g.country} className="flex items-center gap-2.5">
                 <span className="text-base shrink-0">{g.flag}</span>
                 <div className="flex-1 min-w-0">
-                  <div className="flex justify-between text-xs mb-1">
+                  <div className="flex justify-between gap-2 text-xs mb-1">
                     <span style={{ color: "var(--color-muted)" }}>{g.country}</span>
                     <span style={{ color: "var(--color-text)", fontFamily: "var(--font-mono)" }}>{g.users.toLocaleString()}</span>
                   </div>

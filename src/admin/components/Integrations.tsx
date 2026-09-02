@@ -60,7 +60,7 @@ export default function Integrations() {
   const filteredIntegrations = catFilter === "Все" ? INTEGRATIONS : INTEGRATIONS.filter(i => i.category === catFilter);
 
   return (
-    <div className="p-7">
+    <div className="p-4 sm:p-4 sm:p-7">
       <PageHeader
         title="API и интеграции"
         subtitle="API-ключи, сторонние сервисы и вебхуки"
@@ -137,7 +137,7 @@ export default function Integrations() {
             ))}
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {filteredIntegrations.map(intg => (
               <div key={intg.name} className="rounded-xl p-4 flex items-start gap-3" style={{ background: "var(--color-panel)", border: `1px solid ${intg.status === "error" ? "rgba(196,90,66,0.3)" : "var(--color-border)"}` }}>
                 <div className="text-2xl leading-none shrink-0 mt-0.5">{intg.logo}</div>

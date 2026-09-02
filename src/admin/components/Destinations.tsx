@@ -27,7 +27,7 @@ export default function Destinations() {
   };
 
   return (
-    <div className="p-7">
+    <div className="p-4 sm:p-4 sm:p-7">
       <PageHeader
         title="Направления"
         subtitle={`${filtered.length} направлений`}
@@ -35,7 +35,7 @@ export default function Destinations() {
       />
 
       {/* Filters + view toggle */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between gap-2 mb-6">
         <div className="flex gap-1.5">
           {(["all", "active", "seasonal", "draft"] as const).map((f) => {
             const filterLabel: Record<string, string> = { all: "Все", active: "Активные", seasonal: "Сезонные", draft: "Черновик" };
@@ -185,7 +185,7 @@ export default function Destinations() {
               <p className="text-sm leading-relaxed mb-4" style={{ color: "var(--color-muted)" }}>
                 {selected.desc}
               </p>
-              <div className="grid grid-cols-3 gap-3 mb-5">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
                 {[
                   { label: "Рейтинг", val: `★ ${selected.rating}` },
                   { label: "Посещений", val: selected.visits.toLocaleString() },

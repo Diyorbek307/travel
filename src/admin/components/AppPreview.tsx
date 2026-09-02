@@ -16,7 +16,7 @@ function HomeScreen() {
     <div className="flex flex-col h-full overflow-y-auto">
       {/* Header */}
       <div className="px-4 pt-12 pb-4" style={{ background: "linear-gradient(135deg, #0d0c0a 0%, #1c1a15 100%)" }}>
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between gap-2 mb-4">
           <div>
             <div className="text-xs opacity-60" style={{ color: "#f0ebe0" }}>Доброе утро,</div>
             <div className="text-base font-semibold" style={{ color: "#f0ebe0", fontFamily: "var(--font-display)" }}>Откройте Узбекистан</div>
@@ -56,7 +56,7 @@ function HomeScreen() {
 
       {/* Promoted restaurants */}
       <div className="px-4 mt-4">
-        <div className="flex items-center justify-between mb-2.5">
+        <div className="flex items-center justify-between gap-2 mb-2.5">
           <div className="text-xs font-medium" style={{ color: "var(--color-text)" }}>Топ рестораны</div>
           <div className="text-xs" style={{ color: "var(--color-amber)", fontFamily: "var(--font-mono)" }}>Все</div>
         </div>
@@ -165,7 +165,7 @@ function TransportScreen() {
       </div>
 
       <div className="px-4 pt-4">
-        <div className="grid grid-cols-2 gap-2 mb-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-5">
           {[
             { icon: "✈", label: "Рейсы", color: "var(--color-teal)" },
             { icon: "🚄", label: "Поезда", color: "var(--color-amber)" },
@@ -251,7 +251,7 @@ export default function AppPreview() {
   };
 
   return (
-    <div className="p-7">
+    <div className="p-4 sm:p-4 sm:p-7">
       <div className="flex items-start justify-between mb-6">
         <div>
           <h1 className="text-2xl font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}>Превью приложения</h1>
@@ -376,7 +376,7 @@ export default function AppPreview() {
               { label: "Рейтинг App Store", val: "★ 4.8 (1 240 отзывов)" },
               { label: "Рейтинг Play Store", val: "★ 4.7 (890 отзывов)" },
             ].map(s => (
-              <div key={s.label} className="flex justify-between text-xs py-1.5" style={{ borderBottom: "1px solid var(--color-border)" }}>
+              <div key={s.label} className="flex justify-between gap-2 text-xs py-1.5" style={{ borderBottom: "1px solid var(--color-border)" }}>
                 <span style={{ color: "var(--color-muted)" }}>{s.label}</span>
                 <span style={{ color: "var(--color-text)", fontFamily: "var(--font-mono)" }}>{s.val}</span>
               </div>

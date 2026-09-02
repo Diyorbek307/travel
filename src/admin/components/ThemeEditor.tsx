@@ -114,7 +114,7 @@ export default function ThemeEditor() {
   const fontDisplayLabel = (val: string) => val.split(",")[0].replace(/'/g, "").trim();
 
   return (
-    <div className="p-7">
+    <div className="p-4 sm:p-4 sm:p-7">
       <PageHeader
         title="Визуальный редактор"
         subtitle="Нажмите на любое свойство для изменения — изменения применяются мгновенно"

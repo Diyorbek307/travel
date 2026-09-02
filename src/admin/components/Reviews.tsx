@@ -55,7 +55,7 @@ export default function Reviews() {
   }));
 
   return (
-    <div className="p-7">
+    <div className="p-4 sm:p-4 sm:p-7">
       <PageHeader
         title="Отзывы"
         subtitle={`${reviews.length} отзывов · средн. ${avgRating} ★`}
@@ -103,7 +103,7 @@ export default function Reviews() {
         </div>
 
         {/* Status summary */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {[
             { label: "ОПУБЛИКОВАНЫ", val: reviews.filter(r => r.status === "published").length, color: "var(--color-teal)" },
             { label: "НА МОДЕРАЦИИ", val: reviews.filter(r => r.status === "pending").length, color: "var(--color-amber)" },

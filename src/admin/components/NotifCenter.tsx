@@ -64,7 +64,7 @@ export default function NotifCenter({ onNavigate }: { onNavigate?: (page: string
   const unreadCount = notifs.filter(n => !n.read).length;
 
   return (
-    <div className="p-7">
+    <div className="p-4 sm:p-4 sm:p-7">
       <PageHeader
         title="Уведомления"
         subtitle={`${unreadCount} непрочитанных`}

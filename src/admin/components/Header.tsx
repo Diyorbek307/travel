@@ -126,7 +126,7 @@ export default function Header({ active, onNavigate, sidebarCollapsed, onToggleS
 
         {/* Breadcrumb */}
         <div className="flex items-center gap-1.5 text-sm min-w-0">
-          <span style={{ color: "var(--color-dim)" }}>Узбекистан Админ</span>
+          <span className="hidden md:inline" style={{ color: "var(--color-dim)" }}>Узбекистан Админ</span>
           <span style={{ color: "var(--color-dim)" }}>›</span>
           <span className="font-medium truncate" style={{ color: "var(--color-text)" }}>
             {activePage?.label ?? active}
@@ -184,7 +184,7 @@ export default function Header({ active, onNavigate, sidebarCollapsed, onToggleS
                 flexDirection: "column",
               }}
             >
-              <div className="flex items-center justify-between px-4 py-3" style={{ borderBottom: "1px solid var(--color-border)" }}>
+              <div className="flex items-center justify-between gap-2 px-4 py-3" style={{ borderBottom: "1px solid var(--color-border)" }}>
                 <div className="font-medium text-sm" style={{ color: "var(--color-text)", fontFamily: "var(--font-display)" }}>
                   Уведомления
                   {unreadCount > 0 && (

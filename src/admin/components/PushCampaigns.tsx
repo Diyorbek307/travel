@@ -46,7 +46,7 @@ export default function PushCampaigns() {
   const totalClicked = campaigns.filter(c => c.status === "sent").reduce((s, c) => s + c.clicked, 0);
 
   return (
-    <div className="p-7">
+    <div className="p-4 sm:p-4 sm:p-7">
       <PageHeader
         title="Push-уведомления"
         subtitle="Мобильные кампании, сегменты и аналитика доставки"
@@ -54,7 +54,7 @@ export default function PushCampaigns() {
       />
 
       {/* KPIs */}
-      <div className="grid grid-cols-4 gap-4 mb-7">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-7">
         {[
           { label: "ВСЕГО ОТПРАВЛЕНО", val: totalSent.toLocaleString(), color: "var(--color-text)" },
           { label: "ОТКРЫТО", val: `${Math.round(totalOpened / totalSent * 100)}%`, color: "var(--color-amber)" },

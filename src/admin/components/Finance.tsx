@@ -66,7 +66,7 @@ export default function Finance() {
   });
 
   return (
-    <div className="p-7">
+    <div className="p-4 sm:p-4 sm:p-7">
       <PageHeader
         title="Финансовые отчёты"
         subtitle="Выручка, выплаты, транзакции и счета"
@@ -85,7 +85,7 @@ export default function Finance() {
       {tab === "overview" && (
         <div>
           {/* KPIs */}
-          <div className="grid grid-cols-4 gap-4 mb-7">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-7">
             {[
               { label: "ВАЛОВАЯ ВЫРУЧКА", val: `$${totalRevenue.toLocaleString()}`, color: "var(--color-teal)", change: "+8.1%" },
               { label: "ВЫПЛАТЫ ГИДАМ", val: `$${totalPayouts.toLocaleString()}`, color: "var(--color-rose)", change: "+12%" },
@@ -107,7 +107,7 @@ export default function Finance() {
               <div className="flex flex-col gap-3">
                 {MONTHLY_BREAKDOWN.map(b => (
                   <div key={b.category}>
-                    <div className="flex justify-between text-xs mb-1">
+                    <div className="flex justify-between gap-2 text-xs mb-1">
                       <span style={{ color: "var(--color-muted)" }}>{b.category}</span>
                       <span style={{ color: "var(--color-text)", fontFamily: "var(--font-mono)" }}>
                         ${b.revenue.toLocaleString()} <span style={{ color: "var(--color-muted)" }}>({b.pct}%)</span>
@@ -118,7 +118,7 @@ export default function Finance() {
                     </div>
                   </div>
                 ))}
-                <div className="flex justify-between text-sm font-semibold pt-2" style={{ borderTop: "1px solid var(--color-border)", color: "var(--color-text)" }}>
+                <div className="flex justify-between gap-2 text-sm font-semibold pt-2" style={{ borderTop: "1px solid var(--color-border)", color: "var(--color-text)" }}>
                   <span>Итого</span>
                   <span style={{ fontFamily: "var(--font-mono)", color: "var(--color-amber)" }}>$91,240</span>
                 </div>
@@ -144,7 +144,7 @@ export default function Finance() {
                       {m.method.slice(0, 2)}
                     </div>
                     <div className="flex-1">
-                      <div className="flex justify-between text-xs mb-1">
+                      <div className="flex justify-between gap-2 text-xs mb-1">
                         <span style={{ color: "var(--color-muted)" }}>{m.method}</span>
                         <span style={{ color: "var(--color-text)", fontFamily: "var(--font-mono)" }}>{m.amount}</span>
                       </div>

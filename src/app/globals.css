@@ -30,7 +30,9 @@ body {
 }
 
 body {
-  background: var(--green);
+  /* Тот же цвет, что у подложки: иначе при оттягивании экрана из-под
+     приложения выглядывала бы зелёная полоса. */
+  background: var(--cream);
   color: var(--text);
   -webkit-font-smoothing: antialiased;
 }
@@ -293,5 +295,99 @@ body {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/*
+ * Корпус телефона.
+ *
+ * В макете приложение показано в корпусе на большом холсте — это приём
+ * презентации, а не часть интерфейса. На настоящем телефоне корпус
+ * вреден: он отнимает поля по краям (экран 430, корпус жёстко 390 — и
+ * по бокам торчит фон) и рисует вторую строку состояния поверх
+ * системной.
+ *
+ * Поэтому на телефоне приложение занимает экран целиком, а корпус со
+ * всей бутафорией остаётся только там, где для него есть место.
+ */
+
+.device-shell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100dvh;
+  background: var(--cream);
+}
+
+.device {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  width: 100%;
+  /* dvh, а не vh: в мобильном браузере адресная строка съезжает, и по
+     vh низ приложения оказывался бы под ней. */
+  height: 100dvh;
+  background: var(--cream);
+}
+
+/* Нарисованная строка состояния и отступ под неё — только в корпусе. */
+.mock-status {
+  display: none;
+}
+
+.device-content {
+  padding-top: 0;
+}
+
+/* Нижнее меню не должно упираться в полосу «домой». */
+.device-nav {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  height: calc(4rem + env(safe-area-inset-bottom, 0px));
+}
+
+.device-content {
+  padding-bottom: calc(4rem + env(safe-area-inset-bottom, 0px));
+}
+
+/* Кнопки в шапке уходили бы под вырез в режиме приложения. */
+.device-safe-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+@media (min-width: 480px) and (min-height: 760px) {
+  body {
+    background: #1a5c3a;
+  }
+
+  .device-shell {
+    background: linear-gradient(135deg, #2e7d5a 0%, #1a5c3a 100%);
+  }
+
+  .device {
+    width: 390px;
+    height: 844px;
+    border-radius: 44px;
+    box-shadow:
+      0 0 0 1px rgb(255 255 255 / 0.14),
+      0 50px 150px rgb(0 0 0 / 0.55);
+  }
+
+  .mock-status {
+    display: flex;
+  }
+
+  .device-content {
+    padding-top: 40px;
+    padding-bottom: 4rem;
+  }
+
+  .device-nav {
+    padding-bottom: 0;
+    height: 4rem;
+  }
+
+  .device-safe-top {
+    padding-top: 0;
   }
 }

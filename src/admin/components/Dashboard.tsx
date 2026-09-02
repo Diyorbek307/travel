@@ -51,14 +51,14 @@ export default function Dashboard({ onNavigate }: { onNavigate: (id: string) => 
   const maxRev = Math.max(...REVENUE_DATA.map(d => d.val));
 
   return (
-    <div className="p-7">
+    <div className="p-4 sm:p-4 sm:p-7">
       <PageHeader
         title="Обзор"
         subtitle={`${new Date().toLocaleDateString("ru", { weekday: "long", month: "long", day: "numeric", year: "numeric" })} — активные операции`}
       />
 
       {/* Stat cards */}
-      <div className="grid grid-cols-4 gap-4 mb-7">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-7">
         <StatCard label="ВСЕГО БРОНИРОВАНИЙ" value="2,847" change="12.4%" positive sub="к прошлому месяцу" />
         <StatCard label="АКТИВНЫХ ТУРОВ" value="34" change="3" positive sub="новых за неделю" />
         <StatCard label="ВЫРУЧКА ЗА МЕСЯЦ" value="$91,240" change="8.1%" positive sub="к авг 2026" />
@@ -146,7 +146,7 @@ export default function Dashboard({ onNavigate }: { onNavigate: (id: string) => 
 
       {/* Booking heatmap */}
       <Card className="p-5 mb-6">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between gap-2 mb-4">
           <SectionTitle>Тепловая карта — этот месяц</SectionTitle>
           <div className="flex items-center gap-2 text-xs" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
             <span>Низко</span>
@@ -237,7 +237,7 @@ export default function Dashboard({ onNavigate }: { onNavigate: (id: string) => 
                     style={{ background: "var(--color-dim)" }}
                   />
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between gap-2">
                       <span className="text-sm font-medium" style={{ color: "var(--color-text)" }}>{d.name}</span>
                       <span className="text-xs" style={{ color: "var(--color-teal)", fontFamily: "var(--font-mono)" }}>{d.change}</span>
                     </div>

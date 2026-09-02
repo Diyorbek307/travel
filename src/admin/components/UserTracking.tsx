@@ -42,7 +42,7 @@ export default function UserTracking() {
   const displayUsers = selectedUser ? [selectedUser] : (showAll ? activeUsers : []);
 
   return (
-    <div className="p-7">
+    <div className="p-4 sm:p-4 sm:p-7">
       <div className="flex items-start justify-between mb-6">
         <div>
           <h1

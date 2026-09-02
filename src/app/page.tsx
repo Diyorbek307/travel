@@ -25,7 +25,6 @@ import TransportScreen from "@/components/screens/transport";
 import PracticalScreen from "@/components/screens/practical";
 import { MiniPlayer, Toast } from "@/components/widgets";
 import { ContentProvider } from "@/components/content-provider";
-import { CREAM, GREEN } from "@/lib/theme";
 import type { Hotel, Place, Restaurant, Route, Tab } from "@/lib/types";
 
 /**
@@ -110,20 +109,8 @@ function App() {
   const onboarding = phase !== "app";
 
   return (
-    <div
-      className="flex size-full items-center justify-center"
-      style={{ background: `linear-gradient(135deg,${GREEN} 0%,#1A5C3A 100%)` }}
-    >
-      <div
-        className="relative flex flex-col overflow-hidden"
-        style={{
-          width: "min(390px,100vw)",
-          height: "min(844px,100vh)",
-          background: CREAM,
-          borderRadius: "min(44px,5vw)",
-          boxShadow: "0 0 0 1px rgba(255,255,255,0.14),0 50px 150px rgba(0,0,0,0.55)",
-        }}
-      >
+    <div className="device-shell">
+      <div className="device">
         <StatusBar transparent={onboarding} />
 
         {showLogin && (
@@ -145,7 +132,7 @@ function App() {
         )}
 
         {phase === "lang" && (
-          <div className="absolute inset-0 z-40 pt-10">
+          <div className="device-safe-top absolute inset-0 z-40">
             <OnboardingLang
               onNext={(picked) => {
                 setLang(picked);
@@ -156,7 +143,7 @@ function App() {
         )}
 
         {phase === "interests" && (
-          <div className="absolute inset-0 z-40 pt-10">
+          <div className="device-safe-top absolute inset-0 z-40">
             <OnboardingInterests lang={lang} onDone={() => setPhase("app")} />
           </div>
         )}
@@ -175,7 +162,7 @@ function App() {
             {showNotifs && <NotifsPanel onClose={() => setShowNotifs(false)} />}
             {showPractical && <PracticalScreen onBack={() => setShowPractical(false)} />}
             {showTransport && (
-              <div className="absolute inset-0 z-40 pt-10">
+              <div className="device-safe-top absolute inset-0 z-40">
                 <TransportScreen onBack={() => setShowTransport(false)} isPremium={isPremium} />
               </div>
             )}
@@ -202,7 +189,7 @@ function App() {
               />
             )}
 
-            <div className="flex-1 overflow-hidden pb-16 pt-10">
+            <div className="device-content flex-1 overflow-hidden">
               <div key={tabKey} className="animate-fade-in h-full">
                 <Screen
                   tab={tab}

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTheme } from "./context/ThemeContext";
 import Header from "./components/Header";
 import Dashboard from "./components/Dashboard";
@@ -102,10 +102,33 @@ const NAV_GROUPS = [
   },
 ];
 
+/** Следит за шириной окна: панель ведёт себя иначе на телефоне. */
+function useNarrowScreen() {
+  const [narrow, setNarrow] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 899px)");
+    const sync = () => setNarrow(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+  return narrow;
+}
+
 export default function AdminShell() {
   const [active, setActive] = useState("dashboard");
   const [messages, setMessages] = useState(INITIAL_MESSAGES);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  /*
+   * На телефоне боковая панель шириной 224 пикселя оставляла контенту
+   * 136 из 360 — работать в такой щели невозможно. Поэтому на узком
+   * экране она свёрнута, а раскрытая ложится поверх содержимого, а не
+   * отжимает его.
+   */
+  const narrow = useNarrowScreen();
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() =>
+    typeof window !== "undefined" ? window.innerWidth < 900 : false,
+  );
+  const overlay = narrow && !sidebarCollapsed;
   const { isDark, toggleMode } = useTheme();
 
   const unreadCount = Object.values(messages).reduce(
@@ -148,10 +171,27 @@ export default function AdminShell() {
   return (
     <div className="flex h-full" style={{ background: "var(--color-bg)", color: "var(--color-text)" }}>
       {/* Sidebar */}
+      {overlay && (
+        <div
+          className="fixed inset-0 z-40"
+          style={{ background: "rgba(0,0,0,0.5)" }}
+          onClick={() => setSidebarCollapsed(true)}
+          aria-hidden
+        />
+      )}
+
       <aside
-        className="flex flex-col h-full shrink-0 overflow-hidden transition-all duration-200"
+        /* Переход только по ширине. С transition-all он срывался: на
+           узком экране панель одновременно меняет position со static на
+           fixed, анимация обрывается на полпути, и панель застревала
+           раскрытой шириной в 56 пикселей. */
+        className="flex flex-col h-full shrink-0 overflow-hidden transition-[width] duration-200"
         style={{
           width: sidebarWidth,
+          position: overlay ? "fixed" : undefined,
+          insetBlock: overlay ? 0 : undefined,
+          left: overlay ? 0 : undefined,
+          zIndex: overlay ? 50 : undefined,
           background: "var(--color-surface)",
           borderRight: "1px solid var(--color-border)",
         }}
@@ -206,7 +246,10 @@ export default function AdminShell() {
               {group.items.map((item) => (
                 <button
                   key={item.id}
-                  onClick={() => setActive(item.id)}
+                  onClick={() => {
+                    setActive(item.id);
+                    if (narrow) setSidebarCollapsed(true);
+                  }}
                   title={sidebarCollapsed ? item.label : undefined}
                   className="flex items-center w-full text-left text-sm transition-all duration-150 rounded cursor-pointer relative"
                   style={{

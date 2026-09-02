@@ -62,7 +62,7 @@ export default function Hotels() {
   const avgOccupancy = Math.round((totalOccupied / totalRooms) * 100);
 
   return (
-    <div className="p-7">
+    <div className="p-4 sm:p-4 sm:p-7">
       <PageHeader
         title="Отели"
         subtitle={`${filtered.length} объектов · ${avgOccupancy}% средн. заполненность`}
@@ -70,7 +70,7 @@ export default function Hotels() {
       />
 
       {/* Summary cards */}
-      <div className="grid grid-cols-4 gap-4 mb-7">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-7">
         {[
           { label: "ВСЕГО ОБЪЕКТОВ", val: String(hotels.length) },
           { label: "ВСЕГО НОМЕРОВ", val: String(totalRooms) },
@@ -93,7 +93,7 @@ export default function Hotels() {
         ))}
       </div>
 
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between gap-2 mb-6">
         <div className="flex gap-1.5 flex-wrap">
           {cities.map((c) => (
             <button
@@ -162,7 +162,7 @@ export default function Hotels() {
                   </div>
                   {/* Occupancy bar */}
                   <div className="mt-2">
-                    <div className="flex justify-between text-xs mb-1" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
+                    <div className="flex justify-between gap-2 text-xs mb-1" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
                       <span>Заполненность</span>
                       <span style={{ color: occupancy(h) > 80 ? "var(--color-teal)" : occupancy(h) > 50 ? "var(--color-amber)" : "var(--color-rose)" }}>
                         {occupancy(h)}% ({h.occupied}/{h.rooms})
@@ -239,7 +239,7 @@ export default function Hotels() {
       {editing && (
         <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: "rgba(0,0,0,0.7)" }} onClick={() => setEditing(null)}>
           <div className="rounded-2xl w-full max-w-md p-6" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }} onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center justify-between gap-2 mb-5">
               <h3 className="text-lg font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}>Редактировать отель</h3>
               <button onClick={() => setEditing(null)} className="opacity-50 hover:opacity-100 cursor-pointer text-xl" style={{ color: "var(--color-text)" }}>×</button>
             </div>
@@ -266,7 +266,7 @@ export default function Hotels() {
       {showAdd && (
         <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: "rgba(0,0,0,0.7)" }} onClick={() => setShowAdd(false)}>
           <div className="rounded-2xl w-full max-w-md p-6" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }} onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center justify-between gap-2 mb-5">
               <h3 className="text-lg font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}>Добавить отель</h3>
               <button onClick={() => setShowAdd(false)} className="opacity-50 hover:opacity-100 cursor-pointer text-xl" style={{ color: "var(--color-text)" }}>×</button>
             </div>

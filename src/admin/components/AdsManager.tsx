@@ -84,7 +84,7 @@ export default function AdsManager() {
   };
 
   return (
-    <div className="p-7">
+    <div className="p-4 sm:p-4 sm:p-7">
       <PageHeader
         title="Реклама"
         subtitle={`$${totalRevenue}/мес от продвижений · ${activeAds} активных кампаний`}
@@ -92,7 +92,7 @@ export default function AdsManager() {
       />
 
       {/* Summary stats */}
-      <div className="grid grid-cols-4 gap-4 mb-7">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-7">
         {[
           { label: "ДОХОД ОТ ПРОДВИЖЕНИЙ", val: `$${totalRevenue}`, color: "var(--color-teal)" },
           { label: "АКТИВНЫХ КАМПАНИЙ", val: String(activeAds), color: "var(--color-amber)" },
@@ -161,7 +161,7 @@ export default function AdsManager() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-4 gap-4 mt-3">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-3">
                   {[
                     { label: "БЮДЖЕТ", val: `$${ad.budget}` },
                     { label: "ПОТРАЧЕНО", val: `$${ad.spent}` },
@@ -176,7 +176,7 @@ export default function AdsManager() {
                 </div>
 
                 <div className="mt-3">
-                  <div className="flex justify-between text-xs mb-1" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
+                  <div className="flex justify-between gap-2 text-xs mb-1" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
                     <span>Использовано бюджета</span>
                     <span>{pct}%</span>
                   </div>
@@ -325,7 +325,7 @@ export default function AdsManager() {
       {showAddPromo && (
         <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: "rgba(0,0,0,0.7)" }} onClick={() => setShowAddPromo(false)}>
           <div className="rounded-2xl w-full max-w-md p-6" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }} onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center justify-between gap-2 mb-5">
               <h3 className="text-lg font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}>Добавить продвижение</h3>
               <button onClick={() => setShowAddPromo(false)} className="opacity-50 hover:opacity-100 cursor-pointer text-xl" style={{ color: "var(--color-text)" }}>×</button>
             </div>

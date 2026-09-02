@@ -26,7 +26,7 @@ export default function StatusBar({ transparent }: { transparent: boolean }) {
 
   return (
     <div
-      className="absolute left-0 right-0 top-0 z-30 flex h-10 items-center justify-between px-7 pt-1"
+      className="mock-status absolute left-0 right-0 top-0 z-30 h-10 items-center justify-between px-7 pt-1"
       style={{
         background: transparent ? "transparent" : "white",
         borderBottom: transparent ? "none" : `1px solid ${BORDER}`,

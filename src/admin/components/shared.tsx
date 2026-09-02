@@ -34,14 +34,19 @@ export function StatCard({
 }) {
   return (
     <div
-      className="rounded-lg px-5 py-4"
+      className="min-w-0 rounded-lg px-4 py-4 sm:px-5"
       style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }}
     >
-      <div className="text-xs mb-2" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
+      {/* Подписи вроде «ЗАРЕГИСТРИРОВАННЫХ» — одно длинное слово: без
+          переноса по буквам оно просто обрезается на узкой карточке. */}
+      <div
+        className="mb-2 break-words text-xs leading-tight"
+        style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+      >
         {label}
       </div>
       <div
-        className="text-2xl font-semibold"
+        className="break-words text-xl font-semibold sm:text-2xl"
         style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}
       >
         {value}
