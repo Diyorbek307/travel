@@ -33,6 +33,7 @@ function дата(iso: string): string {
 }
 
 type Reset = { token: string; email: string; expiresAt: string };
+type Verify = { email: string; code: string; expiresAt: string };
 
 function активен(u: User): boolean {
   return Date.now() - new Date(u.lastSeenAt).getTime() < НЕАКТИВЕН_МС;
@@ -47,6 +48,8 @@ export default function Users() {
   const [открыт, setОткрыт] = useState<User | null>(null);
   const [заявки, setЗаявки] = useState<Reset[]>([]);
   const [скопирован, setСкопирован] = useState<string | null>(null);
+  const [коды, setКоды] = useState<Verify[]>([]);
+  const [почтаНастроена, setПочтаНастроена] = useState(true);
 
   useEffect(() => {
     fetch("/api/admin/users")
@@ -59,7 +62,11 @@ export default function Users() {
     // оператор.
     fetch("/api/admin/resets")
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error())))
-      .then((d: { resets: Reset[] }) => setЗаявки(d.resets))
+      .then((d: { resets: Reset[]; verifications: Verify[]; mailConfigured: boolean }) => {
+        setЗаявки(d.resets);
+        setКоды(d.verifications);
+        setПочтаНастроена(d.mailConfigured);
+      })
       .catch(() => setЗаявки([]));
   }, []);
 
@@ -101,6 +108,47 @@ export default function Users() {
         <StatCard label="С ФОТОГРАФИЕЙ" value={String(users.filter((u) => u.photo).length)} />
         <StatCard label="СТРАН" value={String(new Set(users.map((u) => u.country).filter(Boolean)).size)} />
       </div>
+
+      {!почтаНастроена && (коды.length > 0 || заявки.length > 0) && (
+        <div
+          className="mb-4 rounded-lg p-4"
+          style={{ background: "var(--color-panel)", border: "1px solid var(--color-rose)" }}
+        >
+          <p className="text-sm font-medium" style={{ color: "var(--color-rose)" }}>
+            Почтовый сервис не подключён
+          </p>
+          <p className="mt-1 text-xs leading-relaxed" style={{ color: "var(--color-muted)" }}>
+            Письма не уходят. Задайте SMTP_HOST, SMTP_USER и SMTP_PASSWORD — и коды со ссылками
+            начнут приходить сами. Пока их передаёт оператор.
+          </p>
+        </div>
+      )}
+
+      {коды.length > 0 && (
+        <div
+          className="mb-4 rounded-lg p-4"
+          style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }}
+        >
+          <p className="mb-3 text-sm font-medium" style={{ color: "var(--color-text)" }}>
+            Коды подтверждения · {коды.length}
+          </p>
+          <ul className="grid gap-2">
+            {коды.map((v) => (
+              <li key={v.email} className="flex flex-wrap items-center gap-2 text-sm">
+                <span className="min-w-0 flex-1 truncate" style={{ color: "var(--color-muted)" }}>
+                  {v.email}
+                </span>
+                <span
+                  className="rounded px-2 py-0.5 font-mono text-base font-bold tracking-widest"
+                  style={{ background: "var(--color-bg)", color: "var(--color-amber)" }}
+                >
+                  {v.code}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {заявки.length > 0 && (
         <div

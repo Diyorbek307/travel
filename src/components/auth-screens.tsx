@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CREAM, GOLD, GREEN, MUTED, TEXT, WHITE } from "@/lib/theme";
 import type { PublicUser } from "@/lib/types";
 
@@ -25,6 +25,9 @@ const ОШИБКИ: Record<string, string> = {
   email_taken: "На этот адрес уже есть аккаунт",
   photo_too_large: "Фотография слишком большая — выберите другую",
   invalid_credentials: "Неверная почта или пароль",
+  code_wrong: "Код не подошёл",
+  code_expired: "Код устарел — запросите новый",
+  code_none: "Код не найден — запросите новый",
 };
 
 function поле(): React.CSSProperties {
@@ -85,6 +88,7 @@ export function RegisterScreen({
   onBack: () => void;
   onDone: (user: PublicUser) => void;
 }) {
+  const [ждётКод, setЖдётКод] = useState<{ email: string; почтаНастроена: boolean; пауза: number } | null>(null);
   const [форма, setФорма] = useState({
     firstName: "",
     lastName: "",
@@ -138,12 +142,29 @@ export function RegisterScreen({
         setОшибка(ОШИБКИ[data.error] ?? "Не получилось зарегистрироваться");
         return;
       }
-      onDone(data.user);
+      // Сессии ещё нет: сперва подтверждение почты кодом из письма.
+      setЖдётКод({
+        email: форма.email.trim().toLowerCase(),
+        почтаНастроена: data.mailSent === true,
+        пауза: Number(data.waitSeconds) || 30,
+      });
     } catch {
       setОшибка("Нет связи с сервером");
     } finally {
       setИдёт(false);
     }
+  }
+
+  if (ждётКод) {
+    return (
+      <VerifyScreen
+        email={ждётКод.email}
+        письмоУшло={ждётКод.почтаНастроена}
+        пауза={ждётКод.пауза}
+        onBack={() => setЖдётКод(null)}
+        onDone={onDone}
+      />
+    );
   }
 
   return (
@@ -245,6 +266,143 @@ export function RegisterScreen({
 }
 
 /* ------------------------------------------------------------------ */
+/* Подтверждение почты                                                */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Шесть цифр из письма.
+ *
+ * Код, а не ссылка: приложение ставится как PWA, и ссылка открылась бы в
+ * браузере по умолчанию — другая сессия, и человек вернулся бы не туда.
+ * Цифры он вводит, не покидая приложение.
+ */
+export function VerifyScreen({
+  email,
+  письмоУшло,
+  пауза = 30,
+  onBack,
+  onDone,
+}: {
+  email: string;
+  письмоУшло: boolean;
+  /** Сколько секунд до следующего письма — приходит с сервера. */
+  пауза?: number;
+  onBack: () => void;
+  onDone: (user: PublicUser) => void;
+}) {
+  const [code, setCode] = useState("");
+  const [ошибка, setОшибка] = useState<string | null>(null);
+  const [идёт, setИдёт] = useState(false);
+  const [осталось, setОсталось] = useState(пауза);
+
+  // Обратный отсчёт до следующей отправки. Пауза растёт с каждым
+  // запросом — сервер присылает новую вместе с ответом.
+  useEffect(() => {
+    if (осталось <= 0) return;
+    const t = setInterval(() => setОсталось((s) => (s > 0 ? s - 1 : 0)), 1000);
+    return () => clearInterval(t);
+  }, [осталось]);
+
+  async function отправить(e: React.FormEvent) {
+    e.preventDefault();
+    setОшибка(null);
+    setИдёт(true);
+    try {
+      const res = await fetch("/api/auth/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, code }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setОшибка(ОШИБКИ[data.error] ?? "Не получилось подтвердить");
+        return;
+      }
+      onDone(data.user);
+    } catch {
+      setОшибка("Нет связи с сервером");
+    } finally {
+      setИдёт(false);
+    }
+  }
+
+  async function заново() {
+    setОшибка(null);
+    try {
+      const res = await fetch("/api/auth/resend", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      // И при успехе, и при «рано» сервер говорит, сколько ещё ждать.
+      setОсталось(Number(data.waitSeconds) || 30);
+      if (!res.ok && data.error !== "too_soon") {
+        setОшибка("Не получилось отправить код");
+      }
+    } catch {
+      setОшибка("Нет связи с сервером");
+    }
+  }
+
+  return (
+    <Обёртка
+      заголовок="Подтвердите почту"
+      подпись={`Отправили код на ${email}`}
+      onBack={onBack}
+    >
+      <form onSubmit={отправить} className="flex flex-col gap-3">
+        <input
+          required
+          inputMode="numeric"
+          autoComplete="one-time-code"
+          pattern="[0-9]{6}"
+          maxLength={6}
+          placeholder="000000"
+          value={code}
+          onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+          className="rounded-xl px-4 py-4 text-center text-2xl font-bold tracking-[0.4em] outline-none"
+          style={поле()}
+        />
+
+        {!письмоУшло && (
+          <p className="text-xs leading-relaxed" style={{ color: "#ffd9a0" }}>
+            Почтовый сервис пока не подключён — письмо не ушло. Код можно узнать в поддержке.
+          </p>
+        )}
+
+        {ошибка && (
+          <p className="text-sm" style={{ color: "#ffb4a2" }}>
+            {ошибка}
+          </p>
+        )}
+
+        <button
+          type="submit"
+          disabled={идёт || code.length !== 6}
+          className="mt-2 rounded-2xl py-4 text-base font-bold disabled:opacity-60"
+          style={{ background: GOLD, color: TEXT }}
+        >
+          {идёт ? "Проверяем…" : "Подтвердить"}
+        </button>
+
+        <button
+          type="button"
+          onClick={заново}
+          disabled={осталось > 0}
+          className="py-2 text-sm disabled:opacity-50"
+          style={{ color: "rgba(255,255,255,0.7)" }}
+        >
+          {осталось > 0
+            ? `Прислать ещё раз через ${осталось} с`
+            : "Прислать код ещё раз"}
+        </button>
+      </form>
+    </Обёртка>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 /* Вход                                                               */
 /* ------------------------------------------------------------------ */
 
@@ -258,6 +416,7 @@ export function LoginScreen({
   onRegister: () => void;
 }) {
   const [забыл, setЗабыл] = useState(false);
+  const [ждётКод, setЖдётКод] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [ошибка, setОшибка] = useState<string | null>(null);
@@ -275,6 +434,11 @@ export function LoginScreen({
       });
       const data = await res.json();
       if (!res.ok) {
+        // Почта не подтверждена — сервер уже выслал новый код.
+        if (data.error === "not_verified") {
+          setЖдётКод(true);
+          return;
+        }
         setОшибка(ОШИБКИ[data.error] ?? "Не получилось войти");
         return;
       }
@@ -284,6 +448,17 @@ export function LoginScreen({
     } finally {
       setИдёт(false);
     }
+  }
+
+  if (ждётКод) {
+    return (
+      <VerifyScreen
+        email={email.trim().toLowerCase()}
+        письмоУшло
+        onBack={() => setЖдётКод(false)}
+        onDone={onDone}
+      />
+    );
   }
 
   if (забыл) {

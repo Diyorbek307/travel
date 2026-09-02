@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createReset, findByEmail } from "@/lib/users";
+import { sendMail, письмоСоСсылкой } from "@/lib/mail";
 
 export const dynamic = "force-dynamic";
 
@@ -20,7 +21,16 @@ export async function POST(request: Request) {
 
   const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
   const user = email ? await findByEmail(email) : null;
-  if (user) await createReset(user);
+  if (user) {
+    const заявка = await createReset(user);
+    // Адрес берём из запроса: за прокси домен известен только ему.
+    const origin = new URL(request.url).origin;
+    const base = process.env.APP_BASE_URL ?? process.env.RENDER_EXTERNAL_URL ?? origin;
+    await sendMail({
+      to: user.email,
+      ...письмоСоСсылкой(`${base}/reset?token=${заявка.token}`),
+    });
+  }
 
   return NextResponse.json({ ok: true });
 }

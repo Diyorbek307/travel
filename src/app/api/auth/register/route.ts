@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { createUser, findByEmail, makeSession, publicUser, SESSION_COOKIE, SESSION_TTL_MS } from "@/lib/users";
+import { createUser, createVerification, findByEmail, publicUser, ждатьДоОтправки } from "@/lib/users";
+import { mailConfigured, sendMail, письмоСКодом } from "@/lib/mail";
 
 export const dynamic = "force-dynamic";
 
@@ -47,13 +48,19 @@ export async function POST(request: Request) {
     phone: str("phone"),
   });
 
-  const res = NextResponse.json({ ok: true, user: publicUser(user) });
-  res.cookies.set(SESSION_COOKIE, makeSession(user.id), {
-    httpOnly: true,
-    sameSite: "lax",
-    path: "/",
-    maxAge: Math.floor(SESSION_TTL_MS / 1000),
-    secure: process.env.NODE_ENV === "production",
+  // Сессию не выдаём: сперва пусть подтвердит почту кодом из письма.
+  // Иначе на чужой адрес можно завести аккаунт и пользоваться им.
+  const code = await createVerification(user.email);
+  const отправлено = await sendMail({ to: user.email, ...письмоСКодом(code) });
+
+  return NextResponse.json({
+    ok: true,
+    needsVerification: true,
+    user: publicUser(user),
+    // Честно говорим приложению, ушло ли письмо: если почта не
+    // настроена, экран подскажет обратиться в поддержку.
+    mailSent: отправлено,
+    mailConfigured: mailConfigured(),
+    waitSeconds: await ждатьДоОтправки(user.email),
   });
-  return res;
 }

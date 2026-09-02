@@ -36,6 +36,8 @@ export interface User {
   photo: string | null;
   country: string;
   phone: string;
+  /** Почта подтверждена кодом из письма. */
+  emailVerified: boolean;
   createdAt: string;
   lastSeenAt: string;
 }
@@ -169,6 +171,7 @@ export async function createUser(input: {
     photo: input.photo,
     country: input.country.trim(),
     phone: input.phone.trim(),
+    emailVerified: false,
     createdAt: now,
     lastSeenAt: now,
   };
@@ -194,6 +197,137 @@ export async function touchUser(id: string): Promise<void> {
 
 export async function deleteUser(id: string): Promise<void> {
   await writeAll((await readAll()).filter((u) => u.id !== id));
+}
+
+/* ------------------------------------------------------------------ */
+/* Подтверждение почты                                                */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Код из письма, а не ссылка.
+ *
+ * Приложение ставится как PWA, и ссылка из письма открылась бы в
+ * браузере по умолчанию — это другая сессия, и человек вернулся бы не
+ * туда, откуда уходил. Шесть цифр он вводит, не покидая приложение.
+ */
+interface Verification {
+  email: string;
+  code: string;
+  expiresAt: string;
+  /** Сколько раз ошиблись: перебор из миллиона вариантов недопустим. */
+  attempts: number;
+  /** Когда письмо ушло в прошлый раз — от этого считается пауза. */
+  sentAt: string;
+  /** Сколько раз просили прислать заново: пауза растёт с каждым разом. */
+  resends: number;
+}
+
+/**
+ * Пауза между письмами: полминуты, минута, две, пять.
+ *
+ * Растущая, а не постоянная. Человек, у которого письмо задержалось,
+ * ждёт всего тридцать секунд, а тот, кто долбит кнопку, упирается в
+ * минуты — и чужой ящик не завалит, и наш адрес не попадёт в спам-листы.
+ */
+const ПАУЗЫ_СЕК = [30, 60, 120, 300];
+
+export function паузаПослеОтправок(resends: number): number {
+  return ПАУЗЫ_СЕК[Math.min(resends, ПАУЗЫ_СЕК.length - 1)];
+}
+
+const VERIFY_FILE = path.join(DATA_DIR, "verifications.json");
+
+/** Пятнадцать минут: успеть открыть почту, но не оставлять код жить. */
+export const VERIFY_TTL_MS = 15 * 60 * 1000;
+
+/** Больше пяти попыток — код сгорает, нужен новый. */
+const MAX_ATTEMPTS = 5;
+
+async function readVerifications(): Promise<Verification[]> {
+  try {
+    return JSON.parse(await readFile(VERIFY_FILE, "utf8")) as Verification[];
+  } catch {
+    return [];
+  }
+}
+
+async function writeVerifications(list: Verification[]): Promise<void> {
+  await mkdir(DATA_DIR, { recursive: true });
+  const tmp = `${VERIFY_FILE}.${process.pid}.tmp`;
+  await writeFile(tmp, JSON.stringify(list, null, 2), "utf8");
+  await rename(tmp, VERIFY_FILE);
+}
+
+export async function createVerification(email: string): Promise<string> {
+  // Код из crypto, а не из Math.random: тот предсказуем по предыдущим
+  // значениям, и коды подтверждения им генерировать нельзя.
+  const code = String(randomBytes(4).readUInt32BE(0) % 1_000_000).padStart(6, "0");
+  const все = await readVerifications();
+  const прошлая = все.find((v) => v.email === email);
+  const прочие = все.filter((v) => v.email !== email);
+
+  await writeVerifications([
+    ...прочие,
+    {
+      email,
+      code,
+      expiresAt: new Date(Date.now() + VERIFY_TTL_MS).toISOString(),
+      attempts: 0,
+      sentAt: new Date().toISOString(),
+      // Счётчик переживает выдачу нового кода: иначе пауза сбрасывалась
+      // бы каждой отправкой и не росла никогда.
+      resends: прошлая ? прошлая.resends + 1 : 0,
+    },
+  ]);
+  return code;
+}
+
+/**
+ * Сколько ещё ждать до следующего письма.
+ *
+ * Ноль означает «можно отправлять». Проверка на сервере, а не только в
+ * интерфейсе: кнопку с обратным отсчётом обходят одним запросом.
+ */
+export async function ждатьДоОтправки(email: string): Promise<number> {
+  const v = (await readVerifications()).find((x) => x.email === email);
+  if (!v) return 0;
+  const прошло = (Date.now() - new Date(v.sentAt).getTime()) / 1000;
+  return Math.max(0, Math.ceil(паузаПослеОтправок(v.resends) - прошло));
+}
+
+export type VerifyResult = "ok" | "wrong" | "expired" | "none";
+
+export async function applyVerification(email: string, code: string): Promise<VerifyResult> {
+  const list = await readVerifications();
+  const i = list.findIndex((v) => v.email === email);
+  if (i === -1) return "none";
+
+  const v = list[i];
+  if (new Date(v.expiresAt).getTime() < Date.now() || v.attempts >= MAX_ATTEMPTS) {
+    await writeVerifications(list.filter((_, k) => k !== i));
+    return "expired";
+  }
+
+  if (v.code !== code.trim()) {
+    list[i] = { ...v, attempts: v.attempts + 1 };
+    await writeVerifications(list);
+    return "wrong";
+  }
+
+  const users = await readAll();
+  const ui = users.findIndex((u) => u.email === email);
+  if (ui === -1) return "none";
+  users[ui] = { ...users[ui], emailVerified: true };
+  await writeAll(users);
+
+  await writeVerifications(list.filter((_, k) => k !== i));
+  return "ok";
+}
+
+/** Действующие коды — оператору, пока почта не подключена. */
+export async function listVerifications(): Promise<Verification[]> {
+  const now = Date.now();
+  return (await readVerifications()).filter((v) => new Date(v.expiresAt).getTime() > now);
 }
 
 /* ------------------------------------------------------------------ */

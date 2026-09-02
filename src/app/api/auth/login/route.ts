@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { sendMail, письмоСКодом } from "@/lib/mail";
 import {
   findByEmail,
   makeSession,
@@ -7,6 +8,7 @@ import {
   SESSION_TTL_MS,
   touchUser,
   verifyPassword,
+  createVerification,
 } from "@/lib/users";
 
 export const dynamic = "force-dynamic";
@@ -28,6 +30,14 @@ export async function POST(request: Request) {
   const ok = user ? await verifyPassword(password, user.passwordHash) : false;
   if (!user || !ok) {
     return NextResponse.json({ error: "invalid_credentials" }, { status: 401 });
+  }
+
+  // Почта не подтверждена — сессию не открываем, шлём новый код.
+  // Иначе аккаунт на чужой адрес работал бы как обычный.
+  if (!user.emailVerified) {
+    const code = await createVerification(user.email);
+    await sendMail({ to: user.email, ...письмоСКодом(code) });
+    return NextResponse.json({ error: "not_verified", email: user.email }, { status: 403 });
   }
 
   await touchUser(user.id);
