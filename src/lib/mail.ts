@@ -103,6 +103,24 @@ export async function проверитьПочту(): Promise<{ ok: boolean; det
     return { ok: false, detail: `Не заданы переменные: ${нет.join(", ")}` };
   }
 
+  /*
+   * Отправитель должен совпадать с тем, под кем вошли.
+   *
+   * Яндекс и большинство сервисов отвергают письмо, если адрес в
+   * MAIL_FROM не тот, которым авторизовались. Ошибка приходит уже при
+   * отправке, а подключение при этом проверяется успешно — поэтому
+   * ловим её здесь, до первого письма.
+   */
+  const адресОтправителя = FROM.match(/<([^>]+)>/)?.[1] ?? FROM;
+  if (USER && адресОтправителя.trim().toLowerCase() !== USER.trim().toLowerCase()) {
+    return {
+      ok: false,
+      detail:
+        `MAIL_FROM указывает на ${адресОтправителя}, а вход выполняется под ${USER}. ` +
+        `Почтовый сервер отвергнет такое письмо — адреса должны совпадать.`,
+    };
+  }
+
   const t = getTransport();
   if (!t) return { ok: false, detail: "Не удалось создать подключение" };
 
@@ -110,7 +128,16 @@ export async function проверитьПочту(): Promise<{ ok: boolean; det
     await t.verify();
     return { ok: true, detail: `Подключение к ${HOST}:${PORT} работает, вход выполнен` };
   } catch (error) {
-    return { ok: false, detail: (error as Error).message };
+    const текст = (error as Error).message;
+    // Подсказываем по самым частым отказам, а не оставляем человека с
+    // англоязычной строкой от библиотеки.
+    const подсказка =
+      /timeout|ETIMEDOUT|ECONNREFUSED/i.test(текст)
+        ? " — сервер не отвечает. Проверьте SMTP_HOST и SMTP_PORT: у Яндекса это smtp.yandex.ru и 465."
+        : /auth|535|credentials/i.test(текст)
+          ? " — вход не принят. Нужен пароль приложения, а не пароль от почты, и включённый доступ по IMAP в настройках Яндекса."
+          : "";
+    return { ok: false, detail: текст + подсказка };
   }
 }
 
