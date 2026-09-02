@@ -6,16 +6,25 @@
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#f5f1e6",
-  "theme_color": "#2d7b57",
-  "categories": ["travel", "navigation", "education"],
-  "icons": [
-    { "src": "/icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
-    { "src": "/icons/maskable.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  "background_color": "#F5F1E6",
+  "theme_color": "#2E7D5A",
+  "categories": [
+    "travel",
+    "navigation",
+    "education"
   ],
-  "shortcuts": [
-    { "name": "Сканировать QR", "url": "/scan", "description": "Открыть аудиогид объекта" },
-    { "name": "Карта", "url": "/map", "description": "Достопримечательности рядом" },
-    { "name": "Построить маршрут", "url": "/planner", "description": "Маршрут под ваше время" }
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
   ]
 }

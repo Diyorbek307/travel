@@ -7,11 +7,7 @@
     "dev": "next dev -p 3000",
     "build": "next build",
     "start": "next start",
-    "seed": "node scripts/seed.mjs",
-    "seed:if-empty": "node scripts/seed.mjs --if-empty",
-    "lint": "next lint",
-    "test": "npm run seed -- --if-empty && vitest run",
-    "test:watch": "vitest"
+    "lint": "next lint"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.120.0",
@@ -34,8 +30,7 @@
     "@types/three": "^0.180.0",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.13",
-    "typescript": "^5.9.2",
-    "vitest": "^4.1.11"
+    "typescript": "^5.9.2"
   },
   "engines": {
     "node": ">=22.5.0"

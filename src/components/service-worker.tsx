@@ -3,23 +3,18 @@
 import { useEffect } from "react";
 
 /**
- * Регистрация Service Worker — основа офлайн-режима (п. 11 ТЗ).
- * В режиме разработки не регистрируем: кэш мешает видеть правки.
+ * Регистрация офлайн-кэша.
  *
- * Отпечаток сборки в адресе обязателен. Браузер сверяет воркер побайтово
- * по его URL: пока адрес тот же, а сам файл не менялся, установленный
- * воркер считается актуальным — и продолжает отдавать оболочку прошлой
- * выкатки. С ?v=<сборка> адрес меняется на каждом деплое, воркер
- * переустанавливается и вычищает кэши предыдущих версий.
+ * Версия сборки уходит в адрес: без неё браузер считает sw.js
+ * неизменившимся и продолжает отдавать старую оболочку после выката.
  */
-export default function ServiceWorkerRegistrar() {
+export default function ServiceWorker() {
   useEffect(() => {
-    if (process.env.NODE_ENV !== "production") return;
     if (!("serviceWorker" in navigator)) return;
-
-    const build = process.env.NEXT_PUBLIC_BUILD_ID ?? "dev";
-    navigator.serviceWorker.register(`/sw.js?v=${build}`).catch(() => {
-      // Регистрация может не пройти по http без localhost — офлайн просто не включится.
+    const version = process.env.NEXT_PUBLIC_BUILD_ID ?? "dev";
+    navigator.serviceWorker.register(`/sw.js?v=${version}`).catch(() => {
+      // Офлайн — приятное дополнение, а не условие работы: если
+      // регистрация не прошла, приложение всё равно должно открыться.
     });
   }, []);
 

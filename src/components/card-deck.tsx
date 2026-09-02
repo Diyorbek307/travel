@@ -1,219 +1,130 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { useRouter } from "next/navigation";
-import Image from "next/image";
-import Icon from "./icon";
+import type { DeckItem, Place } from "@/lib/types";
+import { BORDER, GOLD, GREEN, TEXT, WHITE } from "@/lib/theme";
+import { POPULAR_CITIES, WEATHER } from "@/data/content";
 
-/**
- * Колода карточек из макета.
- *
- * Пять карточек лежат стопкой: центральная в полный размер, соседние
- * уменьшены и притушены яркостью, дальние — ещё сильнее. Листается
- * стрелками, точками, свайпом и клавишами, а нажатие на центральную
- * открывает объект.
- *
- * Размеры, масштабы и кривая перехода взяты из исходников макета как
- * есть: 218×308, шаг 52 пикселя, яркость 1 / 0.6 / 0.38.
- */
-
-export interface DeckItem {
-  href: string;
-  img: string | null;
-  badge: string;
-  sub: string;
-  title: string;
-  stats: [string, string][];
-  price: string;
-  priceLabel: string;
-}
-
-/** Смещения карточек относительно центральной. */
-const SLOTS = [-2, -1, 0, 1, 2];
-
-export default function CardDeck({
-  items,
-  title,
-  seeAllHref,
-  seeAllLabel,
-}: {
-  items: DeckItem[];
-  title: string;
-  seeAllHref?: string;
-  seeAllLabel?: string;
-}) {
+export function CardDeckBase({ items, title, onSelect }:{ items:DeckItem[]; title:string; onSelect:(i:number)=>void }) {
   const [cur, setCur] = useState(0);
-  const dragX = useRef(0);
-  const router = useRouter();
+  const drag = useRef(0);
   const n = items.length;
-  if (n === 0) return null;
+  const go = (d:number) => setCur(c=>(c+d+n)%n);
 
-  const go = (d: number) => setCur((c) => (c + d + n) % n);
+  const card = (offset:number) => {
+    const idx = (cur+offset+n)%n;
+    const it  = items[idx];
+    const cx  = offset===0;
+    const abs = Math.abs(offset);
+    const scale= cx?1:abs===1?0.85:0.74;
+    const tx   = offset*52;         // px, relative to center
+    const ty   = abs*8;
+    const zi   = 10-abs*3;
+    const dim  = cx?1:abs===1?0.6:0.38;
+    return (
+      <button key={`slot${offset}`}
+        onClick={()=>cx?onSelect(idx):go(offset>0?1:-1)}
+        className="absolute rounded-3xl overflow-hidden text-left"
+        style={{
+          width:218, height:308,
+          left:"50%", marginLeft:-109,
+          transform:`translateX(${tx}px) translateY(${ty}px) scale(${scale})`,
+          zIndex:zi,
+          transition:"all 0.42s cubic-bezier(.22,1,.36,1)",
+          filter:`brightness(${dim})`,
+          boxShadow: cx?"0 28px 64px rgba(0,0,0,0.6),0 8px 24px rgba(0,0,0,0.4)":"0 6px 20px rgba(0,0,0,0.35)",
+        }}>
+        <div className="absolute inset-0">
+          <img src={it.img} alt={it.title} className="w-full h-full object-cover"/>
+          <div className="absolute inset-0" style={{background:"linear-gradient(to top,rgba(0,0,0,0.94) 0%,rgba(0,0,0,0.25) 50%,rgba(0,0,0,0.04) 100%)"}}/>
+        </div>
+        {/* Top badges */}
+        <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
+          <span className="text-[8px] font-bold px-2 py-0.5 rounded-full" style={{background:it.badgeColor,color:TEXT}}>{it.badge}</span>
+        </div>
+        {/* Bottom info */}
+        <div className="absolute bottom-0 left-0 right-0 p-3.5">
+          <div className="flex items-center gap-1 mb-1">
+            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span className="text-[8px]" style={{color:"rgba(255,255,255,0.5)"}}>{it.sub}</span>
+          </div>
+          <p className="text-white font-bold leading-tight mb-1" style={{fontSize:15,fontFamily:"'Fraunces',serif"}}>{it.title}</p>
+          <div className="flex gap-4 mb-2.5 border-t pt-2" style={{borderColor:"rgba(255,255,255,0.1)"}}>
+            {([[it.stat1,it.stat1l],[it.stat2,it.stat2l],[it.stat3,it.stat3l]] as [string,string][]).map(([v,l],si)=>(
+              <div key={si}>
+                <p className="text-white font-bold text-[11px]">{v}</p>
+                <p className="text-[8px]" style={{color:"rgba(255,255,255,0.4)"}}>{l}</p>
+              </div>
+            ))}
+          </div>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-[8px]" style={{color:"rgba(255,255,255,0.4)"}}>{it.pricel}</p>
+              <p className="text-white font-bold text-sm">{it.price}</p>
+            </div>
+            <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{background:cx?GOLD:"rgba(255,255,255,0.15)"}}>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={cx?TEXT:"white"} strokeWidth="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+          </div>
+        </div>
+      </button>
+    );
+  };
 
   return (
-    <section className="mb-8">
-      <div className="mb-3 flex items-center justify-between gap-3">
-        <h2 className="display-font min-w-0 flex-1 truncate text-base font-bold">{title}</h2>
-        <div className="flex shrink-0 items-center gap-2">
-          {seeAllHref && (
-            <a href={seeAllHref} className="text-sm font-medium" style={{ color: "var(--primary-text)" }}>
-              {seeAllLabel}
-            </a>
-          )}
-          <button
-            onClick={() => go(-1)}
-            aria-label="←"
-            className="pressable grid h-7 w-7 place-items-center rounded-full"
-            style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
-          >
-            <span className="rotate-180">
-              <Icon name="chevron-right" size={11} />
-            </span>
-          </button>
-          <button
-            onClick={() => go(1)}
-            aria-label="→"
-            className="pressable grid h-7 w-7 place-items-center rounded-full"
-            style={{ background: "var(--primary)", color: "var(--on-primary)" }}
-          >
-            <Icon name="chevron-right" size={11} />
-          </button>
+    <div className="px-4 pt-5">
+      <div className="flex items-center justify-between mb-3">
+        <p className="font-bold text-base" style={{color:TEXT,fontFamily:"'Fraunces',serif"}}>{title}</p>
+        <div className="flex items-center gap-2">
+          <button onClick={()=>go(-1)} className="w-7 h-7 rounded-full flex items-center justify-center border" style={{borderColor:BORDER,background:WHITE}}><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={TEXT} strokeWidth="2.5"><polyline points="15 18 9 12 15 6"/></svg></button>
+          <button onClick={()=>go(1)}  className="w-7 h-7 rounded-full flex items-center justify-center" style={{background:GREEN}}><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"/></svg></button>
         </div>
       </div>
-
-      {/* overflow-hidden обязателен: боковые карточки уезжают на 104
-          пикселя от центра, и на узком телефоне (320) правый край вылезал
-          за экран, давая горизонтальную прокрутку всей страницы. */}
-      <div
-        className="relative -mx-4 overflow-hidden px-4"
-        style={{ height: 334 }}
-        onTouchStart={(e) => {
-          dragX.current = e.touches[0].clientX;
-        }}
-        onTouchEnd={(e) => {
-          const dx = e.changedTouches[0].clientX - dragX.current;
-          if (Math.abs(dx) > 38) go(dx < 0 ? 1 : -1);
-        }}
-      >
+      <div className="relative"
+        style={{height:334}}
+        onTouchStart={e=>{ drag.current=e.touches[0].clientX; }}
+        onTouchEnd={e=>{ const dx=e.changedTouches[0].clientX-drag.current; if(Math.abs(dx)>38) go(dx<0?1:-1); }}>
         <div className="absolute inset-0">
-          {SLOTS.map((offset) => {
-            const idx = (cur + offset + n) % n;
-            const it = items[idx];
-            const center = offset === 0;
-            const abs = Math.abs(offset);
-            const scale = center ? 1 : abs === 1 ? 0.85 : 0.74;
-            const dim = center ? 1 : abs === 1 ? 0.6 : 0.38;
-
-            return (
-              <button
-                key={`slot${offset}`}
-                onClick={() => (center ? router.push(it.href) : go(offset > 0 ? 1 : -1))}
-                aria-hidden={!center}
-                tabIndex={center ? 0 : -1}
-                className="absolute overflow-hidden rounded-3xl text-left"
-                style={{
-                  width: 218,
-                  height: 308,
-                  left: "50%",
-                  marginLeft: -109,
-                  transform: `translateX(${offset * 52}px) translateY(${abs * 8}px) scale(${scale})`,
-                  zIndex: 10 - abs * 3,
-                  transition: "all 0.42s cubic-bezier(.22,1,.36,1)",
-                  filter: `brightness(${dim})`,
-                  boxShadow: center
-                    ? "0 28px 64px rgba(0,0,0,0.6), 0 8px 24px rgba(0,0,0,0.4)"
-                    : "0 6px 20px rgba(0,0,0,0.35)",
-                }}
-              >
-                <span className="absolute inset-0">
-                  {it.img ? (
-                    <Image
-                      src={it.img}
-                      alt=""
-                      fill
-                      sizes="218px"
-                      className="object-cover"
-                    />
-                  ) : (
-                    <span className="photo-placeholder block h-full w-full" />
-                  )}
-                  <span
-                    className="absolute inset-0"
-                    style={{
-                      background:
-                        "linear-gradient(to top, rgba(0,0,0,0.94) 0%, rgba(0,0,0,0.25) 50%, rgba(0,0,0,0.04) 100%)",
-                    }}
-                  />
-                </span>
-
-                <span className="absolute left-4 right-4 top-4 flex items-center justify-between">
-                  <span
-                    className="rounded-full px-2 py-0.5 text-[8px] font-bold"
-                    style={{ background: "var(--accent)", color: "#2b2b2b" }}
-                  >
-                    {it.badge}
-                  </span>
-                </span>
-
-                <span className="absolute inset-x-0 bottom-0 p-3.5 text-white">
-                  <span className="mb-1 flex items-center gap-1">
-                    <Icon name="map" size={8} />
-                    <span className="text-[8px] text-white/50">{it.sub}</span>
-                  </span>
-
-                  <span className="display-font mb-1 block text-[15px] font-bold leading-tight">
-                    {it.title}
-                  </span>
-
-                  <span
-                    className="mb-2.5 flex gap-4 border-t pt-2"
-                    style={{ borderColor: "rgba(255,255,255,0.1)" }}
-                  >
-                    {it.stats.map(([value, label], i) => (
-                      <span key={i} className="block">
-                        <span className="block text-[11px] font-bold">{value}</span>
-                        <span className="block text-[8px] text-white/40">{label}</span>
-                      </span>
-                    ))}
-                  </span>
-
-                  <span className="flex items-center justify-between">
-                    <span>
-                      <span className="block text-[8px] text-white/40">{it.priceLabel}</span>
-                      <span className="block text-sm font-bold">{it.price}</span>
-                    </span>
-                    <span
-                      className="grid h-9 w-9 place-items-center rounded-full"
-                      style={{
-                        background: center ? "var(--accent)" : "rgba(255,255,255,0.15)",
-                        color: center ? "#2b2b2b" : "#ffffff",
-                      }}
-                    >
-                      <Icon name="chevron-right" size={13} />
-                    </span>
-                  </span>
-                </span>
-              </button>
-            );
-          })}
+          {[-2,-1,0,1,2].map(o=>card(o))}
         </div>
-
-        <div className="absolute inset-x-0 bottom-2.5 z-20 flex justify-center gap-1.5">
-          {items.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setCur(i)}
-              aria-label={`${i + 1}`}
-              className="rounded-full transition-all"
-              style={{
-                width: i === cur ? 14 : 4,
-                height: 4,
-                background: i === cur ? "var(--accent)" : "rgba(0,0,0,0.2)",
-              }}
-            />
+        <div className="absolute bottom-2.5 left-0 right-0 flex justify-center gap-1.5 z-20">
+          {items.map((_,i)=>(
+            <button key={i} onClick={()=>setCur(i)} className="rounded-full transition-all" style={{width:i===cur?14:4,height:4,background:i===cur?GOLD:"rgba(0,0,0,0.2)"}}/>
           ))}
         </div>
       </div>
-    </section>
+    </div>
   );
 }
+
+export function CardDeck({ places, onPlace }:{ places:Place[]; onPlace:(p:Place)=>void }) {
+  const items: DeckItem[] = places.map(p=>({
+    img:      p.img,
+    title:    p.name,
+    sub:      `${p.city} · Узбекистан`,
+    badge:    p.type,
+    badgeColor:"rgba(233,196,106,0.92)",
+    stat1:    p.distance,   stat1l:"Расст.",
+    stat2:    WEATHER[p.city]?`${WEATHER[p.city].temp}°`:"—", stat2l:"Темп.",
+    stat3:    `${p.rating}★`, stat3l:"Рейтинг",
+    price:    p.entry,      pricel:"Вход",
+  }));
+  return <CardDeckBase items={items} title="Топ достопримечательности" onSelect={i=>onPlace(places[i])}/>;
+}
+
+export function CityDeck({ onSearch }:{ onSearch:()=>void }) {
+  const CITY_ITEMS: DeckItem[] = POPULAR_CITIES.map(c=>({
+    img:      c.img,
+    title:    c.name,
+    sub:      `${c.sub} · Узбекистан`,
+    badge:    "🏙️ Город",
+    badgeColor:"rgba(46,125,90,0.85)",
+    stat1:    WEATHER[c.name]?`${WEATHER[c.name].temp}°`:"—", stat1l:"Сейчас",
+    stat2:    WEATHER[c.name]?WEATHER[c.name].cond:"—", stat2l:"Погода",
+    stat3:    `${c.rating}★`, stat3l:"Рейтинг",
+    price:    "Открыть", pricel:"Направление",
+  }));
+  return <CardDeckBase items={CITY_ITEMS} title="Популярные города" onSelect={onSearch}/>;
+}
+
+// ── Side Menu ─────────────────────────────────────────────────────────────────

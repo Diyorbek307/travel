@@ -1,252 +1,97 @@
-"use client";
+import type { Tab } from "@/lib/types";
+import { GOLD, GREEN } from "@/lib/theme";
+import { LogoMark } from "./ui";
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useAppState } from "./app-state";
-import Icon, { type IconName } from "./icon";
-import { t } from "@/lib/i18n";
-import type { Lang } from "@/lib/types";
-
-/**
- * Боковое меню из макета.
- *
- * Имя и уровень берутся из паспорта — того же локального состояния, что
- * и на экране профиля. В макете здесь стоял выдуманный «Алекс Джонсон ·
- * Уровень 3»; пока турист не вписал себя, показываем приглашение, а не
- * чужое имя.
- *
- * Счётчики у пунктов настоящие: сколько объектов в избранном и сколько
- * городов скачано. Ноль тоже честный ответ, поэтому пустые не прячем —
- * иначе непонятно, есть раздел или нет.
- */
-
-/** Сколько объектов нужно посетить, чтобы поднять уровень. */
-const PER_LEVEL = 5;
-
-const NAV: { href: string; icon: IconName; key: string }[] = [
-  { href: "/", icon: "home", key: "cities" },
-  { href: "/explore", icon: "explore", key: "explore_short" },
-  { href: "/map", icon: "map", key: "explore_title" },
-  { href: "/audio", icon: "headphones", key: "audio_title" },
-  { href: "/profile", icon: "user", key: "profile" },
-];
-
-export default function SideMenu({ lang }: { lang: Lang }) {
-  const [open, setOpen] = useState(false);
-  const { name, visits, favorites, offlineCities } = useAppState();
-  const pathname = usePathname();
-
-  // Закрываем по Escape: панель перекрывает экран, и уйти с клавиатуры
-  // должно быть можно без мыши.
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [open]);
-
-  const level = 1 + Math.floor(visits.length / PER_LEVEL);
-
-  const extras: { href: string; icon: IconName; key: string; badge?: number }[] = [
-    { href: "/profile", icon: "heart", key: "favorited", badge: favorites.length },
-    { href: "/routes", icon: "explore", key: "my_routes" },
-    { href: "/offline", icon: "download", key: "offline", badge: offlineCities.length },
-    { href: "/search", icon: "search", key: "search_action" },
-    { href: "/support", icon: "shield", key: "support_title" },
-    { href: "/sos", icon: "sos", key: "sos" },
+export function SideMenu({ onClose, onTab, currentTab, isPremium, onPremium, onLogout }:{
+  onClose:()=>void; onTab:(t:Tab)=>void; currentTab:Tab; isPremium:boolean; onPremium:()=>void; onLogout:()=>void;
+}) {
+  const NAV:[Tab,string,string][] = [
+    ["home",   "🏠","Главная"],
+    ["explore","🔍","Исследовать"],
+    ["map",    "🗺️","Карта"],
+    ["audio",  "🎧","Аудиогиды"],
+    ["profile","👤","Профиль"],
   ];
-
+  const EXTRAS:[string,string,string,Tab|null][] = [
+    ["❤️","Избранное",   "12","explore"],
+    ["📋","Мои маршруты","3", "map"    ],
+    ["⬇️","Скачанное",  "",  "audio"  ],
+    ["💱","Конвертер",   "",  "profile"],
+    ["🆘","Экстренная",  "",  "profile"],
+  ];
   return (
     <>
-      <button
-        onClick={() => setOpen(true)}
-        aria-label={t(lang, "menu_title")}
-        aria-expanded={open}
-        className="pressable grid h-9 w-9 place-items-center rounded-[var(--radius-sm)] glass"
-      >
-        <Icon name="menu-lines" size={18} />
-      </button>
-
-      {open && (
-        <>
-          <div
-            className="fixed inset-0 z-40"
-            style={{ background: "rgba(0,0,0,0.55)", backdropFilter: "blur(3px)" }}
-            onClick={() => setOpen(false)}
-            aria-hidden
-          />
-
-          <aside
-            className="slide-in-left fixed bottom-0 left-0 top-0 z-50 flex w-[290px] flex-col text-white"
-            style={{ background: "#0F1A14" }}
-            role="dialog"
-            aria-modal="true"
-            aria-label={t(lang, "menu_title")}
-          >
-            <div
-              className="border-b px-5 pb-5 pt-6"
-              style={{ borderColor: "rgba(255,255,255,0.08)" }}
-            >
-              <div className="mb-5 flex items-center justify-between">
-                <span className="flex items-center gap-2.5">
-                  <Icon name="logo" size={34} />
-                  <span>
-                    <span className="display-font block text-lg font-bold leading-tight">
-                      {t(lang, "app_name")}
-                    </span>
-                    <span className="block text-[10px]" style={{ color: "var(--accent)" }}>
-                      {t(lang, "tagline_short")}
-                    </span>
-                  </span>
-                </span>
-                <button
-                  onClick={() => setOpen(false)}
-                  aria-label={t(lang, "back")}
-                  className="pressable grid h-8 w-8 place-items-center rounded-[var(--radius-sm)]"
-                  style={{ background: "rgba(255,255,255,0.08)" }}
-                >
-                  <Icon name="chevron-right" size={16} />
-                </button>
+      <div className="absolute inset-0 z-40" style={{background:"rgba(0,0,0,0.55)",backdropFilter:"blur(3px)"}} onClick={onClose}/>
+      <div className="absolute top-0 left-0 bottom-0 z-50 flex flex-col slide-in-left" style={{width:290,background:"#0F1A14"}}>
+        {/* Header */}
+        <div className="px-5 pt-14 pb-5 border-b" style={{borderColor:"rgba(255,255,255,0.08)"}}>
+          <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center gap-2.5">
+              <LogoMark size={36}/>
+              <div>
+                <p className="text-white font-bold text-lg" style={{fontFamily:"'Fraunces',serif"}}>UzUp</p>
+                <p className="text-[10px]" style={{color:GOLD}}>Открой Узбекистан</p>
               </div>
-
-              <Link
-                href="/profile"
-                onClick={() => setOpen(false)}
-                className="pressable flex items-center gap-3 rounded-[var(--radius-md)] p-3"
-                style={{ background: "rgba(255,255,255,0.06)" }}
-              >
-                <span
-                  className="grid h-10 w-10 shrink-0 place-items-center rounded-[var(--radius-sm)]"
-                  style={{ background: "linear-gradient(135deg,#2d7b57,#66B38E)" }}
-                >
-                  <Icon name="user" size={20} />
-                </span>
-                <span className="min-w-0">
-                  <span className="block truncate text-sm font-semibold">
-                    {name ?? t(lang, "passport_name_hint")}
-                  </span>
-                  <span
-                    className="block text-[10px]"
-                    style={{ color: "rgba(255,255,255,0.45)" }}
-                  >
-                    {t(lang, "level")} {level} · {visits.length} {t(lang, "stamps")}
-                  </span>
-                </span>
-              </Link>
             </div>
-
-            <nav className="flex-1 overflow-y-auto py-3">
-              <p
-                className="mb-2 px-5 text-[9px] font-bold uppercase tracking-widest"
-                style={{ color: "rgba(255,255,255,0.3)" }}
-              >
-                {t(lang, "menu_nav")}
-              </p>
-              {NAV.map((item) => {
-                const active = pathname === item.href;
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setOpen(false)}
-                    className="flex items-center gap-3 px-5 py-3"
-                    style={{
-                      background: active ? "rgba(45,123,87,0.18)" : undefined,
-                      borderRight: `3px solid ${active ? "var(--primary-soft)" : "transparent"}`,
-                    }}
-                  >
-                    <span
-                      className="w-6"
-                      style={{ color: active ? "var(--primary-soft)" : "rgba(255,255,255,0.75)" }}
-                    >
-                      <Icon name={item.icon} size={19} />
-                    </span>
-                    <span
-                      className="text-sm font-semibold"
-                      style={{ color: active ? "var(--primary-soft)" : "rgba(255,255,255,0.75)" }}
-                    >
-                      {t(lang, item.key)}
-                    </span>
-                  </Link>
-                );
-              })}
-
-              <div
-                className="mx-5 my-3 border-t"
-                style={{ borderColor: "rgba(255,255,255,0.06)" }}
-              />
-              <p
-                className="mb-2 px-5 text-[9px] font-bold uppercase tracking-widest"
-                style={{ color: "rgba(255,255,255,0.3)" }}
-              >
-                {t(lang, "menu_more")}
-              </p>
-              {extras.map((item) => (
-                <Link
-                  key={item.key}
-                  href={item.href}
-                  onClick={() => setOpen(false)}
-                  className="flex items-center gap-3 px-5 py-3"
-                >
-                  <span className="w-6" style={{ color: "rgba(255,255,255,0.65)" }}>
-                    <Icon name={item.icon} size={18} />
-                  </span>
-                  <span
-                    className="flex-1 text-sm font-medium"
-                    style={{ color: "rgba(255,255,255,0.65)" }}
-                  >
-                    {t(lang, item.key)}
-                  </span>
-                  {item.badge != null && (
-                    <span
-                      className="rounded-full px-2 py-0.5 text-[9px] font-bold"
-                      style={{ background: "rgba(45,123,87,0.35)", color: "var(--primary-soft)" }}
-                    >
-                      {item.badge}
-                    </span>
-                  )}
-                </Link>
-              ))}
-
-              <div
-                className="mx-5 my-3 border-t"
-                style={{ borderColor: "rgba(255,255,255,0.06)" }}
-              />
-
-              <Link
-                href="/pro"
-                onClick={() => setOpen(false)}
-                className="pressable mx-4 flex items-center gap-3 rounded-[var(--radius-md)] p-4"
-                style={{ background: "linear-gradient(135deg,#1A1A2E,#2C1810)" }}
-              >
-                <span style={{ color: "var(--accent)" }}>
-                  <Icon name="sparkle" size={22} filled />
-                </span>
-                <span className="min-w-0 flex-1 text-left">
-                  <span className="block text-sm font-bold" style={{ color: "var(--accent)" }}>
-                    {t(lang, "pro_title")}
-                  </span>
-                  <span
-                    className="block text-[9px]"
-                    style={{ color: "rgba(255,255,255,0.45)" }}
-                  >
-                    {t(lang, "pro_perk_ads")}
-                  </span>
-                </span>
-                <Icon name="chevron-right" size={14} />
-              </Link>
-            </nav>
-
-            <div
-              className="border-t px-5 py-4 text-[10px]"
-              style={{ borderColor: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.25)" }}
-            >
-              {t(lang, "app_name")} · {t(lang, "made_in_uz")}
+            <button onClick={onClose} className="w-8 h-8 rounded-xl flex items-center justify-center" style={{background:"rgba(255,255,255,0.08)"}}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+          {/* User */}
+          <div className="flex items-center gap-3 p-3 rounded-2xl" style={{background:"rgba(255,255,255,0.06)"}}>
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl" style={{background:`linear-gradient(135deg,${GREEN},#66B38E)`}}>👤</div>
+            <div className="flex-1">
+              <p className="text-white font-semibold text-sm">Алекс Джонсон</p>
+              <p className="text-[10px]" style={{color:"rgba(255,255,255,0.45)"}}>Уровень 3 · 3 штампа</p>
             </div>
-          </aside>
-        </>
-      )}
+            {isPremium&&<span className="text-sm">👑</span>}
+          </div>
+        </div>
+        <div className="flex-1 overflow-y-auto hide-scroll py-3">
+          {/* Main nav */}
+          <p className="px-5 text-[9px] font-bold tracking-widest uppercase mb-2" style={{color:"rgba(255,255,255,0.3)"}}>Навигация</p>
+          {NAV.map(([t,e,l])=>(
+            <button key={t} onClick={()=>{onTab(t);onClose();}} className="w-full flex items-center gap-3 px-5 py-3 text-left transition-all" style={currentTab===t?{background:`${GREEN}22`,borderRight:`3px solid ${GREEN}`}:{borderRight:"3px solid transparent"}}>
+              <span className="text-lg w-6">{e}</span>
+              <span className="font-semibold text-sm" style={{color:currentTab===t?GREEN:"rgba(255,255,255,0.75)"}}>{l}</span>
+              {currentTab===t&&<div className="ml-auto w-1.5 h-1.5 rounded-full" style={{background:GREEN}}/>}
+            </button>
+          ))}
+          <div className="mx-5 my-3 border-t" style={{borderColor:"rgba(255,255,255,0.06)"}}/>
+          <p className="px-5 text-[9px] font-bold tracking-widest uppercase mb-2" style={{color:"rgba(255,255,255,0.3)"}}>Разное</p>
+          {EXTRAS.map(([e,l,badge,target])=>(
+            <button key={l} onClick={()=>{if(target){onTab(target);onClose();}}} className="w-full flex items-center gap-3 px-5 py-3 text-left active:opacity-70">
+              <span className="text-lg w-6">{e}</span>
+              <span className="flex-1 font-medium text-sm" style={{color:"rgba(255,255,255,0.65)"}}>{l}</span>
+              {badge&&<span className="text-[9px] font-bold px-2 py-0.5 rounded-full" style={{background:`${GREEN}30`,color:GREEN}}>{badge}</span>}
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          ))}
+          <div className="mx-5 my-3 border-t" style={{borderColor:"rgba(255,255,255,0.06)"}}/>
+          {/* Premium */}
+          {!isPremium&&(
+            <button onClick={()=>{onPremium();onClose();}} className="mx-4 w-[calc(100%-32px)] rounded-2xl p-4 flex items-center gap-3 glow-pulse" style={{background:`linear-gradient(135deg,#1A1A2E,#2C1810)`}}>
+              <span className="text-2xl">👑</span>
+              <div className="text-left flex-1">
+                <p className="font-bold text-sm" style={{color:GOLD}}>UzUp Premium</p>
+                <p className="text-[9px]" style={{color:"rgba(255,255,255,0.45)"}}>Без рекламы · $4.99/мес</p>
+              </div>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={GOLD} strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          )}
+        </div>
+        {/* Footer */}
+        <div className="px-5 py-4 border-t" style={{borderColor:"rgba(255,255,255,0.06)"}}>
+          <div className="flex items-center justify-between">
+            <p className="text-[10px]" style={{color:"rgba(255,255,255,0.25)"}}>UzUp v2.4.1 · 🇺🇿 Made in UZ</p>
+            <button onClick={()=>{onClose();onLogout();}} className="text-[10px] font-semibold" style={{color:"rgba(255,255,255,0.45)"}}>🚪 Выйти</button>
+          </div>
+        </div>
+      </div>
     </>
   );
 }
+
+// ── Home Screen ────────────────────────────────────────────────────────────────
+
+export default SideMenu;

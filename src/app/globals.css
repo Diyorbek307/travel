@@ -1,600 +1,297 @@
 @import "tailwindcss";
 
 /*
- * Палитра «изумруд + золото на креме»: купола, изразцы и глинобитные стены.
- * Перенесена из макета в Figma Make, но не скопирована слепо — три цвета
- * оттуда не проходили контраст 4.5:1 и были затемнены на 1–2 единицы
- * (подробности у соответствующих ролей ниже).
+ * Стили макета.
  *
- * Значения превращены в семантические токены: в компонентах используются
- * только имена ролей, не сырые коды цветов.
+ * Ключевые кадры и утилиты перенесены из прототипа значение в значение —
+ * тайминги подобраны дизайнером, и «поправить на глаз» здесь значит
+ * получить другую анимацию.
  */
-@theme {
-  /* Изумруд — цвет куполов Самарканда и Бухары; с золотом и кремом он
-     даёт «земляную» гамму, в которой фотографии памятников выглядят
-     тёплыми, а не выцветшими. Шкала построена по одному тону (H152 S46)
-     с ровным ходом светлоты, поэтому оттенки не «пляшут» между собой.
-     Значения ниже — проверенные, а не подобранные на глаз: см. комментарии
-     о контрасте у ролей. */
-  --color-brand-50: #f0f9f5;
-  --color-brand-100: #ddf3e9;
-  --color-brand-200: #b5e3ce;
-  --color-brand-300: #80d0ab;
-  --color-brand-400: #41af7c;
-  --color-brand-500: #2d7b57;
-  --color-brand-600: #246144;
-  --color-brand-700: #1d4e37;
-  --color-brand-800: #163c2a;
-  --color-brand-900: #0f291d;
-
-  --color-sand-100: #faf8f2;
-  --color-sand-200: #f5f1e6;
-  --color-sand-300: #ece4d1;
-  --color-sand-400: #e9c46a;
-  --color-sand-500: #d9ab45;
-  --color-sand-600: #b98c2f;
-
-  --color-ink-900: #2b2b2b;
-  --color-ink-600: #5f6360;
-  --color-ink-400: #8b908c;
-}
 
 :root {
-  /* Роли, а не цвета: если палитра поменяется, правится только этот блок. */
-  /* Полотно страницы — кремовое: тёплый песок глинобитных стен. На нём
-     белые карточки читаются как приподнятые листы, а не сливаются с
-     фоном, как это было на белом. */
-  --bg: #f5f1e6;
-  --surface: #ffffff;
-  --surface-alt: #faf8f2;
-  --border: #e4dcc9;
-  /* Глубокий изумруд для плавающей навигации и заливок «наоборот». */
-  --ink-deep: #163c2a;
-
+  --green: #2e7d5a;
+  --green-light: #3a9e70;
+  --gold: #e9c46a;
+  --cream: #f5f1e6;
   --text: #2b2b2b;
-  /* Тёплый серо-коричневый вместо холодного серого: на креме нейтральный
-     серый выглядит грязным. 4.54:1 на фоне — выше порога для мелкого
-     текста, проверено, а не на глаз. */
-  --text-soft: #6b6153;
-  --text-faint: #786c5d;
+  --muted: #7a6e5f;
+  --border: #ede8dc;
+}
 
-  --primary: #2d7b57;
-  /* Отдельный оттенок для мелкого текста: 6.49:1 на фоне и 7.32:1 на
-     карточке. Сам бренд-цвет остаётся заливкой под белым текстом — там
-     5.14:1, чего достаточно. */
-  --primary-text: #246144;
-  --primary-soft: #80d0ab;
-  --primary-tint: #ddf3e9;
-  --on-primary: #ffffff;
-
-  --accent: #e9c46a;
-  /* Золото читаемо как текст только в затемнённом варианте. На кремовом
-     полотне пришлось затемнить сильнее прежнего (#96701f давал 4.02):
-     фон стал темнее мятного, и старое значение перестало проходить.
-     Сейчас 4.52:1 на фоне и 5.11:1 на карточке. */
-  --accent-strong: #8c681d;
-
-  /* Терракота из макета — третий цвет гаммы, отданный целиком рекламе.
-     Отдельный тон нужен, чтобы чужой бренд не выдавал себя за наш
-     контент: изумруд и золото в приложении означают «это платформа».
-     Как и у золота, тонов два: заливка и текст. Заливка (#c1603a из
-     макета, затемнена) держит белый текст кнопки — 4.52:1. Тот же цвет
-     как мелкий текст на светлом давал лишь 4.00, поэтому для подписи
-     «Реклама» отдельный тёмный вариант: 4.55:1 даже на самом тёмном из
-     наших светлых фонов. */
-  --ad-strong: #b95c38;
-  --ad-text: #a45232;
-  --ad-tint: #f7e7df;
-
-  --danger: #b3261e;
-
-  /* Ритм отступов кратен четырём — так вертикаль не «плывёт». */
-  --space-1: 0.25rem;
-  --space-2: 0.5rem;
-  --space-3: 0.75rem;
-  --space-4: 1rem;
-  --space-6: 1.5rem;
-  --space-8: 2rem;
-
-  /* Скругления крупные: этого требует выбранный визуальный язык, где
-     карточка читается как объект, а не как рамка вокруг текста. */
-  --radius-sm: 0.875rem;
-  --radius-md: 1.25rem;
-  --radius-lg: 2rem;
-  --radius-full: 9999px;
-
-  /* Одна шкала теней на всё приложение, без случайных значений.
-     Форма взята из макета (смещение 6px при размытии 20px), но альфа
-     втрое мягче: в макете тень лежала на тёмно-зелёном поле, а у нас на
-     светлом креме — 0.35 там читалось бы грязным пятном, а не глубиной.
-     Тон тени тёплый (43 43 43), холодный серый на креме отдаёт синевой. */
-  --shadow-1: 0 1px 3px rgb(43 43 43 / 0.07);
-  --shadow-2: 0 6px 20px rgb(43 43 43 / 0.11);
-  --shadow-3: 0 14px 36px rgb(43 43 43 / 0.16);
+* {
+  box-sizing: border-box;
 }
 
 html,
 body {
-  background: var(--bg);
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--green);
   color: var(--text);
-  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
 }
 
-/*
- * Без isolation body не создаёт свой стековый контекст, и .ambient-bg
- * (z-index: -1) считается относительно КОРНЯ документа — там негативный
- * z-index красится НИЖЕ собственного фона body, а не выше. Из-за этого
- * пятна были в разметке и двигались, но физически перекрывались фоном
- * страницы и не были видны ни при какой яркости. isolate делает body
- * границей: его фон становится нижним слоем именно в этом контексте,
- * и -1 внутри нею уже красится поверх него, как и задумано.
- */
-body {
-  isolation: isolate;
+::-webkit-scrollbar {
+  width: 0;
+  height: 0;
 }
 
-body {
-  /* Системный шрифт остаётся запасным: у Outfit нет иероглифов и арабицы,
-     а приложение десятиязычное — на zh/ja/ko/ar подхватится системный. */
-  font-family: var(--font-sans), ui-sans-serif, system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  /* Место под нижнюю навигацию и safe-area на iPhone. */
-  padding-bottom: calc(5.25rem + env(safe-area-inset-bottom));
-  font-size: 16px;
-  line-height: 1.5;
+.hide-scroll {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
-/* ------------------------------------------------------------------ */
-/* Поверхности                                                        */
-/* ------------------------------------------------------------------ */
-
-/*
- * Две базовые поверхности. `surface` — плоская панель с рамкой,
- * `card` — приподнятая карточка со скруглением и тенью. Обе берут цвет
- * из токенов, поэтому смена палитры не требует правок в компонентах.
- */
-.surface {
-  background: var(--surface);
-  border: 1px solid var(--border);
+.hide-scroll::-webkit-scrollbar {
+  display: none;
 }
 
-.bg-soft {
-  background: var(--surface-alt);
-}
-
-/*
- * Ячейки сеток и флексов не должны раздуваться под длинный контент.
- * По умолчанию у них min-width: auto, и одно длинное название объекта
- * растягивало колонку так, что вся страница получала горизонтальную
- * прокрутку — при том, что внутри карточки стоит truncate.
- */
+/* Ячейки грида и списков по умолчанию имеют min-width: auto — длинное
+   название растягивает колонку и рвёт вёрстку на узком экране. */
 :where(ul, ol) > li,
 :where(.grid) > * {
   min-width: 0;
 }
 
-.card {
-  background: var(--surface);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-1);
-}
-
-.card-raised {
-  background: var(--surface);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-2);
-}
-
-.soft {
-  color: var(--text-soft);
-}
-
-.faint {
-  color: var(--text-faint);
-}
-
-/* Волна под шапкой — мягкая граница вместо прямой линии. */
-.wave-bottom {
-  border-bottom-left-radius: 50% 2.5rem;
-  border-bottom-right-radius: 50% 2.5rem;
-}
-
-/*
- * Плашка вместо фотографии.
- *
- * Настоящих снимков объектов у нас нет: использовать чужие без лицензии
- * нельзя. Вместо серого прямоугольника — восьмиконечная звезда, мотив
- * исламской геометрии. Выглядит намеренно, а не как сломанная картинка.
- */
-.photo-placeholder {
-  background-color: var(--primary-tint);
-  background-image:
-    repeating-linear-gradient(45deg, rgb(45 123 87 / 0.08) 0 8px, transparent 8px 16px),
-    repeating-linear-gradient(-45deg, rgb(233 196 106 / 0.14) 0 8px, transparent 8px 16px);
-  position: relative;
-  overflow: hidden;
-}
-
-/* ------------------------------------------------------------------ */
-/* Интерактив                                                          */
-/* ------------------------------------------------------------------ */
-
-/* Нажатие меняет только прозрачность и масштаб — границы блока не едут,
-   поэтому соседние элементы не дёргаются. */
-.pressable {
-  transition:
-    transform 180ms ease-out,
-    box-shadow 180ms ease-out,
-    background-color 180ms ease-out;
-}
-.pressable:active {
-  transform: scale(0.98);
-}
-
-/* Кольцо фокуса не убираем: без него навигация с клавиатуры слепая. */
-:where(a, button, input, select, textarea, [tabindex]):focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
-  border-radius: var(--radius-sm);
-}
-
-/* ------------------------------------------------------------------ */
-/* Карта                                                               */
-/* ------------------------------------------------------------------ */
-
-.leaflet-container {
-  height: 100%;
-  width: 100%;
-  background: var(--surface-alt);
-  font: inherit;
-  z-index: 0;
-}
-.leaflet-popup-content-wrapper,
-.leaflet-popup-tip {
-  background: var(--surface);
-  color: var(--text);
-  border-radius: var(--radius-sm);
-}
-.leaflet-popup-content {
-  margin: 0.75rem 0.9rem;
-}
-
-.poi-marker {
-  display: grid;
-  place-items: center;
-  width: 2.25rem;
-  height: 2.25rem;
-  background: var(--surface);
-  border: 2px solid var(--primary);
-  border-radius: var(--radius-full);
-  box-shadow: var(--shadow-2);
-  color: var(--primary);
-}
-.poi-marker.is-dimmed {
-  opacity: 0.45;
-}
-
-/* ------------------------------------------------------------------ */
-/* Текст истории объекта                                               */
-/* ------------------------------------------------------------------ */
-
-.story p {
-  margin-bottom: 0.9rem;
-  line-height: 1.7;
-}
-.story strong {
-  font-weight: 600;
-  color: var(--primary);
-}
-
-/* Горизонтальные ленты фильтров без видимой полосы прокрутки. */
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-/* Арка: крупное скругление сверху, обычное снизу. Форма из макета —
-   она смягчает прямоугольник фотографии, не обрезая содержимое. */
-.arch {
-  border-radius: 6rem 6rem var(--radius-lg) var(--radius-lg);
-}
-
-/* Дисплейный заголовок: главный носитель настроения на первом экране. */
-.display {
-  font-size: clamp(2.5rem, 11vw, 3.75rem);
-  line-height: 0.98;
-  letter-spacing: -0.03em;
-  font-weight: 700;
-}
-
-/* ------------------------------------------------------------------ */
-/* Движение                                                            */
-/* ------------------------------------------------------------------ */
-
-/*
- * Фон-«аврора»: два мягких пятна медленно расходятся и сходятся.
- * Анимируются только transform и opacity — единственные свойства,
- * которые браузер считает без пересчёта раскладки. Это важно: рядом
- * крутится трёхмерная сцена, и фон не должен отбирать у неё кадры.
- */
-.aurora {
-  position: absolute;
-  inset: -25%;
-  pointer-events: none;
-  overflow: hidden;
-}
-.aurora::before,
-.aurora::after {
-  content: "";
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(70px);
-  will-change: transform;
-}
-.aurora::before {
-  width: 46%;
-  padding-bottom: 46%;
-  left: 6%;
-  top: 4%;
-  background: radial-gradient(circle, rgb(128 208 171 / 0.55), transparent 70%);
-  animation: aurora-a 19s ease-in-out infinite alternate;
-}
-.aurora::after {
-  width: 52%;
-  padding-bottom: 52%;
-  right: 4%;
-  bottom: 2%;
-  background: radial-gradient(circle, rgb(233 196 106 / 0.45), transparent 70%);
-  animation: aurora-b 23s ease-in-out infinite alternate;
-}
-@keyframes aurora-a {
-  from { transform: translate3d(0, 0, 0) scale(1); }
-  to   { transform: translate3d(14%, 9%, 0) scale(1.18); }
-}
-@keyframes aurora-b {
-  from { transform: translate3d(0, 0, 0) scale(1.06); }
-  to   { transform: translate3d(-11%, -7%, 0) scale(0.94); }
-}
-
-/* Исламская геометрия, медленно уезжающая по диагонали. Тот же мотив,
-   что и в плашке вместо фотографии, — узор в приложении один. */
-.ornament {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background-image:
-    repeating-linear-gradient(45deg, rgb(45 123 87 / 0.06) 0 10px, transparent 10px 20px),
-    repeating-linear-gradient(-45deg, rgb(233 196 106 / 0.07) 0 10px, transparent 10px 20px);
-  animation: ornament-drift 44s linear infinite;
-}
-@keyframes ornament-drift {
-  to { background-position: 56px 56px, -56px 56px; }
-}
-
-/* Появление списков: короткая ступенька задаёт порядок чтения. */
-.rise-in {
-  animation: rise-in 520ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
-}
-@keyframes rise-in {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: none; }
-}
-
-/*
- * Фоновое дыхание приложения: три цветных пятна на весь экран, всегда
- * позади контента (z-index: -1 не создаёт своего слоя выше обычной
- * вёрстки). Первая версия была почти не видна — альфа и блюр гасили друг
- * друга, а ход в 34–40 секунд не успевал прочитаться за время, пока
- * смотришь на экран. Здесь цвет плотнее, блюр меньше, ход втрое быстрее.
- * Экран /explore и обложка первого экрана рисуются поверх — там пятна
- * просто не видны, слой не мешает и не удваивает движение.
- */
-.ambient-bg {
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  overflow: hidden;
-}
-.ambient-bg::before,
-.ambient-bg::after {
-  content: "";
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(60px);
-  will-change: transform;
-}
-.ambient-bg::before {
-  width: 62vmax;
-  height: 62vmax;
-  left: -20vmax;
-  top: -16vmax;
-  background: radial-gradient(circle, rgb(128 208 171 / 0.55), transparent 68%);
-  animation: ambient-a 16s ease-in-out infinite alternate;
-}
-.ambient-bg::after {
-  width: 56vmax;
-  height: 56vmax;
-  right: -18vmax;
-  bottom: -14vmax;
-  background: radial-gradient(circle, rgb(233 196 106 / 0.48), transparent 68%);
-  animation: ambient-b 20s ease-in-out infinite alternate;
-}
-/* Третье пятно — фирменный тёмно-синий, в центре, самое медленное:
-   без него первые два просто меняются местами, а с ним фон ощущается
-   объёмным, а не парой прожекторов по углам. У .ambient-bg уже заняты
-   ::before и ::after первыми двумя пятнами, поэтому это — настоящий
-   вложенный элемент, а не третий псевдоэлемент (их бывает только два). */
-.ambient-bg-mid {
-  position: absolute;
-  left: 50%;
-  top: 55%;
-  width: 50vmax;
-  height: 50vmax;
-  border-radius: 50%;
-  filter: blur(70px);
-  background: radial-gradient(circle, rgb(45 123 87 / 0.4), transparent 70%);
-  animation: ambient-c 24s ease-in-out infinite alternate;
-  will-change: transform;
-}
-@keyframes ambient-a {
-  from { transform: translate3d(0, 0, 0) scale(1); }
-  to   { transform: translate3d(14vmax, 11vmax, 0) scale(1.25); }
-}
-@keyframes ambient-b {
-  from { transform: translate3d(0, 0, 0) scale(1.08); }
-  to   { transform: translate3d(-13vmax, -10vmax, 0) scale(0.85); }
-}
-@keyframes ambient-c {
-  from { transform: translate3d(-50%, -50%, 0) scale(0.9); }
-  to   { transform: translate3d(-38%, -62%, 0) scale(1.2); }
-}
-
-/*
- * Фоновая графика: светящаяся сеть гириха.
- *
- * Прежде здесь были пунктирная дуга и самолёт — образ читался буквально
- * и быстро приедался. Сеть исламской геометрии говорит «Узбекистан»
- * тем же мотивом, что и изразцы Самарканда, но выглядит современно:
- * тонкие линии прочерчивают себя, узлы пульсируют, крупные звёзды
- * плывут в глубине.
- */
-.ambient-grid {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
-
-/* Дальний слой приглушён, иначе спорит с содержимым страницы. */
-.ambient-grid-deep {
-  opacity: 0.5;
-}
-
-/* Линия прочерчивает себя и гаснет, освобождая место следующей. */
-@keyframes grid-line-draw {
-  0%   { stroke-dasharray: 0 120; opacity: 0; }
-  25%  { opacity: 0.9; }
-  60%  { stroke-dasharray: 120 0; opacity: 0.55; }
-  100% { stroke-dasharray: 120 0; opacity: 0; }
-}
-.grid-line {
-  animation: grid-line-draw 9s ease-in-out infinite;
-}
-
-/* Узел дышит: свечение расходится и возвращается. */
-@keyframes grid-node-pulse {
-  0%, 100% { transform: scale(0.7); opacity: 0.35; }
-  50%      { transform: scale(1.35); opacity: 0.9; }
-}
-.grid-node-glow {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: grid-node-pulse 5s ease-in-out infinite;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .pressable {
-    transition: none;
+/* ── Базовые ── */
+@keyframes slide-up {
+  from {
+    transform: translateY(24px);
+    opacity: 0;
   }
-  .pressable:active {
-    transform: none;
-  }
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
+  to {
+    transform: translateY(0);
+    opacity: 1;
   }
 }
 
-@media print {
-  .no-print {
-    display: none !important;
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
   }
-  body {
-    padding-bottom: 0;
-    background: #fff;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-/* ------------------------------------------------------------------ */
-/* Стекло и движение из макета                                        */
-/* ------------------------------------------------------------------ */
-
-/*
- * Три вида «стекла» — значения перенесены из исходников макета как есть.
- * .glass поверх фотографии, .glass-light белой плашкой на снимке,
- * .glass-dark для затемнённой подложки.
- */
-.glass {
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-}
-.glass-light {
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.95);
-  box-shadow: 0 4px 24px rgb(0 0 0 / 0.12);
-}
-.glass-dark {
-  background: rgba(0, 0, 0, 0.22);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+@keyframes bounce-dot {
+  0%,
+  80%,
+  100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-6px);
+  }
 }
 
-/* Заголовочный шрифт макета. Кириллицу Fraunces не покрывает, поэтому
-   следом идёт основной — русские заголовки просто останутся на нём. */
-.display-font {
-  font-family: var(--font-display), var(--font-sans), Georgia, serif;
-}
-
-/* Плавающие фигуры исламской геометрии в шапке — из макета. */
+/* ── Парящая узбекская геометрия ── */
 @keyframes uz-float-1 {
-  0%   { transform: translateY(0) rotate(0deg) scale(1); opacity: 0.18; }
-  50%  { transform: translateY(-28px) rotate(22deg) scale(1.08); opacity: 0.28; }
-  100% { transform: translateY(0) rotate(0deg) scale(1); opacity: 0.18; }
+  0% {
+    transform: translateY(0) rotate(0deg) scale(1);
+    opacity: 0.18;
+  }
+  50% {
+    transform: translateY(-28px) rotate(22deg) scale(1.08);
+    opacity: 0.28;
+  }
+  100% {
+    transform: translateY(0) rotate(0deg) scale(1);
+    opacity: 0.18;
+  }
 }
-@keyframes uz-float-2 {
-  0%   { transform: translateY(0) rotate(45deg) scale(1); opacity: 0.12; }
-  60%  { transform: translateY(-18px) rotate(72deg) scale(0.92); opacity: 0.22; }
-  100% { transform: translateY(0) rotate(45deg) scale(1); opacity: 0.12; }
-}
-@keyframes uz-float-3 {
-  0%   { transform: translateY(0) rotate(0deg); opacity: 0.08; }
-  40%  { transform: translateY(-38px) rotate(-15deg); opacity: 0.18; }
-  100% { transform: translateY(0) rotate(0deg); opacity: 0.08; }
-}
-@keyframes uz-drift {
-  0%   { transform: translate(0, 0) rotate(0deg); }
-  33%  { transform: translate(12px, -16px) rotate(30deg); }
-  66%  { transform: translate(-8px, -28px) rotate(-20deg); }
-  100% { transform: translate(0, 0) rotate(0deg); }
-}
-.uz-float-1 { animation: uz-float-1 6s ease-in-out infinite; }
-.uz-float-2 { animation: uz-float-2 8s ease-in-out infinite; }
-.uz-float-3 { animation: uz-float-3 10s ease-in-out infinite; }
-.uz-drift   { animation: uz-drift 12s ease-in-out infinite; }
 
-/* Нить Шёлкового пути, прочерчивающая себя. */
-@keyframes silk-road {
-  0%   { stroke-dashoffset: 800; opacity: 0; }
-  20%  { opacity: 0.6; }
-  80%  { opacity: 0.4; }
-  100% { stroke-dashoffset: 0; opacity: 0; }
+@keyframes uz-float-2 {
+  0% {
+    transform: translateY(0) rotate(45deg) scale(1);
+    opacity: 0.12;
+  }
+  60% {
+    transform: translateY(-18px) rotate(72deg) scale(0.92);
+    opacity: 0.22;
+  }
+  100% {
+    transform: translateY(0) rotate(45deg) scale(1);
+    opacity: 0.12;
+  }
 }
+
+@keyframes uz-float-3 {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0.08;
+  }
+  40% {
+    transform: translateY(-38px) rotate(-15deg);
+    opacity: 0.18;
+  }
+  100% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0.08;
+  }
+}
+
+@keyframes uz-drift {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  33% {
+    transform: translate(12px, -16px) rotate(30deg);
+  }
+  66% {
+    transform: translate(-8px, -28px) rotate(-20deg);
+  }
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+}
+
+@keyframes silk-road {
+  0% {
+    stroke-dashoffset: 800;
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.6;
+  }
+  80% {
+    opacity: 0.4;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+@keyframes card-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes glow-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgb(233 196 106 / 0.3);
+  }
+  50% {
+    box-shadow:
+      0 0 40px rgb(233 196 106 / 0.6),
+      0 0 60px rgb(46 125 90 / 0.3);
+  }
+}
+
+@keyframes star-twinkle {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.3);
+  }
+}
+
+@keyframes slide-in-left {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.38s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.animate-fade-in {
+  animation: fade-in 0.28s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.bounce-dot {
+  animation: bounce-dot 1.2s ease-in-out infinite;
+}
+.uz-float-1 {
+  animation: uz-float-1 6s ease-in-out infinite;
+}
+.uz-float-2 {
+  animation: uz-float-2 8s ease-in-out infinite;
+}
+.uz-float-3 {
+  animation: uz-float-3 10s ease-in-out infinite;
+}
+.uz-drift {
+  animation: uz-drift 12s ease-in-out infinite;
+}
+.pulse-ring {
+  animation: pulse-ring 2s ease-out infinite;
+}
+.card-float {
+  animation: card-float 4s ease-in-out infinite;
+}
+.glow-pulse {
+  animation: glow-pulse 3s ease-in-out infinite;
+}
+.star-twinkle {
+  animation: star-twinkle 2.5s ease-in-out infinite;
+}
+.slide-in-left {
+  animation: slide-in-left 0.32s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.shimmer-bg {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgb(255 255 255 / 0.06) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s linear infinite;
+}
+
 .silk-road-path {
   stroke-dasharray: 800;
   animation: silk-road 6s ease-in-out infinite;
 }
 
-/* Расходящееся кольцо у точки на карте. */
-@keyframes pulse-ring {
-  0%   { transform: scale(1); opacity: 0.8; }
-  100% { transform: scale(2.4); opacity: 0; }
+/* Движение — украшение, а не смысл: тем, кто просил его отключить,
+   показываем статичный кадр вместо бесконечных циклов. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
-.pulse-ring { animation: pulse-ring 2s ease-out infinite; }

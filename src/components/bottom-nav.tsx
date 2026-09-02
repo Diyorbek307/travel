@@ -1,72 +1,102 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import Icon, { type IconName } from "./icon";
+import { GREEN, MUTED } from "@/lib/theme";
+import type { Tab } from "@/lib/types";
 
-interface Item {
-  href: string;
-  icon: IconName;
-  label: string;
-}
+/** Иконки нижней панели: контур в покое, заливка у активной вкладки. */
+const ITEMS: { key: Tab; label: string; icon: (active: boolean) => React.ReactNode }[] = [
+  {
+    key: "home",
+    label: "Главная",
+    icon: (a) => (
+      <svg width="21" height="21" viewBox="0 0 24 24" fill={a ? GREEN : "none"} stroke={a ? GREEN : MUTED} strokeWidth="2" strokeLinecap="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+        <polyline points="9 22 9 12 15 12 15 22" />
+      </svg>
+    ),
+  },
+  {
+    key: "explore",
+    label: "Исследовать",
+    icon: (a) => (
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke={a ? GREEN : MUTED} strokeWidth="2" strokeLinecap="round">
+        <circle cx="11" cy="11" r="8" />
+        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+      </svg>
+    ),
+  },
+  {
+    // Карта всегда белая: она лежит в приподнятом зелёном кружке и
+    // подсвечивается им, а не цветом штриха.
+    key: "map",
+    label: "Карта",
+    icon: () => (
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round">
+        <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21" />
+        <line x1="9" y1="3" x2="9" y2="18" />
+        <line x1="15" y1="6" x2="15" y2="21" />
+      </svg>
+    ),
+  },
+  {
+    key: "audio",
+    label: "Аудио",
+    icon: (a) => (
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke={a ? GREEN : MUTED} strokeWidth="2" strokeLinecap="round">
+        <path d="M3 18v-6a9 9 0 0 1 18 0v6" />
+        <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z" />
+      </svg>
+    ),
+  },
+  {
+    key: "profile",
+    label: "Профиль",
+    icon: (a) => (
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke={a ? GREEN : MUTED} strokeWidth="2" strokeLinecap="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+        <circle cx="12" cy="7" r="4" />
+      </svg>
+    ),
+  },
+];
 
-/**
- * Нижняя навигация: плавающая тёмная пилюля.
- *
- * Не панель во всю ширину: пилюля не режет экран горизонтальной линией,
- * и фотография под ней продолжается до самого низа — ради этого приём и
- * выбран, вся раскладка приложения построена на снимках.
- *
- * Подпись показывается только у активного пункта. Иконка без подписи
- * угадывается неверно, особенно иностранцем, который видит приложение
- * впервые; пять подписей сразу в пилюлю не помещаются. Компромисс:
- * там, где пользователь находится, написано словом.
- */
-export default function BottomNav({ items }: { items: Item[] }) {
-  const pathname = usePathname();
-  if (pathname.startsWith("/admin")) return null;
-
+export default function BottomNav({
+  tab,
+  onTab,
+}: {
+  tab: Tab;
+  onTab: (t: Tab) => void;
+}) {
   return (
     <nav
-      className="no-print fixed inset-x-0 bottom-0 z-40 flex justify-center px-4"
-      style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 0.75rem)" }}
-      aria-label="Основная навигация"
+      className="absolute bottom-0 left-0 right-0 flex h-16 items-center border-t"
+      style={{ background: "#FFFFFF", borderColor: "var(--border)" }}
     >
-      <ul
-        className="flex max-w-full items-center gap-1 rounded-full p-1.5"
-        style={{
-          background: "var(--ink-deep)",
-          boxShadow: "0 12px 32px rgb(22 40 30 / 0.32)",
-        }}
-      >
-        {items.map((item) => {
-          const active =
-            item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
-
-          return (
-            <li key={item.href}>
-              <Link
-                href={item.href}
-                aria-current={active ? "page" : undefined}
-                aria-label={item.label}
-                // Высота 44px — минимум для уверенного попадания пальцем.
-                className="pressable flex h-11 items-center gap-2 rounded-full px-3.5"
-                style={{
-                  background: active ? "var(--primary-soft)" : "transparent",
-                  color: active ? "var(--ink-deep)" : "rgb(255 255 255 / 0.72)",
-                }}
+      {ITEMS.map(({ key, label, icon }) => {
+        const active = tab === key;
+        return (
+          <button
+            key={key}
+            onClick={() => onTab(key)}
+            aria-current={active ? "page" : undefined}
+            className="flex flex-1 flex-col items-center justify-center gap-1 py-2 transition-all active:scale-95"
+          >
+            {key === "map" ? (
+              <span
+                className="-mt-6 mb-0.5 flex h-12 w-12 items-center justify-center rounded-2xl shadow-md"
+                style={{ background: GREEN }}
               >
-                <Icon name={item.icon} size={21} filled={active} />
-                {active && (
-                  <span className="max-w-[6.5rem] truncate text-[0.78rem] font-medium">
-                    {item.label}
-                  </span>
-                )}
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
+                {icon(true)}
+              </span>
+            ) : (
+              icon(active)
+            )}
+            <span className="text-[9px] font-semibold" style={{ color: active ? GREEN : MUTED }}>
+              {label}
+            </span>
+          </button>
+        );
+      })}
     </nav>
   );
 }
