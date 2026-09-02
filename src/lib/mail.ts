@@ -131,11 +131,25 @@ export async function проверитьПочту(): Promise<{ ok: boolean; det
     const текст = (error as Error).message;
     // Подсказываем по самым частым отказам, а не оставляем человека с
     // англоязычной строкой от библиотеки.
+    /*
+     * Подсказка по адресу сервера, а не по одному конкретному
+     * почтовику: советовать настройки Яндекса тому, у кого Mail.ru,
+     * значит сбить с толку.
+     */
+    const известные: Record<string, string> = {
+      "smtp.yandex.ru": "smtp.yandex.ru, порт 465",
+      "smtp.mail.ru": "smtp.mail.ru, порт 465",
+      "smtp.gmail.com": "smtp.gmail.com, порт 587",
+    };
+    const верно = известные[(HOST ?? "").toLowerCase()];
+
     const подсказка =
-      /timeout|ETIMEDOUT|ECONNREFUSED/i.test(текст)
-        ? " — сервер не отвечает. Проверьте SMTP_HOST и SMTP_PORT: у Яндекса это smtp.yandex.ru и 465."
-        : /auth|535|credentials/i.test(текст)
-          ? " — вход не принят. Нужен пароль приложения, а не пароль от почты, и включённый доступ по IMAP в настройках Яндекса."
+      /timeout|ETIMEDOUT|ECONNREFUSED|ENOTFOUND|EAI_AGAIN/i.test(текст)
+        ? ` — сервер не отвечает. Проверьте SMTP_HOST и SMTP_PORT` +
+          (верно ? `: должно быть ${верно}.` : ". Порт 25 не подойдёт: хостинг его не пропускает.")
+        : /auth|535|credentials|authentication/i.test(текст)
+          ? " — вход не принят. Нужен пароль приложения, а не пароль от почты, " +
+            "и включённый доступ внешним программам в настройках ящика."
           : "";
     return { ok: false, detail: текст + подсказка };
   }
