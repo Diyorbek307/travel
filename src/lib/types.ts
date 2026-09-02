@@ -216,3 +216,16 @@ export interface Content {
 }
 
 export type ContentKey = keyof Content;
+
+/** Турист без секретов — то, что отдаёт сервер и показывает приложение. */
+export interface PublicUser {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  photo: string | null;
+  country: string;
+  phone: string;
+  createdAt: string;
+  lastSeenAt: string;
+}

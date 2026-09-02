@@ -28,8 +28,9 @@ export function SplashScreen({ onStart, onLogin }:{ onStart:()=>void; onLogin:()
 
 // ── Onboarding ────────────────────────────────────────────────────────────────
 
-export function OnboardingLang({ onNext }:{ onNext:(l:string)=>void }) {
-  const [sel, setSel] = useState("🇷🇺 Русский");
+export function OnboardingLang({ onNext, defaultLang }:{ onNext:(l:string)=>void; defaultLang?:string }) {
+  // Предвыбран язык системы телефона: приложение ставят и иностранцы.
+  const [sel, setSel] = useState(defaultLang ?? "🇷🇺 Русский");
   return (
     <div className="flex flex-col h-full animate-slide-up" style={{background:CREAM}}>
       <div className="relative h-52 flex-shrink-0" style={{background:GREEN}}>
