@@ -27,6 +27,7 @@ import { MiniPlayer, Toast } from "@/components/widgets";
 import { ContentProvider } from "@/components/content-provider";
 import { LangProvider } from "@/components/lang-provider";
 import { WeatherProvider } from "@/components/weather-provider";
+import { CurrencyProvider } from "@/components/currency-provider";
 import { AuthSplash, LoginScreen, RegisterScreen } from "@/components/auth-screens";
 import type { Hotel, Place, PublicUser, Restaurant, Route, Tab } from "@/lib/types";
 
@@ -87,7 +88,9 @@ export default function Page() {
     <ContentProvider>
       <LangProvider>
         <WeatherProvider>
-          <App />
+          <CurrencyProvider>
+            <App />
+          </CurrencyProvider>
         </WeatherProvider>
       </LangProvider>
     </ContentProvider>

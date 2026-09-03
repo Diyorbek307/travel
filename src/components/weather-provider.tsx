@@ -58,38 +58,67 @@ export function WeatherProvider({ children }: { children: React.ReactNode }) {
     let живо = true;
     const города = Object.entries(ГОРОДА);
 
-    Promise.all(
-      города.map(async ([имя, geo]) => {
-        try {
-          const url = `https://api.open-meteo.com/v1/forecast?latitude=${geo.lat}&longitude=${geo.lon}&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m`;
-          const r = await fetch(url, { signal: AbortSignal.timeout(8000) });
-          if (!r.ok) return null;
-          const d = await r.json();
-          const c = d.current;
-          if (!c) return null;
-          const { icon, condKey } = поКоду(Number(c.weather_code));
-          const п: Погода = {
-            temp: Math.round(c.temperature_2m),
-            feels: Math.round(c.apparent_temperature ?? c.temperature_2m),
-            windKmh: Math.round(c.wind_speed_10m),
-            icon,
-            condKey,
-          };
-          return [имя, п] as const;
-        } catch {
-          return null;
-        }
-      }),
-    ).then((пары) => {
+    async function обновить() {
+      const пары = await Promise.all(
+        города.map(async ([имя, geo]) => {
+          try {
+            const url = `https://api.open-meteo.com/v1/forecast?latitude=${geo.lat}&longitude=${geo.lon}&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m`;
+            const r = await fetch(url, { signal: AbortSignal.timeout(8000) });
+            if (!r.ok) return null;
+            const d = await r.json();
+            const c = d.current;
+            if (!c) return null;
+            const { icon, condKey } = поКоду(Number(c.weather_code));
+            const п: Погода = {
+              temp: Math.round(c.temperature_2m),
+              feels: Math.round(c.apparent_temperature ?? c.temperature_2m),
+              windKmh: Math.round(c.wind_speed_10m),
+              icon,
+              condKey,
+            };
+            return [имя, п] as const;
+          } catch {
+            return null;
+          }
+        }),
+      );
       if (!живо) return;
       const собрано: Record<string, Погода> = {};
       for (const п of пары) if (п) собрано[п[0]] = п[1];
-      setКарта(собрано);
+      // Пустой ответ (сеть отвалилась) не затираем прежними данными —
+      // старая правда лучше внезапного прочерка на всех городах.
+      if (Object.keys(собрано).length) setКарта(собрано);
       setLoading(false);
-    });
+    }
+
+    обновить();
+
+    /*
+     * Держим данные свежими без перезагрузки.
+     *
+     * Источник обновляет показания примерно раз в час, чаще спрашивать
+     * незачем. Плюс перезапрашиваем, когда человек возвращается на
+     * вкладку: телефон мог пролежать в кармане полдня, и цифра к моменту
+     * возврата успела устареть.
+     */
+    const час = 60 * 60 * 1000;
+    const таймер = setInterval(обновить, час);
+
+    let последнее = Date.now();
+    function приВозврате() {
+      if (document.visibilityState !== "visible") return;
+      // Обновляем, только если прошло заметное время — не на каждый щелчок.
+      if (Date.now() - последнее > 30 * 60 * 1000) {
+        последнее = Date.now();
+        обновить();
+      }
+    }
+    document.addEventListener("visibilitychange", приВозврате);
 
     return () => {
       живо = false;
+      clearInterval(таймер);
+      document.removeEventListener("visibilitychange", приВозврате);
     };
   }, []);
 

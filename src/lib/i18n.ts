@@ -286,6 +286,12 @@ export const СЛОВАРЬ = {
   w_snow: row("Snow", "Снег", "Qor", "雪", "눈", "Schnee", "Neige", "雪", "Kar", "ثلج"),
   w_thunder: row("Thunderstorm", "Гроза", "Momaqaldiroq", "雷雨", "뇌우", "Gewitter", "Orage", "雷雨", "Gök gürültülü", "عاصفة رعدية"),
   w_wind: row("km/h", "км/ч", "km/soat", "公里/时", "km/h", "km/h", "km/h", "km/h", "km/s", "كم/س"),
+  cur_title: row("Currency converter", "Конвертер валют", "Valyuta konvertori", "货币兑换", "환율 계산기", "Währungsrechner", "Convertisseur de devises", "通貨換算", "Döviz çevirici", "محوّل العملات"),
+  cur_amount: row("Amount", "Сумма", "Miqdor", "金额", "금액", "Betrag", "Montant", "金額", "Tutar", "المبلغ"),
+  cur_from: row("From", "Из", "Dan", "从", "보내는", "Von", "De", "から", "Kaynak", "من"),
+  cur_to: row("To", "В", "Ga", "到", "받는", "Nach", "Vers", "へ", "Hedef", "إلى"),
+  cur_updated: row("Rate updated", "Курс обновлён", "Kurs yangilandi", "汇率更新于", "환율 업데이트", "Kurs aktualisiert", "Taux mis à jour", "レート更新", "Kur güncellendi", "حُدّث السعر"),
+  cur_unavailable: row("Exchange rate is unavailable right now.", "Курс сейчас недоступен.", "Kurs hozircha mavjud emas.", "暂时无法获取汇率。", "현재 환율을 가져올 수 없습니다.", "Wechselkurs derzeit nicht verfügbar.", "Taux de change indisponible pour le moment.", "現在レートを取得できません。", "Kur şu anda alınamıyor.", "سعر الصرف غير متاح حالياً."),
   w_feels: row("feels like", "ощущается", "his etiladi", "体感", "체감", "gefühlt", "ressenti", "体感", "hissedilen", "الإحساس"),
 } as const;
 
