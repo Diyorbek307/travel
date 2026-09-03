@@ -6,7 +6,7 @@ import type { Content, ContentKey } from "@/lib/types";
 export const dynamic = "force-dynamic";
 
 /** Разделы, которые разрешено менять — чтобы запрос не завёл лишних. */
-const KEYS: ContentKey[] = ["cities", "places", "hotels", "restaurants", "routes", "events", "ads"];
+const KEYS: ContentKey[] = ["cities", "places", "hotels", "restaurants", "routes", "events", "ads", "audio"];
 
 export async function GET() {
   const content = await readContent();

@@ -17,6 +17,7 @@ import AdsManager from "./components/AdsManager";
 import Restaurants from "./components/Restaurants";
 import Events from "./components/Events";
 import Cities from "./components/Cities";
+import AudioGuides from "./components/AudioGuides";
 import Transport from "./components/Transport";
 import ThemeEditor from "./components/ThemeEditor";
 import AppPreview from "./components/AppPreview";
@@ -52,6 +53,7 @@ const NAV_GROUPS = [
       { id: "hotels", label: "Отели", icon: "▣" },
       { id: "restaurants", label: "Рестораны", icon: "◇" },
       { id: "events", label: "События", icon: "◈" },
+      { id: "audio", label: "Аудиогиды", icon: "◉" },
       { id: "cities", label: "Города", icon: "⬡" },
     ],
   },
@@ -148,6 +150,7 @@ export default function AdminShell() {
     restaurants: <Restaurants />,
     events: <Events />,
     cities: <Cities />,
+    audio: <AudioGuides />,
     transport: <Transport />,
     theme: <ThemeEditor />,
     preview: <AppPreview />,

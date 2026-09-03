@@ -94,6 +94,14 @@ function App() {
   const [user, setUser] = useState<PublicUser | null>(null);
   const [tab, setTab] = useState<Tab>("home");
   const [detail, setDetail] = useState<Detail | null>(null);
+  /*
+   * Код на табличке ведёт на «/?audio=<номер>». Большинство людей снимают
+   * его обычной камерой телефона, а не сканером внутри приложения, и
+   * попадают сюда по ссылке. Забираем номер и сразу же убираем его из
+   * адреса: иначе при каждом обновлении страницы рассказ включался бы
+   * заново, даже когда человек давно занят другим.
+   */
+  const [кодЗаписи, setКодЗаписи] = useState<string | null>(null);
 
   const [showSearch, setShowSearch] = useState(false);
   const [showNotifs, setShowNotifs] = useState(false);
@@ -147,6 +155,17 @@ function App() {
   const openHotel = (value: Hotel) => setDetail({ kind: "hotel", value });
   const openRestaurant = (value: Restaurant) => setDetail({ kind: "restaurant", value });
   const openПуть = (название: string, город: string) => setDetail({ kind: "путь", название, город });
+  useEffect(() => {
+    const п = new URLSearchParams(window.location.search);
+    const id = п.get("audio");
+    if (!id) return;
+    setКодЗаписи(id);
+    setTab("audio");
+    п.delete("audio");
+    const хвост = п.toString();
+    window.history.replaceState({}, "", window.location.pathname + (хвост ? `?${хвост}` : ""));
+  }, []);
+
   const closeDetail = () => setDetail(null);
 
   const switchTab = (next: Tab) => {
@@ -283,6 +302,7 @@ function App() {
                   onHotel={openHotel}
                   onRestaurant={openRestaurant}
                   onПуть={openПуть}
+                  кодЗаписи={кодЗаписи}
                   onTab={switchTab}
                   onToast={showToast}
                   onPlay={setMiniAudio}
@@ -318,6 +338,7 @@ interface ScreenProps {
   onHotel: (h: Hotel) => void;
   onRestaurant: (r: Restaurant) => void;
   onПуть: (название: string, город: string) => void;
+  кодЗаписи: string | null;
   onTab: (t: Tab) => void;
   onToast: (msg: string) => void;
   onPlay: (p: Place) => void;
@@ -403,7 +424,7 @@ function Screen({ tab, detail, ...p }: ScreenProps) {
     case "map":
       return <MapScreen onRoute={p.onRoute} />;
     case "audio":
-      return <AudioScreen onPlay={p.onPlay} isPremium={p.isPremium} />;
+      return <AudioScreen onPlay={p.onPlay} isPremium={p.isPremium} сразуИграть={p.кодЗаписи} />;
     case "profile":
       return <ProfileScreen onLogout={p.onLogout} user={p.user} />;
   }

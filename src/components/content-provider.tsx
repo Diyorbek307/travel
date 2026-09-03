@@ -58,6 +58,8 @@ export function useAppContent() {
     // редактор в панели.
     POPULAR_CITIES: content.cities.filter((c) => c.featured),
     CITIES: content.cities,
+    // Скрытый в панели аудиогид сразу пропадает у туристов.
+    AUDIO: (content.audio ?? []).filter((a) => a.active),
     // Приостановленная в панели кампания сразу исчезает из приложения.
     ADS: content.ads.filter((a) => a.status === "active"),
   };

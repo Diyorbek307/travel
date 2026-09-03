@@ -18,6 +18,7 @@ import type {
   ManagedPlace,
   ManagedRestaurant,
   ManagedRoute,
+  ManagedAudio,
 } from "@/lib/types";
 
 /**
@@ -155,4 +156,11 @@ const ads: ManagedAd[] = ADS.map((a, i) => ({
   bid: 0,
 }));
 
-export const SEED: Content = { cities, places, hotels, restaurants, routes, events, ads };
+/*
+ * Аудиогидов в семенах нет намеренно. Записи — это реальные файлы,
+ * которых у нас нет; выдуманная ссылка привела бы к кнопке «слушать»,
+ * молча ничего не воспроизводящей. Раздел наполняется через панель.
+ */
+const audio: ManagedAudio[] = [];
+
+export const SEED: Content = { cities, places, hotels, restaurants, routes, events, ads, audio };

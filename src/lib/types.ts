@@ -224,6 +224,31 @@ export interface ManagedAd {
 }
 
 /** Всё содержимое платформы одним объектом — его отдаёт и принимает API. */
+/**
+ * Аудиогид: запись, которую человек слушает у объекта.
+ *
+ * Файл не храним у себя, а ссылаемся на него. Звук весит мегабайты, а
+ * постоянного диска у приложения нет — класть его в базу рядом с
+ * учётными записями значит раздуть её до неподъёмного за десяток
+ * экскурсий. Ссылка работает уже сегодня и ничего не стоит; когда
+ * появится файловое хранилище, добавится и загрузка.
+ */
+export interface ManagedAudio {
+  id: string;
+  /** К какому месту относится: по нему гид находится при сканировании кода. */
+  placeId: string;
+  placeName: string;
+  city: string;
+  /** Язык записи — у одного места их бывает несколько. */
+  lang: string;
+  title: string;
+  /** Прямая ссылка на звуковой файл. */
+  url: string;
+  /** Длительность в секундах; 0 — пока не измерена. */
+  seconds: number;
+  active: boolean;
+}
+
 export interface Content {
   cities: ManagedCity[];
   places: ManagedPlace[];
@@ -232,6 +257,7 @@ export interface Content {
   routes: ManagedRoute[];
   events: ManagedEvent[];
   ads: ManagedAd[];
+  audio: ManagedAudio[];
 }
 
 export type ContentKey = keyof Content;
