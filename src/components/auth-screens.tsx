@@ -1,5 +1,8 @@
 "use client";
 
+import { useT } from "@/components/lang-provider";
+import type { TKey } from "@/lib/i18n";
+
 import { useEffect, useRef, useState } from "react";
 import { CREAM, GOLD, GREEN, MUTED, TEXT, WHITE } from "@/lib/theme";
 import type { PublicUser } from "@/lib/types";
@@ -17,17 +20,17 @@ import type { PublicUser } from "@/lib/types";
  */
 
 /** Ошибки сервера на понятном языке. */
-const ОШИБКИ: Record<string, string> = {
-  email_invalid: "Проверьте адрес почты",
-  password_short: "Пароль короче восьми символов",
-  first_name_required: "Введите имя",
-  last_name_required: "Введите фамилию",
-  email_taken: "На этот адрес уже есть аккаунт",
-  photo_too_large: "Фотография слишком большая — выберите другую",
-  invalid_credentials: "Неверная почта или пароль",
-  code_wrong: "Код не подошёл",
-  code_expired: "Код устарел — запросите новый",
-  code_none: "Код не найден — запросите новый",
+const ОШИБКИ: Record<string, TKey> = {
+  email_invalid: "e_email_invalid",
+  password_short: "e_pw_short",
+  first_name_required: "e_first_req",
+  last_name_required: "e_last_req",
+  email_taken: "e_email_taken",
+  photo_too_large: "e_photo_large",
+  invalid_credentials: "e_bad_creds",
+  code_wrong: "e_code_wrong",
+  code_expired: "e_code_expired",
+  code_none: "e_code_none",
 };
 
 function поле(): React.CSSProperties {
@@ -96,6 +99,7 @@ export function RegisterScreen({
   onBack: () => void;
   onDone: (user: PublicUser) => void;
 }) {
+  const { t } = useT();
   const [ждётКод, setЖдётКод] = useState<{ email: string; почтаНастроена: boolean; пауза: number } | null>(null);
   const [форма, setФорма] = useState({
     firstName: "",
@@ -106,7 +110,7 @@ export function RegisterScreen({
     phone: "",
   });
   const [фото, setФото] = useState<string | null>(null);
-  const [ошибка, setОшибка] = useState<string | null>(null);
+  const [ошибка, setОшибка] = useState<TKey | null>(null);
   const [идёт, setИдёт] = useState(false);
   const файл = useRef<HTMLInputElement>(null);
 
@@ -147,7 +151,7 @@ export function RegisterScreen({
       });
       const data = await res.json();
       if (!res.ok) {
-        setОшибка(ОШИБКИ[data.error] ?? "Не получилось зарегистрироваться");
+        setОшибка(ОШИБКИ[data.error] ?? "err_reg_failed");
         return;
       }
       // Сессии ещё нет: сперва подтверждение почты кодом из письма.
@@ -157,7 +161,7 @@ export function RegisterScreen({
         пауза: Number(data.waitSeconds) || 30,
       });
     } catch {
-      setОшибка("Нет связи с сервером");
+      setОшибка("err_network");
     } finally {
       setИдёт(false);
     }
@@ -176,7 +180,7 @@ export function RegisterScreen({
   }
 
   return (
-    <Обёртка заголовок="Создать аккаунт" подпись="Чтобы сохранять маршруты и избранное" onBack={onBack}>
+    <Обёртка заголовок={t("reg_title")} подпись={t("reg_sub")} onBack={onBack}>
       <form onSubmit={отправить} className="flex flex-col gap-3">
         {/* Фотография */}
         <button
@@ -189,7 +193,7 @@ export function RegisterScreen({
             <img src={фото} alt="" className="h-full w-full object-cover" />
           ) : (
             <span className="text-xs" style={{ color: "rgba(255,255,255,0.65)" }}>
-              Фото
+              {t("reg_photo")}
             </span>
           )}
         </button>
@@ -198,7 +202,7 @@ export function RegisterScreen({
         <div className="flex flex-wrap gap-3">
           <input
             required
-            placeholder="Имя"
+            placeholder={t("reg_first")}
             value={форма.firstName}
             onChange={менять("firstName")}
             className="min-w-0 flex-1 rounded-xl px-4 py-3 text-sm outline-none"
@@ -206,7 +210,7 @@ export function RegisterScreen({
           />
           <input
             required
-            placeholder="Фамилия"
+            placeholder={t("reg_last")}
             value={форма.lastName}
             onChange={менять("lastName")}
             className="min-w-0 flex-1 rounded-xl px-4 py-3 text-sm outline-none"
@@ -218,7 +222,7 @@ export function RegisterScreen({
           required
           type="email"
           autoComplete="email"
-          placeholder="Почта"
+          placeholder={t("reg_email")}
           value={форма.email}
           onChange={менять("email")}
           className="rounded-xl px-4 py-3 text-sm outline-none"
@@ -229,21 +233,21 @@ export function RegisterScreen({
           type="password"
           autoComplete="new-password"
           minLength={8}
-          placeholder="Пароль — не короче восьми символов"
+          placeholder={t("reg_pw_ph")}
           value={форма.password}
           onChange={менять("password")}
           className="rounded-xl px-4 py-3 text-sm outline-none"
           style={поле()}
         />
         <input
-          placeholder="Страна (необязательно)"
+          placeholder={t("reg_country_ph")}
           value={форма.country}
           onChange={менять("country")}
           className="rounded-xl px-4 py-3 text-sm outline-none"
           style={поле()}
         />
         <input
-          placeholder="Телефон (необязательно)"
+          placeholder={t("reg_phone_ph")}
           value={форма.phone}
           onChange={менять("phone")}
           className="rounded-xl px-4 py-3 text-sm outline-none"
@@ -251,12 +255,12 @@ export function RegisterScreen({
         />
 
         <p className="text-[11px] leading-relaxed" style={{ color: "rgba(255,255,255,0.45)" }}>
-          Паспортные данные не запрашиваются и не хранятся.
+          {t("reg_no_passport")}
         </p>
 
         {ошибка && (
           <p className="text-sm" style={{ color: "#ffb4a2" }}>
-            {ошибка}
+            {t(ошибка)}
           </p>
         )}
 
@@ -266,7 +270,7 @@ export function RegisterScreen({
           className="mt-2 rounded-2xl py-4 text-base font-bold disabled:opacity-60"
           style={{ background: GOLD, color: TEXT }}
         >
-          {идёт ? "Создаём…" : "Создать аккаунт"}
+          {идёт ? t("reg_submitting") : t("reg_title")}
         </button>
       </form>
     </Обёртка>
@@ -298,8 +302,9 @@ export function VerifyScreen({
   onBack: () => void;
   onDone: (user: PublicUser) => void;
 }) {
+  const { t } = useT();
   const [code, setCode] = useState("");
-  const [ошибка, setОшибка] = useState<string | null>(null);
+  const [ошибка, setОшибка] = useState<TKey | null>(null);
   const [идёт, setИдёт] = useState(false);
   const [осталось, setОсталось] = useState(пауза);
 
@@ -323,12 +328,12 @@ export function VerifyScreen({
       });
       const data = await res.json();
       if (!res.ok) {
-        setОшибка(ОШИБКИ[data.error] ?? "Не получилось подтвердить");
+        setОшибка(ОШИБКИ[data.error] ?? "err_verify_failed");
         return;
       }
       onDone(data.user);
     } catch {
-      setОшибка("Нет связи с сервером");
+      setОшибка("err_network");
     } finally {
       setИдёт(false);
     }
@@ -346,17 +351,17 @@ export function VerifyScreen({
       // И при успехе, и при «рано» сервер говорит, сколько ещё ждать.
       setОсталось(Number(data.waitSeconds) || 30);
       if (!res.ok && data.error !== "too_soon") {
-        setОшибка("Не получилось отправить код");
+        setОшибка("err_send_failed");
       }
     } catch {
-      setОшибка("Нет связи с сервером");
+      setОшибка("err_network");
     }
   }
 
   return (
     <Обёртка
-      заголовок="Подтвердите почту"
-      подпись={`Отправили код на ${email}`}
+      заголовок={t("verify_title")}
+      подпись={`${t("verify_sent_to")} ${email}`}
       onBack={onBack}
     >
       <form onSubmit={отправить} className="flex flex-col gap-3">
@@ -375,13 +380,13 @@ export function VerifyScreen({
 
         {!письмоУшло && (
           <p className="text-xs leading-relaxed" style={{ color: "#ffd9a0" }}>
-            Почтовый сервис пока не подключён — письмо не ушло. Код можно узнать в поддержке.
+            {t("verify_no_mail")}
           </p>
         )}
 
         {ошибка && (
           <p className="text-sm" style={{ color: "#ffb4a2" }}>
-            {ошибка}
+            {t(ошибка)}
           </p>
         )}
 
@@ -391,7 +396,7 @@ export function VerifyScreen({
           className="mt-2 rounded-2xl py-4 text-base font-bold disabled:opacity-60"
           style={{ background: GOLD, color: TEXT }}
         >
-          {идёт ? "Проверяем…" : "Подтвердить"}
+          {идёт ? t("verify_checking") : t("verify_submit")}
         </button>
 
         <button
@@ -402,8 +407,8 @@ export function VerifyScreen({
           style={{ color: "rgba(255,255,255,0.7)" }}
         >
           {осталось > 0
-            ? `Прислать ещё раз через ${осталось} с`
-            : "Прислать код ещё раз"}
+            ? t("verify_resend_in").replace("{n}", String(осталось))
+            : t("verify_resend")}
         </button>
       </form>
     </Обёртка>
@@ -423,11 +428,12 @@ export function LoginScreen({
   onDone: (user: PublicUser) => void;
   onRegister: () => void;
 }) {
+  const { t } = useT();
   const [забыл, setЗабыл] = useState(false);
   const [ждётКод, setЖдётКод] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [ошибка, setОшибка] = useState<string | null>(null);
+  const [ошибка, setОшибка] = useState<TKey | null>(null);
   const [идёт, setИдёт] = useState(false);
 
   async function отправить(e: React.FormEvent) {
@@ -447,12 +453,12 @@ export function LoginScreen({
           setЖдётКод(true);
           return;
         }
-        setОшибка(ОШИБКИ[data.error] ?? "Не получилось войти");
+        setОшибка(ОШИБКИ[data.error] ?? "err_login_failed");
         return;
       }
       onDone(data.user);
     } catch {
-      setОшибка("Нет связи с сервером");
+      setОшибка("err_network");
     } finally {
       setИдёт(false);
     }
@@ -474,13 +480,13 @@ export function LoginScreen({
   }
 
   return (
-    <Обёртка заголовок="Вход" подпись="Аккаунт уже есть — введите почту и пароль" onBack={onBack}>
+    <Обёртка заголовок={t("login_title")} подпись={t("login_sub")} onBack={onBack}>
       <form onSubmit={отправить} className="flex flex-col gap-3">
         <input
           required
           type="email"
           autoComplete="email"
-          placeholder="Почта"
+          placeholder={t("reg_email")}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className="rounded-xl px-4 py-3 text-sm outline-none"
@@ -490,7 +496,7 @@ export function LoginScreen({
           required
           type="password"
           autoComplete="current-password"
-          placeholder="Пароль"
+          placeholder={t("reg_password")}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           className="rounded-xl px-4 py-3 text-sm outline-none"
@@ -499,7 +505,7 @@ export function LoginScreen({
 
         {ошибка && (
           <p className="text-sm" style={{ color: "#ffb4a2" }}>
-            {ошибка}
+            {t(ошибка)}
           </p>
         )}
 
@@ -509,7 +515,7 @@ export function LoginScreen({
           className="mt-2 rounded-2xl py-4 text-base font-bold disabled:opacity-60"
           style={{ background: GOLD, color: TEXT }}
         >
-          {идёт ? "Входим…" : "Войти"}
+          {идёт ? t("login_submitting") : t("login_submit")}
         </button>
 
         <button
@@ -518,7 +524,7 @@ export function LoginScreen({
           className="py-1 text-sm"
           style={{ color: "rgba(255,255,255,0.7)" }}
         >
-          Забыли пароль?
+          {t("login_forgot")}
         </button>
 
         <button
@@ -527,7 +533,7 @@ export function LoginScreen({
           className="py-1 text-sm"
           style={{ color: "rgba(255,255,255,0.7)" }}
         >
-          Нет аккаунта? Создать
+          {t("login_no_account")}
         </button>
       </form>
     </Обёртка>
@@ -546,6 +552,7 @@ export function LoginScreen({
  * другой.
  */
 function ForgotScreen({ onBack, email: начальный }: { onBack: () => void; email: string }) {
+  const { t } = useT();
   const [email, setEmail] = useState(начальный);
   const [отправлено, setОтправлено] = useState(false);
   const [идёт, setИдёт] = useState(false);
@@ -569,10 +576,9 @@ function ForgotScreen({ onBack, email: начальный }: { onBack: () => voi
 
   if (отправлено) {
     return (
-      <Обёртка заголовок="Заявка принята" подпись="" onBack={onBack}>
+      <Обёртка заголовок={t("reset_sent_title")} подпись="" onBack={onBack}>
         <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.75)" }}>
-          Если на этот адрес есть аккаунт, поддержка вышлет ссылку для смены пароля. Ссылка
-          действует один час.
+          {t("reset_sent_body")}
         </p>
       </Обёртка>
     );
@@ -580,8 +586,8 @@ function ForgotScreen({ onBack, email: начальный }: { onBack: () => voi
 
   return (
     <Обёртка
-      заголовок="Забыли пароль?"
-      подпись="Укажите почту — вышлем ссылку для смены"
+      заголовок={t("forgot_title")}
+      подпись={t("forgot_sub")}
       onBack={onBack}
     >
       <form onSubmit={отправить} className="flex flex-col gap-3">
@@ -589,7 +595,7 @@ function ForgotScreen({ onBack, email: начальный }: { onBack: () => voi
           required
           type="email"
           autoComplete="email"
-          placeholder="Почта"
+          placeholder={t("reg_email")}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className="rounded-xl px-4 py-3 text-sm outline-none"
@@ -601,7 +607,7 @@ function ForgotScreen({ onBack, email: начальный }: { onBack: () => voi
           className="mt-2 rounded-2xl py-4 text-base font-bold disabled:opacity-60"
           style={{ background: GOLD, color: TEXT }}
         >
-          {идёт ? "Отправляем…" : "Отправить заявку"}
+          {идёт ? t("reset_submitting") : t("reset_submit")}
         </button>
       </form>
     </Обёртка>

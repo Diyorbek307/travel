@@ -1,24 +1,31 @@
-import type { Tab } from "@/lib/types";
+import type { PublicUser, Tab } from "@/lib/types";
+import { useT } from "@/components/lang-provider";
+import type { TKey } from "@/lib/i18n";
 import { GOLD, GREEN } from "@/lib/theme";
 import { LogoMark } from "./ui";
 
-export function SideMenu({ onClose, onTab, currentTab, isPremium, onPremium, onLogout }:{
-  onClose:()=>void; onTab:(t:Tab)=>void; currentTab:Tab; isPremium:boolean; onPremium:()=>void; onLogout:()=>void;
+export function SideMenu({ onClose, onTab, currentTab, isPremium, onPremium, onLogout, user }:{
+  onClose:()=>void; onTab:(t:Tab)=>void; currentTab:Tab; isPremium:boolean; onPremium:()=>void; onLogout:()=>void; user:PublicUser|null;
 }) {
-  const NAV:[Tab,string,string][] = [
-    ["home",   "🏠","Главная"],
-    ["explore","🔍","Исследовать"],
-    ["map",    "🗺️","Карта"],
-    ["audio",  "🎧","Аудиогиды"],
-    ["profile","👤","Профиль"],
+  const { t } = useT();
+  const NAV:[Tab,string,TKey][] = [
+    ["home",   "🏠","nav_home"],
+    ["explore","🔍","nav_explore"],
+    ["map",    "🗺️","nav_map"],
+    ["audio",  "🎧","nav_audio"],
+    ["profile","👤","nav_profile"],
   ];
-  const EXTRAS:[string,string,string,Tab|null][] = [
-    ["❤️","Избранное",   "12","explore"],
-    ["📋","Мои маршруты","3", "map"    ],
-    ["⬇️","Скачанное",  "",  "audio"  ],
-    ["💱","Конвертер",   "",  "profile"],
-    ["🆘","Экстренная",  "",  "profile"],
+  // Счётчиков у пунктов больше нет: «12 избранных» при пустом списке —
+  // выдумка, а раздел избранного ещё не ведётся.
+  const EXTRAS:[string,TKey,Tab|null][] = [
+    ["❤️","menu_favorites","explore"],
+    ["📋","menu_my_routes","map"    ],
+    ["⬇️","menu_downloads","audio"  ],
+    ["💱","cur_title",     "profile"],
+    ["🆘","menu_emergency","profile"],
   ];
+  const имя = user ? `${user.firstName} ${user.lastName}`.trim() : "—";
+  const откуда = user?.country || "";
   return (
     <>
       <div className="absolute inset-0 z-40" style={{background:"rgba(0,0,0,0.55)",backdropFilter:"blur(3px)"}} onClick={onClose}/>
@@ -30,7 +37,7 @@ export function SideMenu({ onClose, onTab, currentTab, isPremium, onPremium, onL
               <LogoMark size={36}/>
               <div>
                 <p className="text-white font-bold text-lg" style={{fontFamily:"'Fraunces',serif"}}>UzUp</p>
-                <p className="text-[10px]" style={{color:GOLD}}>Открой Узбекистан</p>
+                <p className="text-[10px]" style={{color:GOLD}}>{t("splash_tagline")}</p>
               </div>
             </div>
             <button onClick={onClose} className="w-8 h-8 rounded-xl flex items-center justify-center" style={{background:"rgba(255,255,255,0.08)"}}>
@@ -41,29 +48,28 @@ export function SideMenu({ onClose, onTab, currentTab, isPremium, onPremium, onL
           <div className="flex items-center gap-3 p-3 rounded-2xl" style={{background:"rgba(255,255,255,0.06)"}}>
             <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl" style={{background:`linear-gradient(135deg,${GREEN},#66B38E)`}}>👤</div>
             <div className="flex-1">
-              <p className="text-white font-semibold text-sm">Алекс Джонсон</p>
-              <p className="text-[10px]" style={{color:"rgba(255,255,255,0.45)"}}>Уровень 3 · 3 штампа</p>
+              <p className="text-white font-semibold text-sm truncate">{имя}</p>
+              {откуда&&<p className="text-[10px] truncate" style={{color:"rgba(255,255,255,0.45)"}}>{откуда}</p>}
             </div>
             {isPremium&&<span className="text-sm">👑</span>}
           </div>
         </div>
         <div className="flex-1 overflow-y-auto hide-scroll py-3">
           {/* Main nav */}
-          <p className="px-5 text-[9px] font-bold tracking-widest uppercase mb-2" style={{color:"rgba(255,255,255,0.3)"}}>Навигация</p>
-          {NAV.map(([t,e,l])=>(
-            <button key={t} onClick={()=>{onTab(t);onClose();}} className="w-full flex items-center gap-3 px-5 py-3 text-left transition-all" style={currentTab===t?{background:`${GREEN}22`,borderRight:`3px solid ${GREEN}`}:{borderRight:"3px solid transparent"}}>
+          <p className="px-5 text-[9px] font-bold tracking-widest uppercase mb-2" style={{color:"rgba(255,255,255,0.3)"}}>{t("menu_nav")}</p>
+          {NAV.map(([таб,e,k])=>(
+            <button key={таб} onClick={()=>{onTab(таб);onClose();}} className="w-full flex items-center gap-3 px-5 py-3 text-left transition-all" style={currentTab===таб?{background:`${GREEN}22`,borderRight:`3px solid ${GREEN}`}:{borderRight:"3px solid transparent"}}>
               <span className="text-lg w-6">{e}</span>
-              <span className="font-semibold text-sm" style={{color:currentTab===t?GREEN:"rgba(255,255,255,0.75)"}}>{l}</span>
-              {currentTab===t&&<div className="ml-auto w-1.5 h-1.5 rounded-full" style={{background:GREEN}}/>}
+              <span className="font-semibold text-sm" style={{color:currentTab===таб?GREEN:"rgba(255,255,255,0.75)"}}>{t(k)}</span>
+              {currentTab===таб&&<div className="ml-auto w-1.5 h-1.5 rounded-full" style={{background:GREEN}}/>}
             </button>
           ))}
           <div className="mx-5 my-3 border-t" style={{borderColor:"rgba(255,255,255,0.06)"}}/>
-          <p className="px-5 text-[9px] font-bold tracking-widest uppercase mb-2" style={{color:"rgba(255,255,255,0.3)"}}>Разное</p>
-          {EXTRAS.map(([e,l,badge,target])=>(
-            <button key={l} onClick={()=>{if(target){onTab(target);onClose();}}} className="w-full flex items-center gap-3 px-5 py-3 text-left active:opacity-70">
+          <p className="px-5 text-[9px] font-bold tracking-widest uppercase mb-2" style={{color:"rgba(255,255,255,0.3)"}}>{t("menu_more")}</p>
+          {EXTRAS.map(([e,k,target])=>(
+            <button key={k} onClick={()=>{if(target){onTab(target);onClose();}}} className="w-full flex items-center gap-3 px-5 py-3 text-left active:opacity-70">
               <span className="text-lg w-6">{e}</span>
-              <span className="flex-1 font-medium text-sm" style={{color:"rgba(255,255,255,0.65)"}}>{l}</span>
-              {badge&&<span className="text-[9px] font-bold px-2 py-0.5 rounded-full" style={{background:`${GREEN}30`,color:GREEN}}>{badge}</span>}
+              <span className="flex-1 font-medium text-sm" style={{color:"rgba(255,255,255,0.65)"}}>{t(k)}</span>
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"/></svg>
             </button>
           ))}
@@ -74,7 +80,7 @@ export function SideMenu({ onClose, onTab, currentTab, isPremium, onPremium, onL
               <span className="text-2xl">👑</span>
               <div className="text-left flex-1">
                 <p className="font-bold text-sm" style={{color:GOLD}}>UzUp Premium</p>
-                <p className="text-[9px]" style={{color:"rgba(255,255,255,0.45)"}}>Без рекламы · $4.99/мес</p>
+                <p className="text-[9px]" style={{color:"rgba(255,255,255,0.45)"}}>{t("pay_no_ads")} · $4.99/{t("pay_month")}</p>
               </div>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={GOLD} strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>
             </button>
@@ -83,8 +89,8 @@ export function SideMenu({ onClose, onTab, currentTab, isPremium, onPremium, onL
         {/* Footer */}
         <div className="px-5 py-4 border-t" style={{borderColor:"rgba(255,255,255,0.06)"}}>
           <div className="flex items-center justify-between">
-            <p className="text-[10px]" style={{color:"rgba(255,255,255,0.25)"}}>UzUp v2.4.1 · 🇺🇿 Made in UZ</p>
-            <button onClick={()=>{onClose();onLogout();}} className="text-[10px] font-semibold" style={{color:"rgba(255,255,255,0.45)"}}>🚪 Выйти</button>
+            <p className="text-[10px]" style={{color:"rgba(255,255,255,0.25)"}}>UzUp v2.4.1 · 🇺🇿 {t("menu_made")}</p>
+            <button onClick={()=>{onClose();onLogout();}} className="text-[10px] font-semibold" style={{color:"rgba(255,255,255,0.45)"}}>🚪 {t("prof_logout")}</button>
           </div>
         </div>
       </div>

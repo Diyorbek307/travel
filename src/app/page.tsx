@@ -278,6 +278,7 @@ function App() {
             )}
             {showMenu && (
               <SideMenu
+                user={user}
                 onClose={() => setShowMenu(false)}
                 onTab={switchTab}
                 currentTab={tab}
