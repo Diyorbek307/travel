@@ -3,8 +3,10 @@
 import { useState } from "react";
 import type { Route } from "@/lib/types";
 import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE } from "@/lib/theme";
-import { WEATHER } from "@/data/content";
+
 import { useAppContent } from "@/components/content-provider";
+import { useT } from "@/components/lang-provider";
+import { useWeather } from "@/components/weather-provider";
 import { Badge } from "../ui";
 import RealMap from "@/components/real-map";
 import { ГОРОДА } from "@/data/geo";
@@ -12,6 +14,8 @@ import { ГОРОДА } from "@/data/geo";
 
 export function MapScreen({ onRoute }:{ onRoute:(r:Route)=>void }) {
   const { ROUTES } = useAppContent();
+  const { t } = useT();
+  const погода = useWeather();
   const [mode, setMode] = useState<"map"|"routes"|"ai">("map");
   const [city, setCity]   = useState("Самарканд");
   /*
@@ -34,10 +38,10 @@ export function MapScreen({ onRoute }:{ onRoute:(r:Route)=>void }) {
   return (
     <div className="flex flex-col h-full" style={{background:CREAM}}>
       <div className="px-4 pt-14 pb-3 bg-white border-b" style={{borderColor:BORDER}}>
-        <p className="text-xs font-medium mb-0.5" style={{color:GREEN,letterSpacing:"0.1em"}}>МАРШРУТЫ И КАРТА</p>
-        <h1 className="text-xl font-bold mb-3" style={{color:TEXT,fontFamily:"'Fraunces',serif"}}>Спланируй поездку</h1>
+        <p className="text-xs font-medium mb-0.5" style={{color:GREEN,letterSpacing:"0.1em"}}>{t("map_kicker")}</p>
+        <h1 className="text-xl font-bold mb-3" style={{color:TEXT,fontFamily:"'Fraunces',serif"}}>{t("map_title")}</h1>
         <div className="flex gap-2">
-          {(["map","routes","ai"] as const).map(m=><button key={m} onClick={()=>setMode(m)} className="flex-1 py-2 rounded-xl text-xs font-semibold" style={mode===m?{background:GREEN,color:WHITE}:{background:CREAM,color:MUTED}}>{m==="map"?"🗺️ Карта":m==="routes"?"📋 Маршруты":"✨ AI-гид"}</button>)}
+          {(["map","routes","ai"] as const).map(m=><button key={m} onClick={()=>setMode(m)} className="flex-1 py-2 rounded-xl text-xs font-semibold" style={mode===m?{background:GREEN,color:WHITE}:{background:CREAM,color:MUTED}}>{m==="map"?`🗺️ ${t("map_tab_map")}`:m==="routes"?`📋 ${t("map_tab_routes")}`:`✨ ${t("map_tab_ai")}`}</button>)}
         </div>
       </div>
       <div className="flex-1 overflow-y-auto hide-scroll">
@@ -47,15 +51,15 @@ export function MapScreen({ onRoute }:{ onRoute:(r:Route)=>void }) {
             <div className="rounded-2xl px-4 py-3 flex items-center gap-2" style={{background:GREEN+"15",border:`1px solid ${GREEN}30`}}>
               <span className="text-lg">🗺️</span>
               <div className="min-w-0 flex-1">
-                <p className="text-xs font-bold" style={{color:GREEN}}>Карта Узбекистана</p>
-                <p className="text-[10px]" style={{color:MUTED}}>Нажмите город · синяя точка — вы</p>
+                <p className="text-xs font-bold" style={{color:GREEN}}>{t("map_uz")}</p>
+                <p className="text-[10px]" style={{color:MUTED}}>{t("map_where_you")}</p>
               </div>
               <button
                 onClick={определитьГде}
                 className="shrink-0 rounded-full px-3 py-1 text-[10px] font-bold"
                 style={{background:GREEN,color:WHITE}}
               >
-                {где ? "Обновить" : "Где я"}
+                {где ? t("map_refresh") : t("map_where_am_i")}
               </button>
             </div>
             {/* 3D Map */}
@@ -73,11 +77,11 @@ export function MapScreen({ onRoute }:{ onRoute:(r:Route)=>void }) {
               />
             </div>
             {/* Selected city info */}
-            {city&&WEATHER[city]&&(
+            {city&&погода.get(city)&&(
               <div className="bg-white rounded-2xl p-4 shadow-sm border" style={{borderColor:BORDER}}>
                 <div className="flex items-center justify-between">
-                  <div><p className="font-bold text-base" style={{color:TEXT,fontFamily:"'Fraunces',serif"}}>{city}</p><p className="text-xs" style={{color:MUTED}}>Выбранный город</p></div>
-                  <div className="text-right"><span className="text-2xl">{WEATHER[city].icon}</span><p className="font-bold text-lg" style={{color:TEXT}}>{WEATHER[city].temp}°C</p><p className="text-[9px]" style={{color:MUTED}}>{WEATHER[city].cond}</p></div>
+                  <div><p className="font-bold text-base" style={{color:TEXT,fontFamily:"'Fraunces',serif"}}>{city}</p><p className="text-xs" style={{color:MUTED}}>{t("map_selected_city")}</p></div>
+                  <div className="text-right"><span className="text-2xl">{погода.get(city)!.icon}</span><p className="font-bold text-lg" style={{color:TEXT}}>{погода.get(city)!.temp}°C</p><p className="text-[9px]" style={{color:MUTED}}>{t(погода.get(city)!.condKey)}</p></div>
                 </div>
                 <div className="flex gap-2 mt-3">
                   <button onClick={()=>setMode("routes")} className="flex-1 py-2.5 rounded-xl text-xs font-bold" style={{background:GREEN,color:WHITE}}>🗺️ Маршруты</button>
@@ -87,7 +91,7 @@ export function MapScreen({ onRoute }:{ onRoute:(r:Route)=>void }) {
             )}
             {/* City chips */}
             <div className="flex gap-2 flex-wrap">
-              {Object.keys(WEATHER).map(c=><button key={c} onClick={()=>setCity(c)} className="px-3 py-1.5 rounded-full text-xs font-bold shadow-sm" style={city===c?{background:GREEN,color:WHITE}:{background:WHITE,color:TEXT,border:`1px solid ${BORDER}`}}>{c}</button>)}
+              {Object.keys(ГОРОДА).map(c=><button key={c} onClick={()=>setCity(c)} className="px-3 py-1.5 rounded-full text-xs font-bold shadow-sm" style={city===c?{background:GREEN,color:WHITE}:{background:WHITE,color:TEXT,border:`1px solid ${BORDER}`}}>{c}</button>)}
             </div>
           </div>
         )}

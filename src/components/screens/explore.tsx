@@ -4,7 +4,9 @@ import { useState } from "react";
 import type { Hotel, Place, Restaurant } from "@/lib/types";
 import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE } from "@/lib/theme";
 import { FILTER_TABS, WEATHER } from "@/data/content";
+import type { TKey } from "@/lib/i18n";
 import { useAppContent } from "@/components/content-provider";
+import { useT } from "@/components/lang-provider";
 import { Badge, StarRow } from "../ui";
 import { AnimatedBg } from "@/components/animated-bg";
 import { AdBanner } from "@/components/widgets";
@@ -12,6 +14,14 @@ import { AdBanner } from "@/components/widgets";
 
 export function ExploreScreen({ onPlace, onHotel, onRestaurant, isPremium }:{ onPlace:(p:Place)=>void; onHotel:(h:Hotel)=>void; onRestaurant:(r:Restaurant)=>void; isPremium:boolean }) {
   const { HOTELS, PLACES, RESTAURANTS } = useAppContent();
+  const { t } = useT();
+  // Значение фильтра остаётся русским: по нему сверяется тип места в
+  // данных. Переводится только подпись на кнопке.
+  const подписьФильтра: Record<string, TKey> = {
+    "Всё": "common_all", "История": "f_history", "Мечети": "f_mosques",
+    "Музеи": "f_museums", "Природа": "f_nature", "Базары": "f_bazaars",
+    "Отели": "home_hotels", "Рестораны": "home_restaurants",
+  };
   const [filter, setFilter] = useState("Всё");
   const showHotels = filter==="Отели";
   const showRests  = filter==="Рестораны";
@@ -25,10 +35,10 @@ export function ExploreScreen({ onPlace, onHotel, onRestaurant, isPremium }:{ on
       <div className="relative pt-14 pb-3 overflow-hidden border-b" style={{borderColor:BORDER,background:GREEN}}>
         <div className="absolute inset-0 opacity-20"><AnimatedBg/></div>
         <div className="relative z-10 px-4">
-        <p className="text-[9px] font-bold mb-0.5 uppercase tracking-widest" style={{color:"rgba(255,255,255,0.6)"}}>ИССЛЕДОВАТЬ</p>
-        <h1 className="text-xl font-bold mb-3 text-white" style={{fontFamily:"'Fraunces',serif"}}>Открой Узбекистан</h1>
+        <p className="text-[9px] font-bold mb-0.5 uppercase tracking-widest" style={{color:"rgba(255,255,255,0.6)"}}>{t("explore_kicker")}</p>
+        <h1 className="text-xl font-bold mb-3 text-white" style={{fontFamily:"'Fraunces',serif"}}>{t("explore_title")}</h1>
         <div className="flex gap-2 overflow-x-auto hide-scroll">
-          {FILTER_TABS.map(f=><button key={f} onClick={()=>setFilter(f)} className="flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-semibold" style={filter===f?{background:WHITE,color:GREEN}:{background:"rgba(255,255,255,0.18)",color:"rgba(255,255,255,0.75)"}}>{f}</button>)}
+          {FILTER_TABS.map(f=><button key={f} onClick={()=>setFilter(f)} className="flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-semibold" style={filter===f?{background:WHITE,color:GREEN}:{background:"rgba(255,255,255,0.18)",color:"rgba(255,255,255,0.75)"}}>{подписьФильтра[f] ? t(подписьФильтра[f]) : f}</button>)}
         </div>
       </div>
       </div>
@@ -44,7 +54,7 @@ export function ExploreScreen({ onPlace, onHotel, onRestaurant, isPremium }:{ on
         {showHotels&&HOTELS.map(h=>(
           <button key={h.id} onClick={()=>onHotel(h)} className="w-full bg-white rounded-2xl overflow-hidden shadow-sm border text-left active:scale-[0.98] transition-all" style={{borderColor:BORDER}}>
             <div className="relative h-40"><img src={h.img} alt={h.name} className="w-full h-full object-cover"/><div className="absolute inset-0" style={{background:"linear-gradient(to top,rgba(0,0,0,0.65) 0%,transparent 55%)"}}/><div className="absolute top-3 left-3"><span className="text-[9px] font-bold px-2 py-0.5 rounded-full" style={{background:GOLD,color:TEXT}}>{h.tag}</span></div><div className="absolute bottom-0 left-0 right-0 p-3"><p className="text-white font-bold text-sm" style={{fontFamily:"'Fraunces',serif"}}>{h.name}</p><div className="flex items-center gap-2 mt-0.5"><StarRow rating={h.rating}/><span className="text-white/70 text-xs">{h.city}</span></div></div></div>
-            <div className="px-3 py-2.5 flex items-center justify-between"><div className="flex gap-1.5 flex-wrap">{h.facilities.slice(0,3).map(f=><span key={f} className="text-[9px] font-medium px-2 py-0.5 rounded-full" style={{background:CREAM,color:MUTED}}>{f}</span>)}</div><div className="text-right flex-shrink-0"><p className="font-bold text-base" style={{color:GREEN}}>{h.price}</p><p className="text-[9px]" style={{color:MUTED}}>за ночь</p></div></div>
+            <div className="px-3 py-2.5 flex items-center justify-between"><div className="flex gap-1.5 flex-wrap">{h.facilities.slice(0,3).map(f=><span key={f} className="text-[9px] font-medium px-2 py-0.5 rounded-full" style={{background:CREAM,color:MUTED}}>{подписьФильтра[f] ? t(подписьФильтра[f]) : f}</span>)}</div><div className="text-right flex-shrink-0"><p className="font-bold text-base" style={{color:GREEN}}>{h.price}</p><p className="text-[9px]" style={{color:MUTED}}>за ночь</p></div></div>
           </button>
         ))}
         {showRests&&RESTAURANTS.map(r=>(

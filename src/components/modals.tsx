@@ -148,6 +148,43 @@ export function LoginModal({ onClose, onLogin }:{ onClose:()=>void; onLogin:()=>
 export function PremiumModal({ onClose, onActivate }:{ onClose:()=>void; onActivate:()=>void }) {
   const { PLACES, POPULAR_CITIES } = useAppContent();
   const [plan, setPlan] = useState<"month"|"year">("year");
+  const [идёт, setИдёт] = useState(false);
+  const [нетОплаты, setНетОплаты] = useState(false);
+
+  // Цены в сумах: платёжные системы Узбекистана считают в сумах, и
+  // показывать доллар, а списывать сумы — сбивать человека с толку.
+  const ЦЕНА = { month: 39000, year: 349000 } as const;
+
+  /*
+   * Ведём человека на страницу оплаты. Premium при этом сам не
+   * включается: подтвердить платёж без секретного ключа и адреса для
+   * оповещений нельзя, а включать подписку по одному факту «нажал
+   * оплатить» — раздавать её даром. До настройки проверки платёж
+   * отмечает администратор.
+   */
+  async function оплатить() {
+    setИдёт(true);
+    setНетОплаты(false);
+    try {
+      const r = await fetch("/api/pay", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount: ЦЕНА[plan], plan }),
+      });
+      const d = await r.json();
+      if (d.available && d.url) {
+        window.location.href = d.url;
+      } else {
+        setНетОплаты(true);
+      }
+    } catch {
+      setНетОплаты(true);
+    } finally {
+      setИдёт(false);
+    }
+  }
+  // Пока не пригодилось, но подключение premium остаётся на будущее.
+  void onActivate;
   const PERKS=[
     {e:"🚫",t:"Без рекламы",s:"Никаких баннеров и объявлений"},
     {e:"🎧",t:"Все аудиогиды",s:"500+ гидов без ограничений"},
@@ -173,11 +210,11 @@ export function PremiumModal({ onClose, onActivate }:{ onClose:()=>void; onActiv
               <button key={p} onClick={()=>setPlan(p)} className="flex-1 py-3 text-center relative" style={plan===p?{background:GOLD}:{background:"rgba(255,255,255,0.06)"}}>
                 {p==="year"&&<span className="absolute -top-1 left-1/2 -translate-x-1/2 text-[8px] font-bold px-1.5 py-0.5 rounded-full" style={{background:"#E74C3C",color:WHITE}}>-40%</span>}
                 <p className="font-bold text-sm" style={{color:plan===p?TEXT:WHITE}}>{p==="month"?"Месяц":"Год"}</p>
-                <p className="text-[10px] mt-0.5" style={{color:plan===p?TEXT+"99":"rgba(255,255,255,0.5)"}}>{p==="month"?"$4.99/мес":"$35.99/год"}</p>
+                <p className="text-[10px] mt-0.5" style={{color:plan===p?TEXT+"99":"rgba(255,255,255,0.5)"}}>{p==="month"?"39 000 сум/мес":"349 000 сум/год"}</p>
               </button>
             ))}
           </div>
-          {plan==="year"&&<p className="text-center text-[10px] mt-2" style={{color:"rgba(255,255,255,0.5)"}}>= $3.00/мес · Экономия $24</p>}
+          {plan==="year"&&<p className="text-center text-[10px] mt-2" style={{color:"rgba(255,255,255,0.5)"}}>≈ 29 000 сум/мес · выгода 119 000 сум</p>}
         </div>
       </div>
       {/* Perks */}
@@ -195,9 +232,14 @@ export function PremiumModal({ onClose, onActivate }:{ onClose:()=>void; onActiv
         <div className="rounded-2xl p-4 mb-4 border" style={{background:"#FFF9EE",borderColor:GOLD+"44"}}>
           <p className="text-xs font-semibold text-center" style={{color:MUTED}}>🔒 Отмена в любой момент · Безопасная оплата · Возврат 7 дней</p>
         </div>
-        <button onClick={onActivate} className="w-full py-4 rounded-2xl font-bold text-base mb-2" style={{background:GOLD,color:TEXT}}>
-          👑 Активировать {plan==="month"?"за $4.99/мес":"за $35.99/год"}
+        <button onClick={оплатить} disabled={идёт} className="w-full py-4 rounded-2xl font-bold text-base mb-2 disabled:opacity-60" style={{background:GOLD,color:TEXT}}>
+          {идёт ? "Открываем оплату…" : `💳 Оплатить · ${plan==="month"?"39 000":"349 000"} сум`}
         </button>
+        {нетОплаты&&(
+          <p className="text-center text-[11px] leading-relaxed mb-2" style={{color:MUTED}}>
+            Онлайн-оплата пока не подключена. Как только продавец добавит ключ Payme или Click, кнопка откроет страницу оплаты.
+          </p>
+        )}
         <button onClick={onClose} className="w-full py-3 rounded-2xl text-sm" style={{color:MUTED}}>Остаться на бесплатной версии</button>
         <div className="pb-6"/>
       </div>

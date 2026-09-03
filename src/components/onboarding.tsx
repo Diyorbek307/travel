@@ -4,8 +4,10 @@ import { useState } from "react";
 import { BORDER, CREAM, GREEN, MUTED, TEXT, WHITE } from "@/lib/theme";
 import { LANGS } from "@/data/content";
 import { GeomPattern, LogoMark } from "./ui";
+import { useT } from "@/components/lang-provider";
 
 export function SplashScreen({ onStart, onLogin }:{ onStart:()=>void; onLogin:()=>void }) {
+  const { t } = useT();
   return (
     <div className="flex flex-col h-full relative overflow-hidden">
       <img src="https://images.unsplash.com/photo-1664602078796-68ee76b3fc59?w=800&h=1000&fit=crop&auto=format" alt="Регистан" className="absolute inset-0 w-full h-full object-cover"/>
@@ -13,14 +15,14 @@ export function SplashScreen({ onStart, onLogin }:{ onStart:()=>void; onLogin:()
       <div className="relative z-10 flex items-center gap-3 px-6 pt-16"><LogoMark size={44}/><div><p className="text-white text-2xl font-bold leading-none" style={{fontFamily:"'Fraunces',serif"}}>UzUp</p><p className="text-white/70 text-xs mt-0.5">Открой Узбекистан</p></div></div>
       <div className="relative z-10 flex justify-end px-4 mt-2"><GeomPattern opacity={0.22}/></div>
       <div className="relative z-10 mt-auto px-6 pb-12">
-        <h1 className="text-white font-bold leading-tight mb-3" style={{fontSize:36,fontFamily:"'Fraunces',serif"}}>Открой<br/>Красоту<br/>Узбекистана</h1>
-        <p className="text-white/75 text-sm mb-8 leading-relaxed">Маршруты, аудиогиды, AI-помощник и всё об Узбекистане</p>
+        <h1 className="text-white font-bold leading-tight mb-3" style={{fontSize:36,fontFamily:"'Fraunces',serif"}}>{t("splash_tagline")}</h1>
+        <p className="text-white/75 text-sm mb-8 leading-relaxed">{t("splash_sub")}</p>
         <button onClick={onStart} className="w-full py-4 rounded-2xl text-base font-bold mb-3 flex items-center justify-center gap-2" style={{background:GREEN}}>
-          <span className="text-white">Начать путешествие</span>
+          <span className="text-white">{t("splash_start")}</span>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
-        <button onClick={onLogin} className="w-full py-3 rounded-2xl text-sm font-semibold border" style={{color:"white",borderColor:"rgba(255,255,255,0.3)"}}>Войти в аккаунт</button>
-        <div className="flex justify-center gap-8 mt-8">{[["500+","Мест"],["10","Языков"],["4.9","Рейтинг"]].map(([v,l])=><div key={l} className="text-center"><p className="text-white font-bold text-lg leading-none" style={{fontFamily:"'Fraunces',serif"}}>{v}</p><p className="text-white/60 text-[10px] mt-0.5">{l}</p></div>)}</div>
+        <button onClick={onLogin} className="w-full py-3 rounded-2xl text-sm font-semibold border" style={{color:"white",borderColor:"rgba(255,255,255,0.3)"}}>{t("splash_login")}</button>
+        <div className="flex justify-center gap-8 mt-8">{[["500+",t("splash_places")],["10",t("splash_langs")],["4.9",t("splash_rating")]].map(([v,l])=><div key={l} className="text-center"><p className="text-white font-bold text-lg leading-none" style={{fontFamily:"'Fraunces',serif"}}>{v}</p><p className="text-white/60 text-[10px] mt-0.5">{l}</p></div>)}</div>
       </div>
     </div>
   );

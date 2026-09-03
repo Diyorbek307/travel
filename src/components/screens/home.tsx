@@ -1,7 +1,9 @@
 import type { Hotel, Place, Restaurant, Tab } from "@/lib/types";
 import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE } from "@/lib/theme";
-import { WEATHER } from "@/data/content";
+import { ГОРОДА } from "@/data/geo";
 import { useAppContent } from "@/components/content-provider";
+import { useT } from "@/components/lang-provider";
+import { useWeather } from "@/components/weather-provider";
 import { GeomPattern, LogoMark } from "../ui";
 import { AnimatedBg } from "@/components/animated-bg";
 import { CardDeck, CityDeck } from "@/components/card-deck";
@@ -13,6 +15,9 @@ import TaxiOrder from "@/components/taxi-order";
 
 export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, onRestaurant, onMenu, onTab, onTransport, isPremium }:{ onPlace:(p:Place)=>void; onSearch:()=>void; onHotel:(h:Hotel)=>void; onNotifs:()=>void; onPractical:()=>void; onRestaurant:(r:Restaurant)=>void; onMenu:()=>void; onTab:(t:Tab)=>void; onTransport:()=>void; isPremium:boolean; }) {
   const { EVENTS, HOTELS, PLACES, RESTAURANTS } = useAppContent();
+  const { t, lang } = useT();
+  const погода = useWeather();
+  const самарканд = погода.get("Самарканд");
   return (
     <div className="flex flex-col h-full overflow-y-auto hide-scroll" style={{background:CREAM}}>
 
@@ -44,11 +49,11 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
         <div className="absolute top-16 right-4 rounded-2xl p-3 z-10" style={{...glassLight, minWidth:118}}>
           <p className="text-[9px] font-bold mb-1.5 uppercase tracking-wider" style={{color:MUTED}}>Самарканд</p>
           <div className="flex items-center gap-2">
-            <span className="text-3xl">🌤️</span>
+            <span className="text-3xl">{самарканд?.icon ?? "🌡️"}</span>
             <div>
-              <p className="text-2xl font-bold leading-none" style={{color:TEXT,fontFamily:"'Fraunces',serif"}}>34°C</p>
-              <p className="text-[9px] mt-0.5" style={{color:MUTED}}>Малооблачно</p>
-              <p className="text-[9px]" style={{color:MUTED}}>💨 12 км/ч</p>
+              <p className="text-2xl font-bold leading-none" style={{color:TEXT,fontFamily:"'Fraunces',serif"}}>{самарканд ? `${самарканд.temp}°C` : "—"}</p>
+              <p className="text-[9px] mt-0.5" style={{color:MUTED}}>{самарканд ? t(самарканд.condKey) : ""}</p>
+              <p className="text-[9px]" style={{color:MUTED}}>{самарканд ? `💨 ${самарканд.windKmh} ${t("w_wind")}` : ""}</p>
             </div>
           </div>
         </div>
@@ -57,15 +62,15 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
         <div className="absolute bottom-0 left-0 right-0 px-4 pb-4 z-10">
           <div className="flex items-center gap-2 mb-1">
             <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"/>
-            <p className="text-white/65 text-xs">Добро пожаловать · {new Date().toLocaleDateString("ru",{day:"numeric",month:"long"})}</p>
+            <p className="text-white/65 text-xs">{t("home_welcome")} · {new Date().toLocaleDateString(lang,{day:"numeric",month:"long"})}</p>
           </div>
           <h1 className="text-white font-bold leading-tight mb-1" style={{fontSize:34,fontFamily:"'Fraunces',serif"}}>Самарканд</h1>
           <p className="text-white/65 text-xs mb-3">Сердце Шёлкового пути · 2750 лет истории · ЮНЕСКО</p>
           {/* Glassmorphism search bar */}
           <button onClick={onSearch} className="w-full flex items-center gap-3 rounded-2xl px-4 py-3.5" style={{background:"rgba(255,255,255,0.2)",backdropFilter:"blur(20px)",border:"1px solid rgba(255,255,255,0.38)"}}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" strokeWidth="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <span className="flex-1 text-left text-sm" style={{color:"rgba(255,255,255,0.72)"}}>Куда вы хотите поехать?</span>
-            <div className="px-2.5 py-1 rounded-lg text-[10px] font-bold" style={{background:GOLD,color:TEXT}}>Найти</div>
+            <span className="flex-1 text-left text-sm" style={{color:"rgba(255,255,255,0.72)"}}>{t("home_search_ph")}</span>
+            <div className="px-2.5 py-1 rounded-lg text-[10px] font-bold" style={{background:GOLD,color:TEXT}}>{t("common_search")}</div>
           </button>
         </div>
       </div>
@@ -74,10 +79,10 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
       <div className="px-4 pt-4">
         <div className="grid grid-cols-4 gap-2.5 mb-2.5">
           {([
-            {e:"🏛️",l:"Места",    sub:"500+",   tab:"explore" as Tab, action:undefined},
-            {e:"🗺️",l:"Маршруты", sub:"AI-гид",  tab:"map"    as Tab, action:undefined},
-            {e:"🏨",l:"Отели",    sub:"50+",     tab:"explore" as Tab, action:undefined},
-            {e:"🍽️",l:"Рестораны",sub:"200+",    tab:"explore" as Tab, action:undefined},
+            {e:"🏛️",l:t("home_places"),    sub:"500+",   tab:"explore" as Tab, action:undefined},
+            {e:"🗺️",l:t("home_routes"), sub:t("map_tab_ai"),  tab:"map"    as Tab, action:undefined},
+            {e:"🏨",l:t("home_hotels"),    sub:"50+",     tab:"explore" as Tab, action:undefined},
+            {e:"🍽️",l:t("home_restaurants"),sub:"200+",    tab:"explore" as Tab, action:undefined},
           ]).map(c=>(
             <button key={c.l} onClick={()=>onTab(c.tab)} className="flex flex-col items-center gap-1.5 rounded-2xl border bg-white py-3 text-center shadow-sm transition-all active:scale-95 lg:gap-2 lg:py-6" style={{borderColor:BORDER}}>
               <span className="text-2xl lg:text-3xl">{c.e}</span>
@@ -90,8 +95,8 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
         <button onClick={onTransport} className="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl active:scale-[0.98] transition-all" style={{background:`linear-gradient(135deg,#1A5C3A,${GREEN})`,boxShadow:"0 4px 16px rgba(46,125,90,0.35)"}}>
           <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{background:"rgba(255,255,255,0.18)"}}>🚇</div>
           <div className="flex-1 text-left">
-            <p className="text-white font-bold text-sm">Транспорт</p>
-            <p className="text-white/65 text-[10px]">Рейсы · Поезда · Межгород такси</p>
+            <p className="text-white font-bold text-sm">{t("home_transport")}</p>
+            <p className="text-white/65 text-[10px]">{t("home_transport_sub")}</p>
           </div>
           <div className="flex gap-1.5 mr-2">
             <span className="text-base">✈️</span><span className="text-base">🚄</span><span className="text-base">🚌</span>
@@ -102,19 +107,22 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
 
       {/* ── Weather horizontal scroll ── */}
       <div className="pt-5">
-        <p className="font-bold text-base mb-3 px-4" style={{color:TEXT,fontFamily:"'Fraunces',serif"}}>🌤️ Погода сегодня</p>
+        <p className="font-bold text-base mb-3 px-4" style={{color:TEXT,fontFamily:"'Fraunces',serif"}}>🌤️ {t("home_weather")}</p>
         <div className="flex gap-3 overflow-x-auto hide-scroll px-4 pb-1">
-          {Object.entries(WEATHER).map(([city,w])=>(
-            <div key={city} className="flex-shrink-0 bg-white rounded-2xl px-3 pt-3 pb-2.5 shadow-sm border" style={{width:126,borderColor:BORDER}}>
-              <p className="text-[8px] font-bold tracking-widest mb-1.5 truncate" style={{color:MUTED}}>{city.toUpperCase()}</p>
-              <div className="flex items-center justify-between mb-1.5">
-                <p className="font-bold" style={{color:TEXT,fontSize:28,fontFamily:"'Fraunces',serif",lineHeight:1}}>{w.temp}°</p>
-                <span style={{fontSize:30,lineHeight:1}}>{w.icon}</span>
+          {Object.keys(ГОРОДА).map((city)=>{
+            const w = погода.get(city);
+            return (
+              <div key={city} className="flex-shrink-0 bg-white rounded-2xl p-3 shadow-sm border text-center" style={{borderColor:BORDER,minWidth:96}}>
+                <p className="text-[10px] font-bold mb-1 truncate" style={{color:TEXT}}>{city}</p>
+                <div className="flex items-center justify-center gap-1">
+                  <p className="font-bold" style={{color:TEXT,fontSize:28,fontFamily:"'Fraunces',serif",lineHeight:1}}>{w ? `${w.temp}°` : "—"}</p>
+                  <span style={{fontSize:30,lineHeight:1}}>{w?.icon ?? "🌡️"}</span>
+                </div>
+                <p className="text-[9px] leading-tight mt-1" style={{color:MUTED}}>{w ? t(w.condKey) : ""}</p>
+                <p className="text-[9px] mt-0.5" style={{color:MUTED}}>{w ? `💨 ${w.windKmh} ${t("w_wind")}` : ""}</p>
               </div>
-              <p className="text-[9px] leading-tight" style={{color:MUTED}}>{w.cond}</p>
-              <p className="text-[9px] mt-0.5" style={{color:MUTED}}>💨 {w.wind}</p>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
@@ -165,7 +173,7 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
               {/* Tag */}
               <div className="absolute top-3 left-3"><span className="text-[8px] font-bold px-2 py-0.5 rounded-full" style={{background:"rgba(233,196,106,0.92)",color:TEXT}}>{h.tag}</span></div>
               {/* Weather */}
-              {WEATHER[h.city]&&<div className="absolute top-3 right-3"><span className="text-[8px] font-bold px-2 py-0.5 rounded-full" style={{background:"rgba(0,0,0,0.5)",backdropFilter:"blur(6px)",color:"white"}}>{WEATHER[h.city].icon}{WEATHER[h.city].temp}°</span></div>}
+              {(()=>{const w=погода.get(h.city);return w?<div className="absolute top-3 right-3"><span className="text-[8px] font-bold px-2 py-0.5 rounded-full" style={{background:"rgba(0,0,0,0.5)",backdropFilter:"blur(6px)",color:"white"}}>{w.icon}{w.temp}°</span></div>:null;})()}
               {/* Info */}
               <div className="absolute bottom-0 left-0 right-0 p-3">
                 <p className="text-[8px] mb-0.5" style={{color:"rgba(255,255,255,0.45)"}}>📍 {h.city}</p>
@@ -189,7 +197,7 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
       <div className="pt-5">
         <div className="flex items-center justify-between mb-3 px-4">
           <p className="font-bold text-base" style={{color:TEXT,fontFamily:"'Fraunces',serif"}}>Лучшие рестораны</p>
-          <button onClick={()=>onTab("explore")} className="text-xs font-medium" style={{color:GREEN}}>Все →</button>
+          <button onClick={()=>onTab("explore")} className="text-xs font-medium" style={{color:GREEN}}>{t("home_all")}</button>
         </div>
         <div className="flex gap-3 overflow-x-auto hide-scroll px-4 pb-1">
           {RESTAURANTS.slice(0,8).map(r=>(
@@ -197,7 +205,7 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
               <img src={r.img} alt={r.name} className="absolute inset-0 w-full h-full object-cover"/>
               <div className="absolute inset-0" style={{background:"linear-gradient(to top,rgba(0,0,0,0.96) 0%,rgba(0,0,0,0.15) 55%,transparent 100%)"}}/>
               <div className="absolute top-3 left-3"><span className="text-[8px] font-bold px-2 py-0.5 rounded-full" style={{background:"rgba(193,96,58,0.92)",color:WHITE}}>{r.cuisine}</span></div>
-              {WEATHER[r.city]&&<div className="absolute top-3 right-3"><span className="text-[8px] font-bold px-2 py-0.5 rounded-full" style={{background:"rgba(0,0,0,0.5)",backdropFilter:"blur(6px)",color:"white"}}>{WEATHER[r.city].icon}{WEATHER[r.city].temp}°</span></div>}
+              {(()=>{const w=погода.get(r.city);return w?<div className="absolute top-3 right-3"><span className="text-[8px] font-bold px-2 py-0.5 rounded-full" style={{background:"rgba(0,0,0,0.5)",backdropFilter:"blur(6px)",color:"white"}}>{w.icon}{w.temp}°</span></div>:null;})()}
               <div className="absolute bottom-0 left-0 right-0 p-3">
                 <p className="text-[8px] mb-0.5" style={{color:"rgba(255,255,255,0.45)"}}>📍 {r.city}</p>
                 <p className="text-white font-bold leading-tight mb-1.5" style={{fontSize:12,fontFamily:"'Fraunces',serif"}}>{r.name}</p>
@@ -226,7 +234,7 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
 
       {/* ── Why UzUp ── */}
       <div className="px-4 pt-5 pb-8">
-        <p className="font-bold text-base mb-4" style={{color:TEXT,fontFamily:"'Fraunces',serif"}}>Почему выбирают UzUp?</p>
+        <p className="font-bold text-base mb-4" style={{color:TEXT,fontFamily:"'Fraunces',serif"}}>{t("home_why")}</p>
         <div className="grid grid-cols-4 gap-2">
           {[{icon:"✅",label:"Надёжно",sub:"Проверено"},{icon:"🗺️",label:"Удобно",sub:"Всё вместе"},{icon:"🎧",label:"24/7",sub:"Поддержка"},{icon:"🇺🇿",label:"UZ-made",sub:"С любовью"}].map(f=>(
             <div key={f.label} className="flex flex-col items-center text-center"><div className="w-11 h-11 rounded-2xl flex items-center justify-center text-lg mb-1.5 bg-white shadow-sm border" style={{borderColor:BORDER}}>{f.icon}</div><p className="font-semibold leading-tight" style={{color:TEXT,fontSize:9}}>{f.label}</p><p className="mt-0.5 leading-tight" style={{color:MUTED,fontSize:8}}>{f.sub}</p></div>

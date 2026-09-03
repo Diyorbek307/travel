@@ -1,13 +1,15 @@
 "use client";
 
 import { GREEN, MUTED } from "@/lib/theme";
+import { useT } from "@/components/lang-provider";
+import type { TKey } from "@/lib/i18n";
 import type { Tab } from "@/lib/types";
 
 /** Иконки нижней панели: контур в покое, заливка у активной вкладки. */
-const ITEMS: { key: Tab; label: string; icon: (active: boolean) => React.ReactNode }[] = [
+const ITEMS: { key: Tab; ключ: TKey; icon: (active: boolean) => React.ReactNode }[] = [
   {
     key: "home",
-    label: "Главная",
+    ключ: "nav_home",
     icon: (a) => (
       <svg width="21" height="21" viewBox="0 0 24 24" fill={a ? GREEN : "none"} stroke={a ? GREEN : MUTED} strokeWidth="2" strokeLinecap="round">
         <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
@@ -17,7 +19,7 @@ const ITEMS: { key: Tab; label: string; icon: (active: boolean) => React.ReactNo
   },
   {
     key: "explore",
-    label: "Исследовать",
+    ключ: "nav_explore",
     icon: (a) => (
       <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke={a ? GREEN : MUTED} strokeWidth="2" strokeLinecap="round">
         <circle cx="11" cy="11" r="8" />
@@ -29,7 +31,7 @@ const ITEMS: { key: Tab; label: string; icon: (active: boolean) => React.ReactNo
     // Карта всегда белая: она лежит в приподнятом зелёном кружке и
     // подсвечивается им, а не цветом штриха.
     key: "map",
-    label: "Карта",
+    ключ: "nav_map",
     icon: () => (
       <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round">
         <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21" />
@@ -40,7 +42,7 @@ const ITEMS: { key: Tab; label: string; icon: (active: boolean) => React.ReactNo
   },
   {
     key: "audio",
-    label: "Аудио",
+    ключ: "nav_audio",
     icon: (a) => (
       <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke={a ? GREEN : MUTED} strokeWidth="2" strokeLinecap="round">
         <path d="M3 18v-6a9 9 0 0 1 18 0v6" />
@@ -50,7 +52,7 @@ const ITEMS: { key: Tab; label: string; icon: (active: boolean) => React.ReactNo
   },
   {
     key: "profile",
-    label: "Профиль",
+    ключ: "nav_profile",
     icon: (a) => (
       <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke={a ? GREEN : MUTED} strokeWidth="2" strokeLinecap="round">
         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
@@ -67,6 +69,7 @@ export default function BottomNav({
   tab: Tab;
   onTab: (t: Tab) => void;
 }) {
+  const { t } = useT();
   return (
     <>
       {/* Телефон и планшет: панель внизу, под большим пальцем. */}
@@ -80,7 +83,7 @@ export default function BottomNav({
           на телефоне ограничение всё равно не срабатывает.
         */}
         <div className="flex h-full w-full max-w-lg items-center">
-        {ITEMS.map(({ key, label, icon }) => {
+        {ITEMS.map(({ key, ключ, icon }) => {
           const active = tab === key;
           return (
             <button
@@ -100,7 +103,7 @@ export default function BottomNav({
                 icon(active)
               )}
               <span className="text-[9px] font-semibold" style={{ color: active ? GREEN : MUTED }}>
-                {label}
+                {t(ключ)}
               </span>
             </button>
           );
@@ -132,7 +135,7 @@ export default function BottomNav({
           </span>
         </div>
 
-        {ITEMS.map(({ key, label, icon }) => {
+        {ITEMS.map(({ key, ключ, icon }) => {
           const active = tab === key;
           return (
             <button
@@ -148,7 +151,7 @@ export default function BottomNav({
               <span className="flex h-5 w-5 shrink-0 items-center justify-center">
                 {key === "map" ? иконкаКарты(active) : icon(active)}
               </span>
-              <span className="text-sm font-semibold">{label}</span>
+              <span className="text-sm font-semibold">{t(ключ)}</span>
             </button>
           );
         })}

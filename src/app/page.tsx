@@ -25,6 +25,8 @@ import PracticalScreen from "@/components/screens/practical";
 import RouteView from "@/components/route-view";
 import { MiniPlayer, Toast } from "@/components/widgets";
 import { ContentProvider } from "@/components/content-provider";
+import { LangProvider } from "@/components/lang-provider";
+import { WeatherProvider } from "@/components/weather-provider";
 import { AuthSplash, LoginScreen, RegisterScreen } from "@/components/auth-screens";
 import type { Hotel, Place, PublicUser, Restaurant, Route, Tab } from "@/lib/types";
 
@@ -83,7 +85,11 @@ function языкУстройства(): string {
 export default function Page() {
   return (
     <ContentProvider>
-      <App />
+      <LangProvider>
+        <WeatherProvider>
+          <App />
+        </WeatherProvider>
+      </LangProvider>
     </ContentProvider>
   );
 }

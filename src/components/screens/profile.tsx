@@ -6,14 +6,16 @@ import { PremiumModal } from "@/components/modals";
 import SupportChat from "@/components/support-chat";
 import MyBookings from "@/components/my-bookings";
 import { BORDER, CREAM, GOLD, GREEN, GREEN_LIGHT, MUTED, TEXT, WHITE } from "@/lib/theme";
-import { ACHIEVEMENTS, AI_REPLIES, LANGS, STAMPS } from "@/data/content";
+import { ACHIEVEMENTS, AI_REPLIES, STAMPS } from "@/data/content";
+import { useT } from "@/components/lang-provider";
+import { LOCALE_META, LOCALES, type TKey } from "@/lib/i18n";
 import { Badge } from "../ui";
 import { CurrencyConverter } from "@/components/screens/practical";
 import { AdBanner } from "@/components/widgets";
 
 
 export function SettingsView({ isPremium, onUpgrade, onLogout }:{ isPremium:boolean; onUpgrade:()=>void; onLogout:()=>void }) {
-  const [lang, setLang] = useState("🇷🇺 Русский");
+  const { t, lang, setLang } = useT();
   const [notifNew,   setNotifNew]   = useState(true);
   const [notifNear,  setNotifNear]  = useState(true);
   const [notifDeals, setNotifDeals] = useState(false);
@@ -60,21 +62,25 @@ export function SettingsView({ isPremium, onUpgrade, onLogout }:{ isPremium:bool
 
       {/* Language */}
       <div className="bg-white rounded-2xl px-4 shadow-sm border" style={{borderColor:BORDER}}>
-        <p className="font-bold text-xs pt-3 pb-2 uppercase tracking-widest" style={{color:MUTED}}>Язык</p>
+        <p className="font-bold text-xs pt-3 pb-2 uppercase tracking-widest" style={{color:MUTED}}>{t("prof_language")}</p>
         <div className="grid grid-cols-2 gap-2 pb-3">
-          {LANGS.map(l=>(
-            <button key={l} onClick={()=>setLang(l)} className="flex items-center gap-2 px-3 py-2 rounded-xl border text-left" style={lang===l?{background:GREEN+"12",borderColor:GREEN}:{background:CREAM,borderColor:"transparent"}}>
-              <span className="text-base leading-none">{l.split(" ")[0]}</span>
-              <span className="text-xs font-medium truncate" style={{color:lang===l?GREEN:TEXT}}>{l.split(" ").slice(1).join(" ")}</span>
-              {lang===l&&<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={GREEN} strokeWidth="3" className="ml-auto flex-shrink-0"><polyline points="20 6 9 17 4 12"/></svg>}
-            </button>
-          ))}
+          {LOCALES.map(код=>{
+            const [флаг,...имя]=LOCALE_META[код].label.split(" ");
+            const выбран=lang===код;
+            return (
+              <button key={код} onClick={()=>setLang(код)} className="flex items-center gap-2 px-3 py-2 rounded-xl border text-left" style={выбран?{background:GREEN+"12",borderColor:GREEN}:{borderColor:BORDER}}>
+                <span className="text-base leading-none">{флаг}</span>
+                <span className="text-xs font-medium truncate" style={{color:выбран?GREEN:TEXT}}>{имя.join(" ")}</span>
+                {выбран&&<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={GREEN} strokeWidth="3" className="ml-auto flex-shrink-0"><polyline points="20 6 9 17 4 12"/></svg>}
+              </button>
+            );
+          })}
         </div>
       </div>
 
       {/* Notifications */}
       <div className="bg-white rounded-2xl px-4 shadow-sm border" style={{borderColor:BORDER}}>
-        <p className="font-bold text-xs pt-3 pb-1 uppercase tracking-widest" style={{color:MUTED}}>Уведомления</p>
+        <p className="font-bold text-xs pt-3 pb-1 uppercase tracking-widest" style={{color:MUTED}}>{t("prof_notifications")}</p>
         <Row icon="📍" label="Рядом с достопримечательностью" sub="GPS-триггер при приближении" right={<Toggle on={notifNear} set={setNotifNear}/>}/>
         <Row icon="🎫" label="События и скидки" sub="Акции партнёров и фестивали" right={<Toggle on={notifDeals} set={setNotifDeals}/>}/>
         <Row icon="🆕" label="Новые маршруты и гиды" right={<Toggle on={notifNew} set={setNotifNew}/>}/>
@@ -100,7 +106,7 @@ export function SettingsView({ isPremium, onUpgrade, onLogout }:{ isPremium:bool
 
       {/* Внешний вид */}
       <div className="bg-white rounded-2xl px-4 shadow-sm border" style={{borderColor:BORDER}}>
-        <p className="font-bold text-xs pt-3 pb-1 uppercase tracking-widest" style={{color:MUTED}}>Внешний вид</p>
+        <p className="font-bold text-xs pt-3 pb-1 uppercase tracking-widest" style={{color:MUTED}}>{t("prof_appearance")}</p>
         <Row icon="🌙" label="Тёмная тема" sub="Бережёт батарею ночью" right={<Toggle on={darkMode} set={setDarkMode}/>}/>
         <Row icon="🎵" label="Автовоспроизведение аудио" sub="При открытии места" right={<Toggle on={autoPlay} set={setAutoPlay}/>}/>
         <Row icon="💱" label="Валюта по умолчанию" right={
@@ -120,7 +126,7 @@ export function SettingsView({ isPremium, onUpgrade, onLogout }:{ isPremium:bool
 
       {/* Поддержка */}
       <div className="bg-white rounded-2xl px-4 shadow-sm border" style={{borderColor:BORDER}}>
-        <p className="font-bold text-xs pt-3 pb-1 uppercase tracking-widest" style={{color:MUTED}}>Поддержка</p>
+        <p className="font-bold text-xs pt-3 pb-1 uppercase tracking-widest" style={{color:MUTED}}>{t("prof_support")}</p>
         {[{e:"❓",l:"Помощь и FAQ"},{e:"💬",l:"Написать в поддержку"},{e:"⭐",l:"Оценить приложение"},{e:"📢",l:"Поделиться UzUp"},{e:"📄",l:"Условия использования"},{e:"🔒",l:"Политика конфиденциальности"}].map((item,i)=>(
           <Row key={i} icon={item.e} label={item.l} right={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={MUTED} strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>}/>
         ))}
@@ -128,14 +134,14 @@ export function SettingsView({ isPremium, onUpgrade, onLogout }:{ isPremium:bool
 
       {/* О приложении */}
       <div className="bg-white rounded-2xl px-4 shadow-sm border" style={{borderColor:BORDER}}>
-        <p className="font-bold text-xs pt-3 pb-1 uppercase tracking-widest" style={{color:MUTED}}>О приложении</p>
+        <p className="font-bold text-xs pt-3 pb-1 uppercase tracking-widest" style={{color:MUTED}}>{t("prof_about")}</p>
         <Row icon="📱" label="Версия приложения" right={<span className="text-xs font-mono" style={{color:MUTED}}>2.4.1</span>}/>
         <Row icon="🔄" label="Проверить обновления" right={<span className="text-xs font-bold" style={{color:GREEN}}>Обновлено</span>}/>
         <Row icon="🌍" label="UzUp — Made in Uzbekistan" right={<span className="text-base">🇺🇿</span>}/>
       </div>
 
       <button onClick={onLogout} className="w-full py-3.5 rounded-2xl text-sm font-bold border mb-1 active:scale-[0.98] transition-all" style={{color:"#E74C3C",borderColor:"#FCDADA",background:"#FFF5F5"}}>
-        🚪 Выйти из аккаунта
+        🚪 {t("prof_logout")}
       </button>
       <div className="pb-6"/>
     </div>
@@ -159,8 +165,9 @@ export function ProfileScreen({ onLogout, user }:{ onLogout:()=>void; user:Publi
    * Своё имя на своей странице — не украшение: по нему человек
    * понимает, что вошёл он, а не сосед.
    */
-  const имя = user ? `${user.firstName} ${user.lastName}`.trim() : "Гость";
-  const откуда = user?.country ? `🌍 ${user.country}` : "🌍 Путешественник";
+  const { t: перевод } = useT();
+  const имя = user ? `${user.firstName} ${user.lastName}`.trim() : перевод("prof_traveler");
+  const откуда = user?.country ? `🌍 ${user.country}` : `🌍 ${перевод("prof_traveler")}`;
   const снимок = user?.hasPhoto ? `/api/photo/${user.id}` : null;
   const [view, setView] = useState<"passport"|"bookings"|"support"|"chat"|"stats"|"settings">("passport");
   const [isPremium, setIsPremium] = useState(false);
@@ -178,7 +185,14 @@ export function ProfileScreen({ onLogout, user }:{ onLogout:()=>void; user:Publi
   },[]);
   useEffect(()=>{bottomRef.current?.scrollIntoView({behavior:"smooth"});},[messages,typing]);
 
-  const TABS:[string,string,string][] = [["passport","🪪","Паспорт"],["bookings","🎫","Заявки"],["support","💬","Поддержка"],["chat","🤖","AI-гид"],["stats","📊","Стат."],["settings","⚙️","Настройки"]];
+  const TABS: [typeof view, string, TKey][] = [
+    ["passport", "🪪", "prof_passport"],
+    ["bookings", "🎫", "prof_bookings"],
+    ["support", "💬", "prof_support"],
+    ["chat", "🤖", "prof_ai"],
+    ["stats", "📊", "prof_stats"],
+    ["settings", "⚙️", "prof_settings"],
+  ];
 
   return (
     <div className="flex flex-col h-full" style={{background:CREAM}}>
@@ -204,7 +218,7 @@ export function ProfileScreen({ onLogout, user }:{ onLogout:()=>void; user:Publi
           {!isPremium&&<button onClick={()=>setShowPremium(true)} className="px-3 py-1.5 rounded-xl text-[10px] font-bold" style={{background:`linear-gradient(135deg,#1A1A2E,#0F3460)`,color:GOLD}}>👑 Pro</button>}
         </div>
         <div className="flex gap-1.5">
-          {TABS.map(([v,e,l])=><button key={v} onClick={()=>setView(v as typeof view)} className="flex-1 py-2 rounded-xl text-[10px] font-semibold flex flex-col items-center gap-0.5" style={view===v?{background:GREEN,color:WHITE}:{background:CREAM,color:MUTED}}><span>{e}</span><span>{l}</span></button>)}
+          {TABS.map(([v,e,l])=><button key={v} onClick={()=>setView(v)} className="flex-1 py-2 rounded-xl text-[10px] font-semibold flex flex-col items-center gap-0.5" style={view===v?{background:GREEN,color:WHITE}:{background:CREAM,color:MUTED}}><span>{e}</span><span>{перевод(l)}</span></button>)}
         </div>
       </div>
 
@@ -225,7 +239,7 @@ export function ProfileScreen({ onLogout, user }:{ onLogout:()=>void; user:Publi
               </div>
               <div className="h-6 flex border-t" style={{borderColor:"rgba(255,255,255,0.1)"}}>{Array.from({length:20}).map((_,i)=><div key={i} className="flex-1 flex items-center justify-center" style={{opacity:0.22}}><div className="w-1.5 h-1.5 rotate-45" style={{background:GOLD}}/></div>)}</div>
             </div>
-            <p className="font-bold text-sm mb-3" style={{color:TEXT}}>Коллекция штампов</p>
+            <p className="font-bold text-sm mb-3" style={{color:TEXT}}>{перевод("prof_stamps")}</p>
             <div className="grid grid-cols-3 gap-2.5 mb-4">{STAMPS.map((s,i)=><div key={i} className="rounded-2xl p-3 aspect-square flex flex-col items-center justify-center text-center shadow-sm" style={s.earned?{background:GREEN}:{background:WHITE,border:`2px dashed ${BORDER}`}}><span className="text-2xl mb-1">{s.icon}</span><p className="font-bold text-[9px] leading-tight" style={{color:s.earned?WHITE:MUTED}}>{s.name}</p><p className="text-[8px] mt-0.5" style={{color:s.earned?GOLD:"#C0B0A0"}}>{s.earned?s.date:"Не посещено"}</p></div>)}</div>
             <div className="bg-white rounded-2xl p-4 mb-3 shadow-sm border" style={{borderColor:BORDER}}><div className="flex items-center justify-between mb-2"><p className="font-semibold text-sm" style={{color:TEXT}}>Прогресс</p><p className="text-sm font-bold" style={{color:GREEN}}>3/6</p></div><div className="rounded-full h-2" style={{background:CREAM}}><div className="h-2 rounded-full" style={{background:GREEN,width:"50%"}}/></div><p className="text-xs mt-2" style={{color:MUTED}}>Ещё 2 штампа → скидка 15% у партнёров</p></div>
             <div className="rounded-2xl p-4 mb-4" style={{background:`linear-gradient(135deg,${GOLD},#C17B2F)`}}><p className="font-bold text-sm" style={{color:TEXT}}>🎁 5 штампов = скидка 15%</p><p className="text-xs mt-1" style={{color:TEXT+"99"}}>У партнёров: отели, рестораны, музеи</p></div>
