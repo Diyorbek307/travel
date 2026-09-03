@@ -288,6 +288,7 @@ function App() {
                   onTransport={() => setShowTransport(true)}
                   onMenu={() => setShowMenu(true)}
                   onLogout={logout}
+                  user={user}
                 />
               </div>
             </div>
@@ -322,6 +323,7 @@ interface ScreenProps {
   onTransport: () => void;
   onMenu: () => void;
   onLogout: () => void;
+  user: PublicUser | null;
 }
 
 /**
@@ -399,6 +401,6 @@ function Screen({ tab, detail, ...p }: ScreenProps) {
     case "audio":
       return <AudioScreen onPlay={p.onPlay} isPremium={p.isPremium} />;
     case "profile":
-      return <ProfileScreen onLogout={p.onLogout} />;
+      return <ProfileScreen onLogout={p.onLogout} user={p.user} />;
   }
 }

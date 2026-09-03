@@ -109,7 +109,29 @@ async function подготовить(): Promise<void> {
            updated_at timestamptz NOT NULL DEFAULT now()
          )`,
       )
-      .then(() => undefined)
+      .then(async () => {
+        /*
+         * Кодировка базы. Ловится на живой проверке: у базы, созданной с
+         * системной кодировкой Windows, запись любого русского имени
+         * падала на «character has no equivalent in encoding WIN1251» —
+         * и понять по этой строке, что делать, невозможно.
+         *
+         * Хостинги отдают UTF8 по умолчанию, так что в бою это скорее
+         * всего не случится. Но если случится, приложение должно назвать
+         * причину и лекарство, а не сыпать ошибками на каждой
+         * регистрации.
+         */
+        const r = await пул().query<{ enc: string }>(
+          "SELECT pg_encoding_to_char(encoding) AS enc FROM pg_database WHERE datname = current_database()",
+        );
+        const кодировка = r.rows[0]?.enc;
+        if (кодировка && кодировка !== "UTF8") {
+          throw new Error(
+            `База создана в кодировке ${кодировка}, а нужна UTF8: русские и узбекские имена в неё не запишутся. ` +
+              "Создайте базу заново командой CREATE DATABASE ... WITH ENCODING 'UTF8' TEMPLATE template0.",
+          );
+        }
+      })
       .catch((e) => {
         // Не запоминаем неудачу: база могла быть просто недоступна
         // секунду, и следующая попытка должна пройти.

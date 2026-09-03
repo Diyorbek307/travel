@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { ChatMessage } from "@/lib/types";
+import type { ChatMessage, PublicUser } from "@/lib/types";
 import { PremiumModal } from "@/components/modals";
 import SupportChat from "@/components/support-chat";
 import MyBookings from "@/components/my-bookings";
@@ -142,7 +142,26 @@ export function SettingsView({ isPremium, onUpgrade, onLogout }:{ isPremium:bool
   );
 }
 
-export function ProfileScreen({ onLogout }:{ onLogout:()=>void }) {
+/** Снимок профиля, если человек его загрузил. */
+function snimok(адрес: string | null) {
+  if (!адрес) return null;
+  // eslint-disable-next-line @next/next/no-img-element
+  return <img src={адрес} alt="" className="h-full w-full object-cover" />;
+}
+
+export function ProfileScreen({ onLogout, user }:{ onLogout:()=>void; user:PublicUser|null }) {
+  /*
+   * Имя берём из учётной записи, а не из образца.
+   *
+   * Здесь стояло «Алекс Джонсон, турист из Нью-Йорка» — вёрстка из
+   * макета, которую забыли заменить. Замечено при проверке: вход был
+   * сделан китайским аккаунтом, а профиль показывал чужого человека.
+   * Своё имя на своей странице — не украшение: по нему человек
+   * понимает, что вошёл он, а не сосед.
+   */
+  const имя = user ? `${user.firstName} ${user.lastName}`.trim() : "Гость";
+  const откуда = user?.country ? `🌍 ${user.country}` : "🌍 Путешественник";
+  const снимок = user?.hasPhoto ? `/api/photo/${user.id}` : null;
   const [view, setView] = useState<"passport"|"bookings"|"support"|"chat"|"stats"|"settings">("passport");
   const [isPremium, setIsPremium] = useState(false);
   const [showPremium, setShowPremium] = useState(false);
@@ -168,12 +187,14 @@ export function ProfileScreen({ onLogout }:{ onLogout:()=>void }) {
       <div className="px-4 pt-14 pb-3 bg-white border-b" style={{borderColor:BORDER}}>
         <div className="flex items-center gap-3 mb-3">
           <div className="relative">
-            <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0" style={{background:`linear-gradient(135deg,${GREEN},#66B38E)`}}>👤</div>
+            <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0 overflow-hidden" style={{background:`linear-gradient(135deg,${GREEN},#66B38E)`}}>
+              {snimok(снимок) ?? "👤"}
+            </div>
             {isPremium&&<div className="absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-[10px]" style={{background:GOLD}}>👑</div>}
           </div>
           <div className="flex-1">
-            <p className="font-bold text-base" style={{color:TEXT,fontFamily:"'Fraunces',serif"}}>Алекс Джонсон</p>
-            <p className="text-xs" style={{color:MUTED}}>🌍 Турист из Нью-Йорка · Уровень 3</p>
+            <p className="font-bold text-base truncate" style={{color:TEXT,fontFamily:"'Fraunces',serif"}}>{имя}</p>
+            <p className="text-xs truncate" style={{color:MUTED}}>{откуда}</p>
             <div className="flex gap-1.5 mt-1">
               <Badge text="EXPLORER" color={GREEN}/>
               <Badge text="3 штампа" color={GOLD}/>
@@ -195,8 +216,10 @@ export function ProfileScreen({ onLogout }:{ onLogout:()=>void }) {
               <div className="p-5">
                 <div className="flex items-start justify-between mb-4"><div><p className="text-[9px] font-bold tracking-widest uppercase" style={{color:GOLD}}>UzUp · Uzbekistan Travel</p><p className="text-white text-xl mt-0.5" style={{fontFamily:"'Fraunces',serif",fontWeight:600}}>Цифровой Паспорт</p></div><div className="text-right"><p className="text-white/40 text-[9px]">ПАСПОРТ №</p><p className="text-[10px] font-mono font-bold" style={{color:GOLD}}>UZT-2026-0841</p></div></div>
                 <div className="flex items-center gap-3 rounded-2xl p-3" style={{background:"rgba(255,255,255,0.12)"}}>
-                  <div className="w-11 h-11 rounded-xl flex items-center justify-center text-2xl flex-shrink-0" style={{background:"rgba(255,255,255,0.15)"}}>👤</div>
-                  <div><p className="text-white font-semibold text-sm">Алекс Джонсон</p><p className="text-white/60 text-xs">3 штампа · 3 осталось</p></div>
+                  <div className="w-11 h-11 rounded-xl flex items-center justify-center text-2xl flex-shrink-0 overflow-hidden" style={{background:"rgba(255,255,255,0.15)"}}>
+                    {snimok(снимок) ?? "👤"}
+                  </div>
+                  <div className="min-w-0"><p className="text-white font-semibold text-sm truncate">{имя}</p><p className="text-white/60 text-xs">3 штампа · 3 осталось</p></div>
                   <div className="ml-auto flex-shrink-0"><svg width="40" height="40" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="18" stroke={GOLD} strokeWidth="2" strokeDasharray="56.5 56.5" strokeDashoffset="28.3" transform="rotate(-90 20 20)"/><text x="20" y="25" textAnchor="middle" fill={GOLD} fontSize="11" fontWeight="bold">50%</text></svg></div>
                 </div>
               </div>
