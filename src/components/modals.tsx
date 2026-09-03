@@ -14,7 +14,7 @@ export function NotifsPanel({ onClose }:{ onClose:()=>void }) {
   const [notifs, setNotifs] = useState(NOTIFS);
   const unread = notifs.filter(n=>n.unread).length;
   return (
-    <div className="absolute inset-0 z-50 flex flex-col animate-slide-up" style={{background:CREAM}}>
+    <div className="overlay-screen absolute inset-0 z-50 flex flex-col animate-slide-up" style={{background:CREAM}}>
       <div className="bg-white px-4 pt-14 pb-3 border-b" style={{borderColor:BORDER}}>
         <div className="flex items-center justify-between">
           <div><h2 className="font-bold text-xl" style={{color:TEXT,fontFamily:"'Fraunces',serif"}}>Уведомления</h2>{unread>0&&<p className="text-xs mt-0.5" style={{color:GREEN}}>{unread} непрочитанных</p>}</div>
@@ -51,7 +51,7 @@ export function SearchModal({ onClose, onPlace }:{ onClose:()=>void; onPlace:(p:
     setResults(PLACES.filter(p=>p.name.toLowerCase().includes(query.toLowerCase())||p.city.toLowerCase().includes(query.toLowerCase())||p.type.toLowerCase().includes(query.toLowerCase())));
   },[query]);
   return (
-    <div className="absolute inset-0 z-50 flex flex-col animate-slide-up" style={{background:CREAM}}>
+    <div className="overlay-screen absolute inset-0 z-50 flex flex-col animate-slide-up" style={{background:CREAM}}>
       <div className="bg-white px-4 pt-14 pb-3 border-b" style={{borderColor:BORDER}}>
         <div className="flex items-center gap-3">
           <div className="flex-1 flex items-center gap-2 rounded-2xl px-4 py-3" style={{background:CREAM}}>
@@ -105,7 +105,7 @@ export function LoginModal({ onClose, onLogin }:{ onClose:()=>void; onLogin:()=>
     { e:"📧", label:"Войти по email",          color:GREEN         },
   ];
   return (
-    <div className="absolute inset-0 z-50 flex flex-col animate-slide-up" style={{background:CREAM}}>
+    <div className="overlay-screen absolute inset-0 z-50 flex flex-col animate-slide-up" style={{background:CREAM}}>
       <div className="relative overflow-hidden flex-shrink-0" style={{height:240,background:`linear-gradient(135deg,#0F3460 0%,#16213E 60%,#1A1A2E 100%)`}}>
         <div className="absolute inset-0 flex items-center justify-center opacity-10"><GeomPattern opacity={1}/></div>
         <div className="absolute inset-0 opacity-25"><AnimatedBg/></div>
@@ -157,7 +157,7 @@ export function PremiumModal({ onClose, onActivate }:{ onClose:()=>void; onActiv
     {e:"🏷️",t:"Скидки партнёров",s:"До 25% в отелях и ресторанах"},
   ];
   return (
-    <div className="absolute inset-0 z-50 flex flex-col animate-slide-up" style={{background:CREAM}}>
+    <div className="overlay-screen absolute inset-0 z-50 flex flex-col animate-slide-up" style={{background:CREAM}}>
       {/* Header */}
       <div className="relative overflow-hidden px-4 pt-14 pb-6" style={{background:`linear-gradient(135deg,#1A1A2E 0%,#16213E 50%,#0F3460 100%)`}}>
         <div className="absolute inset-0 flex items-center justify-end opacity-10 pr-2"><GeomPattern opacity={1}/></div>

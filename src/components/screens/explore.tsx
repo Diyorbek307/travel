@@ -32,8 +32,15 @@ export function ExploreScreen({ onPlace, onHotel, onRestaurant, isPremium }:{ on
         </div>
       </div>
       </div>
-      <div className="flex-1 overflow-y-auto hide-scroll p-4 space-y-3">
-        <AdBanner isPremium={isPremium}/>
+      <div className="flex-1 overflow-y-auto hide-scroll p-4">
+        <div className="mb-3"><AdBanner isPremium={isPremium}/></div>
+        {/*
+          Сетка вместо столбца. На телефоне это по-прежнему один столбец,
+          а на широком экране карточки встают рядом: иначе каждая
+          растягивается через весь стол, и от неё остаётся полоска с
+          картинкой в углу.
+        */}
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         {showHotels&&HOTELS.map(h=>(
           <button key={h.id} onClick={()=>onHotel(h)} className="w-full bg-white rounded-2xl overflow-hidden shadow-sm border text-left active:scale-[0.98] transition-all" style={{borderColor:BORDER}}>
             <div className="relative h-40"><img src={h.img} alt={h.name} className="w-full h-full object-cover"/><div className="absolute inset-0" style={{background:"linear-gradient(to top,rgba(0,0,0,0.65) 0%,transparent 55%)"}}/><div className="absolute top-3 left-3"><span className="text-[9px] font-bold px-2 py-0.5 rounded-full" style={{background:GOLD,color:TEXT}}>{h.tag}</span></div><div className="absolute bottom-0 left-0 right-0 p-3"><p className="text-white font-bold text-sm" style={{fontFamily:"'Fraunces',serif"}}>{h.name}</p><div className="flex items-center gap-2 mt-0.5"><StarRow rating={h.rating}/><span className="text-white/70 text-xs">{h.city}</span></div></div></div>
@@ -49,7 +56,7 @@ export function ExploreScreen({ onPlace, onHotel, onRestaurant, isPremium }:{ on
         {!showHotels&&!showRests&&(
           <>
             {filter==="Всё"&&(
-              <button onClick={()=>onPlace(PLACES[0])} className="w-full relative rounded-2xl overflow-hidden shadow-sm text-left active:scale-[0.98]" style={{height:180}}>
+              <button onClick={()=>onPlace(PLACES[0])} className="w-full relative rounded-2xl overflow-hidden shadow-sm text-left active:scale-[0.98] sm:col-span-2 xl:col-span-3" style={{height:180}}>
                 <img src={PLACES[0].img} alt={PLACES[0].name} className="w-full h-full object-cover"/>
                 <div className="absolute inset-0" style={{background:"linear-gradient(to top,rgba(0,0,0,0.7) 0%,transparent 55%)"}}/>
                 <div className="absolute top-3 left-3"><span className="text-[9px] font-bold px-2 py-0.5 rounded-full" style={{background:GOLD,color:TEXT}}>⭐ FEATURED</span></div>
@@ -64,6 +71,7 @@ export function ExploreScreen({ onPlace, onHotel, onRestaurant, isPremium }:{ on
             ))}
           </>
         )}
+        </div>
       </div>
     </div>
   );

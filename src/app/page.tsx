@@ -209,7 +209,7 @@ function App() {
         )}
 
         {phase === "lang" && (
-          <div className="device-safe-top absolute inset-0 z-40">
+          <div className="overlay-screen device-safe-top absolute inset-0 z-40">
             <OnboardingLang
               defaultLang={lang}
               onNext={(picked) => {
@@ -221,7 +221,7 @@ function App() {
         )}
 
         {phase === "interests" && (
-          <div className="device-safe-top absolute inset-0 z-40">
+          <div className="overlay-screen device-safe-top absolute inset-0 z-40">
             <OnboardingInterests lang={lang} onDone={() => setPhase("app")} />
           </div>
         )}
@@ -238,9 +238,13 @@ function App() {
               />
             )}
             {showNotifs && <NotifsPanel onClose={() => setShowNotifs(false)} />}
-            {showPractical && <PracticalScreen onBack={() => setShowPractical(false)} />}
+            {showPractical && (
+              <div className="overlay-screen absolute inset-0 z-40">
+                <PracticalScreen onBack={() => setShowPractical(false)} />
+              </div>
+            )}
             {showTransport && (
-              <div className="device-safe-top absolute inset-0 z-40">
+              <div className="overlay-screen device-safe-top absolute inset-0 z-40">
                 <TransportScreen onBack={() => setShowTransport(false)} isPremium={isPremium} />
               </div>
             )}
@@ -268,7 +272,7 @@ function App() {
             )}
 
             <div className="device-content flex-1 overflow-hidden">
-              <div key={tabKey} className="animate-fade-in h-full">
+              <div key={tabKey} className="app-page animate-fade-in h-full">
                 <Screen
                   tab={tab}
                   detail={detail}

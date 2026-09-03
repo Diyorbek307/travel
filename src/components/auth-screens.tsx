@@ -54,6 +54,12 @@ function Обёртка({
       className="flex h-full flex-col overflow-y-auto px-6 pb-10 pt-12"
       style={{ background: `linear-gradient(160deg, ${GREEN} 0%, #14402c 100%)` }}
     >
+      {/*
+        Колонка ограниченной ширины. Поле ввода во весь ноутбук выглядит
+        не как форма, а как ошибка вёрстки: глаз не связывает подпись
+        слева с полем, уехавшим на метр вправо.
+      */}
+      <div className="mx-auto flex w-full max-w-md flex-col">
       <button
         onClick={onBack}
         className="mb-6 self-start text-sm"
@@ -73,8 +79,10 @@ function Обёртка({
       </p>
 
       {children}
+      </div>
     </div>
   );
+
 }
 
 /* ------------------------------------------------------------------ */

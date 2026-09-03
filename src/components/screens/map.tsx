@@ -61,7 +61,7 @@ export function MapScreen({ onRoute }:{ onRoute:(r:Route)=>void }) {
             {/* 3D Map */}
             <div className="bg-white rounded-2xl overflow-hidden shadow-sm border" style={{borderColor:BORDER}}>
               <RealMap
-                высота={320}
+                высота="clamp(300px, 46vh, 560px)"
                 откуда={где}
                 приблизить={false}
                 точки={Object.entries(ГОРОДА).map(([название,geo])=>({

@@ -217,7 +217,7 @@ export default function TaxiOrder({
         {карта && старт && (
           <div className="mb-3 overflow-hidden rounded-xl border" style={{ borderColor: BORDER }}>
             <RealMap
-              высота={260}
+              высота="clamp(240px, 36vh, 420px)"
               откуда={старт}
               точки={местаГорода.map((м) => ({
                 geo: м.geo,

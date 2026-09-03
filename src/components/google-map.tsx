@@ -38,7 +38,8 @@ export default function GoogleMap({
   откуда?: Geo | null;
   куда: Geo;
   подпись?: string;
-  высота?: number;
+  /** Как и у своей карты: число или строка CSS. */
+  высота?: number | string;
   пешком?: boolean;
 }) {
   const ключ = googleКлюч();

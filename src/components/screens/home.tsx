@@ -17,7 +17,7 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
     <div className="flex flex-col h-full overflow-y-auto hide-scroll" style={{background:CREAM}}>
 
       {/* ── Glassmorphism Hero ── */}
-      <div className="relative flex-shrink-0" style={{height:400}}>
+      <div className="relative h-[400px] flex-shrink-0 lg:h-[480px]">
         <img src="https://images.unsplash.com/photo-1664602078796-68ee76b3fc59?w=900&h=900&fit=crop&auto=format" alt="Самарканд" className="absolute inset-0 w-full h-full object-cover"/>
         <div className="absolute inset-0" style={{background:"linear-gradient(to bottom,rgba(0,0,0,0.32) 0%,rgba(0,0,0,0.04) 38%,rgba(0,0,0,0.75) 100%)"}}/>
         {/* Animated Uzbek overlay */}
@@ -79,10 +79,10 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
             {e:"🏨",l:"Отели",    sub:"50+",     tab:"explore" as Tab, action:undefined},
             {e:"🍽️",l:"Рестораны",sub:"200+",    tab:"explore" as Tab, action:undefined},
           ]).map(c=>(
-            <button key={c.l} onClick={()=>onTab(c.tab)} className="flex flex-col items-center gap-1.5 py-3 rounded-2xl text-center bg-white border shadow-sm active:scale-95 transition-all" style={{borderColor:BORDER}}>
-              <span className="text-2xl">{c.e}</span>
-              <p className="font-bold text-[10px]" style={{color:TEXT}}>{c.l}</p>
-              <p className="text-[9px]" style={{color:MUTED}}>{c.sub}</p>
+            <button key={c.l} onClick={()=>onTab(c.tab)} className="flex flex-col items-center gap-1.5 rounded-2xl border bg-white py-3 text-center shadow-sm transition-all active:scale-95 lg:gap-2 lg:py-6" style={{borderColor:BORDER}}>
+              <span className="text-2xl lg:text-3xl">{c.e}</span>
+              <p className="text-[10px] font-bold lg:text-sm" style={{color:TEXT}}>{c.l}</p>
+              <p className="text-[9px] lg:text-xs" style={{color:MUTED}}>{c.sub}</p>
             </button>
           ))}
         </div>
