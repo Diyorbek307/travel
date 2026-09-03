@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useT } from "@/components/lang-provider";
+import type { TKey } from "@/lib/i18n";
 import TaxiOrder from "@/components/taxi-order";
 import { BORDER, CREAM, GREEN, MUTED, TEXT, WHITE } from "@/lib/theme";
 import { FLIGHTS, INTERCITY, TRAINS, UZ_CITIES } from "@/data/content";
@@ -10,12 +12,13 @@ import { AdBanner } from "@/components/widgets";
 
 
 export function CityPicker({ value, onChange, label, icon }:{ value:string; onChange:(c:string)=>void; label:string; icon:string }) {
+  const { t } = useT();
   const [open, setOpen] = useState(false);
   return (
     <>
       <button onClick={()=>setOpen(true)} className="flex-1 flex flex-col gap-0.5 px-3 py-2.5 rounded-2xl text-left" style={{background:"rgba(255,255,255,0.18)"}}>
         <span className="text-[9px] font-bold uppercase tracking-widest" style={{color:"rgba(255,255,255,0.55)"}}>{label}</span>
-        <span className="font-bold text-sm text-white truncate">{icon} {value||"Выбрать"}</span>
+        <span className="font-bold text-sm text-white truncate">{icon} {value||t("tr_choose")}</span>
       </button>
       {open&&(
         <div className="absolute inset-0 z-50 flex flex-col justify-end" style={{background:"rgba(0,0,0,0.5)",backdropFilter:"blur(4px)"}}>
@@ -46,20 +49,21 @@ export function CityPicker({ value, onChange, label, icon }:{ value:string; onCh
 // ── Transport Screen ───────────────────────────────────────────────────────────
 
 export function TransportScreen({ onBack, isPremium }:{ onBack:()=>void; isPremium:boolean }) {
+  const { t } = useT();
   const [mode, setMode] = useState<"trains"|"flights"|"taxi">("trains");
   const [booked, setBooked] = useState<string|null>(null);
   const [fromCity, setFromCity] = useState("");
   const [toCity,   setToCity]   = useState("");
-  const TABS:[typeof mode,string,string][] = [["trains","🚄","Поезда"],["flights","✈️","Рейсы"],["taxi","🚌","Такси"]];
+  const TABS:[typeof mode,string,TKey][] = [["trains","🚄","tr_trains"],["flights","✈️","tr_flights"],["taxi","🚌","tr_taxi"]];
 
   const TicketCard = ({ children, id, price, onBook }:{ children:React.ReactNode; id:string; price:string; onBook:()=>void }) => (
     <div className="bg-white rounded-2xl overflow-hidden shadow-sm border" style={{borderColor:BORDER}}>
       {children}
       <div className="px-4 pb-4 flex items-center justify-between">
-        <div><p className="text-[9px] uppercase font-bold tracking-widest" style={{color:MUTED}}>Цена / чел.</p><p className="font-bold text-lg" style={{color:GREEN,fontFamily:"'Fraunces',serif"}}>{price}</p></div>
+        <div><p className="text-[9px] uppercase font-bold tracking-widest" style={{color:MUTED}}>{t("tr_price_pp")}</p><p className="font-bold text-lg" style={{color:GREEN,fontFamily:"'Fraunces',serif"}}>{price}</p></div>
         {booked===id
-          ? <div className="px-4 py-2.5 rounded-xl text-xs font-bold" style={{background:"#EDF7F2",color:GREEN}}>✓ Забронировано</div>
-          : <button onClick={onBook} className="px-4 py-2.5 rounded-xl text-xs font-bold text-white" style={{background:GREEN}}>Купить</button>
+          ? <div className="px-4 py-2.5 rounded-xl text-xs font-bold" style={{background:"#EDF7F2",color:GREEN}}>✓ {t("d_book")}</div>
+          : <button onClick={onBook} className="px-4 py-2.5 rounded-xl text-xs font-bold text-white" style={{background:GREEN}}>{t("tr_buy")}</button>
         }
       </div>
     </div>
@@ -78,23 +82,23 @@ export function TransportScreen({ onBack, isPremium }:{ onBack:()=>void; isPremi
           <button onClick={onBack} className="mb-3 w-9 h-9 rounded-xl flex items-center justify-center" style={{background:"rgba(255,255,255,0.2)"}}>
             <svg width="16" height="16" fill="none" stroke="white" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
           </button>
-          <p className="text-white/60 text-[10px] font-bold uppercase tracking-widest mb-0.5">ТРАНСПОРТ</p>
+          <p className="text-white/60 text-[10px] font-bold uppercase tracking-widest mb-0.5">{t("tr_kicker")}</p>
           <h1 className="text-white text-xl font-bold mb-3" style={{fontFamily:"'Fraunces',serif"}}>Перевозки по Узбекистану</h1>
           {/* City pickers */}
           <div className="relative flex items-center gap-2 mb-3">
-            <CityPicker value={fromCity} onChange={setFromCity} label="Откуда" icon="🛫"/>
+            <CityPicker value={fromCity} onChange={setFromCity} label={t("tr_from")} icon="🛫"/>
             <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center" style={{background:"rgba(255,255,255,0.2)"}}>
-              <button onClick={()=>{const t=fromCity;setFromCity(toCity);setToCity(t);}} title="Поменять местами">
+              <button onClick={()=>{const t=fromCity;setFromCity(toCity);setToCity(t);}} title={t("tr_swap")}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><path d="M7 16V4m0 0L3 8m4-4l4 4"/><path d="M17 8v12m0 0l4-4m-4 4l-4-4"/></svg>
               </button>
             </div>
-            <CityPicker value={toCity}   onChange={setToCity}   label="Куда"   icon="🛬"/>
+            <CityPicker value={toCity}   onChange={setToCity}   label={t("tr_to")}   icon="🛬"/>
           </div>
           <div className="flex gap-2">
             {TABS.map(([v,e,l])=>(
               <button key={v} onClick={()=>setMode(v)} className="flex-1 py-2.5 rounded-2xl text-[10px] font-bold flex flex-col items-center gap-0.5"
                 style={mode===v?{background:WHITE,color:GREEN}:{background:"rgba(255,255,255,0.15)",color:"rgba(255,255,255,0.85)"}}>
-                <span className="text-base">{e}</span><span>{l}</span>
+                <span className="text-base">{e}</span><span>{t(l)}</span>
               </button>
             ))}
           </div>
@@ -164,7 +168,7 @@ export function TransportScreen({ onBack, isPremium }:{ onBack:()=>void; isPremi
               <div className="flex items-center gap-3">
                 <div className="flex-1">
                   <p className="font-bold text-base" style={{color:TEXT}}>{ic.from}</p>
-                  <p className="text-[9px] mt-0.5" style={{color:MUTED}}>Отправление</p>
+                  <p className="text-[9px] mt-0.5" style={{color:MUTED}}>{t("tr_departure")}</p>
                 </div>
                 <div className="flex flex-col items-center gap-1 flex-shrink-0">
                   <p className="text-[9px]" style={{color:MUTED}}>{ic.dur}</p>
@@ -172,12 +176,12 @@ export function TransportScreen({ onBack, isPremium }:{ onBack:()=>void; isPremi
                 </div>
                 <div className="flex-1 text-right">
                   <p className="font-bold text-base" style={{color:TEXT}}>{ic.to}</p>
-                  <p className="text-[9px] mt-0.5" style={{color:MUTED}}>Прибытие</p>
+                  <p className="text-[9px] mt-0.5" style={{color:MUTED}}>{t("tr_arrival")}</p>
                 </div>
               </div>
               <div className="mt-3 pt-3 border-t flex items-center justify-between" style={{borderColor:BORDER}}>
                 <div><p className="text-[9px]" style={{color:MUTED}}>{ic.departs}</p><p className="text-xs font-medium mt-0.5" style={{color:TEXT}}>{ic.note}</p></div>
-                <div className="text-right"><p className="font-bold text-base" style={{color:GREEN,fontFamily:"'Fraunces',serif"}}>{ic.price}</p><button className="mt-1 px-3 py-1.5 rounded-lg text-[10px] font-bold text-white" style={{background:GREEN}}>Заказать</button></div>
+                <div className="text-right"><p className="font-bold text-base" style={{color:GREEN,fontFamily:"'Fraunces',serif"}}>{ic.price}</p><button className="mt-1 px-3 py-1.5 rounded-lg text-[10px] font-bold text-white" style={{background:GREEN}}>{t("tr_book")}</button></div>
               </div>
             </div>
           </div>

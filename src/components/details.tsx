@@ -7,10 +7,12 @@ import type { Hotel, Place, Restaurant, Route } from "@/lib/types";
 import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE } from "@/lib/theme";
 import { LANGS } from "@/data/content";
 import { Badge, GeomPattern, StarRow } from "./ui";
+import { useT } from "@/components/lang-provider";
 import { glass } from "@/lib/theme";
 
 
 export function PlaceDetail({ place, onBack, onPlay, onToast, onПуть }:{ place:Place; onBack:()=>void; onPlay:(p:Place)=>void; onToast:(m:string)=>void; onПуть:(название:string,город:string)=>void }) {
+  const { t } = useT();
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [fav, setFav] = useState(false);
@@ -36,8 +38,8 @@ export function PlaceDetail({ place, onBack, onPlay, onToast, onПуть }:{ pla
       </div>
       <div className="flex-1 overflow-y-auto hide-scroll px-4 pt-4">
         <div className="grid grid-cols-4 gap-2 mb-4">
-          {[{e:"📍",v:place.distance,l:"Расстояние"},{e:"🎫",v:place.entry,l:"Вход"},{e:"🕐",v:place.hours.length>8?"Всегда":place.hours,l:"Часы"},{e:"⏱",v:"8:42",l:"Аудио"}].map(s=>(
-            <div key={s.l} className="bg-white rounded-2xl p-2.5 text-center shadow-sm border" style={{borderColor:BORDER}}><p className="text-base">{s.e}</p><p className="font-semibold text-[10px] mt-1 leading-tight" style={{color:TEXT}}>{s.v}</p><p className="text-[8px] mt-0.5" style={{color:MUTED}}>{s.l}</p></div>
+          {[{e:"📍",v:place.distance,k:"d_distance" as const},{e:"🎫",v:place.entry,k:"d_entry" as const},{e:"🕐",v:place.hours.length>8?t("d_always"):place.hours,k:"d_hours" as const},{e:"⏱",v:"8:42",k:"d_audio" as const}].map(s=>(
+            <div key={s.k} className="bg-white rounded-2xl p-2.5 text-center shadow-sm border" style={{borderColor:BORDER}}><p className="text-base">{s.e}</p><p className="font-semibold text-[10px] mt-1 leading-tight" style={{color:TEXT}}>{s.v}</p><p className="text-[8px] mt-0.5" style={{color:MUTED}}>{t(s.k)}</p></div>
           ))}
         </div>
         <div className="bg-white rounded-2xl p-4 mb-3 shadow-sm border" style={{borderColor:BORDER}}>
@@ -48,7 +50,7 @@ export function PlaceDetail({ place, onBack, onPlay, onToast, onПуть }:{ pla
           <div className="rounded-2xl p-4 mb-3" style={{background:GREEN}}>
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{background:GOLD}}><svg width="13" height="13" viewBox="0 0 24 24" fill={TEXT}><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
-              <div className="flex-1"><p className="text-white font-semibold text-sm">Аудиогид</p><p className="text-white/60 text-xs">{LANGS[activeLang]} · 8:42</p></div>
+              <div className="flex-1"><p className="text-white font-semibold text-sm">{t("d_audioguide")}</p><p className="text-white/60 text-xs">{LANGS[activeLang]} · 8:42</p></div>
               <span className="text-white/50 text-xs">{Math.floor(progress*8.42/100/60)}:{String(Math.floor(progress*8.42/100%60)).padStart(2,"0")} / 8:42</span>
             </div>
             <div className="rounded-full h-1.5 mb-1 cursor-pointer" style={{background:"rgba(255,255,255,0.2)"}} onClick={e=>{const r=(e.target as HTMLElement).getBoundingClientRect();setProgress(((e.clientX-r.left)/r.width)*100);}}>
@@ -67,8 +69,8 @@ export function PlaceDetail({ place, onBack, onPlay, onToast, onПуть }:{ pla
           </div>
         )}
         <div className="flex gap-3 pb-6">
-          <button onClick={()=>onПуть(place.name, place.city)} className="flex-1 py-3.5 rounded-2xl text-white text-sm font-bold active:scale-[0.98] transition-all" style={{background:GREEN}}>📍 Маршрут</button>
-          <button onClick={()=>onToast(`✅ «${place.name}» добавлено в маршрут!`)} className="flex-1 py-3.5 rounded-2xl text-sm font-bold border active:scale-[0.98] transition-all" style={{color:GREEN,borderColor:GREEN,background:WHITE}}>🗺️ В маршрут</button>
+          <button onClick={()=>onПуть(place.name, place.city)} className="flex-1 py-3.5 rounded-2xl text-white text-sm font-bold active:scale-[0.98] transition-all" style={{background:GREEN}}>📍 {t("d_route")}</button>
+          <button onClick={()=>onToast(`✅ «${place.name}» добавлено в маршрут!`)} className="flex-1 py-3.5 rounded-2xl text-sm font-bold border active:scale-[0.98] transition-all" style={{color:GREEN,borderColor:GREEN,background:WHITE}}>🗺️ {t("d_add_route")}</button>
         </div>
       </div>
         <ReviewForm placeId={place.id} placeName={place.name} />
@@ -79,6 +81,7 @@ export function PlaceDetail({ place, onBack, onPlay, onToast, onПуть }:{ pla
 // ── Hotel Detail ───────────────────────────────────────────────────────────────
 
 export function HotelDetail({ hotel, onBack, onToast }:{ hotel:Hotel; onBack:()=>void; onToast:(m:string)=>void }) {
+  const { t } = useT();
   const [imgIdx, setImgIdx] = useState(0);
   const [guests, setGuests] = useState(2);
   const [nights, setNights] = useState(2);
@@ -110,12 +113,12 @@ export function HotelDetail({ hotel, onBack, onToast }:{ hotel:Hotel; onBack:()=
           </div>
         </div>
         <div className="bg-white rounded-2xl p-4 mb-3 shadow-sm border" style={{borderColor:BORDER}}>
-          <p className="font-bold text-sm mb-3" style={{color:TEXT}}>Бронирование</p>
+          <p className="font-bold text-sm mb-3" style={{color:TEXT}}>{t("d_booking")}</p>
           <div className="grid grid-cols-2 gap-3 mb-3">
-            {[{l:"ЗАЕЗД",v:"30 авг 2026"},{l:"ВЫЕЗД",v:`${1+nights} сент 2026`}].map(d=><div key={d.l} className="rounded-xl p-3 border" style={{background:CREAM,borderColor:BORDER}}><p className="text-[10px] font-semibold mb-0.5" style={{color:MUTED}}>{d.l}</p><p className="text-sm font-bold" style={{color:TEXT}}>{d.v}</p></div>)}
+            {[{l:t("d_checkin"),v:"30 авг 2026"},{l:t("d_checkout"),v:`${1+nights} сент 2026`}].map(d=><div key={d.l} className="rounded-xl p-3 border" style={{background:CREAM,borderColor:BORDER}}><p className="text-[10px] font-semibold mb-0.5" style={{color:MUTED}}>{d.l}</p><p className="text-sm font-bold" style={{color:TEXT}}>{d.v}</p></div>)}
           </div>
           <div className="flex items-center justify-between mb-3">
-            {[{l:"НОЧЕЙ",v:nights,set:setNights,min:1},{l:"ГОСТЕЙ",v:guests,set:setGuests,min:1}].map(c=>(
+            {[{l:t("d_nights"),v:nights,set:setNights,min:1},{l:t("d_guests"),v:guests,set:setGuests,min:1}].map(c=>(
               <div key={c.l}>
                 <p className="text-[10px] font-semibold mb-1" style={{color:MUTED}}>{c.l}</p>
                 <div className="flex items-center gap-3">
@@ -125,7 +128,7 @@ export function HotelDetail({ hotel, onBack, onToast }:{ hotel:Hotel; onBack:()=
                 </div>
               </div>
             ))}
-            <div className="text-right"><p className="text-[10px] font-semibold" style={{color:MUTED}}>ИТОГО</p><p className="text-xl font-bold mt-1" style={{color:GREEN,fontFamily:"'Fraunces',serif"}}>${total}</p><p className="text-[9px]" style={{color:MUTED}}>{hotel.price}/ночь × {nights}</p></div>
+            <div className="text-right"><p className="text-[10px] font-semibold" style={{color:MUTED}}>{t("d_total")}</p><p className="text-xl font-bold mt-1" style={{color:GREEN,fontFamily:"'Fraunces',serif"}}>${total}</p><p className="text-[9px]" style={{color:MUTED}}>{hotel.price}/ночь × {nights}</p></div>
           </div>
           {booked?(
             <div className="rounded-2xl p-5 text-center" style={{background:"#EDF7F2",border:`1.5px solid ${GREEN}`}}>
@@ -136,7 +139,7 @@ export function HotelDetail({ hotel, onBack, onToast }:{ hotel:Hotel; onBack:()=
             </div>
           ):(
             <>
-              <button onClick={()=>{setBooked(true);onToast("Забронировано! Детали отправлены на email.");}} className="w-full py-4 rounded-2xl text-white font-bold text-sm active:scale-[0.98] transition-all" style={{background:GREEN}}>Забронировать — ${total}</button>
+              <button onClick={()=>{setBooked(true);onToast(t("d_booked"));}} className="w-full py-4 rounded-2xl text-white font-bold text-sm active:scale-[0.98] transition-all" style={{background:GREEN}}>Забронировать — ${total}</button>
               <p className="text-center text-[10px] mt-2" style={{color:MUTED}}>Бесплатная отмена до 24 ч · Скидка UzUp -10%</p>
             </>
           )}
@@ -160,6 +163,7 @@ export function HotelDetail({ hotel, onBack, onToast }:{ hotel:Hotel; onBack:()=
 // ── Restaurant Detail ─────────────────────────────────────────────────────────
 
 export function RestaurantDetail({ r, onBack, onToast, onПуть }:{ r:Restaurant; onBack:()=>void; onToast:(m:string)=>void; onПуть:(название:string,город:string)=>void }) {
+  const { t } = useT();
   const [fav, setFav] = useState(false);
   return (
     <div className="flex flex-col h-full animate-slide-up" style={{background:CREAM}}>
@@ -176,11 +180,11 @@ export function RestaurantDetail({ r, onBack, onToast, onПуть }:{ r:Restaura
       </div>
       <div className="flex-1 overflow-y-auto hide-scroll px-4 pt-4">
         <div className="grid grid-cols-3 gap-2 mb-4">
-          {[{e:"🕐",v:r.open,l:"Режим"},{e:"💰",v:r.price,l:"Цена"},{e:"🍽️",v:r.cuisine,l:"Кухня"}].map(s=>(
-            <div key={s.l} className="bg-white rounded-2xl p-3 text-center shadow-sm border" style={{borderColor:BORDER}}><p className="text-base">{s.e}</p><p className="font-semibold text-[10px] mt-1 leading-tight" style={{color:TEXT}}>{s.v}</p><p className="text-[8px] mt-0.5" style={{color:MUTED}}>{s.l}</p></div>
+          {[{e:"🕐",v:r.open,k:"d_mode" as const},{e:"💰",v:r.price,k:"d_price" as const},{e:"🍽️",v:r.cuisine,k:"i_cuisine" as const}].map(s=>(
+            <div key={s.k} className="bg-white rounded-2xl p-3 text-center shadow-sm border" style={{borderColor:BORDER}}><p className="text-base">{s.e}</p><p className="font-semibold text-[10px] mt-1 leading-tight" style={{color:TEXT}}>{s.v}</p><p className="text-[8px] mt-0.5" style={{color:MUTED}}>{t(s.k)}</p></div>
           ))}
         </div>
-        <div className="bg-white rounded-2xl p-4 mb-3 shadow-sm border" style={{borderColor:BORDER}}><p className="font-bold text-sm mb-2" style={{color:TEXT}}>О ресторане</p><p className="text-sm leading-relaxed" style={{color:MUTED}}>{r.desc}</p></div>
+        <div className="bg-white rounded-2xl p-4 mb-3 shadow-sm border" style={{borderColor:BORDER}}><p className="font-bold text-sm mb-2" style={{color:TEXT}}>{t("d_about_rest")}</p><p className="text-sm leading-relaxed" style={{color:MUTED}}>{r.desc}</p></div>
         <div className="bg-white rounded-2xl p-4 mb-3 shadow-sm border" style={{borderColor:BORDER}}>
           <p className="font-bold text-sm mb-2" style={{color:TEXT}}>Фирменные блюда</p>
           <div className="space-y-2">
@@ -193,8 +197,8 @@ export function RestaurantDetail({ r, onBack, onToast, onПуть }:{ r:Restaura
           </div>
         </div>
         <div className="flex gap-3 pb-6">
-          <button onClick={()=>onПуть(r.name, r.city)} className="flex-1 py-3.5 rounded-2xl text-white text-sm font-bold active:scale-[0.98] transition-all" style={{background:"#C1603A"}}>📍 Маршрут</button>
-          <button onClick={()=>onToast(`📞 Звонок в «${r.name}»...`)} className="flex-1 py-3.5 rounded-2xl text-sm font-bold border active:scale-[0.98] transition-all" style={{color:"#C1603A",borderColor:"#C1603A",background:WHITE}}>📞 Позвонить</button>
+          <button onClick={()=>onПуть(r.name, r.city)} className="flex-1 py-3.5 rounded-2xl text-white text-sm font-bold active:scale-[0.98] transition-all" style={{background:"#C1603A"}}>📍 {t("d_route")}</button>
+          <button onClick={()=>onToast(`📞 Звонок в «${r.name}»...`)} className="flex-1 py-3.5 rounded-2xl text-sm font-bold border active:scale-[0.98] transition-all" style={{color:"#C1603A",borderColor:"#C1603A",background:WHITE}}>📞 {t("d_call")}</button>
         </div>
       </div>
         <BookingForm kind="restaurant" itemId={r.id} itemName={r.name} />
@@ -206,6 +210,7 @@ export function RestaurantDetail({ r, onBack, onToast, onПуть }:{ r:Restaura
 // ── Route Detail ───────────────────────────────────────────────────────────────
 
 export function RouteDetail({ route, onBack }:{ route:Route; onBack:()=>void }) {
+  const { t } = useT();
   return (
     <div className="flex flex-col h-full animate-slide-up" style={{background:CREAM}}>
       <div className="relative px-4 pt-12 pb-5" style={{background:route.color}}>

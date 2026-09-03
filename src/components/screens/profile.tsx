@@ -48,14 +48,14 @@ export function SettingsView({ isPremium, onUpgrade, onLogout }:{ isPremium:bool
       {!isPremium&&(
         <button onClick={onUpgrade} className="w-full rounded-2xl p-4 flex items-center gap-3 text-left active:scale-[0.98] transition-all" style={{background:`linear-gradient(135deg,#1A1A2E,#0F3460)`}}>
           <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0" style={{background:GOLD}}>👑</div>
-          <div className="flex-1"><p className="text-white font-bold text-sm">UzUp Premium</p><p className="text-white/60 text-xs">Без рекламы · Все функции · Офлайн</p></div>
+          <div className="flex-1"><p className="text-white font-bold text-sm">UzUp Premium</p><p className="text-white/60 text-xs">{t("pay_no_ads")} · UzUp Pro</p></div>
           <div className="px-3 py-1.5 rounded-xl text-xs font-bold" style={{background:GOLD,color:TEXT}}>$4.99</div>
         </button>
       )}
       {isPremium&&(
         <div className="rounded-2xl p-4 flex items-center gap-3" style={{background:`linear-gradient(135deg,#1A1A2E,#0F3460)`}}>
           <div className="w-10 h-10 rounded-2xl flex items-center justify-center text-xl" style={{background:GOLD}}>👑</div>
-          <div><p className="text-white font-bold text-sm">UzUp Premium активен</p><p className="text-white/50 text-xs">Действует до 30 авг 2027</p></div>
+          <div><p className="text-white font-bold text-sm">UzUp Premium активен</p><p className="text-white/50 text-xs">{t("prof_updated")}</p></div>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={GOLD} strokeWidth="2.5" className="ml-auto"><polyline points="20 6 9 17 4 12"/></svg>
         </div>
       )}
@@ -81,23 +81,23 @@ export function SettingsView({ isPremium, onUpgrade, onLogout }:{ isPremium:bool
       {/* Notifications */}
       <div className="bg-white rounded-2xl px-4 shadow-sm border" style={{borderColor:BORDER}}>
         <p className="font-bold text-xs pt-3 pb-1 uppercase tracking-widest" style={{color:MUTED}}>{t("prof_notifications")}</p>
-        <Row icon="📍" label="Рядом с достопримечательностью" sub="GPS-триггер при приближении" right={<Toggle on={notifNear} set={setNotifNear}/>}/>
-        <Row icon="🎫" label="События и скидки" sub="Акции партнёров и фестивали" right={<Toggle on={notifDeals} set={setNotifDeals}/>}/>
-        <Row icon="🆕" label="Новые маршруты и гиды" right={<Toggle on={notifNew} set={setNotifNew}/>}/>
-        <Row icon="📰" label="Новости Узбекистана" right={<Toggle on={notifNews} set={setNotifNews}/>}/>
+        <Row icon="📍" label={t("s_nearby")} sub={t("s_nearby_sub")} right={<Toggle on={notifNear} set={setNotifNear}/>}/>
+        <Row icon="🎫" label={t("s_events")} sub={t("s_events_sub")} right={<Toggle on={notifDeals} set={setNotifDeals}/>}/>
+        <Row icon="🆕" label={t("s_news_sub")} right={<Toggle on={notifNew} set={setNotifNew}/>}/>
+        <Row icon="📰" label={t("s_news")} right={<Toggle on={notifNews} set={setNotifNews}/>}/>
       </div>
 
       {/* Карта и навигация */}
       <div className="bg-white rounded-2xl px-4 shadow-sm border" style={{borderColor:BORDER}}>
-        <p className="font-bold text-xs pt-3 pb-1 uppercase tracking-widest" style={{color:MUTED}}>Карта и навигация</p>
-        <Row icon="🗺️" label="Стиль карты" right={
+        <p className="font-bold text-xs pt-3 pb-1 uppercase tracking-widest" style={{color:MUTED}}>{t("prof_map_nav")}</p>
+        <Row icon="🗺️" label={t("s_map_style")} right={
           <div className="flex rounded-lg overflow-hidden border" style={{borderColor:BORDER}}>
             {(["diorama","sat"] as const).map(s=><button key={s} onClick={()=>setMapStyle(s)} className="px-2.5 py-1 text-[10px] font-bold" style={mapStyle===s?{background:GREEN,color:WHITE}:{background:CREAM,color:MUTED}}>{s==="diorama"?"3D":"Спутник"}</button>)}
           </div>
         }/>
-        <Row icon="📡" label="GPS-аудиогид" sub="Автозапуск при приближении" right={<Toggle on={gps} set={setGps}/>}/>
-        <Row icon="⬇️" label="Офлайн-карты" sub="Скачать для работы без сети" right={<Toggle on={offline} set={setOffline}/>}/>
-        <Row icon="📏" label="Единицы" right={
+        <Row icon="📡" label="GPS-аудиогид" sub={t("s_nearby_sub")} right={<Toggle on={gps} set={setGps}/>}/>
+        <Row icon="⬇️" label={t("s_offline_maps")} sub={t("s_offline_sub")} right={<Toggle on={offline} set={setOffline}/>}/>
+        <Row icon="📏" label={t("s_units")} right={
           <div className="flex rounded-lg overflow-hidden border" style={{borderColor:BORDER}}>
             {(["metric","imperial"] as const).map(u=><button key={u} onClick={()=>setUnits(u)} className="px-2.5 py-1 text-[10px] font-bold" style={units===u?{background:GREEN,color:WHITE}:{background:CREAM,color:MUTED}}>{u==="metric"?"км":"миль"}</button>)}
           </div>
@@ -107,9 +107,9 @@ export function SettingsView({ isPremium, onUpgrade, onLogout }:{ isPremium:bool
       {/* Внешний вид */}
       <div className="bg-white rounded-2xl px-4 shadow-sm border" style={{borderColor:BORDER}}>
         <p className="font-bold text-xs pt-3 pb-1 uppercase tracking-widest" style={{color:MUTED}}>{t("prof_appearance")}</p>
-        <Row icon="🌙" label="Тёмная тема" sub="Бережёт батарею ночью" right={<Toggle on={darkMode} set={setDarkMode}/>}/>
-        <Row icon="🎵" label="Автовоспроизведение аудио" sub="При открытии места" right={<Toggle on={autoPlay} set={setAutoPlay}/>}/>
-        <Row icon="💱" label="Валюта по умолчанию" right={
+        <Row icon="🌙" label={t("s_dark")} sub={t("s_dark_sub")} right={<Toggle on={darkMode} set={setDarkMode}/>}/>
+        <Row icon="🎵" label={t("s_autoplay")} sub={t("s_autoplay_sub")} right={<Toggle on={autoPlay} set={setAutoPlay}/>}/>
+        <Row icon="💱" label={t("s_currency")} right={
           <select value={currency} onChange={e=>setCurrency(e.target.value)} className="text-xs font-bold px-2 py-1 rounded-lg outline-none border" style={{color:GREEN,borderColor:BORDER,background:CREAM}}>
             {["USD","EUR","RUB","GBP","KRW","CNY","JPY"].map(c=><option key={c}>{c}</option>)}
           </select>
@@ -118,8 +118,8 @@ export function SettingsView({ isPremium, onUpgrade, onLogout }:{ isPremium:bool
 
       {/* Аккаунт */}
       <div className="bg-white rounded-2xl px-4 shadow-sm border" style={{borderColor:BORDER}}>
-        <p className="font-bold text-xs pt-3 pb-1 uppercase tracking-widest" style={{color:MUTED}}>Аккаунт</p>
-        {[{e:"👤",l:"Редактировать профиль"},{e:"🔐",l:"Безопасность и пароль"},{e:"🔗",l:"Связанные аккаунты"},{e:"📊",l:"Мои данные и конфиденциальность"},{e:"🗑️",l:"Удалить аккаунт"}].map((item,i)=>(
+        <p className="font-bold text-xs pt-3 pb-1 uppercase tracking-widest" style={{color:MUTED}}>{t("prof_account")}</p>
+        {[{e:"👤",l:t("s_edit_profile")},{e:"🔐",l:t("s_security")},{e:"🔗",l:t("s_linked")},{e:"📊",l:t("s_privacy")},{e:"🗑️",l:t("s_delete")}].map((item,i)=>(
           <Row key={i} icon={item.e} label={item.l} right={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={MUTED} strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>}/>
         ))}
       </div>
@@ -127,7 +127,7 @@ export function SettingsView({ isPremium, onUpgrade, onLogout }:{ isPremium:bool
       {/* Поддержка */}
       <div className="bg-white rounded-2xl px-4 shadow-sm border" style={{borderColor:BORDER}}>
         <p className="font-bold text-xs pt-3 pb-1 uppercase tracking-widest" style={{color:MUTED}}>{t("prof_support")}</p>
-        {[{e:"❓",l:"Помощь и FAQ"},{e:"💬",l:"Написать в поддержку"},{e:"⭐",l:"Оценить приложение"},{e:"📢",l:"Поделиться UzUp"},{e:"📄",l:"Условия использования"},{e:"🔒",l:"Политика конфиденциальности"}].map((item,i)=>(
+        {[{e:"❓",l:t("s_help")},{e:"💬",l:t("s_write_support")},{e:"⭐",l:t("s_rate")},{e:"📢",l:t("s_share")},{e:"📄",l:t("s_terms")},{e:"🔒",l:t("s_privacy_policy")}].map((item,i)=>(
           <Row key={i} icon={item.e} label={item.l} right={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={MUTED} strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>}/>
         ))}
       </div>
@@ -135,8 +135,8 @@ export function SettingsView({ isPremium, onUpgrade, onLogout }:{ isPremium:bool
       {/* О приложении */}
       <div className="bg-white rounded-2xl px-4 shadow-sm border" style={{borderColor:BORDER}}>
         <p className="font-bold text-xs pt-3 pb-1 uppercase tracking-widest" style={{color:MUTED}}>{t("prof_about")}</p>
-        <Row icon="📱" label="Версия приложения" right={<span className="text-xs font-mono" style={{color:MUTED}}>2.4.1</span>}/>
-        <Row icon="🔄" label="Проверить обновления" right={<span className="text-xs font-bold" style={{color:GREEN}}>Обновлено</span>}/>
+        <Row icon="📱" label={t("s_version")} right={<span className="text-xs font-mono" style={{color:MUTED}}>2.4.1</span>}/>
+        <Row icon="🔄" label={t("s_check_updates")} right={<span className="text-xs font-bold" style={{color:GREEN}}>{t("prof_updated")}</span>}/>
         <Row icon="🌍" label="UzUp — Made in Uzbekistan" right={<span className="text-base">🇺🇿</span>}/>
       </div>
 
@@ -165,9 +165,9 @@ export function ProfileScreen({ onLogout, user }:{ onLogout:()=>void; user:Publi
    * Своё имя на своей странице — не украшение: по нему человек
    * понимает, что вошёл он, а не сосед.
    */
-  const { t: перевод } = useT();
-  const имя = user ? `${user.firstName} ${user.lastName}`.trim() : перевод("prof_traveler");
-  const откуда = user?.country ? `🌍 ${user.country}` : `🌍 ${перевод("prof_traveler")}`;
+  const { t } = useT();
+  const имя = user ? `${user.firstName} ${user.lastName}`.trim() : t("prof_traveler");
+  const откуда = user?.country ? `🌍 ${user.country}` : `🌍 ${t("prof_traveler")}`;
   const снимок = user?.hasPhoto ? `/api/photo/${user.id}` : null;
   const [view, setView] = useState<"passport"|"bookings"|"support"|"chat"|"stats"|"settings">("passport");
   const [isPremium, setIsPremium] = useState(false);
@@ -211,14 +211,14 @@ export function ProfileScreen({ onLogout, user }:{ onLogout:()=>void; user:Publi
             <p className="text-xs truncate" style={{color:MUTED}}>{откуда}</p>
             <div className="flex gap-1.5 mt-1">
               <Badge text="EXPLORER" color={GREEN}/>
-              <Badge text="3 штампа" color={GOLD}/>
+              <Badge text="★ 3" color={GOLD}/>
               {isPremium&&<Badge text="PREMIUM" color="#1A1A2E"/>}
             </div>
           </div>
           {!isPremium&&<button onClick={()=>setShowPremium(true)} className="px-3 py-1.5 rounded-xl text-[10px] font-bold" style={{background:`linear-gradient(135deg,#1A1A2E,#0F3460)`,color:GOLD}}>👑 Pro</button>}
         </div>
         <div className="flex gap-1.5">
-          {TABS.map(([v,e,l])=><button key={v} onClick={()=>setView(v)} className="flex-1 py-2 rounded-xl text-[10px] font-semibold flex flex-col items-center gap-0.5" style={view===v?{background:GREEN,color:WHITE}:{background:CREAM,color:MUTED}}><span>{e}</span><span>{перевод(l)}</span></button>)}
+          {TABS.map(([v,e,l])=><button key={v} onClick={()=>setView(v)} className="flex-1 py-2 rounded-xl text-[10px] font-semibold flex flex-col items-center gap-0.5" style={view===v?{background:GREEN,color:WHITE}:{background:CREAM,color:MUTED}}><span>{e}</span><span>{t(l)}</span></button>)}
         </div>
       </div>
 
@@ -228,7 +228,7 @@ export function ProfileScreen({ onLogout, user }:{ onLogout:()=>void; user:Publi
           <div className="px-4">
             <div className="rounded-3xl overflow-hidden mb-4 shadow-lg" style={{background:`linear-gradient(135deg,#1A5C3A 0%,${GREEN} 55%,${GREEN_LIGHT} 100%)`}}>
               <div className="p-5">
-                <div className="flex items-start justify-between mb-4"><div><p className="text-[9px] font-bold tracking-widest uppercase" style={{color:GOLD}}>UzUp · Uzbekistan Travel</p><p className="text-white text-xl mt-0.5" style={{fontFamily:"'Fraunces',serif",fontWeight:600}}>Цифровой Паспорт</p></div><div className="text-right"><p className="text-white/40 text-[9px]">ПАСПОРТ №</p><p className="text-[10px] font-mono font-bold" style={{color:GOLD}}>UZT-2026-0841</p></div></div>
+                <div className="flex items-start justify-between mb-4"><div><p className="text-[9px] font-bold tracking-widest uppercase" style={{color:GOLD}}>UzUp · Uzbekistan Travel</p><p className="text-white text-xl mt-0.5" style={{fontFamily:"'Fraunces',serif",fontWeight:600}}>{t("prof_digital_passport")}</p></div><div className="text-right"><p className="text-white/40 text-[9px]">{t("prof_passport_no")}</p><p className="text-[10px] font-mono font-bold" style={{color:GOLD}}>UZT-2026-0841</p></div></div>
                 <div className="flex items-center gap-3 rounded-2xl p-3" style={{background:"rgba(255,255,255,0.12)"}}>
                   <div className="w-11 h-11 rounded-xl flex items-center justify-center text-2xl flex-shrink-0 overflow-hidden" style={{background:"rgba(255,255,255,0.15)"}}>
                     {snimok(снимок) ?? "👤"}
@@ -239,11 +239,11 @@ export function ProfileScreen({ onLogout, user }:{ onLogout:()=>void; user:Publi
               </div>
               <div className="h-6 flex border-t" style={{borderColor:"rgba(255,255,255,0.1)"}}>{Array.from({length:20}).map((_,i)=><div key={i} className="flex-1 flex items-center justify-center" style={{opacity:0.22}}><div className="w-1.5 h-1.5 rotate-45" style={{background:GOLD}}/></div>)}</div>
             </div>
-            <p className="font-bold text-sm mb-3" style={{color:TEXT}}>{перевод("prof_stamps")}</p>
+            <p className="font-bold text-sm mb-3" style={{color:TEXT}}>{t("prof_stamps")}</p>
             <div className="grid grid-cols-3 gap-2.5 mb-4">{STAMPS.map((s,i)=><div key={i} className="rounded-2xl p-3 aspect-square flex flex-col items-center justify-center text-center shadow-sm" style={s.earned?{background:GREEN}:{background:WHITE,border:`2px dashed ${BORDER}`}}><span className="text-2xl mb-1">{s.icon}</span><p className="font-bold text-[9px] leading-tight" style={{color:s.earned?WHITE:MUTED}}>{s.name}</p><p className="text-[8px] mt-0.5" style={{color:s.earned?GOLD:"#C0B0A0"}}>{s.earned?s.date:"Не посещено"}</p></div>)}</div>
-            <div className="bg-white rounded-2xl p-4 mb-3 shadow-sm border" style={{borderColor:BORDER}}><div className="flex items-center justify-between mb-2"><p className="font-semibold text-sm" style={{color:TEXT}}>Прогресс</p><p className="text-sm font-bold" style={{color:GREEN}}>3/6</p></div><div className="rounded-full h-2" style={{background:CREAM}}><div className="h-2 rounded-full" style={{background:GREEN,width:"50%"}}/></div><p className="text-xs mt-2" style={{color:MUTED}}>Ещё 2 штампа → скидка 15% у партнёров</p></div>
+            <div className="bg-white rounded-2xl p-4 mb-3 shadow-sm border" style={{borderColor:BORDER}}><div className="flex items-center justify-between mb-2"><p className="font-semibold text-sm" style={{color:TEXT}}>{t("prof_progress")}</p><p className="text-sm font-bold" style={{color:GREEN}}>3/6</p></div><div className="rounded-full h-2" style={{background:CREAM}}><div className="h-2 rounded-full" style={{background:GREEN,width:"50%"}}/></div><p className="text-xs mt-2" style={{color:MUTED}}>Ещё 2 штампа → скидка 15% у партнёров</p></div>
             <div className="rounded-2xl p-4 mb-4" style={{background:`linear-gradient(135deg,${GOLD},#C17B2F)`}}><p className="font-bold text-sm" style={{color:TEXT}}>🎁 5 штампов = скидка 15%</p><p className="text-xs mt-1" style={{color:TEXT+"99"}}>У партнёров: отели, рестораны, музеи</p></div>
-            <p className="font-bold text-sm mb-3" style={{color:TEXT}}>Достижения</p>
+            <p className="font-bold text-sm mb-3" style={{color:TEXT}}>{t("prof_achievements")}</p>
             <div className="grid grid-cols-3 gap-2.5 pb-4">{ACHIEVEMENTS.map((a,i)=><div key={i} className="bg-white rounded-2xl p-3 text-center shadow-sm border" style={{borderColor:BORDER,opacity:a.earned?1:0.55}}><div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl mb-1.5 mx-auto" style={{background:a.color+"18"}}>{a.emoji}</div><p className="text-[9px] font-semibold leading-tight" style={{color:TEXT}}>{a.title}</p><p className="text-[8px] mt-0.5" style={{color:a.earned?GREEN:MUTED}}>{a.earned?"✓ Получено":"В процессе"}</p></div>)}</div>
           </div>
         </div>
@@ -271,10 +271,10 @@ export function ProfileScreen({ onLogout, user }:{ onLogout:()=>void; user:Publi
         <div className="flex-1 overflow-y-auto hide-scroll animate-fade-in">
           <AdBanner isPremium={isPremium}/>
           <div className="px-4 space-y-4 pb-4">
-            <div className="grid grid-cols-2 gap-3">{[{e:"🏙️",v:"3",l:"Города"},{e:"📍",v:"12",l:"Мест"},{e:"🛣️",v:"847 км",l:"Пройдено"},{e:"🎧",v:"24",l:"Аудиогидов"}].map(s=><div key={s.l} className="bg-white rounded-2xl p-4 shadow-sm border text-center" style={{borderColor:BORDER}}><p className="text-3xl mb-1">{s.e}</p><p className="text-2xl font-bold" style={{color:GREEN,fontFamily:"'Fraunces',serif"}}>{s.v}</p><p className="text-xs mt-0.5" style={{color:MUTED}}>{s.l}</p></div>)}</div>
+            <div className="grid grid-cols-2 gap-3">{[{e:"🏙️",v:"3",l:t("prof_cnt_cities")},{e:"📍",v:"12",l:t("prof_cnt_places")},{e:"🛣️",v:"847 км",l:t("prof_passed")},{e:"🎧",v:"24",l:t("prof_cnt_audio")}].map(s=><div key={s.l} className="bg-white rounded-2xl p-4 shadow-sm border text-center" style={{borderColor:BORDER}}><p className="text-3xl mb-1">{s.e}</p><p className="text-2xl font-bold" style={{color:GREEN,fontFamily:"'Fraunces',serif"}}>{s.v}</p><p className="text-xs mt-0.5" style={{color:MUTED}}>{s.l}</p></div>)}</div>
             <CurrencyConverter/>
-            <div className="bg-white rounded-2xl p-4 shadow-sm border" style={{borderColor:BORDER}}><p className="font-bold text-sm mb-3" style={{color:TEXT}}>Активность</p>{[{e:"🕌",a:"Посетил",p:"Площадь Регистан",t:"Сегодня, 09:30"},{e:"🎧",a:"Слушал",p:"Гид Шахи-Зинда",t:"Сегодня, 11:15"},{e:"✅",a:"Завершил",p:"Самарканд за 1 день",t:"12 авг"}].map((a,i)=><div key={i} className="flex items-center gap-3 py-2.5 border-b last:border-0" style={{borderColor:"#F0EBE1"}}><span className="text-lg">{a.e}</span><div className="flex-1"><p className="text-sm" style={{color:TEXT}}><span style={{color:MUTED}}>{a.a}</span> {a.p}</p><p className="text-xs" style={{color:"#B0A090"}}>{a.t}</p></div></div>)}</div>
-            <div className="rounded-2xl p-4" style={{background:"#1A1410"}}><p className="font-bold text-sm mb-3" style={{color:GOLD}}>🆘 Экстренная помощь</p><div className="grid grid-cols-2 gap-2">{[{l:"Полиция",n:"102",e:"👮"},{l:"Скорая",n:"103",e:"🚑"},{l:"Пожарная",n:"101",e:"🚒"},{l:"Туристам",n:"1322",e:"ℹ️"}].map(s=><button key={s.l} className="rounded-xl p-3 text-left" style={{background:"rgba(255,255,255,0.08)"}}><span className="text-xl">{s.e}</span><p className="text-white text-xs font-semibold mt-1">{s.l}</p><p className="text-sm font-bold font-mono" style={{color:GOLD}}>{s.n}</p></button>)}</div><button className="mt-3 w-full py-3 rounded-xl text-sm font-bold bg-red-600 text-white flex items-center justify-center gap-2"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Отправить геолокацию</button></div>
+            <div className="bg-white rounded-2xl p-4 shadow-sm border" style={{borderColor:BORDER}}><p className="font-bold text-sm mb-3" style={{color:TEXT}}>{t("prof_activity")}</p>{[{e:"🕌",a:"Посетил",p:"Площадь Регистан",t:"Сегодня, 09:30"},{e:"🎧",a:"Слушал",p:"Гид Шахи-Зинда",t:"Сегодня, 11:15"},{e:"✅",a:"Завершил",p:"Самарканд за 1 день",t:"12 авг"}].map((a,i)=><div key={i} className="flex items-center gap-3 py-2.5 border-b last:border-0" style={{borderColor:"#F0EBE1"}}><span className="text-lg">{a.e}</span><div className="flex-1"><p className="text-sm" style={{color:TEXT}}><span style={{color:MUTED}}>{a.a}</span> {a.p}</p><p className="text-xs" style={{color:"#B0A090"}}>{a.t}</p></div></div>)}</div>
+            <div className="rounded-2xl p-4" style={{background:"#1A1410"}}><p className="font-bold text-sm mb-3" style={{color:GOLD}}>🆘 Экстренная помощь</p><div className="grid grid-cols-2 gap-2">{[{l:t("emg_police"),n:"102",e:"👮"},{l:t("emg_ambulance"),n:"103",e:"🚑"},{l:t("emg_fire"),n:"101",e:"🚒"},{l:t("prof_for_tourists"),n:"1322",e:"ℹ️"}].map(s=><button key={s.l} className="rounded-xl p-3 text-left" style={{background:"rgba(255,255,255,0.08)"}}><span className="text-xl">{s.e}</span><p className="text-white text-xs font-semibold mt-1">{s.l}</p><p className="text-sm font-bold font-mono" style={{color:GOLD}}>{s.n}</p></button>)}</div><button className="mt-3 w-full py-3 rounded-xl text-sm font-bold bg-red-600 text-white flex items-center justify-center gap-2"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>{t("prof_send_location")}</button></div>
           </div>
         </div>
       )}
