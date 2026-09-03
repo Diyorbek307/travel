@@ -14,7 +14,7 @@ import { ГОРОДА } from "@/data/geo";
 
 export function MapScreen({ onRoute }:{ onRoute:(r:Route)=>void }) {
   const { ROUTES } = useAppContent();
-  const { t } = useT();
+  const { t, трК } = useT();
   const погода = useWeather();
   const [mode, setMode] = useState<"map"|"routes"|"ai">("map");
   const [city, setCity]   = useState("Самарканд");
@@ -80,7 +80,7 @@ export function MapScreen({ onRoute }:{ onRoute:(r:Route)=>void }) {
             {city&&погода.get(city)&&(
               <div className="bg-white rounded-2xl p-4 shadow-sm border" style={{borderColor:BORDER}}>
                 <div className="flex items-center justify-between">
-                  <div><p className="font-bold text-base" style={{color:TEXT,fontFamily:"'Fraunces',serif"}}>{city}</p><p className="text-xs" style={{color:MUTED}}>{t("map_selected_city")}</p></div>
+                  <div><p className="font-bold text-base" style={{color:TEXT,fontFamily:"'Fraunces',serif"}}>{трК(city)}</p><p className="text-xs" style={{color:MUTED}}>{t("map_selected_city")}</p></div>
                   <div className="text-right"><span className="text-2xl">{погода.get(city)!.icon}</span><p className="font-bold text-lg" style={{color:TEXT}}>{погода.get(city)!.temp}°C</p><p className="text-[9px]" style={{color:MUTED}}>{t(погода.get(city)!.condKey)}</p></div>
                 </div>
                 <div className="flex gap-2 mt-3">

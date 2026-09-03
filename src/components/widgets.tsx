@@ -1,4 +1,5 @@
 "use client";
+import { useT } from "@/components/lang-provider";
 
 import { useAppContent } from "./content-provider";
 import { ADS } from "@/data/content";
@@ -102,6 +103,7 @@ export function OfflinePacks() {
 
 export function AdBanner({ isPremium }:{ isPremium:boolean }) {
   const { ADS: live } = useAppContent();
+  const { трК } = useT();
   // Пока сеть не ответила, показываем вшитые креативы: место под баннер
   // уже занято вёрсткой, и пустая дыра выглядела бы поломкой.
   const ads = live.length > 0 ? live : ADS;
@@ -116,14 +118,14 @@ export function AdBanner({ isPremium }:{ isPremium:boolean }) {
           <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{background:ad.color+"18"}}>{ad.emoji}</div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5 mb-0.5">
-              <span className="text-[8px] font-bold tracking-widest uppercase px-1.5 py-0.5 rounded" style={{background:"#F0EBE1",color:MUTED}}>{ad.label}</span>
+              <span className="text-[8px] font-bold tracking-widest uppercase px-1.5 py-0.5 rounded" style={{background:"#F0EBE1",color:MUTED}}>{трК(ad.label)}</span>
             </div>
             <p className="font-bold text-xs leading-tight" style={{color:TEXT}}>{ad.title}</p>
             <p className="text-[10px] mt-0.5 truncate" style={{color:MUTED}}>{ad.sub}</p>
           </div>
           <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
             <button onClick={()=>setDismissed(true)} className="text-[10px] font-medium px-1" style={{color:MUTED}}>✕</button>
-            <button onClick={()=>setIdx(i => (i + 1) % ads.length)} className="text-[9px] font-bold px-2.5 py-1 rounded-lg text-white" style={{background:ad.color}}>{ad.cta}</button>
+            <button onClick={()=>setIdx(i => (i + 1) % ads.length)} className="text-[9px] font-bold px-2.5 py-1 rounded-lg text-white" style={{background:ad.color}}>{трК(ad.cta)}</button>
           </div>
         </div>
       </div>

@@ -12,7 +12,7 @@ import { glass } from "@/lib/theme";
 
 
 export function PlaceDetail({ place, onBack, onPlay, onToast, onПуть }:{ place:Place; onBack:()=>void; onPlay:(p:Place)=>void; onToast:(m:string)=>void; onПуть:(название:string,город:string)=>void }) {
-  const { t } = useT();
+  const { t, трК } = useT();
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [fav, setFav] = useState(false);
@@ -33,7 +33,7 @@ export function PlaceDetail({ place, onBack, onPlay, onToast, onПуть }:{ pla
         <div className="absolute bottom-0 left-0 right-0 p-4">
           <div className="flex items-center gap-1.5 mb-1.5"><Badge text={place.type} color={GREEN}/>{place.audio&&<Badge text="🎧 Аудиогид" color={MUTED}/>}{place.qr&&<Badge text="QR" color={MUTED}/>}</div>
           <h2 className="text-white text-xl font-bold" style={{fontFamily:"'Fraunces',serif"}}>{place.name}</h2>
-          <p className="text-white/70 text-xs mt-0.5">{place.city} · ★ {place.rating} ({place.reviews.toLocaleString()} отзывов)</p>
+          <p className="text-white/70 text-xs mt-0.5">{трК(place.city)} · ★ {place.rating} ({place.reviews.toLocaleString()} отзывов)</p>
         </div>
       </div>
       <div className="flex-1 overflow-y-auto hide-scroll px-4 pt-4">
@@ -81,7 +81,7 @@ export function PlaceDetail({ place, onBack, onPlay, onToast, onПуть }:{ pla
 // ── Hotel Detail ───────────────────────────────────────────────────────────────
 
 export function HotelDetail({ hotel, onBack, onToast }:{ hotel:Hotel; onBack:()=>void; onToast:(m:string)=>void }) {
-  const { t } = useT();
+  const { t, трК } = useT();
   const [imgIdx, setImgIdx] = useState(0);
   const [guests, setGuests] = useState(2);
   const [nights, setNights] = useState(2);
@@ -99,7 +99,7 @@ export function HotelDetail({ hotel, onBack, onToast }:{ hotel:Hotel; onBack:()=
           {hotel.imgs.map((_,i)=><button key={i} onClick={()=>setImgIdx(i)} className="rounded-full transition-all" style={{width:i===imgIdx?18:6,height:6,background:i===imgIdx?WHITE:"rgba(255,255,255,0.5)"}}/>)}
         </div>
         <div className="absolute bottom-0 left-0 right-0 p-4">
-          <div className="flex items-center gap-2 mb-1"><Badge text={hotel.tag} color={GOLD}/><Badge text={hotel.city} color={GREEN}/></div>
+          <div className="flex items-center gap-2 mb-1"><Badge text={hotel.tag} color={GOLD}/><Badge text={трК(hotel.city)} color={GREEN}/></div>
           <p className="text-white text-lg font-bold" style={{fontFamily:"'Fraunces',serif"}}>{hotel.name}</p>
           <div className="flex items-center gap-3"><StarRow rating={hotel.rating}/><span className="text-white/60 text-xs">{hotel.reviews} отзывов</span></div>
         </div>
@@ -163,7 +163,7 @@ export function HotelDetail({ hotel, onBack, onToast }:{ hotel:Hotel; onBack:()=
 // ── Restaurant Detail ─────────────────────────────────────────────────────────
 
 export function RestaurantDetail({ r, onBack, onToast, onПуть }:{ r:Restaurant; onBack:()=>void; onToast:(m:string)=>void; onПуть:(название:string,город:string)=>void }) {
-  const { t } = useT();
+  const { t, трК } = useT();
   const [fav, setFav] = useState(false);
   return (
     <div className="flex flex-col h-full animate-slide-up" style={{background:CREAM}}>
@@ -173,7 +173,7 @@ export function RestaurantDetail({ r, onBack, onToast, onПуть }:{ r:Restaura
         <button onClick={onBack} className="absolute top-12 left-4 w-9 h-9 rounded-xl flex items-center justify-center backdrop-blur-sm" style={{...glass}}><svg width="16" height="16" fill="none" stroke="white" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
         <button onClick={()=>setFav(!fav)} className="absolute top-12 right-4 w-9 h-9 rounded-xl flex items-center justify-center backdrop-blur-sm" style={{...glass}}><svg width="16" height="16" viewBox="0 0 24 24" fill={fav?GOLD:"none"} stroke={fav?GOLD:"white"} strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
         <div className="absolute bottom-0 left-0 right-0 p-4">
-          <div className="flex items-center gap-1.5 mb-1"><Badge text={r.cuisine} color={"#C1603A"}/><Badge text={r.city} color={GREEN}/></div>
+          <div className="flex items-center gap-1.5 mb-1"><Badge text={r.cuisine} color={"#C1603A"}/><Badge text={трК(r.city)} color={GREEN}/></div>
           <p className="text-white text-xl font-bold" style={{fontFamily:"'Fraunces',serif"}}>{r.name}</p>
           <div className="flex items-center gap-3 mt-0.5"><StarRow rating={r.rating}/><span className="text-white/70 text-xs">{r.reviews} отзывов</span><span className="text-white/70 text-xs">{r.price}</span></div>
         </div>
@@ -210,7 +210,7 @@ export function RestaurantDetail({ r, onBack, onToast, onПуть }:{ r:Restaura
 // ── Route Detail ───────────────────────────────────────────────────────────────
 
 export function RouteDetail({ route, onBack }:{ route:Route; onBack:()=>void }) {
-  const { t } = useT();
+  const { t, трК } = useT();
   return (
     <div className="flex flex-col h-full animate-slide-up" style={{background:CREAM}}>
       <div className="relative px-4 pt-12 pb-5" style={{background:route.color}}>

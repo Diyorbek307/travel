@@ -110,7 +110,7 @@ export function CurrencyConverter() {
 // ── Practical Info Screen ──────────────────────────────────────────────────────
 
 export function PracticalScreen({ onBack }:{ onBack:()=>void }) {
-  const { t } = useT();
+  const { t, трК } = useT();
   const SECTIONS = [
     { title:"Валюта и деньги", tk:"pr_money" as const,  icon:"💱",color:"#C17B2F",items:["Курс смотрите в конвертере выше — он живой","Обменивайте в банках или обменниках","Карты принимают в крупных отелях","Наличные нужны для рынков и кафе"] },
     { title:"Транспорт", tk:"pr_transport" as const,        icon:"🚌",color:GREEN,        items:["Яндекс.Такси — самый удобный","Афросиаб: Ташкент–Самарканд 2 ч $12","Самарканд–Бухара 1.5 ч $9","Метро есть только в Ташкенте","Аренда авто от $30/день"] },
@@ -139,7 +139,7 @@ export function PracticalScreen({ onBack }:{ onBack:()=>void }) {
               <div className="flex-1"><p className="font-bold text-sm" style={{color:TEXT}}>{t(s.tk)}</p></div>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={MUTED} strokeWidth="2" className="flex-shrink-0" style={{transform:open===i?"rotate(90deg)":"none",transition:"transform 0.2s"}}><polyline points="9 18 15 12 9 6"/></svg>
             </button>
-            {open===i&&<div className="px-4 pb-4 border-t" style={{borderColor:BORDER}}><ul className="space-y-2 mt-3">{s.items.map((item,j)=><li key={j} className="flex items-start gap-2.5"><div className="w-1.5 h-1.5 rounded-full flex-shrink-0 mt-1.5" style={{background:s.color}}/><p className="text-xs leading-relaxed" style={{color:MUTED}}>{item}</p></li>)}</ul></div>}
+            {open===i&&<div className="px-4 pb-4 border-t" style={{borderColor:BORDER}}><ul className="space-y-2 mt-3">{s.items.map((item,j)=><li key={j} className="flex items-start gap-2.5"><div className="w-1.5 h-1.5 rounded-full flex-shrink-0 mt-1.5" style={{background:s.color}}/><p className="text-xs leading-relaxed" style={{color:MUTED}}>{трК(item)}</p></li>)}</ul></div>}
           </div>
         ))}
         <div className="pb-4"/>

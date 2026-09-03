@@ -165,7 +165,7 @@ export function ProfileScreen({ onLogout, user }:{ onLogout:()=>void; user:Publi
    * Своё имя на своей странице — не украшение: по нему человек
    * понимает, что вошёл он, а не сосед.
    */
-  const { t } = useT();
+  const { t, трК } = useT();
   const имя = user ? `${user.firstName} ${user.lastName}`.trim() : t("prof_traveler");
   const откуда = user?.country ? `🌍 ${user.country}` : `🌍 ${t("prof_traveler")}`;
   const снимок = user?.hasPhoto ? `/api/photo/${user.id}` : null;
@@ -240,7 +240,7 @@ export function ProfileScreen({ onLogout, user }:{ onLogout:()=>void; user:Publi
               <div className="h-6 flex border-t" style={{borderColor:"rgba(255,255,255,0.1)"}}>{Array.from({length:20}).map((_,i)=><div key={i} className="flex-1 flex items-center justify-center" style={{opacity:0.22}}><div className="w-1.5 h-1.5 rotate-45" style={{background:GOLD}}/></div>)}</div>
             </div>
             <p className="font-bold text-sm mb-3" style={{color:TEXT}}>{t("prof_stamps")}</p>
-            <div className="grid grid-cols-3 gap-2.5 mb-4">{STAMPS.map((s,i)=><div key={i} className="rounded-2xl p-3 aspect-square flex flex-col items-center justify-center text-center shadow-sm" style={s.earned?{background:GREEN}:{background:WHITE,border:`2px dashed ${BORDER}`}}><span className="text-2xl mb-1">{s.icon}</span><p className="font-bold text-[9px] leading-tight" style={{color:s.earned?WHITE:MUTED}}>{s.name}</p><p className="text-[8px] mt-0.5" style={{color:s.earned?GOLD:"#C0B0A0"}}>{s.earned?s.date:"Не посещено"}</p></div>)}</div>
+            <div className="grid grid-cols-3 gap-2.5 mb-4">{STAMPS.map((s,i)=><div key={i} className="rounded-2xl p-3 aspect-square flex flex-col items-center justify-center text-center shadow-sm" style={s.earned?{background:GREEN}:{background:WHITE,border:`2px dashed ${BORDER}`}}><span className="text-2xl mb-1">{s.icon}</span><p className="font-bold text-[9px] leading-tight" style={{color:s.earned?WHITE:MUTED}}>{s.name}</p><p className="text-[8px] mt-0.5" style={{color:s.earned?GOLD:"#C0B0A0"}}>{s.earned?s.date:трК("Не посещено")}</p></div>)}</div>
             <div className="bg-white rounded-2xl p-4 mb-3 shadow-sm border" style={{borderColor:BORDER}}><div className="flex items-center justify-between mb-2"><p className="font-semibold text-sm" style={{color:TEXT}}>{t("prof_progress")}</p><p className="text-sm font-bold" style={{color:GREEN}}>3/6</p></div><div className="rounded-full h-2" style={{background:CREAM}}><div className="h-2 rounded-full" style={{background:GREEN,width:"50%"}}/></div><p className="text-xs mt-2" style={{color:MUTED}}>Ещё 2 штампа → скидка 15% у партнёров</p></div>
             <div className="rounded-2xl p-4 mb-4" style={{background:`linear-gradient(135deg,${GOLD},#C17B2F)`}}><p className="font-bold text-sm" style={{color:TEXT}}>🎁 5 штампов = скидка 15%</p><p className="text-xs mt-1" style={{color:TEXT+"99"}}>У партнёров: отели, рестораны, музеи</p></div>
             <p className="font-bold text-sm mb-3" style={{color:TEXT}}>{t("prof_achievements")}</p>

@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { SEED } from "@/data/seed";
 import type { Content } from "@/lib/types";
+import { useT } from "@/components/lang-provider";
 
 /**
  * Содержимое приложения.
@@ -48,10 +49,22 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
  */
 export function useAppContent() {
   const content = useContext(ContentContext);
+  const { трК } = useT();
+
+  /*
+   * Переводим только те поля, что не служат ключами поиска: категорию,
+   * тег, кухню. Имя и город остаются как есть — по городу ищется погода,
+   * а имя-топоним мы не коверкаем. Незнакомая словарю строка (новое из
+   * панели) возвращается как введена.
+   */
+  const мПлейс = (p: (typeof content.places)[number]) => ({ ...p, type: трК(p.type) });
+  const мОтель = (h: (typeof content.hotels)[number]) => ({ ...h, tag: трК(h.tag) });
+  const мРест = (r: (typeof content.restaurants)[number]) => ({ ...r, cuisine: трК(r.cuisine) });
+
   return {
-    PLACES: content.places,
-    HOTELS: content.hotels,
-    RESTAURANTS: content.restaurants,
+    PLACES: content.places.map(мПлейс),
+    HOTELS: content.hotels.map(мОтель),
+    RESTAURANTS: content.restaurants.map(мРест),
     ROUTES: content.routes,
     EVENTS: content.events,
     // На главной показываются только отмеченные города; порядок задаёт

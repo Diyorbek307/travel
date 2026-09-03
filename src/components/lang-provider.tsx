@@ -8,6 +8,7 @@ import {
   type Locale,
   type TKey,
 } from "@/lib/i18n";
+import { переведиКонтент } from "@/lib/content-i18n";
 
 /**
  * Язык интерфейса для всего приложения.
@@ -27,6 +28,8 @@ interface Контекст {
   lang: Locale;
   setLang: (l: Locale) => void;
   t: (key: TKey) => string;
+  /** Перевод строки содержимого (категории, города, теги). */
+  трК: (текст: string) => string;
   dir: "ltr" | "rtl";
 }
 
@@ -68,6 +71,7 @@ export function LangProvider({ children }: { children: React.ReactNode }) {
       lang,
       setLang,
       t: (key: TKey) => переведи(key, lang),
+      трК: (текст: string) => переведиКонтент(текст, lang),
       dir: LOCALE_META[lang].dir,
     }),
     [lang, setLang],
@@ -85,6 +89,7 @@ export function useT(): Контекст {
       lang: "en",
       setLang: () => undefined,
       t: (key) => переведи(key, "en"),
+      трК: (текст: string) => переведиКонтент(текст, "en"),
       dir: "ltr",
     };
   }

@@ -15,7 +15,7 @@ import TaxiOrder from "@/components/taxi-order";
 
 export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, onRestaurant, onMenu, onTab, onTransport, isPremium }:{ onPlace:(p:Place)=>void; onSearch:()=>void; onHotel:(h:Hotel)=>void; onNotifs:()=>void; onPractical:()=>void; onRestaurant:(r:Restaurant)=>void; onMenu:()=>void; onTab:(t:Tab)=>void; onTransport:()=>void; isPremium:boolean; }) {
   const { EVENTS, HOTELS, PLACES, RESTAURANTS } = useAppContent();
-  const { t, lang } = useT();
+  const { t, lang, трК } = useT();
   const погода = useWeather();
   const самарканд = погода.get("Самарканд");
   return (
@@ -113,7 +113,7 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
             const w = погода.get(city);
             return (
               <div key={city} className="flex-shrink-0 bg-white rounded-2xl p-3 shadow-sm border text-center" style={{borderColor:BORDER,minWidth:96}}>
-                <p className="text-[10px] font-bold mb-1 truncate" style={{color:TEXT}}>{city}</p>
+                <p className="text-[10px] font-bold mb-1 truncate" style={{color:TEXT}}>{трК(city)}</p>
                 <div className="flex items-center justify-center gap-1">
                   <p className="font-bold" style={{color:TEXT,fontSize:28,fontFamily:"'Fraunces',serif",lineHeight:1}}>{w ? `${w.temp}°` : "—"}</p>
                   <span style={{fontSize:30,lineHeight:1}}>{w?.icon ?? "🌡️"}</span>
@@ -144,7 +144,7 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
               <div className="relative z-10 p-4">
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl mb-2.5" style={{background:"rgba(255,255,255,0.22)"}}>{ev.emoji}</div>
                 <p className="font-bold text-sm text-white leading-tight">{ev.name}</p>
-                <p className="text-[9px] mt-1 font-semibold" style={{color:"rgba(255,255,255,0.75)"}}>{ev.date} · {ev.city}</p>
+                <p className="text-[9px] mt-1 font-semibold" style={{color:"rgba(255,255,255,0.75)"}}>{ev.date} · {трК(ev.city)}</p>
                 <p className="text-[9px] mt-2 leading-relaxed" style={{color:"rgba(255,255,255,0.7)"}}>{ev.desc}</p>
                 <button className="mt-3 px-3 py-1.5 rounded-xl text-[9px] font-bold" style={{background:"rgba(255,255,255,0.22)",color:"white"}}>📅 Напомнить</button>
               </div>
@@ -176,7 +176,7 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
               {(()=>{const w=погода.get(h.city);return w?<div className="absolute top-3 right-3"><span className="text-[8px] font-bold px-2 py-0.5 rounded-full" style={{background:"rgba(0,0,0,0.5)",backdropFilter:"blur(6px)",color:"white"}}>{w.icon}{w.temp}°</span></div>:null;})()}
               {/* Info */}
               <div className="absolute bottom-0 left-0 right-0 p-3">
-                <p className="text-[8px] mb-0.5" style={{color:"rgba(255,255,255,0.45)"}}>📍 {h.city}</p>
+                <p className="text-[8px] mb-0.5" style={{color:"rgba(255,255,255,0.45)"}}>📍 {трК(h.city)}</p>
                 <p className="text-white font-bold leading-tight mb-1.5" style={{fontSize:13,fontFamily:"'Fraunces',serif"}}>{h.name}</p>
                 <div className="flex gap-3 pb-2 mb-2 border-b" style={{borderColor:"rgba(255,255,255,0.1)"}}>
                   <div><p className="text-white font-bold text-[10px]">{h.rating}★</p><p className="text-[7px]" style={{color:"rgba(255,255,255,0.4)"}}>Рейтинг</p></div>
@@ -207,7 +207,7 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
               <div className="absolute top-3 left-3"><span className="text-[8px] font-bold px-2 py-0.5 rounded-full" style={{background:"rgba(193,96,58,0.92)",color:WHITE}}>{r.cuisine}</span></div>
               {(()=>{const w=погода.get(r.city);return w?<div className="absolute top-3 right-3"><span className="text-[8px] font-bold px-2 py-0.5 rounded-full" style={{background:"rgba(0,0,0,0.5)",backdropFilter:"blur(6px)",color:"white"}}>{w.icon}{w.temp}°</span></div>:null;})()}
               <div className="absolute bottom-0 left-0 right-0 p-3">
-                <p className="text-[8px] mb-0.5" style={{color:"rgba(255,255,255,0.45)"}}>📍 {r.city}</p>
+                <p className="text-[8px] mb-0.5" style={{color:"rgba(255,255,255,0.45)"}}>📍 {трК(r.city)}</p>
                 <p className="text-white font-bold leading-tight mb-1.5" style={{fontSize:12,fontFamily:"'Fraunces',serif"}}>{r.name}</p>
                 <div className="flex gap-3 pb-1.5 mb-1.5 border-b" style={{borderColor:"rgba(255,255,255,0.1)"}}>
                   <div><p className="text-white font-bold text-[10px]">{r.rating}★</p><p className="text-[7px]" style={{color:"rgba(255,255,255,0.4)"}}>Рейтинг</p></div>

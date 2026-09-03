@@ -11,7 +11,7 @@ import { AnimatedBg } from "@/components/animated-bg";
 
 
 export function NotifsPanel({ onClose }:{ onClose:()=>void }) {
-  const { t } = useT();
+  const { t, трК } = useT();
   const { PLACES, POPULAR_CITIES } = useAppContent();
   const [notifs, setNotifs] = useState(NOTIFS);
   const unread = notifs.filter(n=>n.unread).length;
@@ -31,8 +31,8 @@ export function NotifsPanel({ onClose }:{ onClose:()=>void }) {
           <button key={i} onClick={()=>setNotifs(p=>p.map((x,j)=>j===i?{...x,unread:false}:x))} className="w-full bg-white rounded-2xl p-4 border text-left flex items-start gap-3 shadow-sm" style={{borderColor:n.unread?GREEN:BORDER,borderWidth:n.unread?"1.5px":"1px"}}>
             <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{background:n.unread?GREEN+"15":CREAM}}>{n.emoji}</div>
             <div className="flex-1 min-w-0">
-              <div className="flex items-center justify-between gap-2"><p className="font-bold text-sm" style={{color:TEXT}}>{n.title}</p>{n.unread&&<div className="w-2 h-2 rounded-full flex-shrink-0" style={{background:GREEN}}/>}</div>
-              <p className="text-xs mt-0.5 leading-relaxed" style={{color:MUTED}}>{n.body}</p>
+              <div className="flex items-center justify-between gap-2"><p className="font-bold text-sm" style={{color:TEXT}}>{трК(n.title)}</p>{n.unread&&<div className="w-2 h-2 rounded-full flex-shrink-0" style={{background:GREEN}}/>}</div>
+              <p className="text-xs mt-0.5 leading-relaxed" style={{color:MUTED}}>{трК(n.body)}</p>
               <p className="text-[10px] mt-1.5" style={{color:n.unread?GREEN:"#B0A090"}}>{n.time}</p>
             </div>
           </button>
@@ -43,7 +43,7 @@ export function NotifsPanel({ onClose }:{ onClose:()=>void }) {
 }
 
 export function SearchModal({ onClose, onPlace }:{ onClose:()=>void; onPlace:(p:Place)=>void }) {
-  const { t } = useT();
+  const { t, трК } = useT();
   const { PLACES, POPULAR_CITIES } = useAppContent();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Place[]>([]);
@@ -74,7 +74,7 @@ export function SearchModal({ onClose, onPlace }:{ onClose:()=>void; onPlace:(p:
                 <button key={c.name} onClick={()=>setQuery(c.name)} className="relative rounded-2xl overflow-hidden text-left" style={{height:90}}>
                   <img src={c.img} alt={c.name} className="w-full h-full object-cover"/>
                   <div className="absolute inset-0" style={{background:"linear-gradient(to top,rgba(0,0,0,0.65) 0%,transparent 65%)"}}/>
-                  <div className="absolute bottom-0 left-0 right-0 p-2.5"><p className="text-white font-bold text-sm">{c.name}</p><StarRow rating={c.rating}/></div>
+                  <div className="absolute bottom-0 left-0 right-0 p-2.5"><p className="text-white font-bold text-sm">{трК(c.name)}</p><StarRow rating={c.rating}/></div>
                 </button>
               ))}
             </div>
@@ -101,7 +101,7 @@ export function SearchModal({ onClose, onPlace }:{ onClose:()=>void; onPlace:(p:
 // ── Mini Audio Player ──────────────────────────────────────────────────────────
 
 export function LoginModal({ onClose, onLogin }:{ onClose:()=>void; onLogin:()=>void }) {
-  const { t } = useT();
+  const { t, трК } = useT();
   const { PLACES, POPULAR_CITIES } = useAppContent();
   const PROVIDERS = [
     { e:"🌐", label:"Продолжить с Google",    color:"#4285F4" },
@@ -150,7 +150,7 @@ export function LoginModal({ onClose, onLogin }:{ onClose:()=>void; onLogin:()=>
 // ── Currency Converter ─────────────────────────────────────────────────────────
 
 export function PremiumModal({ onClose, onActivate }:{ onClose:()=>void; onActivate:()=>void }) {
-  const { t } = useT();
+  const { t, трК } = useT();
   const { PLACES, POPULAR_CITIES } = useAppContent();
   const [plan, setPlan] = useState<"month"|"year">("year");
   const [идёт, setИдёт] = useState(false);
