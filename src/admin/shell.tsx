@@ -33,6 +33,19 @@ import Integrations from "./components/Integrations";
 import AccessControl from "./components/AccessControl";
 import Staff from "./components/Staff";
 
+/*
+ * В меню только разделы с настоящими данными: они читают и пишут через
+ * /api (учётные записи, брони, отзывы, чат, статистика) или через общий
+ * контент /api/content (города, места, отели, рестораны, события, туры,
+ * аудиогиды, реклама).
+ *
+ * Демонстрационные разделы с вымышленными людьми и цифрами — сотрудники,
+ * гиды, «карта геолокации», финансы, промокоды, push-кампании, календарь
+ * туров, интеграции, управление доступом, транспорт — убраны: показывать
+ * выдуманные данные как настоящие нельзя. Сами компоненты остались в
+ * коде (в `pages` ниже) — раздел вернётся в меню, как только за ним
+ * появится реальный источник данных.
+ */
 const NAV_GROUPS = [
   {
     label: "Операции",
@@ -40,7 +53,6 @@ const NAV_GROUPS = [
       { id: "dashboard", label: "Дашборд", icon: "⬡" },
       { id: "bookings", label: "Бронирования", icon: "◫" },
       { id: "chat", label: "Чат поддержки", icon: "◈", badge: true },
-      { id: "calendar", label: "Календарь туров", icon: "◉" },
       { id: "analytics", label: "Аналитика", icon: "◎" },
     ],
   },
@@ -49,7 +61,6 @@ const NAV_GROUPS = [
     items: [
       { id: "destinations", label: "Направления", icon: "◉" },
       { id: "tours", label: "Туры", icon: "◎" },
-      { id: "guides", label: "Гиды", icon: "◈" },
       { id: "hotels", label: "Отели", icon: "▣" },
       { id: "restaurants", label: "Рестораны", icon: "◇" },
       { id: "events", label: "События", icon: "◈" },
@@ -61,7 +72,6 @@ const NAV_GROUPS = [
     label: "Пользователи",
     items: [
       { id: "users", label: "Пользователи", icon: "◎" },
-      { id: "tracking", label: "Карта геолокации", icon: "◈" },
       { id: "reviews", label: "Отзывы", icon: "◇" },
     ],
   },
@@ -69,15 +79,6 @@ const NAV_GROUPS = [
     label: "Монетизация",
     items: [
       { id: "ads", label: "Реклама", icon: "◈" },
-      { id: "promos", label: "Промокоды", icon: "◇" },
-      { id: "finance", label: "Финансы", icon: "▣" },
-      { id: "push", label: "Push-кампании", icon: "◉" },
-    ],
-  },
-  {
-    label: "Транспорт",
-    items: [
-      { id: "transport", label: "Транспорт", icon: "◉" },
     ],
   },
   {
@@ -85,15 +86,6 @@ const NAV_GROUPS = [
     items: [
       { id: "preview", label: "Превью приложения", icon: "◎" },
       { id: "theme", label: "Визуальный редактор", icon: "◈" },
-    ],
-  },
-  {
-    label: "Система",
-    items: [
-      { id: "notifs", label: "Уведомления", icon: "◈" },
-      { id: "integrations", label: "Интеграции", icon: "⬡" },
-      { id: "access", label: "Управление доступом", icon: "◉" },
-      { id: "staff", label: "Сотрудники", icon: "◎" },
     ],
   },
   {
