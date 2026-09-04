@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { BORDER, GOLD, MUTED, TEXT, WHITE } from "@/lib/theme";
+import { useT } from "@/components/lang-provider";
 
 /**
  * Отзывы о месте.
@@ -31,6 +32,7 @@ function Звёзды({ n, размер = 14 }: { n: number; размер?: numb
 
 export default function ReviewForm({ placeId, placeName }: { placeId: string; placeName: string }) {
   const [отзывы, setОтзывы] = useState<Review[]>([]);
+  const { t } = useT();
   const [rating, setRating] = useState(5);
   const [text, setText] = useState("");
   const [итог, setИтог] = useState<"нет" | "ок" | "нужен-вход" | "ошибка">("нет");
@@ -109,7 +111,7 @@ export default function ReviewForm({ placeId, placeName }: { placeId: string; pl
           value={text}
           onChange={(e) => setText(e.target.value)}
           maxLength={1000}
-          placeholder="Что понравилось, что нет"
+          placeholder={t("review_ph")}
           className="w-full rounded-xl px-3 py-2.5 text-sm outline-none"
           style={{ background: "var(--cream)", border: `1px solid ${BORDER}`, color: TEXT }}
         />

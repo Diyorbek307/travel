@@ -9,6 +9,7 @@ import type { Hotel, Place } from "@/lib/types";
 import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE } from "@/lib/theme";
 
 export function MiniPlayer({ place, onClose }:{ place:Place; onClose:()=>void }) {
+  const { t } = useT();
   const [playing, setPlaying] = useState(true);
   const [progress, setProgress] = useState(18);
   const timerRef = useRef<ReturnType<typeof setInterval>|null>(null);
@@ -23,7 +24,7 @@ export function MiniPlayer({ place, onClose }:{ place:Place; onClose:()=>void })
         <div className="h-0.5 w-full" style={{background:"rgba(255,255,255,0.2)"}}><div className="h-0.5" style={{background:GOLD,width:`${progress}%`,transition:"width 0.2s linear"}}/></div>
         <div className="flex items-center gap-3 px-3 py-2.5">
           <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0"><img src={place.img} alt={place.name} className="w-full h-full object-cover"/></div>
-          <div className="flex-1 min-w-0"><p className="text-white font-semibold text-xs truncate">{place.name}</p><p className="text-white/60 text-[10px]">Аудиогид · {Math.floor(progress*8.42/100/60)}:{String(Math.floor(progress*8.42/100%60)).padStart(2,"0")} / 8:42</p></div>
+          <div className="flex-1 min-w-0"><p className="text-white font-semibold text-xs truncate">{place.name}</p><p className="text-white/60 text-[10px]">{t("d_audioguide")} · {Math.floor(progress*8.42/100/60)}:{String(Math.floor(progress*8.42/100%60)).padStart(2,"0")} / 8:42</p></div>
           <div className="flex items-center gap-2">
             <button onClick={()=>setPlaying(!playing)} className="w-8 h-8 rounded-xl flex items-center justify-center" style={{background:GOLD}}>
               <svg width="12" height="12" viewBox="0 0 24 24" fill={TEXT}>{playing?<><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></>:<polygon points="5 3 19 12 5 21 5 3"/>}</svg>
@@ -39,6 +40,7 @@ export function MiniPlayer({ place, onClose }:{ place:Place; onClose:()=>void })
 // ── Place Detail ───────────────────────────────────────────────────────────────
 
 export function OfflinePacks() {
+  const { t, трК } = useT();
   type Pack = { name:string; count:number; size:string; done:boolean };
   const [packs, setPacks] = useState<Pack[]>([
     { name:"Самарканд", count:127, size:"2.4 ГБ", done:true  },
@@ -63,7 +65,7 @@ export function OfflinePacks() {
   };
   return (
     <div>
-      <p className="font-bold text-sm mb-2.5" style={{color:TEXT}}>⬇️ Офлайн-пакеты</p>
+      <p className="font-bold text-sm mb-2.5" style={{color:TEXT}}>⬇️ {t("off_packs")}</p>
       <div className="space-y-2.5">
         {packs.map(pack=>{
           const pct = progress[pack.name];
@@ -75,16 +77,16 @@ export function OfflinePacks() {
                   <span style={{color:pack.done?GREEN:MUTED}}>{pack.done?"✓":"⬇"}</span>
                 </div>
                 <div className="flex-1">
-                  <p className="font-semibold text-sm" style={{color:TEXT}}>{pack.name}</p>
-                  <p className="text-xs" style={{color:MUTED}}>{pack.count} гидов · {pack.size}</p>
+                  <p className="font-semibold text-sm" style={{color:TEXT}}>{трК(pack.name)}</p>
+                  <p className="text-xs" style={{color:MUTED}}>{pack.count} {t("off_guides")} · {pack.size}</p>
                 </div>
-                {!pack.done&&!downloading&&<button onClick={()=>startDownload(pack.name)} className="px-3 py-1.5 rounded-lg text-xs font-bold" style={{background:GREEN,color:WHITE}}>Скачать</button>}
-                {pack.done&&<span className="text-xs font-semibold px-2 py-1 rounded-lg" style={{background:GREEN+"18",color:GREEN}}>Готово</span>}
+                {!pack.done&&!downloading&&<button onClick={()=>startDownload(pack.name)} className="px-3 py-1.5 rounded-lg text-xs font-bold" style={{background:GREEN,color:WHITE}}>{t("off_download")}</button>}
+                {pack.done&&<span className="text-xs font-semibold px-2 py-1 rounded-lg" style={{background:GREEN+"18",color:GREEN}}>{t("off_done")}</span>}
               </div>
               {downloading&&(
                 <div className="mt-2.5">
                   <div className="flex justify-between mb-1">
-                    <span className="text-xs" style={{color:MUTED}}>Загрузка…</span>
+                    <span className="text-xs" style={{color:MUTED}}>{t("off_loading")}</span>
                     <span className="text-xs font-semibold" style={{color:GREEN}}>{Math.round(pct??0)}%</span>
                   </div>
                   <div className="rounded-full h-1.5 overflow-hidden" style={{background:BORDER}}>

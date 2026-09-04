@@ -303,6 +303,11 @@ const ЗАПИСИ: [string, Строка][] = [
   с("Весь день", { en: "All day", uz: "Kun boʻyi", zh: "全天", ko: "하루 종일", de: "Ganztags", fr: "Toute la journée", ja: "終日", tr: "Tüm gün", ar: "طوال اليوم" }),
   с("История + Архитектура + Кухня", { en: "History + Architecture + Cuisine", uz: "Tarix + Meʼmorchilik + Oshxona", zh: "历史 + 建筑 + 美食", ko: "역사 + 건축 + 미식", de: "Geschichte + Architektur + Küche", fr: "Histoire + Architecture + Cuisine", ja: "歴史 + 建築 + 料理", tr: "Tarih + Mimari + Mutfak", ar: "تاريخ + عمارة + مطبخ" }),
   с("Бесплатно", { en: "Free", uz: "Bepul", zh: "免费", ko: "무료", de: "Kostenlos", fr: "Gratuit", ja: "無料", tr: "Ücretsiz", ar: "مجاناً" }),
+  // ── Даты событий ─────────────────────────────────────────────────
+  с("21 марта", { en: "21 March", uz: "21-mart", zh: "3月21日", ko: "3월 21일", de: "21. März", fr: "21 mars", ja: "3月21日", tr: "21 Mart", ar: "21 مارس" }),
+  с("12–15 июня", { en: "12–15 June", uz: "12–15-iyun", zh: "6月12–15日", ko: "6월 12–15일", de: "12.–15. Juni", fr: "12–15 juin", ja: "6月12〜15日", tr: "12–15 Haziran", ar: "12–15 يونيو" }),
+  с("5 октября", { en: "5 October", uz: "5-oktabr", zh: "10月5日", ko: "10월 5일", de: "5. Oktober", fr: "5 octobre", ja: "10月5日", tr: "5 Ekim", ar: "5 أكتوبر" }),
+  с("Март", { en: "March", uz: "Mart", zh: "3月", ko: "3월", de: "März", fr: "Mars", ja: "3月", tr: "Mart", ar: "مارس" }),
 ];
 
 const СЛОВАРЬ: Map<string, Строка> = new Map(ЗАПИСИ);

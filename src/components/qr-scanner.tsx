@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { BORDER, GREEN, MUTED, TEXT, WHITE } from "@/lib/theme";
+import { useT } from "@/components/lang-provider";
 
 /**
  * Сканер QR-кода.
@@ -28,6 +29,7 @@ export default function QrScanner({
   onClose: () => void;
 }) {
   const узел = useRef<HTMLDivElement>(null);
+  const { t } = useT();
   const [состояние, setСостояние] = useState<"пуск" | "идёт" | "отказ" | "нет-камеры">("пуск");
 
   useEffect(() => {
@@ -79,7 +81,7 @@ export default function QrScanner({
   return (
     <div className="fixed inset-0 z-[60] flex flex-col" style={{ background: "rgba(0,0,0,0.92)" }}>
       <div className="flex items-center justify-between px-4 pt-14 pb-3">
-        <p className="text-sm font-bold text-white">Наведите на код у объекта</p>
+        <p className="text-sm font-bold text-white">{t("qr_aim")}</p>
         <button
           onClick={onClose}
           className="rounded-xl px-3 py-1.5 text-xs font-semibold"

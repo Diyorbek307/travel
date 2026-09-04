@@ -552,6 +552,23 @@ export const СЛОВАРЬ = {
   taxi_choose: row("Choose a destination", "Выберите, куда едем", "Qayerga borishni tanlang", "请选择目的地", "목적지를 선택하세요", "Ziel wählen", "Choisissez une destination", "行き先を選んでください", "Bir varış noktası seçin", "اختر الوجهة"),
   taxi_footer: row("The ride is handled by Yandex Go: payment, car and ride support are there.", "Поездку оформляет Яндекс Go: там оплата, машина и поддержка по поездке.", "Safarni Yandex Go rasmiylashtiradi: toʻlov, mashina va yordam oʻsha yerda.", "行程由 Yandex Go 处理：支付、车辆和行程支持都在其中。", "탑승은 Yandex Go가 처리합니다: 결제·차량·지원이 그곳에 있습니다.", "Die Fahrt wickelt Yandex Go ab: Zahlung, Auto und Support sind dort.", "La course est gérée par Yandex Go : paiement, voiture et assistance y sont.", "配車はYandex Goが担当します。支払い・車両・サポートはそちらで。", "Yolculuğu Yandex Go yürütür: ödeme, araç ve destek oradadır.", "الرحلة يديرها Yandex Go: الدفع والسيارة والدعم هناك."),
   taxi_my_location: row("My location", "Моё местоположение", "Mening joylashuvim", "我的位置", "내 위치", "Mein Standort", "Ma position", "現在地", "Konumum", "موقعي"),
+
+  // ── Хвосты: настройки, штампы, QR, отзыв, офлайн ─────────────────
+  s_satellite: row("Satellite", "Спутник", "Sun'iy yo'ldosh", "卫星", "위성", "Satellit", "Satellite", "衛星", "Uydu", "قمر صناعي"),
+  s_gps_audio: row("GPS audio guide", "GPS-аудиогид", "GPS audio yoʻriqchi", "GPS 语音导览", "GPS 오디오 가이드", "GPS-Audioguide", "Audioguide GPS", "GPS音声ガイド", "GPS sesli rehber", "دليل صوتي GPS"),
+  unit_km: row("km", "км", "km", "公里", "km", "km", "km", "km", "km", "كم"),
+  unit_mi: row("mi", "миль", "mil", "英里", "마일", "mi", "mi", "マイル", "mil", "ميل"),
+  prof_stamps_count: row("3 stamps · 3 to go", "3 штампа · 3 осталось", "3 muhr · 3 qoldi", "3 枚印章 · 还差 3 枚", "스탬프 3개 · 3개 남음", "3 Stempel · noch 3", "3 tampons · encore 3", "スタンプ3個 · あと3個", "3 damga · 3 kaldı", "3 أختام · بقي 3"),
+  prof_stamps_more: row("2 more stamps → 15% off with partners", "Ещё 2 штампа → скидка 15% у партнёров", "Yana 2 muhr → hamkorlarda 15% chegirma", "再集 2 枚印章 → 合作商家享 85 折", "스탬프 2개 더 → 파트너 15% 할인", "Noch 2 Stempel → 15% Rabatt bei Partnern", "Encore 2 tampons → −15 % chez les partenaires", "あと2個で提携先15%オフ", "2 damga daha → ortaklarda %15 indirim", "ختمان إضافيان ← خصم 15% لدى الشركاء"),
+  prof_stamps_reward: row("5 stamps = 15% off", "5 штампов = скидка 15%", "5 muhr = 15% chegirma", "5 枚印章 = 85 折", "스탬프 5개 = 15% 할인", "5 Stempel = 15% Rabatt", "5 tampons = −15 %", "スタンプ5個 = 15%オフ", "5 damga = %15 indirim", "5 أختام = خصم 15%"),
+  prof_stamps_partners: row("At partners: hotels, restaurants, museums", "У партнёров: отели, рестораны, музеи", "Hamkorlarda: mehmonxona, restoran, muzey", "合作商家：酒店、餐厅、博物馆", "파트너: 호텔·레스토랑·박물관", "Bei Partnern: Hotels, Restaurants, Museen", "Chez les partenaires : hôtels, restaurants, musées", "提携先：ホテル・レストラン・博物館", "Ortaklarda: oteller, restoranlar, müzeler", "لدى الشركاء: فنادق ومطاعم ومتاحف"),
+  qr_aim: row("Point at the code by the object", "Наведите на код у объекта", "Obyekt yonidagi kodga qarating", "对准物体旁的二维码", "장소의 코드를 비추세요", "Auf den Code am Objekt richten", "Visez le code près du site", "施設のコードにかざしてください", "Nesnenin yanındaki koda tutun", "وجّه نحو الرمز عند الموقع"),
+  review_ph: row("What you liked, what you didn't", "Что понравилось, что нет", "Nima yoqdi, nima yoqmadi", "喜欢什么，不喜欢什么", "좋았던 점, 아쉬운 점", "Was hat gefallen, was nicht", "Ce qui vous a plu ou non", "良かった点・気になった点", "Neyi beğendiniz, neyi beğenmediniz", "ما أعجبك وما لم يعجبك"),
+  off_packs: row("Offline packs", "Офлайн-пакеты", "Oflayn paketlar", "离线包", "오프라인 팩", "Offline-Pakete", "Packs hors ligne", "オフラインパック", "Çevrimdışı paketler", "حزم بلا اتصال"),
+  off_download: row("Download", "Скачать", "Yuklab olish", "下载", "다운로드", "Herunterladen", "Télécharger", "ダウンロード", "İndir", "تنزيل"),
+  off_done: row("Done", "Готово", "Tayyor", "已完成", "완료", "Fertig", "Terminé", "完了", "Tamam", "تم"),
+  off_loading: row("Downloading…", "Загрузка…", "Yuklanmoqda…", "下载中…", "다운로드 중…", "Wird geladen…", "Téléchargement…", "ダウンロード中…", "İndiriliyor…", "جارٍ التنزيل…"),
+  off_guides: row("guides", "гидов", "yoʻriqchi", "个导览", "개 가이드", "Guides", "guides", "件のガイド", "rehber", "أدلة"),
 } as const;
 
 export type TKey = keyof typeof СЛОВАРЬ;

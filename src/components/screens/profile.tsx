@@ -92,14 +92,14 @@ export function SettingsView({ isPremium, onUpgrade, onLogout }:{ isPremium:bool
         <p className="font-bold text-xs pt-3 pb-1 uppercase tracking-widest" style={{color:MUTED}}>{t("prof_map_nav")}</p>
         <Row icon="🗺️" label={t("s_map_style")} right={
           <div className="flex rounded-lg overflow-hidden border" style={{borderColor:BORDER}}>
-            {(["diorama","sat"] as const).map(s=><button key={s} onClick={()=>setMapStyle(s)} className="px-2.5 py-1 text-[10px] font-bold" style={mapStyle===s?{background:GREEN,color:WHITE}:{background:CREAM,color:MUTED}}>{s==="diorama"?"3D":"Спутник"}</button>)}
+            {(["diorama","sat"] as const).map(s=><button key={s} onClick={()=>setMapStyle(s)} className="px-2.5 py-1 text-[10px] font-bold" style={mapStyle===s?{background:GREEN,color:WHITE}:{background:CREAM,color:MUTED}}>{s==="diorama"?"3D":t("s_satellite")}</button>)}
           </div>
         }/>
-        <Row icon="📡" label="GPS-аудиогид" sub={t("s_nearby_sub")} right={<Toggle on={gps} set={setGps}/>}/>
+        <Row icon="📡" label={t("s_gps_audio")} sub={t("s_nearby_sub")} right={<Toggle on={gps} set={setGps}/>}/>
         <Row icon="⬇️" label={t("s_offline_maps")} sub={t("s_offline_sub")} right={<Toggle on={offline} set={setOffline}/>}/>
         <Row icon="📏" label={t("s_units")} right={
           <div className="flex rounded-lg overflow-hidden border" style={{borderColor:BORDER}}>
-            {(["metric","imperial"] as const).map(u=><button key={u} onClick={()=>setUnits(u)} className="px-2.5 py-1 text-[10px] font-bold" style={units===u?{background:GREEN,color:WHITE}:{background:CREAM,color:MUTED}}>{u==="metric"?"км":"миль"}</button>)}
+            {(["metric","imperial"] as const).map(u=><button key={u} onClick={()=>setUnits(u)} className="px-2.5 py-1 text-[10px] font-bold" style={units===u?{background:GREEN,color:WHITE}:{background:CREAM,color:MUTED}}>{u==="metric"?t("unit_km"):t("unit_mi")}</button>)}
           </div>
         }/>
       </div>
@@ -242,7 +242,7 @@ export function ProfileScreen({ onLogout, user }:{ onLogout:()=>void; user:Publi
                   <div className="w-11 h-11 rounded-xl flex items-center justify-center text-2xl flex-shrink-0 overflow-hidden" style={{background:"rgba(255,255,255,0.15)"}}>
                     {snimok(снимок) ?? "👤"}
                   </div>
-                  <div className="min-w-0"><p className="text-white font-semibold text-sm truncate">{имя}</p><p className="text-white/60 text-xs">3 штампа · 3 осталось</p></div>
+                  <div className="min-w-0"><p className="text-white font-semibold text-sm truncate">{имя}</p><p className="text-white/60 text-xs">{t("prof_stamps_count")}</p></div>
                   <div className="ml-auto flex-shrink-0"><svg width="40" height="40" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="18" stroke={GOLD} strokeWidth="2" strokeDasharray="56.5 56.5" strokeDashoffset="28.3" transform="rotate(-90 20 20)"/><text x="20" y="25" textAnchor="middle" fill={GOLD} fontSize="11" fontWeight="bold">50%</text></svg></div>
                 </div>
               </div>
@@ -250,8 +250,8 @@ export function ProfileScreen({ onLogout, user }:{ onLogout:()=>void; user:Publi
             </div>
             <p className="font-bold text-sm mb-3" style={{color:TEXT}}>{t("prof_stamps")}</p>
             <div className="grid grid-cols-3 gap-2.5 mb-4">{STAMPS.map((s,i)=><div key={i} className="rounded-2xl p-3 aspect-square flex flex-col items-center justify-center text-center shadow-sm" style={s.earned?{background:GREEN}:{background:WHITE,border:`2px dashed ${BORDER}`}}><span className="text-2xl mb-1">{s.icon}</span><p className="font-bold text-[9px] leading-tight" style={{color:s.earned?WHITE:MUTED}}>{s.name}</p><p className="text-[8px] mt-0.5" style={{color:s.earned?GOLD:"#C0B0A0"}}>{s.earned?s.date:трК("Не посещено")}</p></div>)}</div>
-            <div className="bg-white rounded-2xl p-4 mb-3 shadow-sm border" style={{borderColor:BORDER}}><div className="flex items-center justify-between mb-2"><p className="font-semibold text-sm" style={{color:TEXT}}>{t("prof_progress")}</p><p className="text-sm font-bold" style={{color:GREEN}}>3/6</p></div><div className="rounded-full h-2" style={{background:CREAM}}><div className="h-2 rounded-full" style={{background:GREEN,width:"50%"}}/></div><p className="text-xs mt-2" style={{color:MUTED}}>Ещё 2 штампа → скидка 15% у партнёров</p></div>
-            <div className="rounded-2xl p-4 mb-4" style={{background:`linear-gradient(135deg,${GOLD},#C17B2F)`}}><p className="font-bold text-sm" style={{color:TEXT}}>🎁 5 штампов = скидка 15%</p><p className="text-xs mt-1" style={{color:TEXT+"99"}}>У партнёров: отели, рестораны, музеи</p></div>
+            <div className="bg-white rounded-2xl p-4 mb-3 shadow-sm border" style={{borderColor:BORDER}}><div className="flex items-center justify-between mb-2"><p className="font-semibold text-sm" style={{color:TEXT}}>{t("prof_progress")}</p><p className="text-sm font-bold" style={{color:GREEN}}>3/6</p></div><div className="rounded-full h-2" style={{background:CREAM}}><div className="h-2 rounded-full" style={{background:GREEN,width:"50%"}}/></div><p className="text-xs mt-2" style={{color:MUTED}}>{t("prof_stamps_more")}</p></div>
+            <div className="rounded-2xl p-4 mb-4" style={{background:`linear-gradient(135deg,${GOLD},#C17B2F)`}}><p className="font-bold text-sm" style={{color:TEXT}}>🎁 {t("prof_stamps_reward")}</p><p className="text-xs mt-1" style={{color:TEXT+"99"}}>{t("prof_stamps_partners")}</p></div>
             <p className="font-bold text-sm mb-3" style={{color:TEXT}}>{t("prof_achievements")}</p>
             <div className="grid grid-cols-3 gap-2.5 pb-4">{ACHIEVEMENTS.map((a,i)=><div key={i} className="bg-white rounded-2xl p-3 text-center shadow-sm border" style={{borderColor:BORDER,opacity:a.earned?1:0.55}}><div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl mb-1.5 mx-auto" style={{background:a.color+"18"}}>{a.emoji}</div><p className="text-[9px] font-semibold leading-tight" style={{color:TEXT}}>{a.title}</p><p className="text-[8px] mt-0.5" style={{color:a.earned?GREEN:MUTED}}>{a.earned?"✓ Получено":"В процессе"}</p></div>)}</div>
           </div>

@@ -144,7 +144,7 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
               <div className="relative z-10 p-4">
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl mb-2.5" style={{background:"rgba(255,255,255,0.22)"}}>{ev.emoji}</div>
                 <p className="font-bold text-sm text-white leading-tight">{трК(ev.name)}</p>
-                <p className="text-[9px] mt-1 font-semibold" style={{color:"rgba(255,255,255,0.75)"}}>{ev.date} · {трК(ev.city)}</p>
+                <p className="text-[9px] mt-1 font-semibold" style={{color:"rgba(255,255,255,0.75)"}}>{трК(ev.date)} · {трК(ev.city)}</p>
                 <p className="text-[9px] mt-2 leading-relaxed" style={{color:"rgba(255,255,255,0.7)"}}>{трК(ev.desc)}</p>
                 <button className="mt-3 px-3 py-1.5 rounded-xl text-[9px] font-bold" style={{background:"rgba(255,255,255,0.22)",color:"white"}}>📅 {t("home_remind")}</button>
               </div>
