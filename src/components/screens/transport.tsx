@@ -83,7 +83,7 @@ export function TransportScreen({ onBack, isPremium }:{ onBack:()=>void; isPremi
             <svg width="16" height="16" fill="none" stroke="white" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
           </button>
           <p className="text-white/60 text-[10px] font-bold uppercase tracking-widest mb-0.5">{t("tr_kicker")}</p>
-          <h1 className="text-white text-xl font-bold mb-3" style={{fontFamily:"'Fraunces',serif"}}>Перевозки по Узбекистану</h1>
+          <h1 className="text-white text-xl font-bold mb-3" style={{fontFamily:"'Fraunces',serif"}}>{t("tr_subtitle")}</h1>
           {/* City pickers */}
           <div className="relative flex items-center gap-2 mb-3">
             <CityPicker value={fromCity} onChange={setFromCity} label={t("tr_from")} icon="🛫"/>

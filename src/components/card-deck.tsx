@@ -5,6 +5,7 @@ import type { DeckItem, Place } from "@/lib/types";
 import { BORDER, GOLD, GREEN, TEXT, WHITE } from "@/lib/theme";
 import { WEATHER } from "@/data/content";
 import { useAppContent } from "./content-provider";
+import { useT } from "@/components/lang-provider";
 
 /**
  * Подборка карточек: колода на телефоне, лента на широком экране.
@@ -239,42 +240,44 @@ export function CardDeckBase({
 }
 
 export function CardDeck({ places, onPlace }: { places: Place[]; onPlace: (p: Place) => void }) {
+  const { t, трК } = useT();
   const items: DeckItem[] = places.map((p) => ({
     img: p.img,
     title: p.name,
-    sub: `${p.city} · Узбекистан`,
+    sub: `${трК(p.city)} · ${t("uz_country")}`,
     badge: p.type,
     badgeColor: "rgba(233,196,106,0.92)",
     stat1: p.distance,
-    stat1l: "Расст.",
+    stat1l: t("card_dist"),
     stat2: WEATHER[p.city] ? `${WEATHER[p.city].temp}°` : "—",
-    stat2l: "Темп.",
+    stat2l: t("card_temp"),
     stat3: `${p.rating}★`,
-    stat3l: "Рейтинг",
+    stat3l: t("card_rating"),
     price: p.entry,
-    pricel: "Вход",
+    pricel: t("card_entry"),
   }));
   return (
-    <CardDeckBase items={items} title="Топ достопримечательности" onSelect={(i) => onPlace(places[i])} />
+    <CardDeckBase items={items} title={t("deck_top_sights")} onSelect={(i) => onPlace(places[i])} />
   );
 }
 
 export function CityDeck({ onSearch }: { onSearch: () => void }) {
   const { POPULAR_CITIES } = useAppContent();
+  const { t, трК } = useT();
   const items: DeckItem[] = POPULAR_CITIES.map((c) => ({
     img: c.img,
-    title: c.name,
-    sub: `${c.sub} · Узбекистан`,
-    badge: "🏙️ Город",
+    title: трК(c.name),
+    sub: `${трК(c.sub)} · ${t("uz_country")}`,
+    badge: `🏙️ ${t("deck_city_badge")}`,
     badgeColor: "rgba(46,125,90,0.85)",
     stat1: WEATHER[c.name] ? `${WEATHER[c.name].temp}°` : "—",
-    stat1l: "Сейчас",
-    stat2: WEATHER[c.name] ? WEATHER[c.name].cond : "—",
-    stat2l: "Погода",
+    stat1l: t("card_now"),
+    stat2: WEATHER[c.name] ? трК(WEATHER[c.name].cond) : "—",
+    stat2l: t("card_weather"),
     stat3: `${c.rating}★`,
-    stat3l: "Рейтинг",
-    price: "Открыть",
-    pricel: "Направление",
+    stat3l: t("card_rating"),
+    price: t("card_open"),
+    pricel: t("card_direction"),
   }));
-  return <CardDeckBase items={items} title="Популярные города" onSelect={onSearch} />;
+  return <CardDeckBase items={items} title={t("deck_popular_cities")} onSelect={onSearch} />;
 }

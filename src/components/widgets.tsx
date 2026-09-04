@@ -121,7 +121,7 @@ export function AdBanner({ isPremium }:{ isPremium:boolean }) {
               <span className="text-[8px] font-bold tracking-widest uppercase px-1.5 py-0.5 rounded" style={{background:"#F0EBE1",color:MUTED}}>{трК(ad.label)}</span>
             </div>
             <p className="font-bold text-xs leading-tight" style={{color:TEXT}}>{ad.title}</p>
-            <p className="text-[10px] mt-0.5 truncate" style={{color:MUTED}}>{ad.sub}</p>
+            <p className="text-[10px] mt-0.5 truncate" style={{color:MUTED}}>{трК(ad.sub)}</p>
           </div>
           <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
             <button onClick={()=>setDismissed(true)} className="text-[10px] font-medium px-1" style={{color:MUTED}}>✕</button>

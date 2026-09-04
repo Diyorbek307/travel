@@ -5,6 +5,7 @@ import { BORDER, GOLD, GREEN, MUTED, TEXT, WHITE } from "@/lib/theme";
 import { ГОРОДА, МЕСТА, расстояниеКм, точка } from "@/data/geo";
 import type { Geo } from "@/lib/types";
 import RealMap from "@/components/real-map";
+import { useT } from "@/components/lang-provider";
 
 /**
  * Заказ такси.
@@ -39,9 +40,10 @@ export default function TaxiOrder({
   /** Если экран открыт со страницы места — оно уже выбрано. */
   сразуКуда?: { название: string; geo: Geo | null };
 }) {
+  const { t, трК } = useT();
   const [город, setГород] = useState(городСразу);
   const [откуда, setОткуда] = useState<Geo | null>(null);
-  const [подписьОткуда, setПодписьОткуда] = useState("Моё местоположение");
+  const [подписьОткуда, setПодписьОткуда] = useState(t("taxi_my_location"));
   const [геоОшибка, setГеоОшибка] = useState<string | null>(null);
   const [куда, setКуда] = useState<{ название: string; geo: Geo; своя?: boolean } | null>(() => {
     if (сразуКуда?.geo) return { название: сразуКуда.название, geo: сразуКуда.geo };
@@ -162,7 +164,7 @@ export default function TaxiOrder({
   return (
     <section className="px-4 pt-5">
       <p className="mb-3 text-base font-bold" style={{ color: TEXT, fontFamily: "'Fraunces',serif" }}>
-        🚖 Такси
+        🚖 {t("taxi_title")}
       </p>
 
       <div className="rounded-2xl border p-4" style={{ background: WHITE, borderColor: BORDER }}>
@@ -188,14 +190,14 @@ export default function TaxiOrder({
         <div className="mb-2 flex flex-wrap items-center gap-3 rounded-xl px-3 py-2.5" style={{ background: "#F0F8F4" }}>
           <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: GREEN }} />
           <span className="min-w-0 flex-1 truncate text-sm" style={{ color: TEXT }}>
-            {откуда ? подписьОткуда : `Центр города · ${город}`}
+            {откуда ? подписьОткуда : `${t("taxi_from_city")} · ${трК(город)}`}
           </span>
           <button
             onClick={определитьГде}
             className="shrink-0 rounded-full px-3 py-1 text-xs font-semibold"
             style={{ background: GREEN, color: WHITE }}
           >
-            Отсюда
+            {t("taxi_from_here")}
           </button>
         </div>
 
@@ -203,14 +205,14 @@ export default function TaxiOrder({
         <div className="mb-3 flex flex-wrap items-center gap-3 rounded-xl border px-3 py-2.5" style={{ borderColor: BORDER }}>
           <span className="h-2 w-2 shrink-0 rounded-sm" style={{ background: GOLD }} />
           <span className="min-w-0 flex-1 truncate text-sm" style={{ color: куда ? TEXT : MUTED }}>
-            {куда ? куда.название : "Куда едем"}
+            {куда ? куда.название : t("taxi_where")}
           </span>
           <button
             onClick={() => setКарта((в) => !в)}
             className="shrink-0 rounded-full border px-3 py-1 text-xs font-semibold"
             style={{ borderColor: карта ? GREEN : BORDER, color: карта ? GREEN : MUTED }}
           >
-            {карта ? "Скрыть карту" : "На карте"}
+            {карта ? t("taxi_hide_map") : t("taxi_show_map")}
           </button>
         </div>
 
@@ -232,7 +234,7 @@ export default function TaxiOrder({
               onТочка={точкаНаКарте}
             />
             <p className="px-3 py-2 text-[11px] leading-relaxed" style={{ color: MUTED }}>
-              Нажмите на карту — поставим точку назначения. Адрес по ней определит Яндекс Go.
+              {t("taxi_tap_map")}
             </p>
           </div>
         )}
@@ -278,7 +280,7 @@ export default function TaxiOrder({
 
         {куда && ценаДоступна === false && (
           <p className="mb-3 text-xs leading-relaxed" style={{ color: MUTED }}>
-            Цену покажет Яндекс Go — там же подтвердите поездку.
+            {t("taxi_price_note")}
           </p>
         )}
 
@@ -297,11 +299,11 @@ export default function TaxiOrder({
             pointerEvents: адрес ? undefined : "none",
           }}
         >
-          {куда ? "Открыть в Яндекс Go" : "Выберите, куда едем"}
+          {куда ? t("taxi_open") : t("taxi_choose")}
         </a>
 
         <p className="mt-2 text-[11px] leading-relaxed" style={{ color: MUTED }}>
-          Поездку оформляет Яндекс Go: там оплата, машина и поддержка по поездке.
+          {t("taxi_footer")}
         </p>
       </div>
     </section>

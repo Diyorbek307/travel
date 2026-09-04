@@ -55,7 +55,7 @@ export function SettingsView({ isPremium, onUpgrade, onLogout }:{ isPremium:bool
       {isPremium&&(
         <div className="rounded-2xl p-4 flex items-center gap-3" style={{background:`linear-gradient(135deg,#1A1A2E,#0F3460)`}}>
           <div className="w-10 h-10 rounded-2xl flex items-center justify-center text-xl" style={{background:GOLD}}>👑</div>
-          <div><p className="text-white font-bold text-sm">UzUp Premium активен</p><p className="text-white/50 text-xs">{t("prof_updated")}</p></div>
+          <div><p className="text-white font-bold text-sm">{t("prof_premium_active")}</p><p className="text-white/50 text-xs">{t("prof_updated")}</p></div>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={GOLD} strokeWidth="2.5" className="ml-auto"><polyline points="20 6 9 17 4 12"/></svg>
         </div>
       )}
@@ -165,24 +165,33 @@ export function ProfileScreen({ onLogout, user }:{ onLogout:()=>void; user:Publi
    * Своё имя на своей странице — не украшение: по нему человек
    * понимает, что вошёл он, а не сосед.
    */
-  const { t, трК } = useT();
+  const { t, трК, lang } = useT();
   const имя = user ? `${user.firstName} ${user.lastName}`.trim() : t("prof_traveler");
   const откуда = user?.country ? `🌍 ${user.country}` : `🌍 ${t("prof_traveler")}`;
   const снимок = user?.hasPhoto ? `/api/photo/${user.id}` : null;
   const [view, setView] = useState<"passport"|"bookings"|"support"|"chat"|"stats"|"settings">("passport");
   const [isPremium, setIsPremium] = useState(false);
   const [showPremium, setShowPremium] = useState(false);
-  const [messages, setMessages] = useState<ChatMessage[]>([{role:"ai",text:"Assalomu alaykum! 👋 Я ваш AI-гид. Спрашивайте всё — история, маршруты, рестораны, транспорт, валюта!",time:"09:41"}]);
+  const [messages, setMessages] = useState<ChatMessage[]>([{role:"ai",text:трК("Assalomu alaykum! 👋 Я ваш AI-гид. Спрашивайте всё — история, маршруты, рестораны, транспорт, валюта!"),time:"09:41"}]);
   const [input, setInput]   = useState("");
   const [typing, setTyping] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+  // Быстрые вопросы хранятся по-русски: это ключ, по которому ищется ответ
+  // в AI_REPLIES. На экране показываем перевод (трК), а по клику отправляем
+  // русский ключ — так один и тот же ответ находится на любом языке.
   const QUICK=["Что рядом?","История Регистана","Лучшие рестораны?","Что бесплатно?","Как добраться до Бухары?","Где переночевать?","Курс валюты?","Транспорт в Самарканде?"];
-  const sendMsg=useCallback((t:string)=>{
-    const now=new Date().toLocaleTimeString("ru",{hour:"2-digit",minute:"2-digit"});
-    setMessages(p=>[...p,{role:"user",text:t,time:now}]);
+  const sendMsg=useCallback((вопрос:string)=>{
+    const now=new Date().toLocaleTimeString(lang,{hour:"2-digit",minute:"2-digit"});
+    // Известный вопрос трК переведёт; свободный текст на любом языке вернётся
+    // как есть — и в пузыре пользователь видит именно то, что спросил.
+    setMessages(p=>[...p,{role:"user",text:трК(вопрос),time:now}]);
     setInput("");setTyping(true);
-    setTimeout(()=>{const r=AI_REPLIES[t]??"Отличный вопрос! Рекомендую посещать рано утром — свет, тишина, минимум туристов.";setMessages(p=>[...p,{role:"ai",text:r,time:new Date().toLocaleTimeString("ru",{hour:"2-digit",minute:"2-digit"})}]);setTyping(false);},1400);
-  },[]);
+    setTimeout(()=>{
+      const рус=AI_REPLIES[вопрос]??"Отличный вопрос! Рекомендую посещать рано утром — свет, тишина, минимум туристов.";
+      setMessages(p=>[...p,{role:"ai",text:трК(рус),time:new Date().toLocaleTimeString(lang,{hour:"2-digit",minute:"2-digit"})}]);
+      setTyping(false);
+    },1400);
+  },[трК,lang]);
   useEffect(()=>{bottomRef.current?.scrollIntoView({behavior:"smooth"});},[messages,typing]);
 
   const TABS: [typeof view, string, TKey][] = [
@@ -263,8 +272,8 @@ export function ProfileScreen({ onLogout, user }:{ onLogout:()=>void; user:Publi
             {typing&&<div className="flex"><div className="w-7 h-7 rounded-lg flex items-center justify-center mr-2 text-white text-[10px] font-bold" style={{background:GREEN}}>AI</div><div className="bg-white rounded-2xl rounded-tl px-4 py-3 shadow-sm border" style={{borderColor:BORDER,borderTopLeftRadius:4}}><div className="flex gap-1.5 items-center h-4">{[0,150,300].map(d=><span key={d} className="w-2 h-2 rounded-full bounce-dot" style={{background:GREEN,animationDelay:`${d}ms`}}/>)}</div></div></div>}
             <div ref={bottomRef}/>
           </div>
-          <div className="px-4 pb-2"><div className="flex gap-2 overflow-x-auto hide-scroll">{QUICK.map((q,i)=><button key={i} onClick={()=>sendMsg(q)} className="flex-shrink-0 px-3 py-2 rounded-full text-xs font-medium bg-white border" style={{color:TEXT,borderColor:BORDER}}>{q}</button>)}</div></div>
-          <div className="px-4 pb-5 pt-2"><div className="flex items-center gap-2 bg-white rounded-2xl px-4 py-2.5 border" style={{borderColor:BORDER}}><input value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&input.trim()&&sendMsg(input.trim())} placeholder="Спросите что угодно…" className="flex-1 text-sm bg-transparent outline-none" style={{color:TEXT}}/><button onClick={()=>input.trim()&&sendMsg(input.trim())} className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0" style={{background:GREEN}}><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button></div></div>
+          <div className="px-4 pb-2"><div className="flex gap-2 overflow-x-auto hide-scroll">{QUICK.map((q,i)=><button key={i} onClick={()=>sendMsg(q)} className="flex-shrink-0 px-3 py-2 rounded-full text-xs font-medium bg-white border" style={{color:TEXT,borderColor:BORDER}}>{трК(q)}</button>)}</div></div>
+          <div className="px-4 pb-5 pt-2"><div className="flex items-center gap-2 bg-white rounded-2xl px-4 py-2.5 border" style={{borderColor:BORDER}}><input value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&input.trim()&&sendMsg(input.trim())} placeholder={трК("Спросите что угодно…")} className="flex-1 text-sm bg-transparent outline-none" style={{color:TEXT}}/><button onClick={()=>input.trim()&&sendMsg(input.trim())} className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0" style={{background:GREEN}}><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button></div></div>
         </div>
       )}
       {view==="stats"&&(
@@ -274,7 +283,7 @@ export function ProfileScreen({ onLogout, user }:{ onLogout:()=>void; user:Publi
             <div className="grid grid-cols-2 gap-3">{[{e:"🏙️",v:"3",l:t("prof_cnt_cities")},{e:"📍",v:"12",l:t("prof_cnt_places")},{e:"🛣️",v:"847 км",l:t("prof_passed")},{e:"🎧",v:"24",l:t("prof_cnt_audio")}].map(s=><div key={s.l} className="bg-white rounded-2xl p-4 shadow-sm border text-center" style={{borderColor:BORDER}}><p className="text-3xl mb-1">{s.e}</p><p className="text-2xl font-bold" style={{color:GREEN,fontFamily:"'Fraunces',serif"}}>{s.v}</p><p className="text-xs mt-0.5" style={{color:MUTED}}>{s.l}</p></div>)}</div>
             <CurrencyConverter/>
             <div className="bg-white rounded-2xl p-4 shadow-sm border" style={{borderColor:BORDER}}><p className="font-bold text-sm mb-3" style={{color:TEXT}}>{t("prof_activity")}</p>{[{e:"🕌",a:"Посетил",p:"Площадь Регистан",t:"Сегодня, 09:30"},{e:"🎧",a:"Слушал",p:"Гид Шахи-Зинда",t:"Сегодня, 11:15"},{e:"✅",a:"Завершил",p:"Самарканд за 1 день",t:"12 авг"}].map((a,i)=><div key={i} className="flex items-center gap-3 py-2.5 border-b last:border-0" style={{borderColor:"#F0EBE1"}}><span className="text-lg">{a.e}</span><div className="flex-1"><p className="text-sm" style={{color:TEXT}}><span style={{color:MUTED}}>{a.a}</span> {a.p}</p><p className="text-xs" style={{color:"#B0A090"}}>{a.t}</p></div></div>)}</div>
-            <div className="rounded-2xl p-4" style={{background:"#1A1410"}}><p className="font-bold text-sm mb-3" style={{color:GOLD}}>🆘 Экстренная помощь</p><div className="grid grid-cols-2 gap-2">{[{l:t("emg_police"),n:"102",e:"👮"},{l:t("emg_ambulance"),n:"103",e:"🚑"},{l:t("emg_fire"),n:"101",e:"🚒"},{l:t("prof_for_tourists"),n:"1322",e:"ℹ️"}].map(s=><button key={s.l} className="rounded-xl p-3 text-left" style={{background:"rgba(255,255,255,0.08)"}}><span className="text-xl">{s.e}</span><p className="text-white text-xs font-semibold mt-1">{s.l}</p><p className="text-sm font-bold font-mono" style={{color:GOLD}}>{s.n}</p></button>)}</div><button className="mt-3 w-full py-3 rounded-xl text-sm font-bold bg-red-600 text-white flex items-center justify-center gap-2"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>{t("prof_send_location")}</button></div>
+            <div className="rounded-2xl p-4" style={{background:"#1A1410"}}><p className="font-bold text-sm mb-3" style={{color:GOLD}}>🆘 {t("prof_emergency")}</p><div className="grid grid-cols-2 gap-2">{[{l:t("emg_police"),n:"102",e:"👮"},{l:t("emg_ambulance"),n:"103",e:"🚑"},{l:t("emg_fire"),n:"101",e:"🚒"},{l:t("prof_for_tourists"),n:"1322",e:"ℹ️"}].map(s=><button key={s.l} className="rounded-xl p-3 text-left" style={{background:"rgba(255,255,255,0.08)"}}><span className="text-xl">{s.e}</span><p className="text-white text-xs font-semibold mt-1">{s.l}</p><p className="text-sm font-bold font-mono" style={{color:GOLD}}>{s.n}</p></button>)}</div><button className="mt-3 w-full py-3 rounded-xl text-sm font-bold bg-red-600 text-white flex items-center justify-center gap-2"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>{t("prof_send_location")}</button></div>
           </div>
         </div>
       )}

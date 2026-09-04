@@ -207,7 +207,7 @@ export function PremiumModal({ onClose, onActivate }:{ onClose:()=>void; onActiv
         <div className="relative z-10">
           <div className="flex items-center gap-2 mb-3">
             <div className="w-10 h-10 rounded-2xl flex items-center justify-center text-xl" style={{background:GOLD}}>👑</div>
-            <div><p className="text-white text-xl font-bold" style={{fontFamily:"'Fraunces',serif"}}>UzUp Premium</p><p className="text-white/60 text-xs">Без рекламы · Всё включено</p></div>
+            <div><p className="text-white text-xl font-bold" style={{fontFamily:"'Fraunces',serif"}}>UzUp Premium</p><p className="text-white/60 text-xs">{t("prem_sub_incl")}</p></div>
           </div>
           {/* Plan toggle */}
           <div className="flex rounded-2xl overflow-hidden border" style={{borderColor:"rgba(255,255,255,0.15)"}}>
@@ -215,11 +215,11 @@ export function PremiumModal({ onClose, onActivate }:{ onClose:()=>void; onActiv
               <button key={p} onClick={()=>setPlan(p)} className="flex-1 py-3 text-center relative" style={plan===p?{background:GOLD}:{background:"rgba(255,255,255,0.06)"}}>
                 {p==="year"&&<span className="absolute -top-1 left-1/2 -translate-x-1/2 text-[8px] font-bold px-1.5 py-0.5 rounded-full" style={{background:"#E74C3C",color:WHITE}}>-40%</span>}
                 <p className="font-bold text-sm" style={{color:plan===p?TEXT:WHITE}}>{p==="month"?t("pay_month"):t("prem_year")}</p>
-                <p className="text-[10px] mt-0.5" style={{color:plan===p?TEXT+"99":"rgba(255,255,255,0.5)"}}>{p==="month"?"39 000 сум/мес":"349 000 сум/год"}</p>
+                <p className="text-[10px] mt-0.5" style={{color:plan===p?TEXT+"99":"rgba(255,255,255,0.5)"}}>{p==="month"?`39 000 ${t("cur_uzs_word")}${t("prem_per_month")}`:`349 000 ${t("cur_uzs_word")}${t("prem_per_year")}`}</p>
               </button>
             ))}
           </div>
-          {plan==="year"&&<p className="text-center text-[10px] mt-2" style={{color:"rgba(255,255,255,0.5)"}}>≈ 29 000 сум/мес · выгода 119 000 сум</p>}
+          {plan==="year"&&<p className="text-center text-[10px] mt-2" style={{color:"rgba(255,255,255,0.5)"}}>{t("prem_year_save")}</p>}
         </div>
       </div>
       {/* Perks */}
@@ -235,17 +235,17 @@ export function PremiumModal({ onClose, onActivate }:{ onClose:()=>void; onActiv
           ))}
         </div>
         <div className="rounded-2xl p-4 mb-4 border" style={{background:"#FFF9EE",borderColor:GOLD+"44"}}>
-          <p className="text-xs font-semibold text-center" style={{color:MUTED}}>🔒 Отмена в любой момент · Безопасная оплата · Возврат 7 дней</p>
+          <p className="text-xs font-semibold text-center" style={{color:MUTED}}>{t("prem_guarantee")}</p>
         </div>
         <button onClick={оплатить} disabled={идёт} className="w-full py-4 rounded-2xl font-bold text-base mb-2 disabled:opacity-60" style={{background:GOLD,color:TEXT}}>
           {идёт ? t("prem_opening") : `💳 ${t("pay_pay")} · ${plan==="month"?"39 000":"349 000"} ${t("cur_uzs_word")}`}
         </button>
         {нетОплаты&&(
           <p className="text-center text-[11px] leading-relaxed mb-2" style={{color:MUTED}}>
-            Онлайн-оплата пока не подключена. Как только продавец добавит ключ Payme или Click, кнопка откроет страницу оплаты.
+            {t("prem_no_pay")}
           </p>
         )}
-        <button onClick={onClose} className="w-full py-3 rounded-2xl text-sm" style={{color:MUTED}}>Остаться на бесплатной версии</button>
+        <button onClick={onClose} className="w-full py-3 rounded-2xl text-sm" style={{color:MUTED}}>{t("prem_stay_free")}</button>
         <div className="pb-6"/>
       </div>
     </div>

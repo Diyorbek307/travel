@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { BORDER, GOLD, GREEN, MUTED, TEXT, WHITE } from "@/lib/theme";
+import { useT } from "@/components/lang-provider";
 
 /**
  * Переписка с поддержкой.
@@ -22,6 +23,7 @@ interface Message {
 const ОПРОС_МС = 5000;
 
 export default function SupportChat({ onBack }: { onBack: () => void }) {
+  const { t } = useT();
   const [messages, setMessages] = useState<Message[]>([]);
   const [text, setText] = useState("");
   const [загрузка, setЗагрузка] = useState(true);
@@ -78,14 +80,14 @@ export default function SupportChat({ onBack }: { onBack: () => void }) {
         style={{ background: WHITE, borderBottom: `1px solid ${BORDER}` }}
       >
         <button onClick={onBack} className="text-sm" style={{ color: MUTED }}>
-          ← Назад
+          ← {t("common_back")}
         </button>
         <div className="min-w-0">
           <p className="text-sm font-bold" style={{ color: TEXT, fontFamily: "'Fraunces',serif" }}>
-            Поддержка
+            {t("prof_support")}
           </p>
           <p className="text-[11px]" style={{ color: MUTED }}>
-            Отвечаем в рабочие часы
+            {t("sup_hours")}
           </p>
         </div>
       </header>
@@ -93,15 +95,15 @@ export default function SupportChat({ onBack }: { onBack: () => void }) {
       <div className="flex-1 space-y-2 overflow-y-auto p-4">
         {загрузка && (
           <p className="py-10 text-center text-sm" style={{ color: MUTED }}>
-            Загружаем переписку…
+            {t("sup_loading")}
           </p>
         )}
 
         {!загрузка && messages.length === 0 && (
           <p className="py-10 text-center text-sm leading-relaxed" style={{ color: MUTED }}>
-            Напишите нам — ответим здесь же.
+            {t("sup_empty1")}
             <br />
-            Вопросы о маршрутах, бронях, оплате.
+            {t("sup_empty2")}
           </p>
         )}
 
@@ -134,7 +136,7 @@ export default function SupportChat({ onBack }: { onBack: () => void }) {
         <input
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="Сообщение"
+          placeholder={t("sup_ph")}
           maxLength={2000}
           className="min-w-0 flex-1 rounded-full px-4 py-2.5 text-sm outline-none"
           style={{ background: "var(--cream)", border: `1px solid ${BORDER}`, color: TEXT }}

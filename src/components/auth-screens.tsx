@@ -52,6 +52,7 @@ function Обёртка({
   onBack: () => void;
   children: React.ReactNode;
 }) {
+  const { t } = useT();
   return (
     <div
       className="flex h-full flex-col overflow-y-auto px-6 pb-10 pt-12"
@@ -68,7 +69,7 @@ function Обёртка({
         className="mb-6 self-start text-sm"
         style={{ color: "rgba(255,255,255,0.7)" }}
       >
-        ← Назад
+        ← {t("common_back")}
       </button>
 
       <h1

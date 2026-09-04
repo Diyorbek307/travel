@@ -57,9 +57,14 @@ export function useAppContent() {
    * а имя-топоним мы не коверкаем. Незнакомая словарю строка (новое из
    * панели) возвращается как введена.
    */
-  const мПлейс = (p: (typeof content.places)[number]) => ({ ...p, type: трК(p.type) });
-  const мОтель = (h: (typeof content.hotels)[number]) => ({ ...h, tag: трК(h.tag) });
-  const мРест = (r: (typeof content.restaurants)[number]) => ({ ...r, cuisine: трК(r.cuisine) });
+  // entry содержит либо цену ($8 — трК вернёт как есть), либо «Бесплатно» —
+  // и его переводим: это не ключ поиска, только текст на карточке.
+  const мПлейс = (p: (typeof content.places)[number]) => ({ ...p, type: трК(p.type), desc: трК(p.desc), entry: трК(p.entry) });
+  // Удобства (facilities) не переводим здесь: иконку в деталях выбирают по
+  // русскому ключу, поэтому перевод делается на месте показа (details.tsx),
+  // где сырой ключ остаётся для иконки, а рядом рисуется его перевод.
+  const мОтель = (h: (typeof content.hotels)[number]) => ({ ...h, tag: трК(h.tag), desc: трК(h.desc) });
+  const мРест = (r: (typeof content.restaurants)[number]) => ({ ...r, cuisine: трК(r.cuisine), desc: трК(r.desc) });
 
   return {
     PLACES: content.places.map(мПлейс),

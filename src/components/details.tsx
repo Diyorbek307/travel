@@ -31,9 +31,9 @@ export function PlaceDetail({ place, onBack, onPlay, onToast, onПуть }:{ pla
         <button onClick={onBack} className="absolute top-12 left-4 w-9 h-9 rounded-xl flex items-center justify-center backdrop-blur-sm" style={{...glass}}><svg width="16" height="16" fill="none" stroke="white" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
         <button onClick={()=>setFav(!fav)} className="absolute top-12 right-4 w-9 h-9 rounded-xl flex items-center justify-center backdrop-blur-sm" style={{...glass}}><svg width="16" height="16" viewBox="0 0 24 24" fill={fav?GOLD:"none"} stroke={fav?GOLD:"white"} strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
         <div className="absolute bottom-0 left-0 right-0 p-4">
-          <div className="flex items-center gap-1.5 mb-1.5"><Badge text={place.type} color={GREEN}/>{place.audio&&<Badge text="🎧 Аудиогид" color={MUTED}/>}{place.qr&&<Badge text="QR" color={MUTED}/>}</div>
+          <div className="flex items-center gap-1.5 mb-1.5"><Badge text={place.type} color={GREEN}/>{place.audio&&<Badge text={"🎧 "+t("d_audioguide")} color={MUTED}/>}{place.qr&&<Badge text="QR" color={MUTED}/>}</div>
           <h2 className="text-white text-xl font-bold" style={{fontFamily:"'Fraunces',serif"}}>{place.name}</h2>
-          <p className="text-white/70 text-xs mt-0.5">{трК(place.city)} · ★ {place.rating} ({place.reviews.toLocaleString()} отзывов)</p>
+          <p className="text-white/70 text-xs mt-0.5">{трК(place.city)} · ★ {place.rating} ({place.reviews.toLocaleString()} {t("d_reviews_word")})</p>
         </div>
       </div>
       <div className="flex-1 overflow-y-auto hide-scroll px-4 pt-4">
@@ -43,7 +43,7 @@ export function PlaceDetail({ place, onBack, onPlay, onToast, onПуть }:{ pla
           ))}
         </div>
         <div className="bg-white rounded-2xl p-4 mb-3 shadow-sm border" style={{borderColor:BORDER}}>
-          <p className="font-bold text-sm mb-2" style={{color:TEXT}}>Описание</p>
+          <p className="font-bold text-sm mb-2" style={{color:TEXT}}>{t("d_description")}</p>
           <p className="text-sm leading-relaxed" style={{color:MUTED}}>{place.desc}</p>
         </div>
         {place.audio&&(
@@ -58,7 +58,7 @@ export function PlaceDetail({ place, onBack, onPlay, onToast, onПуть }:{ pla
             </div>
             <div className="flex justify-between text-white/40 text-[9px] mb-3"><span>0:00</span><span>8:42</span></div>
             <div className="flex gap-2 mb-3">
-              <button onClick={()=>{setPlaying(!playing);if(!playing)onPlay(place);}} className="flex-1 py-2.5 rounded-xl text-sm font-bold" style={{background:GOLD,color:TEXT}}>{playing?"⏸ Пауза":"▶ Слушать"}</button>
+              <button onClick={()=>{setPlaying(!playing);if(!playing)onPlay(place);}} className="flex-1 py-2.5 rounded-xl text-sm font-bold" style={{background:GOLD,color:TEXT}}>{playing?"⏸ "+t("d_pause"):"▶ "+t("d_listen")}</button>
               <button className="w-10 h-10 rounded-xl flex items-center justify-center" style={{background:"rgba(255,255,255,0.15)"}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></button>
             </div>
             <div className="flex gap-1.5 overflow-x-auto hide-scroll">
@@ -70,7 +70,7 @@ export function PlaceDetail({ place, onBack, onPlay, onToast, onПуть }:{ pla
         )}
         <div className="flex gap-3 pb-6">
           <button onClick={()=>onПуть(place.name, place.city)} className="flex-1 py-3.5 rounded-2xl text-white text-sm font-bold active:scale-[0.98] transition-all" style={{background:GREEN}}>📍 {t("d_route")}</button>
-          <button onClick={()=>onToast(`✅ «${place.name}» добавлено в маршрут!`)} className="flex-1 py-3.5 rounded-2xl text-sm font-bold border active:scale-[0.98] transition-all" style={{color:GREEN,borderColor:GREEN,background:WHITE}}>🗺️ {t("d_add_route")}</button>
+          <button onClick={()=>onToast(`✅ «${place.name}» ${t("d_added_route")}`)} className="flex-1 py-3.5 rounded-2xl text-sm font-bold border active:scale-[0.98] transition-all" style={{color:GREEN,borderColor:GREEN,background:WHITE}}>🗺️ {t("d_add_route")}</button>
         </div>
       </div>
         <ReviewForm placeId={place.id} placeName={place.name} />
@@ -101,15 +101,15 @@ export function HotelDetail({ hotel, onBack, onToast }:{ hotel:Hotel; onBack:()=
         <div className="absolute bottom-0 left-0 right-0 p-4">
           <div className="flex items-center gap-2 mb-1"><Badge text={hotel.tag} color={GOLD}/><Badge text={трК(hotel.city)} color={GREEN}/></div>
           <p className="text-white text-lg font-bold" style={{fontFamily:"'Fraunces',serif"}}>{hotel.name}</p>
-          <div className="flex items-center gap-3"><StarRow rating={hotel.rating}/><span className="text-white/60 text-xs">{hotel.reviews} отзывов</span></div>
+          <div className="flex items-center gap-3"><StarRow rating={hotel.rating}/><span className="text-white/60 text-xs">{hotel.reviews} {t("d_reviews_word")}</span></div>
         </div>
       </div>
       <div className="flex-1 overflow-y-auto hide-scroll px-4 pt-4">
-        <div className="bg-white rounded-2xl p-4 mb-3 shadow-sm border" style={{borderColor:BORDER}}><p className="font-bold text-sm mb-2" style={{color:TEXT}}>Об отеле</p><p className="text-sm leading-relaxed" style={{color:MUTED}}>{hotel.desc}</p></div>
+        <div className="bg-white rounded-2xl p-4 mb-3 shadow-sm border" style={{borderColor:BORDER}}><p className="font-bold text-sm mb-2" style={{color:TEXT}}>{t("d_about_hotel")}</p><p className="text-sm leading-relaxed" style={{color:MUTED}}>{hotel.desc}</p></div>
         <div className="bg-white rounded-2xl p-4 mb-3 shadow-sm border" style={{borderColor:BORDER}}>
-          <p className="font-bold text-sm mb-3" style={{color:TEXT}}>Удобства</p>
+          <p className="font-bold text-sm mb-3" style={{color:TEXT}}>{t("d_facilities")}</p>
           <div className="flex flex-wrap gap-2">
-            {hotel.facilities.map(f=><div key={f} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border" style={{background:CREAM,borderColor:BORDER}}><span className="text-sm">{f==="Wi-Fi"?"📶":f==="Бассейн"?"🏊":f==="Ресторан"?"🍽️":f==="Спа"?"💆":f==="Парковка"?"🅿️":f==="Трансфер"?"🚗":f==="Терраса"?"🌿":f==="Экскурсии"?"🗺️":f==="Завтрак"?"☕":f==="Бар"?"🍹":"🏨"}</span><span className="text-xs font-medium" style={{color:TEXT}}>{f}</span></div>)}
+            {hotel.facilities.map(f=><div key={f} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border" style={{background:CREAM,borderColor:BORDER}}><span className="text-sm">{f==="Wi-Fi"?"📶":f==="Бассейн"?"🏊":f==="Ресторан"?"🍽️":f==="Спа"?"💆":f==="Парковка"?"🅿️":f==="Трансфер"?"🚗":f==="Терраса"?"🌿":f==="Экскурсии"?"🗺️":f==="Завтрак"?"☕":f==="Бар"?"🍹":"🏨"}</span><span className="text-xs font-medium" style={{color:TEXT}}>{трК(f)}</span></div>)}
           </div>
         </div>
         <div className="bg-white rounded-2xl p-4 mb-3 shadow-sm border" style={{borderColor:BORDER}}>
@@ -128,25 +128,25 @@ export function HotelDetail({ hotel, onBack, onToast }:{ hotel:Hotel; onBack:()=
                 </div>
               </div>
             ))}
-            <div className="text-right"><p className="text-[10px] font-semibold" style={{color:MUTED}}>{t("d_total")}</p><p className="text-xl font-bold mt-1" style={{color:GREEN,fontFamily:"'Fraunces',serif"}}>${total}</p><p className="text-[9px]" style={{color:MUTED}}>{hotel.price}/ночь × {nights}</p></div>
+            <div className="text-right"><p className="text-[10px] font-semibold" style={{color:MUTED}}>{t("d_total")}</p><p className="text-xl font-bold mt-1" style={{color:GREEN,fontFamily:"'Fraunces',serif"}}>${total}</p><p className="text-[9px]" style={{color:MUTED}}>{hotel.price}{t("d_per_night")} × {nights}</p></div>
           </div>
           {booked?(
             <div className="rounded-2xl p-5 text-center" style={{background:"#EDF7F2",border:`1.5px solid ${GREEN}`}}>
               <p className="text-4xl mb-2">🎉</p>
-              <p className="font-bold text-base" style={{color:GREEN}}>Бронирование подтверждено!</p>
-              <p className="text-xs mt-1.5" style={{color:MUTED}}>Детали отправлены на email</p>
+              <p className="font-bold text-base" style={{color:GREEN}}>{t("d_book_confirmed")}</p>
+              <p className="text-xs mt-1.5" style={{color:MUTED}}>{t("d_book_email")}</p>
               <p className="font-mono text-xs font-bold mt-2 px-3 py-1.5 rounded-xl inline-block" style={{background:GREEN,color:WHITE}}>№ UZH-2026-{hotel.id.toUpperCase()}{nights}{guests}</p>
             </div>
           ):(
             <>
-              <button onClick={()=>{setBooked(true);onToast(t("d_booked"));}} className="w-full py-4 rounded-2xl text-white font-bold text-sm active:scale-[0.98] transition-all" style={{background:GREEN}}>Забронировать — ${total}</button>
-              <p className="text-center text-[10px] mt-2" style={{color:MUTED}}>Бесплатная отмена до 24 ч · Скидка UzUp -10%</p>
+              <button onClick={()=>{setBooked(true);onToast(t("d_booked"));}} className="w-full py-4 rounded-2xl text-white font-bold text-sm active:scale-[0.98] transition-all" style={{background:GREEN}}>{t("d_book")} — ${total}</button>
+              <p className="text-center text-[10px] mt-2" style={{color:MUTED}}>{t("d_book_terms")}</p>
             </>
           )}
         </div>
         <div className="bg-white rounded-2xl p-4 mb-6 shadow-sm border" style={{borderColor:BORDER}}>
-          <div className="flex items-center justify-between mb-3"><p className="font-bold text-sm" style={{color:TEXT}}>Отзывы</p><StarRow rating={hotel.rating}/></div>
-          {[{name:"Sophie M.",flag:"🇩🇪",text:"Потрясающий вид. Персонал отзывчивый.",stars:5},{name:"James T.",flag:"🇺🇸",text:"Exceeded all expectations. Unforgettable.",stars:4}].map((r,i)=>(
+          <div className="flex items-center justify-between mb-3"><p className="font-bold text-sm" style={{color:TEXT}}>{t("d_reviews_title")}</p><StarRow rating={hotel.rating}/></div>
+          {[{name:"Sophie M.",flag:"🇩🇪",text:трК("Потрясающий вид. Персонал отзывчивый."),stars:5},{name:"James T.",flag:"🇺🇸",text:"Exceeded all expectations. Unforgettable.",stars:4}].map((r,i)=>(
             <div key={i} className="py-3 border-b last:border-0" style={{borderColor:BORDER}}>
               <div className="flex items-center gap-2 mb-1"><span className="text-lg">{r.flag}</span><span className="text-sm font-semibold" style={{color:TEXT}}>{r.name}</span><span className="text-xs ml-auto" style={{color:GOLD}}>{"★".repeat(r.stars)}</span></div>
               <p className="text-xs leading-relaxed" style={{color:MUTED}}>{r.text}</p>
@@ -175,7 +175,7 @@ export function RestaurantDetail({ r, onBack, onToast, onПуть }:{ r:Restaura
         <div className="absolute bottom-0 left-0 right-0 p-4">
           <div className="flex items-center gap-1.5 mb-1"><Badge text={r.cuisine} color={"#C1603A"}/><Badge text={трК(r.city)} color={GREEN}/></div>
           <p className="text-white text-xl font-bold" style={{fontFamily:"'Fraunces',serif"}}>{r.name}</p>
-          <div className="flex items-center gap-3 mt-0.5"><StarRow rating={r.rating}/><span className="text-white/70 text-xs">{r.reviews} отзывов</span><span className="text-white/70 text-xs">{r.price}</span></div>
+          <div className="flex items-center gap-3 mt-0.5"><StarRow rating={r.rating}/><span className="text-white/70 text-xs">{r.reviews} {t("d_reviews_word")}</span><span className="text-white/70 text-xs">{r.price}</span></div>
         </div>
       </div>
       <div className="flex-1 overflow-y-auto hide-scroll px-4 pt-4">
@@ -186,11 +186,11 @@ export function RestaurantDetail({ r, onBack, onToast, onПуть }:{ r:Restaura
         </div>
         <div className="bg-white rounded-2xl p-4 mb-3 shadow-sm border" style={{borderColor:BORDER}}><p className="font-bold text-sm mb-2" style={{color:TEXT}}>{t("d_about_rest")}</p><p className="text-sm leading-relaxed" style={{color:MUTED}}>{r.desc}</p></div>
         <div className="bg-white rounded-2xl p-4 mb-3 shadow-sm border" style={{borderColor:BORDER}}>
-          <p className="font-bold text-sm mb-2" style={{color:TEXT}}>Фирменные блюда</p>
+          <p className="font-bold text-sm mb-2" style={{color:TEXT}}>{t("d_signature")}</p>
           <div className="space-y-2">
             {["Плов", "Шашлык из баранины", "Самса тандырная", "Лагман", "Нон горячий"].map((dish,i)=>(
               <div key={i} className="flex items-center justify-between py-2 border-b last:border-0" style={{borderColor:BORDER}}>
-                <span className="text-sm" style={{color:TEXT}}>{dish}</span>
+                <span className="text-sm" style={{color:TEXT}}>{трК(dish)}</span>
                 <span className="text-xs font-bold" style={{color:GREEN}}>${3+i*2}–${5+i*3}</span>
               </div>
             ))}
@@ -198,7 +198,7 @@ export function RestaurantDetail({ r, onBack, onToast, onПуть }:{ r:Restaura
         </div>
         <div className="flex gap-3 pb-6">
           <button onClick={()=>onПуть(r.name, r.city)} className="flex-1 py-3.5 rounded-2xl text-white text-sm font-bold active:scale-[0.98] transition-all" style={{background:"#C1603A"}}>📍 {t("d_route")}</button>
-          <button onClick={()=>onToast(`📞 Звонок в «${r.name}»...`)} className="flex-1 py-3.5 rounded-2xl text-sm font-bold border active:scale-[0.98] transition-all" style={{color:"#C1603A",borderColor:"#C1603A",background:WHITE}}>📞 {t("d_call")}</button>
+          <button onClick={()=>onToast(`📞 ${t("d_calling")} «${r.name}»...`)} className="flex-1 py-3.5 rounded-2xl text-sm font-bold border active:scale-[0.98] transition-all" style={{color:"#C1603A",borderColor:"#C1603A",background:WHITE}}>📞 {t("d_call")}</button>
         </div>
       </div>
         <BookingForm kind="restaurant" itemId={r.id} itemName={r.name} />
@@ -217,26 +217,26 @@ export function RouteDetail({ route, onBack }:{ route:Route; onBack:()=>void }) 
         <div className="absolute inset-0 flex items-center justify-end pr-4 opacity-15"><GeomPattern opacity={1}/></div>
         <button onClick={onBack} className="mb-3 w-9 h-9 rounded-xl flex items-center justify-center relative z-10" style={{background:"rgba(255,255,255,0.2)"}}><svg width="16" height="16" fill="none" stroke="white" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
         <div className="relative z-10">
-          <Badge text={route.badge} color="rgba(255,255,255,0.9)"/>
-          <h2 className="text-white text-xl font-bold mt-1 leading-tight" style={{fontFamily:"'Fraunces',serif"}}>{route.icon} {route.title}</h2>
-          <p className="text-white/70 text-xs mt-1">{route.sub}</p>
-          <div className="flex gap-4 mt-3">{[["⏱",route.duration],["📍",`${route.stops.length} ост.`]].map(([e,v])=><div key={String(v)} className="flex items-center gap-1"><span className="text-sm">{e}</span><span className="text-white text-xs font-semibold">{v}</span></div>)}</div>
+          <Badge text={трК(route.badge)} color="rgba(255,255,255,0.9)"/>
+          <h2 className="text-white text-xl font-bold mt-1 leading-tight" style={{fontFamily:"'Fraunces',serif"}}>{route.icon} {трК(route.title)}</h2>
+          <p className="text-white/70 text-xs mt-1">{трК(route.sub)}</p>
+          <div className="flex gap-4 mt-3">{[["⏱",route.duration],["📍",`${route.stops.length} ${t("d_stops_short")}`]].map(([e,v])=><div key={String(v)} className="flex items-center gap-1"><span className="text-sm">{e}</span><span className="text-white text-xs font-semibold">{v}</span></div>)}</div>
         </div>
       </div>
       <div className="flex-1 overflow-y-auto hide-scroll p-4">
-        <p className="font-bold text-sm mb-3" style={{color:TEXT}}>Остановки маршрута</p>
+        <p className="font-bold text-sm mb-3" style={{color:TEXT}}>{t("d_route_stops")}</p>
         {route.stops.map((s,i)=>(
           <div key={i} className="flex gap-3 mb-2">
             <div className="flex flex-col items-center"><div className="w-7 h-7 rounded-xl flex items-center justify-center text-white text-xs font-bold flex-shrink-0" style={{background:route.color}}>{i+1}</div>{i<route.stops.length-1&&<div className="w-0.5 flex-1 mt-1" style={{background:BORDER}}/>}</div>
             <div className="bg-white rounded-2xl p-3 flex-1 shadow-sm border mb-2" style={{borderColor:BORDER}}>
-              <div className="flex items-start justify-between gap-2"><div><p className="font-bold text-sm" style={{color:TEXT}}>{s.name}</p><p className="text-[10px] mt-0.5" style={{color:MUTED}}>{s.dur&&`⏱ ${s.dur}`}{s.entry?` · 🎫 ${s.entry}`:""}</p></div><span className="text-[10px] font-semibold flex-shrink-0" style={{color:MUTED}}>{s.time}</span></div>
-              {s.note&&<p className="text-xs mt-1.5 font-medium" style={{color:route.color}}>💡 {s.note}</p>}
+              <div className="flex items-start justify-between gap-2"><div><p className="font-bold text-sm" style={{color:TEXT}}>{трК(s.name)}</p><p className="text-[10px] mt-0.5" style={{color:MUTED}}>{s.dur&&`⏱ ${s.dur}`}{s.entry?` · 🎫 ${s.entry}`:""}</p></div><span className="text-[10px] font-semibold flex-shrink-0" style={{color:MUTED}}>{s.time}</span></div>
+              {s.note&&<p className="text-xs mt-1.5 font-medium" style={{color:route.color}}>💡 {трК(s.note)}</p>}
             </div>
           </div>
         ))}
         <div className="flex gap-3 pb-6 mt-2">
-          <button className="flex-1 py-3.5 rounded-2xl text-white text-sm font-bold" style={{background:route.color}}>▶ Начать</button>
-          <button className="flex-1 py-3.5 rounded-2xl text-sm font-bold border" style={{color:route.color,borderColor:route.color,background:WHITE}}>💾 Сохранить</button>
+          <button className="flex-1 py-3.5 rounded-2xl text-white text-sm font-bold" style={{background:route.color}}>▶ {t("d_start")}</button>
+          <button className="flex-1 py-3.5 rounded-2xl text-sm font-bold border" style={{color:route.color,borderColor:route.color,background:WHITE}}>💾 {t("d_save")}</button>
         </div>
       </div>
         <BookingForm kind="tour" itemId={route.id} itemName={route.title} />
