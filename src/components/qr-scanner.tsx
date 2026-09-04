@@ -87,7 +87,7 @@ export default function QrScanner({
           className="rounded-xl px-3 py-1.5 text-xs font-semibold"
           style={{ background: "rgba(255,255,255,0.15)", color: WHITE }}
         >
-          Закрыть
+          {t("common_close")}
         </button>
       </div>
 
@@ -97,22 +97,19 @@ export default function QrScanner({
 
           {состояние === "пуск" && (
             <p className="mt-4 text-center text-sm" style={{ color: "rgba(255,255,255,0.75)" }}>
-              Включаем камеру…
+              {t("qr_starting")}
             </p>
           )}
 
           {состояние === "нет-камеры" && (
             <p className="mt-4 text-center text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.75)" }}>
-              Камеру на этом устройстве найти не удалось. Аудиогид можно выбрать
-              из списка на экране.
+              {t("qr_no_camera")}
             </p>
           )}
 
           {состояние === "отказ" && (
             <p className="mt-4 text-center text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.75)" }}>
-              Доступ к камере закрыт. Разрешение спрашивают один раз, поэтому
-              вернуть его можно только в настройках браузера, в разделе прав
-              этого сайта.
+              {t("qr_denied")}
             </p>
           )}
         </div>
@@ -123,6 +120,7 @@ export default function QrScanner({
 
 /** Рамка сканера в списке — та же кнопка, что была, но теперь рабочая. */
 export function КнопкаСканера({ onClick }: { onClick: () => void }) {
+  const { t } = useT();
   return (
     <button
       onClick={onClick}
@@ -142,10 +140,10 @@ export function КнопкаСканера({ onClick }: { onClick: () => void })
         </div>
         <div className="min-w-0 text-left">
           <p className="text-sm font-bold" style={{ color: TEXT }}>
-            Сканировать код
+            {t("qr_scan")}
           </p>
           <p className="mt-0.5 text-xs" style={{ color: MUTED }}>
-            Наведите камеру на табличку — включится нужный аудиогид
+            {t("qr_scan_sub")}
           </p>
         </div>
       </div>

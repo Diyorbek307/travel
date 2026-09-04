@@ -5,6 +5,7 @@ import type { Place } from "@/lib/types";
 import { BORDER, CREAM, GREEN, MUTED, TEXT, WHITE } from "@/lib/theme";
 import { PRACTICAL } from "@/data/content";
 import { useAppContent } from "@/components/content-provider";
+import { useT } from "@/components/lang-provider";
 import { AdBanner, OfflinePacks } from "@/components/widgets";
 import QrScanner, { КнопкаСканера } from "@/components/qr-scanner";
 
@@ -40,6 +41,7 @@ export function AudioScreen({
   сразуИграть?: string | null;
 }) {
   const { AUDIO, PLACES } = useAppContent();
+  const { t, трК } = useT();
   const [язык, setЯзык] = useState<string | null>(null);
   const [сканер, setСканер] = useState(false);
   const [играет, setИграет] = useState<string | null>(null);
@@ -81,7 +83,7 @@ export function AudioScreen({
     }
     const найдено = AUDIO.find((а) => а.id === id);
     if (найдено) включить(найдено.id, найдено.url, найдено.placeId);
-    else setОшибка("Этот код не относится ни к одному аудиогиду.");
+    else setОшибка(t("audio_bad_code"));
   }
 
   function включить(id: string, url: string, placeId: string, самоНачало = false) {
@@ -127,7 +129,7 @@ export function AudioScreen({
     if (!сразуИграть || ужеВключили.current === сразуИграть) return;
     const запись = AUDIO.find((а) => а.id === сразуИграть);
     if (!запись) {
-      if (AUDIO.length) setОшибка("Этот код не относится ни к одному аудиогиду.");
+      if (AUDIO.length) setОшибка(t("audio_bad_code"));
       return;
     }
     ужеВключили.current = сразуИграть;
@@ -143,16 +145,16 @@ export function AudioScreen({
     <div className="flex h-full flex-col" style={{ background: CREAM }}>
       <div className="border-b bg-white px-4 pt-14 pb-4" style={{ borderColor: BORDER }}>
         <p className="mb-0.5 text-xs font-medium" style={{ color: GREEN, letterSpacing: "0.1em" }}>
-          АУДИОГИД
+          {t("audio_kicker")}
         </p>
         <h1 className="mb-3 text-xl font-bold" style={{ color: TEXT, fontFamily: "'Fraunces',serif" }}>
-          Слушай истории
+          {t("audio_listen")}
         </h1>
 
         {языки.length > 1 && (
           <>
             <p className="mb-2 text-xs" style={{ color: MUTED }}>
-              Язык аудиогида
+              {t("audio_lang")}
             </p>
             <div className="hide-scroll flex gap-2 overflow-x-auto">
               <button
@@ -160,7 +162,7 @@ export function AudioScreen({
                 className="flex-shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold"
                 style={язык === null ? { background: GREEN, color: WHITE } : { background: CREAM, color: MUTED }}
               >
-                Все
+                {t("audio_all")}
               </button>
               {языки.map((я) => (
                 <button
@@ -190,8 +192,7 @@ export function AudioScreen({
 
         {нужноНажать && (
           <p className="rounded-xl px-3 py-2 text-xs leading-relaxed" style={{ background: GREEN + "12", color: GREEN }}>
-            Запись готова — нажмите на неё, чтобы начать. Браузер включает звук
-            только по касанию.
+            {t("audio_ready")}
           </p>
         )}
 
@@ -199,7 +200,7 @@ export function AudioScreen({
           <div className="mb-2.5 flex items-center gap-2">
             <div className="h-2 w-2 rounded-full bg-green-500" />
             <p className="text-sm font-bold" style={{ color: TEXT }}>
-              {AUDIO.length ? "Доступные записи" : "Записи"}
+              {AUDIO.length ? t("audio_available") : t("audio_records")}
             </p>
           </div>
 
@@ -207,8 +208,8 @@ export function AudioScreen({
             <div className="rounded-2xl border bg-white p-4" style={{ borderColor: BORDER }}>
               <p className="text-sm leading-relaxed" style={{ color: MUTED }}>
                 {AUDIO.length === 0
-                  ? "Аудиогидов пока нет. Как только их запишут и добавят, они появятся здесь."
-                  : "На этом языке записей пока нет."}
+                  ? t("audio_empty_none")
+                  : t("audio_empty_lang")}
               </p>
             </div>
           ) : (
@@ -223,7 +224,7 @@ export function AudioScreen({
                   >
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-bold" style={{ color: TEXT }}>
-                        {а.title}
+                        {трК(а.title)}
                       </p>
                       <p className="mt-0.5 truncate text-xs" style={{ color: MUTED }}>
                         {а.placeName} · {а.lang}
@@ -253,16 +254,16 @@ export function AudioScreen({
 
         <div>
           <p className="mb-2.5 text-sm font-bold" style={{ color: TEXT }}>
-            💡 Практическое
+            💡 {t("audio_practical")}
           </p>
           <div className="grid gap-2.5 sm:grid-cols-2">
             {PRACTICAL.map((п, i) => (
               <div key={i} className="rounded-2xl border bg-white p-3" style={{ borderColor: BORDER }}>
                 <p className="text-sm font-bold" style={{ color: TEXT }}>
-                  {п.icon} {п.title}
+                  {п.icon} {трК(п.title)}
                 </p>
                 <p className="mt-1 text-xs leading-relaxed" style={{ color: MUTED }}>
-                  {п.body}
+                  {трК(п.body)}
                 </p>
               </div>
             ))}
