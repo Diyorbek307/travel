@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { подЛимитом, ipЗапроса } from "@/lib/rate-limit";
 import { createReset, findByEmail } from "@/lib/users";
 import { sendMail, письмоСоСсылкой } from "@/lib/mail";
 
@@ -12,6 +13,9 @@ export const dynamic = "force-dynamic";
  * смотреть, где ответ другой.
  */
 export async function POST(request: Request) {
+  if (!подЛимитом(`forgot:${ipЗапроса(request)}`, 5, 60_000))
+    return NextResponse.json({ error: "too_many" }, { status: 429 });
+
   let body: Record<string, unknown>;
   try {
     body = await request.json();

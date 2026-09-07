@@ -2,6 +2,7 @@ import { createHmac, randomBytes, scrypt, timingSafeEqual } from "node:crypto";
 import { promisify } from "node:util";
 import path from "node:path";
 import { создатьХранилище } from "./storage";
+import { требуетсяСекрет } from "./secrets";
 
 /**
  * Учётные записи туристов.
@@ -91,7 +92,10 @@ export async function verifyPassword(password: string, stored: string): Promise<
 /* ------------------------------------------------------------------ */
 
 function secret(): string {
-  return process.env.SESSION_SECRET ?? process.env.ADMIN_SECRET ?? "uz-session-dev-secret";
+  // Подойдёт свой ключ сессий или, как запасной, ключ админки — лишь бы
+  // в бою был задан хоть один. Иначе подпись сессии подделывается.
+  const заданный = process.env.SESSION_SECRET ?? process.env.ADMIN_SECRET;
+  return требуетсяСекрет("SESSION_SECRET", заданный, "uz-session-dev-secret");
 }
 
 function sign(payload: string): string {

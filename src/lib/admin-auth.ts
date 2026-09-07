@@ -1,5 +1,6 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { cookies } from "next/headers";
+import { требуетсяСекрет, вПродакшене } from "./secrets";
 
 /**
  * Доступ в админ-панель.
@@ -20,7 +21,7 @@ export const ADMIN_COOKIE = "uz_admin";
 const TTL_MS = 12 * 60 * 60 * 1000;
 
 function secret(): string {
-  return process.env.ADMIN_SECRET ?? "uz-admin-dev-secret";
+  return требуетсяСекрет("ADMIN_SECRET", process.env.ADMIN_SECRET, "uz-admin-dev-secret");
 }
 
 export function isDefaultPassword(): boolean {
@@ -31,8 +32,16 @@ function password(): string {
   return process.env.ADMIN_PASSWORD ?? "admin";
 }
 
-/** Сравнение за постоянное время: обычное `===` выдаёт длину совпадения. */
+/**
+ * Проверка пароля админки — за постоянное время: обычное `===` выдаёт
+ * длину совпадения по скорости ответа.
+ *
+ * В бою пароль обязателен. Если его не задали, вход закрыт для всех:
+ * пускать по дефолтному «admin» на боевом стенде — это открытая дверь.
+ * На машине разработчика (пароль не задан) по-прежнему пускает «admin».
+ */
 export function checkPassword(input: string): boolean {
+  if (вПродакшене() && isDefaultPassword()) return false;
   const a = Buffer.from(input);
   const b = Buffer.from(password());
   return a.length === b.length && timingSafeEqual(a, b);

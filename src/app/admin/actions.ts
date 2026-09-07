@@ -1,8 +1,9 @@
 "use server";
 
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { ADMIN_COOKIE, checkPassword, makeToken } from "@/lib/admin-auth";
+import { подЛимитом } from "@/lib/rate-limit";
 
 export interface LoginResult {
   ok: boolean;
@@ -10,6 +11,13 @@ export interface LoginResult {
 }
 
 export async function login(_prev: LoginResult | null, formData: FormData): Promise<LoginResult> {
+  // Тормоз против перебора: у панели один общий пароль, поэтому вход
+  // ограничиваем жёстче обычного — восемь попыток в минуту с адреса.
+  const ip = (await headers()).get("x-forwarded-for")?.split(",")[0].trim() ?? "unknown";
+  if (!подЛимитом(`admin-login:${ip}`, 8, 60_000)) {
+    return { ok: false, message: "Слишком много попыток. Подождите минуту." };
+  }
+
   const input = String(formData.get("password") ?? "");
   if (!checkPassword(input)) {
     return { ok: false, message: "Неверный пароль" };

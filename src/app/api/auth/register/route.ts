@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { подЛимитом, ipЗапроса } from "@/lib/rate-limit";
 import {
   createUser,
   createVerification,
@@ -22,6 +23,9 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const MAX_PHOTO_BYTES = 400_000;
 
 export async function POST(request: Request) {
+  if (!подЛимитом(`register:${ipЗапроса(request)}`, 5, 60_000))
+    return NextResponse.json({ error: "too_many" }, { status: 429 });
+
   let body: Record<string, unknown>;
   try {
     body = await request.json();
