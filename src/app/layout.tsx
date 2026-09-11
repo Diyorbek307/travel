@@ -32,6 +32,33 @@ export const metadata: Metadata = {
   description:
     "Маршруты, аудиогиды, отели и рестораны Узбекистана в одном приложении.",
   manifest: "/manifest.webmanifest",
+  applicationName: "UzUp",
+  /*
+   * iOS не читает web-манифест: и значок на домашнем экране, и запуск без
+   * адресной строки он берёт только отсюда. Без этих полей «установленное»
+   * приложение открывалось бы обычной вкладкой Safari со скриншотом вместо
+   * иконки.
+   */
+  appleWebApp: {
+    capable: true,
+    title: "UzUp",
+    statusBarStyle: "default",
+  },
+  icons: {
+    icon: [
+      { url: "/icons/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon.svg", type: "image/svg+xml" },
+    ],
+    apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180" }],
+  },
+  formatDetection: {
+    // Телефоны и даты в текстах — часть вёрстки. Автоссылки от iOS их
+    // перекрашивают и ломают строку.
+    telephone: false,
+    date: false,
+    address: false,
+  },
 };
 
 export const viewport: Viewport = {
@@ -41,6 +68,10 @@ export const viewport: Viewport = {
   // Экран карты и колода карточек живут на жестах — двойной тап по ним
   // не должен зумить страницу.
   maximumScale: 1,
+  // Во весь экран, включая области под чёлкой и полосой домой. Отступы
+  // под них берём в CSS через env(safe-area-inset-*) — иначе нижняя
+  // панель вкладок оказалась бы под полосой жеста на iPhone.
+  viewportFit: "cover",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

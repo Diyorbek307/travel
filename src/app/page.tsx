@@ -164,13 +164,29 @@ function App() {
   const openHotel = (value: Hotel) => setDetail({ kind: "hotel", value });
   const openRestaurant = (value: Restaurant) => setDetail({ kind: "restaurant", value });
   const openПуть = (название: string, город: string) => setDetail({ kind: "путь", название, город });
+  /*
+   * Вход по адресу: QR-код ведёт на `?audio=<id>`, а ярлыки приложения на
+   * домашнем экране телефона — на `?tab=<вкладка>` (долгое нажатие по
+   * значку). Оба параметра одноразовые: сразу после разбора стираем их из
+   * адреса, иначе обновление страницы снова утащило бы человека на ту же
+   * вкладку, откуда он уже ушёл.
+   */
   useEffect(() => {
     const п = new URLSearchParams(window.location.search);
     const id = п.get("audio");
-    if (!id) return;
-    setКодЗаписи(id);
-    setTab("audio");
-    п.delete("audio");
+    const вкладка = п.get("tab");
+    const вкладки: Tab[] = ["home", "explore", "map", "audio", "profile"];
+
+    if (id) {
+      setКодЗаписи(id);
+      setTab("audio");
+      п.delete("audio");
+    } else if (вкладка && (вкладки as string[]).includes(вкладка)) {
+      setTab(вкладка as Tab);
+    }
+    if (!id && !вкладка) return;
+
+    п.delete("tab");
     const хвост = п.toString();
     window.history.replaceState({}, "", window.location.pathname + (хвост ? `?${хвост}` : ""));
   }, []);
