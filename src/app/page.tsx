@@ -245,7 +245,14 @@ function App() {
 
         {phase === "splash" && (
           <div className="absolute inset-0 z-40">
-            <SplashScreen onStart={() => setPhase("register")} onLogin={() => setPhase("login")} />
+            {/*
+             * ВРЕМЕННО (демо): обе кнопки ведут сразу в приложение, минуя
+             * регистрацию и вход — чтобы показывать его другим без аккаунта.
+             * Гость идёт как «Путешественник» (профиль это уже умеет).
+             * Вернуть настоящий вход: onStart → setPhase("register"),
+             *                         onLogin → setPhase("login").
+             */}
+            <SplashScreen onStart={() => setPhase("app")} onLogin={() => setPhase("app")} />
           </div>
         )}
 
