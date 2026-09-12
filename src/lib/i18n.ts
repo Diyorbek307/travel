@@ -490,6 +490,7 @@ export const СЛОВАРЬ = {
   card_entry: row("Entry", "Вход", "Kirish", "门票", "입장", "Eintritt", "Entrée", "入場", "Giriş", "الدخول"),
   card_now: row("Now", "Сейчас", "Hozir", "此刻", "지금", "Jetzt", "Maintenant", "現在", "Şimdi", "الآن"),
   card_weather: row("Weather", "Погода", "Ob-havo", "天气", "날씨", "Wetter", "Météo", "天気", "Hava", "الطقس"),
+  card_wind: row("Wind", "Ветер", "Shamol", "风", "바람", "Wind", "Vent", "風", "Rüzgar", "الرياح"),
   card_open: row("Open", "Открыть", "Ochish", "打开", "열기", "Öffnen", "Ouvrir", "開く", "Aç", "افتح"),
   card_direction: row("Destination", "Направление", "Yoʻnalish", "目的地", "여행지", "Reiseziel", "Destination", "行き先", "Yön", "الوجهة"),
   deck_top_sights: row("Top sights", "Топ достопримечательности", "Eng zoʻr diqqatga sazovor joylar", "热门景点", "인기 명소", "Top-Sehenswürdigkeiten", "Sites incontournables", "人気の名所", "En iyi yerler", "أبرز المعالم"),

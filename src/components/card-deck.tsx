@@ -48,6 +48,16 @@ function CardFace({ it, active }: { it: DeckItem; active: boolean }) {
         >
           {it.badge}
         </span>
+        {/* Погода в углу — как на карточках отелей. */}
+        {it.temp && (
+          <span
+            className="rounded-full px-2 py-0.5 text-[9px] font-bold text-white"
+            style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(6px)" }}
+          >
+            {it.tempIcon}
+            {it.temp}°
+          </span>
+        )}
       </div>
 
       <div className="absolute bottom-0 left-0 right-0 p-3.5">
@@ -254,12 +264,16 @@ export function CardDeck({ places, onPlace }: { places: Place[]; onPlace: (p: Pl
     sub: `${трК(p.city)} · ${t("uz_country")}`,
     badge: p.type,
     badgeColor: "rgba(233,196,106,0.92)",
-    stat1: p.distance,
-    stat1l: t("card_dist"),
-    stat2: WEATHER[p.city] ? `${WEATHER[p.city].temp}°` : "—",
-    stat2l: t("card_temp"),
-    stat3: `${p.rating}★`,
-    stat3l: t("card_rating"),
+    // Погода — чипом в углу, как у отелей.
+    temp: WEATHER[p.city]?.temp,
+    tempIcon: WEATHER[p.city]?.icon,
+    // Три коротких метрики (как у отелей): рейтинг, отзывы, расстояние.
+    stat1: `${p.rating}★`,
+    stat1l: t("card_rating"),
+    stat2: String(p.reviews),
+    stat2l: t("d_reviews_word"),
+    stat3: p.distance,
+    stat3l: t("card_dist"),
     price: p.entry,
     pricel: t("card_entry"),
   }));
@@ -279,14 +293,16 @@ export function CityDeck({ onSearch }: { onSearch: () => void }) {
     badgeColor: "rgba(46,125,90,0.85)",
     // Зелёный бейдж — светлый текст, иначе тёмный на тёмном не читался.
     badgeTextColor: WHITE,
-    stat1: WEATHER[c.name] ? `${WEATHER[c.name].temp}°` : "—",
-    stat1l: t("card_now"),
-    // Погода значком (эмодзи) вместо длинного слова — колонка остаётся
-    // компактной на любом языке, а само состояние уходит в подпись.
-    stat2: WEATHER[c.name] ? WEATHER[c.name].icon : "—",
-    stat2l: WEATHER[c.name] ? трК(WEATHER[c.name].cond) : t("card_weather"),
-    stat3: `${c.rating}★`,
-    stat3l: t("card_rating"),
+    // Погода — чипом в углу, как у отелей.
+    temp: WEATHER[c.name]?.temp,
+    tempIcon: WEATHER[c.name]?.icon,
+    // Три коротких метрики: рейтинг, «ощущается», ветер (единица локализована).
+    stat1: `${c.rating}★`,
+    stat1l: t("card_rating"),
+    stat2: WEATHER[c.name] ? `${WEATHER[c.name].feels}°` : "—",
+    stat2l: t("w_feels"),
+    stat3: WEATHER[c.name] ? `${parseInt(WEATHER[c.name].wind, 10)} ${t("w_wind")}` : "—",
+    stat3l: t("card_wind"),
     price: t("card_open"),
     pricel: t("card_direction"),
   }));
