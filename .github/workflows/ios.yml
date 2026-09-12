@@ -40,13 +40,22 @@ jobs:
       - name: Синхронизировать
         run: npx cap sync ios
 
-      - name: Собрать под симулятор (без подписи)
-        # Без -destination: собираем под SDK симулятора, без привязки к
-        # конкретному устройству — так надёжнее в CI. Три флага подписи
-        # вместе полностью её выключают: одного CODE_SIGNING_ALLOWED мало,
-        # поды всё равно требуют identity.
+      - name: Установить поды явно
+        # cap add ios ставит поды, но если что-то пошло не так, workspace
+        # не создастся и xcodebuild упадёт с кодом 66. Ставим сами и падаем
+        # тут, где причина видна, а не глубже.
         run: |
-          set -eo pipefail
+          cd ios/App
+          pod install --repo-update
+
+      - name: Собрать под симулятор (без подписи)
+        # Без -destination: собираем под SDK симулятора. Три флага подписи
+        # вместе полностью её выключают. Ошибку xcodebuild выводим через
+        # ::error::, чтобы она попала в аннотации сборки.
+        run: |
+          echo "== схемы =="
+          xcodebuild -list -workspace ios/App/App.xcworkspace 2>&1 | head -40 || true
+          set +e
           xcodebuild \
             -workspace ios/App/App.xcworkspace \
             -scheme App \
@@ -56,7 +65,13 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
-            build
+            build 2>&1 | tee xcode.log
+          code=${PIPESTATUS[0]}
+          if [ "$code" -ne 0 ]; then
+            echo "::error::xcodebuild завершился с кодом $code"
+            grep -iE "error:|does not contain|no scheme|cannot |ld: |fatal|not found" xcode.log | tail -15 | while IFS= read -r l; do echo "::error::$l"; done
+            exit "$code"
+          fi
 
       - name: Запустить в симуляторе и снять экран
         run: |
@@ -82,4 +97,5 @@ jobs:
           path: |
             build/Build/Products/**/App.app
             app-iphone.png
+            xcode.log
           if-no-files-found: warn
