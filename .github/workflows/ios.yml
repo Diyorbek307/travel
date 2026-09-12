@@ -33,28 +33,33 @@ jobs:
         run: npm ci
 
       - name: Создать iOS-проект
-        # cap add создаёт нативный проект и ставит поды. Если он уже есть в
-        # репозитории — просто синхронизируем.
-        run: npx cap add ios || npx cap sync ios
+        # Без маскировки ошибок: если cap add упадёт — увидим это здесь, а
+        # не глубже. cap add уже копирует шаблон и ставит поды.
+        run: npx cap add ios
 
       - name: Синхронизировать
         run: npx cap sync ios
 
       - name: Установить поды
-        # cap add ios не всегда доводит pod install до конца, и тогда
-        # App.xcworkspace не создаётся. Ставим сами — обычным pod install
-        # (через CDN, без медленного и капризного --repo-update). Ошибку
-        # выводим в аннотации.
+        # Podfile ищем, где бы он ни лежал, и ставим поды рядом с ним —
+        # именно pod install создаёт App.xcworkspace. Нет Podfile — значит
+        # проект не собрался; выводим дерево в аннотации и падаем.
         run: |
-          cd ios/App
           set +e
-          pod install 2>&1 | tee ../../pod.log
+          POD=$(find ios -name Podfile -maxdepth 4 2>/dev/null | head -1)
+          echo "Podfile: ${POD:-не найден}"
+          if [ -z "$POD" ]; then
+            echo "::error::Podfile не найден после cap add ios — проект не создался"
+            find ios -maxdepth 3 2>/dev/null | head -40 | while IFS= read -r l; do echo "::error::дерево: $l"; done
+            exit 1
+          fi
+          cd "$(dirname "$POD")"
+          pod install 2>&1 | tee /tmp/pod.log
           code=${PIPESTATUS[0]}
           if [ "$code" -ne 0 ]; then
-            grep -iE "error|\[!\]|unable|could not|not found|conflict|require" ../../pod.log | tail -20 | while IFS= read -r l; do echo "::error::$l"; done
+            grep -iE "error|\[!\]|unable|could not|conflict|require" /tmp/pod.log | tail -20 | while IFS= read -r l; do echo "::error::$l"; done
             exit "$code"
           fi
-          test -d App.xcworkspace && echo "workspace создан" || { echo "::error::App.xcworkspace так и не создан"; exit 1; }
 
       - name: Собрать под симулятор (без подписи)
         # Без -destination: собираем под SDK симулятора. Три флага подписи
