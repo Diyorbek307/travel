@@ -40,41 +40,23 @@ jobs:
       - name: Синхронизировать
         run: npx cap sync ios
 
-      - name: Установить поды
-        # Podfile ищем, где бы он ни лежал, и ставим поды рядом с ним —
-        # именно pod install создаёт App.xcworkspace. Нет Podfile — значит
-        # проект не собрался; выводим дерево в аннотации и падаем.
-        run: |
-          set +e
-          POD=$(find ios -name Podfile -maxdepth 4 2>/dev/null | head -1)
-          echo "Podfile: ${POD:-не найден}"
-          if [ -z "$POD" ]; then
-            echo "::error::Podfile не найден после cap add ios — проект не создался"
-            find ios -maxdepth 3 2>/dev/null | head -40 | while IFS= read -r l; do echo "::error::дерево: $l"; done
-            exit 1
-          fi
-          cd "$(dirname "$POD")"
-          pod install 2>&1 | tee /tmp/pod.log
-          code=${PIPESTATUS[0]}
-          if [ "$code" -ne 0 ]; then
-            grep -iE "error|\[!\]|unable|could not|conflict|require" /tmp/pod.log | tail -20 | while IFS= read -r l; do echo "::error::$l"; done
-            exit "$code"
-          fi
-
       - name: Собрать под симулятор (без подписи)
+        # Capacitor 8 использует Swift Package Manager, а не CocoaPods:
+        # Podfile и App.xcworkspace не создаются, зависимости тянет сам
+        # Xcode. Поэтому собираем -project App.xcodeproj (не workspace).
         # Без -destination: собираем под SDK симулятора. Три флага подписи
-        # вместе полностью её выключают. Ошибку xcodebuild выводим через
-        # ::error::, чтобы она попала в аннотации сборки.
+        # вместе полностью её выключают. Ошибку выводим через ::error::.
         run: |
           echo "== схемы =="
-          xcodebuild -list -workspace ios/App/App.xcworkspace 2>&1 | head -40 || true
+          xcodebuild -list -project ios/App/App.xcodeproj 2>&1 | head -40 || true
           set +e
           xcodebuild \
-            -workspace ios/App/App.xcworkspace \
+            -project ios/App/App.xcodeproj \
             -scheme App \
             -configuration Debug \
             -sdk iphonesimulator \
             -derivedDataPath build \
+            -clonedSourcePackagesDirPath spm-cache \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
