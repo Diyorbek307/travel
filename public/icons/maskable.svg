@@ -1,8 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="UzRoam">
-  <rect width="512" height="512" fill="#2d7b57"/>
-  <g transform="translate(256 256) scale(0.62) translate(-256 -256)">
-    <path d="M256 96C328 96 388 156 388 232C388 312 300 372 256 432C212 372 124 312 124 232C124 156 184 96 256 96Z" fill="#ffffff"/>
-    <path d="M202 356V236C202 180 224 144 256 116C288 144 310 180 310 236V356Z" fill="#2d7b57"/>
-    <path d="M360 106C368 138 380 150 412 158C380 166 368 178 360 210C352 178 340 166 308 158C340 150 352 138 360 106Z" fill="#e9c46a"/>
+  <rect width="512" height="512" fill="#164A30"/>
+  <!-- Тот же знак, но в безопасной зоне (меньше масштаб) для маскируемой иконки -->
+  <g transform="translate(256 260) scale(2.8) translate(-50 -50)">
+    <path d="M50 6C56 15 68 18 74.5 26C81 34 82 42 82 50C82 65 70 80 50 92C30 80 18 65 18 50C18 42 19 34 25.5 26C32 18 44 15 50 6Z" fill="#F6F3EA"/>
+    <path d="M50 26C51.2 33 54 35.8 61 38C54 40.2 51.2 43 50 50C48.8 43 46 40.2 39 38C46 35.8 48.8 33 50 26Z" fill="#164A30"/>
+    <path d="M59 57C60 69 45 70 37 82C43 86 52 84 57 79" fill="none" stroke="#164A30" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
   </g>
 </svg>

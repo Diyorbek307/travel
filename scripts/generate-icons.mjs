@@ -30,7 +30,7 @@ const icon = path.join(OUT, "icon.svg");
 const maskable = path.join(OUT, "maskable.svg");
 
 /** Тёмно-зелёный фон бренда — им заливаем углы там, где нельзя альфу. */
-const ФОН = { r: 0x16, g: 0x3c, b: 0x2a, alpha: 1 };
+const ФОН = { r: 0x16, g: 0x4a, b: 0x30, alpha: 1 };
 
 const работы = [
   { из: icon, размер: 192, имя: "icon-192.png", плоско: false },

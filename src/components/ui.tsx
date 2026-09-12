@@ -1,4 +1,4 @@
-import { GOLD, GREEN, GREEN_LIGHT } from "@/lib/theme";
+import { CREAM, GOLD, GREEN, GREEN_DARK } from "@/lib/theme";
 
 /** Мелкие элементы, которые встречаются на каждом втором экране. */
 
@@ -27,22 +27,31 @@ export function StarRow({ rating }: { rating: number }) {
 }
 
 export function LogoMark({ size = 30 }: { size?: number }) {
-  // Знак UzRoam: булавка-путь с узбекской стрельчатой аркой (пиштак)
-  // внутри и звездой-искрой — путешествие, наследие, открытие.
+  // Знак UzRoam: купол-михраб с окном-звездой и вьющейся дорогой-рекой —
+  // путешествие, наследие, открытие. Кладём на тёмно-зелёную плитку,
+  // чтобы значок читался и на фото, и на зелёных шапках.
+  const cut = GREEN_DARK; // цвет звезды и дороги — совпадает с плиткой
   return (
-    <svg width={size} height={size} viewBox="0 0 40 40" fill="none" aria-hidden>
-      <path
-        d="M20 3C27.5 3 34 9.2 34 17.5C34 25.5 27 31.5 20 37.5C13 31.5 6 25.5 6 17.5C6 9.2 12.5 3 20 3Z"
-        fill={GREEN}
-      />
-      <path
-        d="M14.5 27.5V18.5C14.5 13.5 16.7 10.2 20 7.5C23.3 10.2 25.5 13.5 25.5 18.5V27.5Z"
-        fill={GREEN_LIGHT}
-      />
-      <path
-        d="M29 4C29.9 7.3 31.2 8.6 34.5 9.5C31.2 10.4 29.9 11.7 29 15C28.1 11.7 26.8 10.4 23.5 9.5C26.8 8.6 28.1 7.3 29 4Z"
-        fill={GOLD}
-      />
+    <svg width={size} height={size} viewBox="0 0 100 100" fill="none" aria-hidden>
+      <rect width="100" height="100" rx="22" fill={GREEN_DARK} />
+      <g transform="translate(50 51) scale(0.74) translate(-50 -50)">
+        <path
+          d="M50 6C56 15 68 18 74.5 26C81 34 82 42 82 50C82 65 70 80 50 92C30 80 18 65 18 50C18 42 19 34 25.5 26C32 18 44 15 50 6Z"
+          fill={CREAM}
+        />
+        <path
+          d="M50 26C51.2 33 54 35.8 61 38C54 40.2 51.2 43 50 50C48.8 43 46 40.2 39 38C46 35.8 48.8 33 50 26Z"
+          fill={cut}
+        />
+        <path
+          d="M59 57C60 69 45 70 37 82C43 86 52 84 57 79"
+          fill="none"
+          stroke={cut}
+          strokeWidth="7"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </g>
     </svg>
   );
 }

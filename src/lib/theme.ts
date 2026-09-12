@@ -9,6 +9,8 @@ import type { CSSProperties } from "react";
  */
 export const GREEN = "#2E7D5A";
 export const GREEN_LIGHT = "#3A9E70";
+/** Тёмный лес — плитка логотипа и подложка бренда. */
+export const GREEN_DARK = "#164A30";
 export const GOLD = "#E9C46A";
 export const CREAM = "#F5F1E6";
 export const WHITE = "#FFFFFF";
