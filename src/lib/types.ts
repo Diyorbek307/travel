@@ -69,6 +69,9 @@ export interface DeckItem {
   sub: string;
   badge: string;
   badgeColor: string;
+  /** Цвет текста бейджа. По умолчанию тёмный — читается на светлом (золотом)
+   *  фоне; на тёмном (зелёном) бейдже передаём белый. */
+  badgeTextColor?: string;
   stat1: string;
   stat1l: string;
   stat2: string;

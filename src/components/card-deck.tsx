@@ -44,7 +44,7 @@ function CardFace({ it, active }: { it: DeckItem; active: boolean }) {
       <div className="absolute left-4 right-4 top-4 flex items-center justify-between">
         <span
           className="rounded-full px-2 py-0.5 text-[8px] font-bold"
-          style={{ background: it.badgeColor, color: TEXT }}
+          style={{ background: it.badgeColor, color: it.badgeTextColor ?? TEXT }}
         >
           {it.badge}
         </span>
@@ -68,7 +68,7 @@ function CardFace({ it, active }: { it: DeckItem; active: boolean }) {
           {it.title}
         </p>
 
-        <div className="mb-2.5 flex gap-3 border-t pt-2" style={{ borderColor: "rgba(255,255,255,0.1)" }}>
+        <div className="mb-2.5 flex gap-2 border-t pt-2" style={{ borderColor: "rgba(255,255,255,0.1)" }}>
           {(
             [
               [it.stat1, it.stat1l],
@@ -76,10 +76,11 @@ function CardFace({ it, active }: { it: DeckItem; active: boolean }) {
               [it.stat3, it.stat3l],
             ] as [string, string][]
           ).map(([v, l], si) => (
-            // min-w-0 + truncate: длинные подписи (напр. «Рейтинг» по-русски)
-            // не переносятся уродливым дефисом, а при нехватке места мягко
-            // обрезаются многоточием. whitespace-nowrap держит слово целым.
-            <div key={si} className="min-w-0">
+            // flex-1 + min-w-0: три равные колонки по центру — одинаково
+            // аккуратно на любой карточке. truncate + nowrap: длинное значение
+            // или подпись мягко обрезаются многоточием, а не переносятся
+            // уродливым дефисом («Рейтин-Г») и не распирают колонку.
+            <div key={si} className="min-w-0 flex-1 text-center">
               <p className="truncate whitespace-nowrap text-[11px] font-bold text-white">{v}</p>
               <p
                 className="truncate whitespace-nowrap text-[8px]"
@@ -276,10 +277,14 @@ export function CityDeck({ onSearch }: { onSearch: () => void }) {
     sub: `${трК(c.sub)} · ${t("uz_country")}`,
     badge: `🏙️ ${t("deck_city_badge")}`,
     badgeColor: "rgba(46,125,90,0.85)",
+    // Зелёный бейдж — светлый текст, иначе тёмный на тёмном не читался.
+    badgeTextColor: WHITE,
     stat1: WEATHER[c.name] ? `${WEATHER[c.name].temp}°` : "—",
     stat1l: t("card_now"),
-    stat2: WEATHER[c.name] ? трК(WEATHER[c.name].cond) : "—",
-    stat2l: t("card_weather"),
+    // Погода значком (эмодзи) вместо длинного слова — колонка остаётся
+    // компактной на любом языке, а само состояние уходит в подпись.
+    stat2: WEATHER[c.name] ? WEATHER[c.name].icon : "—",
+    stat2l: WEATHER[c.name] ? трК(WEATHER[c.name].cond) : t("card_weather"),
     stat3: `${c.rating}★`,
     stat3l: t("card_rating"),
     price: t("card_open"),
