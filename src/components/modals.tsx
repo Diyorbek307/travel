@@ -118,7 +118,7 @@ export function LoginModal({ onClose, onLogin }:{ onClose:()=>void; onLogin:()=>
         </button>
         <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
           <LogoMark size={52}/>
-          <p className="text-white text-2xl font-bold mt-3" style={{fontFamily:"'Fraunces',serif"}}>UzUp</p>
+          <p className="text-white text-2xl font-bold mt-3" style={{fontFamily:"'Fraunces',serif"}}>UzRoam</p>
           <p className="text-white/60 text-sm mt-1">Войди в аккаунт</p>
         </div>
       </div>
@@ -207,7 +207,7 @@ export function PremiumModal({ onClose, onActivate }:{ onClose:()=>void; onActiv
         <div className="relative z-10">
           <div className="flex items-center gap-2 mb-3">
             <div className="w-10 h-10 rounded-2xl flex items-center justify-center text-xl" style={{background:GOLD}}>👑</div>
-            <div><p className="text-white text-xl font-bold" style={{fontFamily:"'Fraunces',serif"}}>UzUp Premium</p><p className="text-white/60 text-xs">{t("prem_sub_incl")}</p></div>
+            <div><p className="text-white text-xl font-bold" style={{fontFamily:"'Fraunces',serif"}}>UzRoam Premium</p><p className="text-white/60 text-xs">{t("prem_sub_incl")}</p></div>
           </div>
           {/* Plan toggle */}
           <div className="flex rounded-2xl overflow-hidden border" style={{borderColor:"rgba(255,255,255,0.15)"}}>

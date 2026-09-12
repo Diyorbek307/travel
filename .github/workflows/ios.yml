@@ -40,6 +40,11 @@ jobs:
       - name: Синхронизировать
         run: npx cap sync ios
 
+      - name: Иконки приложения из assets/
+        # iOS-проект создаётся здесь заново, поэтому значок ставим тем же
+        # источником (assets/icon.png), что и на Android — бренд один.
+        run: npx @capacitor/assets generate --ios --iconBackgroundColor "#14402c" || true
+
       - name: Собрать под симулятор (без подписи)
         # Capacitor 8 использует Swift Package Manager, а не CocoaPods:
         # Podfile и App.xcworkspace не создаются, зависимости тянет сам

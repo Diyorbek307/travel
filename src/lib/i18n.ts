@@ -213,7 +213,7 @@ export const СЛОВАРЬ = {
   home_transport_sub: row("Flights · Trains · Intercity taxi", "Рейсы · Поезда · Межгород такси", "Reyslar · Poyezdlar · Shaharlararo taksi", "航班 · 火车 · 城际出租车", "항공 · 기차 · 시외 택시", "Flüge · Züge · Überlandtaxi", "Vols · Trains · Taxi interurbain", "航空 · 鉄道 · 都市間タクシー", "Uçuşlar · Trenler · Şehirlerarası taksi", "رحلات · قطارات · تاكسي بين المدن"),
   home_weather: row("Weather today", "Погода сегодня", "Bugungi ob-havo", "今日天气", "오늘 날씨", "Wetter heute", "Météo du jour", "今日の天気", "Bugün hava", "طقس اليوم"),
   home_popular_cities: row("Popular cities", "Популярные города", "Mashhur shaharlar", "热门城市", "인기 도시", "Beliebte Städte", "Villes populaires", "人気の都市", "Popüler şehirler", "مدن مشهورة"),
-  home_why: row("Why choose UzUp?", "Почему выбирают UzUp?", "Nega UzUp tanlanadi?", "为什么选择 UzUp？", "왜 UzUp일까요?", "Warum UzUp?", "Pourquoi UzUp ?", "なぜUzUpなのか", "Neden UzUp?", "لماذا UzUp؟"),
+  home_why: row("Why choose UzRoam?", "Почему выбирают UzRoam?", "Nega UzRoam tanlanadi?", "为什么选择 UzRoam？", "왜 UzRoam일까요?", "Warum UzRoam?", "Pourquoi UzRoam ?", "なぜUzRoamなのか", "Neden UzRoam?", "لماذا UzRoam؟"),
   home_all: row("All →", "Все →", "Barchasi →", "全部 →", "전체 →", "Alle →", "Tout →", "すべて →", "Tümü →", "الكل →"),
 
   // ── Исследовать ──────────────────────────────────────────────────
@@ -293,7 +293,7 @@ export const СЛОВАРЬ = {
   prof_account: row("Account", "Аккаунт", "Hisob", "账户", "계정", "Konto", "Compte", "アカウント", "Hesap", "الحساب"),
 
   // ── Оплата ───────────────────────────────────────────────────────
-  pay_premium: row("UzUp Pro", "UzUp Pro", "UzUp Pro", "UzUp Pro", "UzUp Pro", "UzUp Pro", "UzUp Pro", "UzUp Pro", "UzUp Pro", "UzUp Pro"),
+  pay_premium: row("UzRoam Pro", "UzRoam Pro", "UzRoam Pro", "UzRoam Pro", "UzRoam Pro", "UzRoam Pro", "UzRoam Pro", "UzRoam Pro", "UzRoam Pro", "UzRoam Pro"),
   pay_no_ads: row("No ads", "Без рекламы", "Reklamasiz", "无广告", "광고 없음", "Keine Werbung", "Sans publicité", "広告なし", "Reklamsız", "بدون إعلانات"),
   pay_pay: row("Pay", "Оплатить", "Toʻlash", "支付", "결제", "Bezahlen", "Payer", "支払う", "Öde", "ادفع"),
   pay_month: row("month", "месяц", "oy", "月", "월", "Monat", "mois", "月", "ay", "شهر"),
@@ -388,7 +388,7 @@ export const СЛОВАРЬ = {
   s_help: row("Help and FAQ", "Помощь и FAQ", "Yordam va FAQ", "帮助与常见问题", "도움말 및 FAQ", "Hilfe und FAQ", "Aide et FAQ", "ヘルプとよくある質問", "Yardım ve SSS", "المساعدة والأسئلة"),
   s_write_support: row("Contact support", "Написать в поддержку", "Qoʻllab-quvvatlashga yozish", "联系客服", "고객지원에 문의", "Support kontaktieren", "Contacter le support", "サポートに連絡", "Desteğe yaz", "مراسلة الدعم"),
   s_rate: row("Rate the app", "Оценить приложение", "Ilovani baholash", "为应用评分", "앱 평가", "App bewerten", "Noter l'application", "アプリを評価", "Uygulamayı puanla", "قيّم التطبيق"),
-  s_share: row("Share UzUp", "Поделиться UzUp", "UzUp bilan ulashish", "分享 UzUp", "UzUp 공유", "UzUp teilen", "Partager UzUp", "UzUpを共有", "UzUp'u paylaş", "شارك UzUp"),
+  s_share: row("Share UzRoam", "Поделиться UzRoam", "UzRoam bilan ulashish", "分享 UzRoam", "UzRoam 공유", "UzRoam teilen", "Partager UzRoam", "UzRoamを共有", "UzRoam'u paylaş", "شارك UzRoam"),
   s_version: row("App version", "Версия приложения", "Ilova versiyasi", "应用版本", "앱 버전", "App-Version", "Version de l'app", "アプリのバージョン", "Uygulama sürümü", "إصدار التطبيق"),
   s_check_updates: row("Check for updates", "Проверить обновления", "Yangilanishlarni tekshirish", "检查更新", "업데이트 확인", "Nach Updates suchen", "Rechercher des mises à jour", "更新を確認", "Güncellemeleri denetle", "التحقق من التحديثات"),
   s_terms: row("Terms of use", "Условия использования", "Foydalanish shartlari", "使用条款", "이용약관", "Nutzungsbedingungen", "Conditions d'utilisation", "利用規約", "Kullanım koşulları", "شروط الاستخدام"),
@@ -474,7 +474,7 @@ export const СЛОВАРЬ = {
   d_calling: row("Calling", "Звонок в", "Qoʻngʻiroq", "正在拨打", "전화 거는 중", "Anruf bei", "Appel de", "電話中", "Aranıyor", "جارٍ الاتصال بـ"),
   d_book_confirmed: row("Booking confirmed!", "Бронирование подтверждено!", "Bron tasdiqlandi!", "预订已确认！", "예약 완료!", "Buchung bestätigt!", "Réservation confirmée !", "予約が確定しました！", "Rezervasyon onaylandı!", "تم تأكيد الحجز!"),
   d_book_email: row("Details sent to your email", "Детали отправлены на email", "Tafsilotlar emailga yuborildi", "详情已发送至邮箱", "상세 내용을 이메일로 전송", "Details an Ihre E-Mail gesendet", "Détails envoyés par e-mail", "詳細をメールに送信しました", "Ayrıntılar e-postanıza gönderildi", "أُرسلت التفاصيل إلى بريدك"),
-  d_book_terms: row("Free cancellation up to 24 h · UzUp discount −10%", "Бесплатная отмена до 24 ч · Скидка UzUp −10%", "24 soatgacha bepul bekor qilish · UzUp chegirmasi −10%", "24小时内免费取消 · UzUp 优惠 −10%", "24시간 전 무료 취소 · UzUp 할인 −10%", "Kostenlose Stornierung bis 24 h · UzUp-Rabatt −10%", "Annulation gratuite jusqu'à 24 h · Réduction UzUp −10%", "24時間前まで無料キャンセル · UzUp割引 −10%", "24 saate kadar ücretsiz iptal · UzUp indirimi −10%", "إلغاء مجاني حتى 24 ساعة · خصم UzUp −10%"),
+  d_book_terms: row("Free cancellation up to 24 h · UzRoam discount −10%", "Бесплатная отмена до 24 ч · Скидка UzRoam −10%", "24 soatgacha bepul bekor qilish · UzRoam chegirmasi −10%", "24小时内免费取消 · UzRoam 优惠 −10%", "24시간 전 무료 취소 · UzRoam 할인 −10%", "Kostenlose Stornierung bis 24 h · UzRoam-Rabatt −10%", "Annulation gratuite jusqu'à 24 h · Réduction UzRoam −10%", "24時間前まで無料キャンセル · UzRoam割引 −10%", "24 saate kadar ücretsiz iptal · UzRoam indirimi −10%", "إلغاء مجاني حتى 24 ساعة · خصم UzRoam −10%"),
   d_per_night: row("/ night", "/ночь", "/kecha", "/晚", "/박", "/Nacht", "/nuit", "/泊", "/gece", "/ليلة"),
   d_signature: row("Signature dishes", "Фирменные блюда", "Firma taomlari", "招牌菜", "대표 요리", "Spezialitäten", "Plats signature", "看板料理", "İmza yemekler", "أطباق مميّزة"),
   d_route_stops: row("Route stops", "Остановки маршрута", "Marshrut bekatlari", "路线站点", "경로 정차지", "Routenstopps", "Étapes de l'itinéraire", "ルートの立ち寄り先", "Rota durakları", "محطات المسار"),
@@ -539,7 +539,7 @@ export const СЛОВАРЬ = {
   prem_guarantee: row("🔒 Cancel anytime · Secure payment · 7-day refund", "🔒 Отмена в любой момент · Безопасная оплата · Возврат 7 дней", "🔒 Istalgan vaqtda bekor qilish · Xavfsiz toʻlov · 7 kun ichida qaytarish", "🔒 随时取消 · 安全支付 · 7 天退款", "🔒 언제든 취소 · 안전 결제 · 7일 환불", "🔒 Jederzeit kündbar · Sichere Zahlung · 7 Tage Rückgabe", "🔒 Annulation à tout moment · Paiement sécurisé · Remboursement 7 jours", "🔒 いつでも解約 · 安全な決済 · 7日間返金", "🔒 İstediğiniz an iptal · Güvenli ödeme · 7 gün iade", "🔒 إلغاء في أي وقت · دفع آمن · استرداد خلال 7 أيام"),
   prem_no_pay: row("Online payment isn't connected yet. As soon as the seller adds a Payme or Click key, the button will open the payment page.", "Онлайн-оплата пока не подключена. Как только продавец добавит ключ Payme или Click, кнопка откроет страницу оплаты.", "Onlayn toʻlov hali ulanmagan. Sotuvchi Payme yoki Click kalitini qoʻshishi bilan tugma toʻlov sahifasini ochadi.", "在线支付尚未接入。商家添加 Payme 或 Click 密钥后，此按钮将打开支付页面。", "온라인 결제가 아직 연결되지 않았습니다. 판매자가 Payme 또는 Click 키를 추가하면 버튼이 결제 페이지를 엽니다.", "Online-Zahlung ist noch nicht verbunden. Sobald der Verkäufer einen Payme- oder Click-Schlüssel hinzufügt, öffnet die Schaltfläche die Zahlungsseite.", "Le paiement en ligne n'est pas encore connecté. Dès que le vendeur ajoute une clé Payme ou Click, le bouton ouvrira la page de paiement.", "オンライン決済はまだ接続されていません。販売者がPaymeまたはClickのキーを追加すると、ボタンで決済ページが開きます。", "Çevrimiçi ödeme henüz bağlı değil. Satıcı bir Payme veya Click anahtarı eklediğinde düğme ödeme sayfasını açacak.", "الدفع الإلكتروني غير مُفعّل بعد. حالما يضيف البائع مفتاح Payme أو Click سيفتح الزر صفحة الدفع."),
   prem_stay_free: row("Stay on the free version", "Остаться на бесплатной версии", "Bepul versiyada qolish", "继续使用免费版", "무료 버전 유지", "Bei der Gratis-Version bleiben", "Rester sur la version gratuite", "無料版のままにする", "Ücretsiz sürümde kal", "البقاء على النسخة المجانية"),
-  prof_premium_active: row("UzUp Premium active", "UzUp Premium активен", "UzUp Premium faol", "UzUp Premium 已激活", "UzUp Premium 활성", "UzUp Premium aktiv", "UzUp Premium actif", "UzUp Premium 有効", "UzUp Premium etkin", "UzUp Premium مُفعّل"),
+  prof_premium_active: row("UzRoam Premium active", "UzRoam Premium активен", "UzRoam Premium faol", "UzRoam Premium 已激活", "UzRoam Premium 활성", "UzRoam Premium aktiv", "UzRoam Premium actif", "UzRoam Premium 有効", "UzRoam Premium etkin", "UzRoam Premium مُفعّل"),
   prof_emergency: row("Emergency help", "Экстренная помощь", "Favqulodda yordam", "紧急求助", "긴급 도움", "Notfallhilfe", "Aide d'urgence", "緊急支援", "Acil yardım", "مساعدة طارئة"),
 
   // ── Заказ такси (taxi_title / taxi_from_here / taxi_hide_map уже есть выше) ──

@@ -36,7 +36,7 @@ export function SideMenu({ onClose, onTab, currentTab, isPremium, onPremium, onL
             <div className="flex items-center gap-2.5">
               <LogoMark size={36}/>
               <div>
-                <p className="text-white font-bold text-lg" style={{fontFamily:"'Fraunces',serif"}}>UzUp</p>
+                <p className="text-white font-bold text-lg" style={{fontFamily:"'Fraunces',serif"}}>UzRoam</p>
                 <p className="text-[10px]" style={{color:GOLD}}>{t("splash_tagline")}</p>
               </div>
             </div>
@@ -79,7 +79,7 @@ export function SideMenu({ onClose, onTab, currentTab, isPremium, onPremium, onL
             <button onClick={()=>{onPremium();onClose();}} className="mx-4 w-[calc(100%-32px)] rounded-2xl p-4 flex items-center gap-3 glow-pulse" style={{background:`linear-gradient(135deg,#1A1A2E,#2C1810)`}}>
               <span className="text-2xl">👑</span>
               <div className="text-left flex-1">
-                <p className="font-bold text-sm" style={{color:GOLD}}>UzUp Premium</p>
+                <p className="font-bold text-sm" style={{color:GOLD}}>UzRoam Premium</p>
                 <p className="text-[9px]" style={{color:"rgba(255,255,255,0.45)"}}>{t("pay_no_ads")} · $4.99/{t("pay_month")}</p>
               </div>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={GOLD} strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>
@@ -89,7 +89,7 @@ export function SideMenu({ onClose, onTab, currentTab, isPremium, onPremium, onL
         {/* Footer */}
         <div className="px-5 py-4 border-t" style={{borderColor:"rgba(255,255,255,0.06)"}}>
           <div className="flex items-center justify-between">
-            <p className="text-[10px]" style={{color:"rgba(255,255,255,0.25)"}}>UzUp v2.4.1 · 🇺🇿 {t("menu_made")}</p>
+            <p className="text-[10px]" style={{color:"rgba(255,255,255,0.25)"}}>UzRoam v2.4.1 · 🇺🇿 {t("menu_made")}</p>
             <button onClick={()=>{onClose();onLogout();}} className="text-[10px] font-semibold" style={{color:"rgba(255,255,255,0.45)"}}>🚪 {t("prof_logout")}</button>
           </div>
         </div>

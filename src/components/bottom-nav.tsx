@@ -131,7 +131,7 @@ export default function BottomNav({
             Uz
           </span>
           <span className="text-lg font-bold" style={{ color: "var(--text)", fontFamily: "'Fraunces',serif" }}>
-            UzUp
+            UzRoam
           </span>
         </div>
 

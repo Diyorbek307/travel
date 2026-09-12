@@ -48,7 +48,7 @@ export function SettingsView({ isPremium, onUpgrade, onLogout }:{ isPremium:bool
       {!isPremium&&(
         <button onClick={onUpgrade} className="w-full rounded-2xl p-4 flex items-center gap-3 text-left active:scale-[0.98] transition-all" style={{background:`linear-gradient(135deg,#1A1A2E,#0F3460)`}}>
           <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0" style={{background:GOLD}}>👑</div>
-          <div className="flex-1"><p className="text-white font-bold text-sm">UzUp Premium</p><p className="text-white/60 text-xs">{t("pay_no_ads")} · UzUp Pro</p></div>
+          <div className="flex-1"><p className="text-white font-bold text-sm">UzRoam Premium</p><p className="text-white/60 text-xs">{t("pay_no_ads")} · UzRoam Pro</p></div>
           <div className="px-3 py-1.5 rounded-xl text-xs font-bold" style={{background:GOLD,color:TEXT}}>$4.99</div>
         </button>
       )}
@@ -137,7 +137,7 @@ export function SettingsView({ isPremium, onUpgrade, onLogout }:{ isPremium:bool
         <p className="font-bold text-xs pt-3 pb-1 uppercase tracking-widest" style={{color:MUTED}}>{t("prof_about")}</p>
         <Row icon="📱" label={t("s_version")} right={<span className="text-xs font-mono" style={{color:MUTED}}>2.4.1</span>}/>
         <Row icon="🔄" label={t("s_check_updates")} right={<span className="text-xs font-bold" style={{color:GREEN}}>{t("prof_updated")}</span>}/>
-        <Row icon="🌍" label="UzUp — Made in Uzbekistan" right={<span className="text-base">🇺🇿</span>}/>
+        <Row icon="🌍" label="UzRoam — Made in Uzbekistan" right={<span className="text-base">🇺🇿</span>}/>
       </div>
 
       <button onClick={onLogout} className="w-full py-3.5 rounded-2xl text-sm font-bold border mb-1 active:scale-[0.98] transition-all" style={{color:"#E74C3C",borderColor:"#FCDADA",background:"#FFF5F5"}}>
@@ -237,7 +237,7 @@ export function ProfileScreen({ onLogout, user }:{ onLogout:()=>void; user:Publi
           <div className="px-4">
             <div className="rounded-3xl overflow-hidden mb-4 shadow-lg" style={{background:`linear-gradient(135deg,#1A5C3A 0%,${GREEN} 55%,${GREEN_LIGHT} 100%)`}}>
               <div className="p-5">
-                <div className="flex items-start justify-between mb-4"><div><p className="text-[9px] font-bold tracking-widest uppercase" style={{color:GOLD}}>UzUp · Uzbekistan Travel</p><p className="text-white text-xl mt-0.5" style={{fontFamily:"'Fraunces',serif",fontWeight:600}}>{t("prof_digital_passport")}</p></div><div className="text-right"><p className="text-white/40 text-[9px]">{t("prof_passport_no")}</p><p className="text-[10px] font-mono font-bold" style={{color:GOLD}}>UZT-2026-0841</p></div></div>
+                <div className="flex items-start justify-between mb-4"><div><p className="text-[9px] font-bold tracking-widest uppercase" style={{color:GOLD}}>UzRoam · Uzbekistan Travel</p><p className="text-white text-xl mt-0.5" style={{fontFamily:"'Fraunces',serif",fontWeight:600}}>{t("prof_digital_passport")}</p></div><div className="text-right"><p className="text-white/40 text-[9px]">{t("prof_passport_no")}</p><p className="text-[10px] font-mono font-bold" style={{color:GOLD}}>UZT-2026-0841</p></div></div>
                 <div className="flex items-center gap-3 rounded-2xl p-3" style={{background:"rgba(255,255,255,0.12)"}}>
                   <div className="w-11 h-11 rounded-xl flex items-center justify-center text-2xl flex-shrink-0 overflow-hidden" style={{background:"rgba(255,255,255,0.15)"}}>
                     {snimok(снимок) ?? "👤"}

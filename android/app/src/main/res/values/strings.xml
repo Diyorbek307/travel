@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">UzUp</string>
-    <string name="title_activity_main">UzUp</string>
+    <string name="app_name">UzRoam</string>
+    <string name="title_activity_main">UzRoam</string>
     <string name="package_name">uz.uzup.app</string>
     <string name="custom_url_scheme">uz.uzup.app</string>
 </resources>

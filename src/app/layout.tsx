@@ -28,11 +28,11 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
-  title: "UzUp — открой Узбекистан",
+  title: "UzRoam — открой Узбекистан",
   description:
     "Маршруты, аудиогиды, отели и рестораны Узбекистана в одном приложении.",
   manifest: "/manifest.webmanifest",
-  applicationName: "UzUp",
+  applicationName: "UzRoam",
   /*
    * iOS не читает web-манифест: и значок на домашнем экране, и запуск без
    * адресной строки он берёт только отсюда. Без этих полей «установленное»
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
    */
   appleWebApp: {
     capable: true,
-    title: "UzUp",
+    title: "UzRoam",
     statusBarStyle: "default",
   },
   icons: {

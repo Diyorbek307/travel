@@ -25,8 +25,8 @@ export function httpПровайдер(): Провайдер {
 /** Разбирает «Имя <адрес>» на части: сервисы просят их раздельно. */
 function разобратьОтправителя(from: string): { name: string; email: string } {
   const m = from.match(/^\s*(.*?)\s*<([^>]+)>\s*$/);
-  if (m) return { name: m[1] || "UzUp", email: m[2].trim() };
-  return { name: "UzUp", email: from.trim() };
+  if (m) return { name: m[1] || "UzRoam", email: m[2].trim() };
+  return { name: "UzRoam", email: from.trim() };
 }
 
 export interface HttpПисьмо {

@@ -1,4 +1,4 @@
-import { GOLD, GREEN } from "@/lib/theme";
+import { GOLD, GREEN, GREEN_LIGHT } from "@/lib/theme";
 
 /** Мелкие элементы, которые встречаются на каждом втором экране. */
 
@@ -27,17 +27,22 @@ export function StarRow({ rating }: { rating: number }) {
 }
 
 export function LogoMark({ size = 30 }: { size?: number }) {
+  // Знак UzRoam: булавка-путь с узбекской стрельчатой аркой (пиштак)
+  // внутри и звездой-искрой — путешествие, наследие, открытие.
   return (
     <svg width={size} height={size} viewBox="0 0 40 40" fill="none" aria-hidden>
-      <circle cx="20" cy="20" r="18" stroke={GREEN} strokeWidth="2" />
       <path
-        d="M20 6l3.8 8.2 8.8.8-6.4 6.2 1.9 8.8L20 25.5l-8.1 4.5 1.9-8.8-6.4-6.2 8.8-.8z"
+        d="M20 3C27.5 3 34 9.2 34 17.5C34 25.5 27 31.5 20 37.5C13 31.5 6 25.5 6 17.5C6 9.2 12.5 3 20 3Z"
         fill={GREEN}
-        fillOpacity="0.18"
-        stroke={GREEN}
-        strokeWidth="1.4"
       />
-      <circle cx="20" cy="20" r="4" fill={GREEN} />
+      <path
+        d="M14.5 27.5V18.5C14.5 13.5 16.7 10.2 20 7.5C23.3 10.2 25.5 13.5 25.5 18.5V27.5Z"
+        fill={GREEN_LIGHT}
+      />
+      <path
+        d="M29 4C29.9 7.3 31.2 8.6 34.5 9.5C31.2 10.4 29.9 11.7 29 15C28.1 11.7 26.8 10.4 23.5 9.5C26.8 8.6 28.1 7.3 29 4Z"
+        fill={GOLD}
+      />
     </svg>
   );
 }

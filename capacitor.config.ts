@@ -16,7 +16,7 @@ import type { CapacitorConfig } from "@capacitor/cli";
  */
 const config: CapacitorConfig = {
   appId: "uz.uzup.app",
-  appName: "UzUp",
+  appName: "UzRoam",
   // Обязателен, даже при server.url: сюда кладётся запасная оболочка.
   webDir: "public",
   server: {

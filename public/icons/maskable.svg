@@ -1,9 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Uzbekistan Travel">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="UzRoam">
   <rect width="512" height="512" fill="#2d7b57"/>
-  <g transform="translate(256 268) scale(0.62) translate(-256 -256)">
-    <path d="M256 96c-62 0-112 50-112 112v208h224V208c0-62-50-112-112-112z" fill="#163c2a"/>
-    <path d="M256 152c-38 0-68 30-68 68v196h136V220c0-38-30-68-68-68z" fill="#2d7b57"/>
-    <path d="M256 40c-30 26-46 58-46 92h92c0-34-16-66-46-92z" fill="#163c2a"/>
-    <path d="M256 236l14 30 33 5-24 23 6 33-29-16-29 16 6-33-24-23 33-5z" fill="#e9c46a"/>
+  <g transform="translate(256 256) scale(0.62) translate(-256 -256)">
+    <path d="M256 96C328 96 388 156 388 232C388 312 300 372 256 432C212 372 124 312 124 232C124 156 184 96 256 96Z" fill="#ffffff"/>
+    <path d="M202 356V236C202 180 224 144 256 116C288 144 310 180 310 236V356Z" fill="#2d7b57"/>
+    <path d="M360 106C368 138 380 150 412 158C380 166 368 178 360 210C352 178 340 166 308 158C340 150 352 138 360 106Z" fill="#e9c46a"/>
   </g>
 </svg>

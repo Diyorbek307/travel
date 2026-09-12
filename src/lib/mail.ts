@@ -19,7 +19,7 @@ const PORT = Number(process.env.SMTP_PORT ?? 587);
 const USER = process.env.SMTP_USER;
 const PASS = process.env.SMTP_PASSWORD;
 
-const FROM = process.env.MAIL_FROM ?? `UzUp <${USER ?? "noreply@uzup.uz"}>`;
+const FROM = process.env.MAIL_FROM ?? `UzRoam <${USER ?? "noreply@uzroam.com"}>`;
 
 /**
  * Настроен ли хоть какой-то способ отправки.
@@ -281,7 +281,7 @@ export async function проверитьПочту(): Promise<{
 export async function пробноеПисьмо(to: string): Promise<boolean> {
   return sendMail({
     to,
-    subject: "Проверка почты UzUp",
+    subject: "Проверка почты UzRoam",
     text: "Если вы это читаете, отправка писем настроена верно.",
     html: каркас(
       "Почта настроена",
@@ -300,7 +300,7 @@ function каркас(заголовок: string, тело: string): string {
 <html lang="ru"><body style="margin:0;padding:24px;background:#f5f1e6;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;color:#2b2b2b">
   <table role="presentation" style="max-width:480px;margin:0 auto;background:#ffffff;border-radius:16px;overflow:hidden">
     <tr><td style="background:#2e7d5a;padding:24px 28px">
-      <div style="color:#ffffff;font-size:20px;font-weight:700">UzUp</div>
+      <div style="color:#ffffff;font-size:20px;font-weight:700">UzRoam</div>
       <div style="color:rgba(255,255,255,0.7);font-size:13px;margin-top:2px">Открой Узбекистан</div>
     </td></tr>
     <tr><td style="padding:28px">
@@ -316,7 +316,7 @@ function каркас(заголовок: string, тело: string): string {
 
 export function письмоСКодом(code: string): Omit<Letter, "to"> {
   return {
-    subject: `${code} — код подтверждения UzUp`,
+    subject: `${code} — код подтверждения UzRoam`,
     text: `Ваш код подтверждения: ${code}\n\nОн действует 15 минут.\n\nЕсли вы этого не запрашивали, ничего делать не нужно.`,
     html: каркас(
       "Подтвердите почту",
@@ -329,7 +329,7 @@ export function письмоСКодом(code: string): Omit<Letter, "to"> {
 
 export function письмоСоСсылкой(link: string): Omit<Letter, "to"> {
   return {
-    subject: "Смена пароля UzUp",
+    subject: "Смена пароля UzRoam",
     text: `Чтобы задать новый пароль, откройте ссылку:\n${link}\n\nОна действует один час и сработает только один раз.`,
     html: каркас(
       "Смена пароля",

@@ -37,7 +37,7 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
           </button>
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-full" style={{...glass}}>
             <LogoMark size={22}/>
-            <span className="text-white text-sm font-bold" style={{fontFamily:"'Fraunces',serif"}}>UzUp</span>
+            <span className="text-white text-sm font-bold" style={{fontFamily:"'Fraunces',serif"}}>UzRoam</span>
           </div>
           <button onClick={onNotifs} className="w-9 h-9 rounded-xl flex items-center justify-center relative" style={{...glass}}>
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
@@ -232,7 +232,7 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
         </button>
       </div>
 
-      {/* ── Why UzUp ── */}
+      {/* ── Why UzRoam ── */}
       <div className="px-4 pt-5 pb-8">
         <p className="font-bold text-base mb-4" style={{color:TEXT,fontFamily:"'Fraunces',serif"}}>{t("home_why")}</p>
         <div className="grid grid-cols-4 gap-2">
