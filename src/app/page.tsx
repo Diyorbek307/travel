@@ -29,6 +29,7 @@ import { LangProvider } from "@/components/lang-provider";
 import { WeatherProvider } from "@/components/weather-provider";
 import { CurrencyProvider } from "@/components/currency-provider";
 import { AuthSplash, LoginScreen, RegisterScreen } from "@/components/auth-screens";
+import NativeBack from "@/components/native-back";
 import type { Hotel, Place, PublicUser, Restaurant, Route, Tab } from "@/lib/types";
 
 /**
@@ -208,9 +209,32 @@ function App() {
     setShowMenu(false);
   };
 
+  /*
+   * Один шаг назад — тот же, что делают стрелки на экранах, но из одной
+   * точки, чтобы к нему могла привязаться аппаратная кнопка телефона.
+   * Разбираем сверху вниз по приоритету: сначала всплывающие слои, затем
+   * открытая карточка, затем шаги входа, и в самом низу — возврат с
+   * вкладки на главную. Вернули true — что-то закрыли; false — мы на
+   * самом верху, дальше только выход из приложения.
+   */
+  const назадНаШаг = useCallback((): boolean => {
+    if (showSearch) return setShowSearch(false), true;
+    if (showNotifs) return setShowNotifs(false), true;
+    if (showPremium) return setShowPremium(false), true;
+    if (showMenu) return setShowMenu(false), true;
+    if (showPractical) return setShowPractical(false), true;
+    if (showTransport) return setShowTransport(false), true;
+    if (detail) return setDetail(null), true;
+    if (phase === "register" || phase === "login") return setPhase("splash"), true;
+    if (phase === "interests") return setPhase("lang"), true;
+    if (phase === "app" && tab !== "home") return switchTab("home"), true;
+    return false;
+  }, [showSearch, showNotifs, showPremium, showMenu, showPractical, showTransport, detail, phase, tab]);
+
 
   return (
     <div className="device-shell">
+      <NativeBack onBack={назадНаШаг} />
       <div className="device">
 
         {phase === "checking" && (

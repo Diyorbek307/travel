@@ -34,7 +34,7 @@ const SECURITY_HEADERS = [
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   // Камера (QR-сканер) и геолокация (карта) — только самому приложению;
   // микрофон, оплата и определение местоположения по датчикам — никому.
-  { key: "Permissions-Policy", value: "camera=(self), geolocation=(self), microphone=(), payment=()" },
+  { key: "Permissions-Policy", value: "camera=(self), geolocation=(self), microphone=()" },
 ];
 
 const nextConfig: NextConfig = {

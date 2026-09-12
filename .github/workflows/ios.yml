@@ -1,0 +1,80 @@
+# Сборка iOS-приложения в облаке.
+#
+# Собрать под iPhone можно только на macOS, а у публичного репозитория
+# GitHub даёт macOS-раннеры бесплатно. Здесь оболочка Capacitor собирается
+# под симулятор без подписи — этого достаточно, чтобы увидеть работающее
+# приложение и снять скриншот. Подпись и выгрузка в App Store добавятся
+# отдельным шагом, когда появится аккаунт Apple Developer.
+name: iOS (симулятор)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "public/**"
+      - "capacitor.config.ts"
+      - "package.json"
+      - ".github/workflows/ios.yml"
+  workflow_dispatch: {} # можно запускать вручную кнопкой в GitHub
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Установить зависимости
+        run: npm ci
+
+      - name: Создать iOS-проект
+        # cap add создаёт нативный проект и ставит поды. Если он уже есть в
+        # репозитории — просто синхронизируем.
+        run: npx cap add ios || npx cap sync ios
+
+      - name: Синхронизировать
+        run: npx cap sync ios
+
+      - name: Собрать под симулятор (без подписи)
+        run: |
+          set -eo pipefail
+          xcodebuild \
+            -workspace ios/App/App.xcworkspace \
+            -scheme App \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      - name: Запустить в симуляторе и снять экран
+        run: |
+          set +e
+          DEVICE=$(xcrun simctl list devices available | grep -m1 -o 'iPhone 1[5-9]' | head -1)
+          DEVICE=${DEVICE:-iPhone 15}
+          echo "Симулятор: $DEVICE"
+          xcrun simctl boot "$DEVICE"
+          sleep 5
+          APP=$(find build/Build/Products -name 'App.app' -type d | head -1)
+          echo "Приложение: $APP"
+          xcrun simctl install booted "$APP"
+          xcrun simctl launch booted uz.uzup.app
+          sleep 14
+          xcrun simctl io booted screenshot app-iphone.png
+          echo "готово"
+
+      - name: Выложить сборку и скриншот
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ios-приложение
+          path: |
+            build/Build/Products/**/App.app
+            app-iphone.png
+          if-no-files-found: warn

@@ -13,6 +13,11 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.120.0",
+    "@capacitor/android": "^8.5.2",
+    "@capacitor/app": "^8.1.1",
+    "@capacitor/cli": "^8.5.2",
+    "@capacitor/core": "^8.5.2",
+    "@capacitor/ios": "^8.5.2",
     "@react-three/fiber": "^9.7.0",
     "@types/pg": "^8.23.1",
     "html5-qrcode": "^2.3.8",
