@@ -7,7 +7,12 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        android:enableOnBackInvokedCallback="false"><!--
+        Android 13+ по умолчанию отправляет «Назад» через новый
+        OnBackInvokedCallback, минуя onBackPressed, — и наша нативная
+        обработка не срабатывала бы. Отключаем новый диспетчер: кнопка
+        снова идёт через onBackPressed в MainActivity. -->
 
         <activity
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode|navigation|density"

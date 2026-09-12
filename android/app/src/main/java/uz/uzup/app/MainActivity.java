@@ -28,10 +28,13 @@ public class MainActivity extends BridgeActivity {
             super.onBackPressed();
             return;
         }
-        final String js = "(window.__uzupBack && window.__uzupBack()) ? 'true' : 'false'";
+        // Возвращаем булево, а не строку: evaluateJavascript отдаёт
+        // результат в JSON, и строка 'true' пришла бы в кавычках («"true"»),
+        // а булево true — без них, как и ждёт сравнение ниже.
+        final String js = "!!(window.__uzupBack && window.__uzupBack())";
         bridge.getWebView().evaluateJavascript(js, new ValueCallback<String>() {
             @Override
-            public void onReceiveValue(String value) {
+            public void onReceiveValue(final String value) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
