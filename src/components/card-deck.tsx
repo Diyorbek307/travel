@@ -68,7 +68,7 @@ function CardFace({ it, active }: { it: DeckItem; active: boolean }) {
           {it.title}
         </p>
 
-        <div className="mb-2.5 flex gap-4 border-t pt-2" style={{ borderColor: "rgba(255,255,255,0.1)" }}>
+        <div className="mb-2.5 flex gap-3 border-t pt-2" style={{ borderColor: "rgba(255,255,255,0.1)" }}>
           {(
             [
               [it.stat1, it.stat1l],
@@ -76,9 +76,15 @@ function CardFace({ it, active }: { it: DeckItem; active: boolean }) {
               [it.stat3, it.stat3l],
             ] as [string, string][]
           ).map(([v, l], si) => (
-            <div key={si}>
-              <p className="text-[11px] font-bold text-white">{v}</p>
-              <p className="text-[8px]" style={{ color: "rgba(255,255,255,0.4)" }}>
+            // min-w-0 + truncate: длинные подписи (напр. «Рейтинг» по-русски)
+            // не переносятся уродливым дефисом, а при нехватке места мягко
+            // обрезаются многоточием. whitespace-nowrap держит слово целым.
+            <div key={si} className="min-w-0">
+              <p className="truncate whitespace-nowrap text-[11px] font-bold text-white">{v}</p>
+              <p
+                className="truncate whitespace-nowrap text-[8px]"
+                style={{ color: "rgba(255,255,255,0.4)" }}
+              >
                 {l}
               </p>
             </div>
