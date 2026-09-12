@@ -233,6 +233,32 @@ body {
   }
 }
 
+/* Появление знака на заставке: мягко поднимается и проявляется. */
+@keyframes logo-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Блеск золотой звезды: пульсирует масштабом и золотым свечением. Масштаб
+   считаем от центра самой звезды (fill-box), иначе SVG крутил бы её от угла. */
+@keyframes logo-star-glow {
+  0%,
+  100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 0 rgb(233 196 106 / 0));
+  }
+  50% {
+    transform: scale(1.14);
+    filter: drop-shadow(0 0 3px rgb(242 206 110 / 0.85));
+  }
+}
+
 .animate-slide-up {
   animation: slide-up 0.38s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
@@ -268,6 +294,15 @@ body {
 }
 .slide-in-left {
   animation: slide-in-left 0.32s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.logo-rise {
+  animation: logo-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.logo-star {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: logo-star-glow 2.8s ease-in-out infinite;
+  animation-delay: 0.7s;
 }
 
 .shimmer-bg {

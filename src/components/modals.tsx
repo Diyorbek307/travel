@@ -117,7 +117,7 @@ export function LoginModal({ onClose, onLogin }:{ onClose:()=>void; onLogin:()=>
           <svg width="16" height="16" fill="none" stroke="white" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
         </button>
         <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
-          <LogoMark size={52}/>
+          <LogoMark size={52} intro/>
           <p className="text-white text-2xl font-bold mt-3" style={{fontFamily:"'Fraunces',serif"}}>UzRoam</p>
           <p className="text-white/60 text-sm mt-1">Войди в аккаунт</p>
         </div>

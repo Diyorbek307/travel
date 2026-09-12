@@ -40,11 +40,23 @@ export const LOGO_D =
 const STAR_D =
   "M 84.572 72.772 C 83.546 76.006, 79.236 80.827, 75.767 82.621 L 72.772 84.169 75.634 85.654 C 80 87.919, 81.726 89.816, 83.647 94.462 L 85.407 98.716 87.588 94.008 C 89.607 89.650, 93.386 85.957, 97 84.809 C 97.988 84.495, 97.212 83.721, 94.730 82.543 C 90.915 80.732, 87.727 77.139, 86.148 72.871 L 85.283 70.533 84.572 72.772";
 
-export function LogoMark({ size = 30, tone = CREAM }: { size?: number; tone?: string }) {
+/** Яркое золото звезды — чуть светлее базового GOLD, чтобы искра «горела». */
+const STAR_GOLD = "#F2CE6E";
+
+export function LogoMark({
+  size = 30,
+  tone = CREAM,
+  intro = false,
+}: {
+  size?: number;
+  tone?: string;
+  /** На заставке: знак плавно проявляется, звезда мерцает золотом. */
+  intro?: boolean;
+}) {
   // Знак без плитки: кремовый силуэт, а ниша и дорога — сквозные вырезы
   // (evenodd), сквозь которые видно тёмную шапку/фото. Звезда — золотой
-  // акцент (направление, вдохновение). Мягкая тень держит контур даже
-  // поверх пёстрой фотографии.
+  // акцент (направление, вдохновение), чуть увеличена (×1.15). Мягкая
+  // тень держит контур даже поверх пёстрой фотографии.
   const T = "translate(50 50) scale(0.66) translate(-85.5 -99)";
   return (
     <svg
@@ -53,10 +65,13 @@ export function LogoMark({ size = 30, tone = CREAM }: { size?: number; tone?: st
       viewBox="0 0 100 100"
       fill="none"
       aria-hidden
+      className={intro ? "logo-rise" : undefined}
       style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.35))" }}
     >
       <path d={LOGO_D} fill={tone} fillRule="evenodd" transform={T} />
-      <path d={STAR_D} fill={GOLD} transform={T} />
+      <g transform={`${T} translate(85 84.5) scale(1.15) translate(-85 -84.5)`}>
+        <path d={STAR_D} fill={STAR_GOLD} className={intro ? "logo-star" : undefined} />
+      </g>
     </svg>
   );
 }

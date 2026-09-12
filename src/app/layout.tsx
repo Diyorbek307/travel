@@ -28,11 +28,31 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
+  // База для абсолютных ссылок в og/twitter — иначе картинка шеринга
+  // подставилась бы относительным путём, и превью в мессенджерах пустое.
+  metadataBase: new URL("https://uzbekistan-travel.onrender.com"),
   title: "UzRoam — открой Узбекистан",
   description:
     "Маршруты, аудиогиды, отели и рестораны Узбекистана в одном приложении.",
   manifest: "/manifest.webmanifest",
   applicationName: "UzRoam",
+  // Карточка, которую видят, когда ссылку кидают в Telegram/WhatsApp/соцсети.
+  openGraph: {
+    type: "website",
+    siteName: "UzRoam",
+    locale: "ru_RU",
+    title: "UzRoam — открой красоту Узбекистана",
+    description:
+      "Маршруты, аудиогиды, AI-гид и всё об Узбекистане. 10 языков, работает офлайн.",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "UzRoam" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "UzRoam — открой красоту Узбекистана",
+    description:
+      "Маршруты, аудиогиды, AI-гид и всё об Узбекистане. 10 языков, работает офлайн.",
+    images: ["/og.png"],
+  },
   /*
    * iOS не читает web-манифест: и значок на домашнем экране, и запуск без
    * адресной строки он берёт только отсюда. Без этих полей «установленное»

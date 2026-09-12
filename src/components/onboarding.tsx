@@ -12,7 +12,7 @@ export function SplashScreen({ onStart, onLogin }:{ onStart:()=>void; onLogin:()
     <div className="flex flex-col h-full relative overflow-hidden">
       <img src="https://images.unsplash.com/photo-1664602078796-68ee76b3fc59?w=800&h=1000&fit=crop&auto=format" alt="Регистан" className="absolute inset-0 w-full h-full object-cover"/>
       <div className="absolute inset-0" style={{background:"linear-gradient(180deg,rgba(46,125,90,0.5) 0%,rgba(0,0,0,0.1) 40%,rgba(0,0,0,0.82) 100%)"}}/>
-      <div className="relative z-10 flex items-center gap-3 px-6 pt-16"><LogoMark size={44}/><div><p className="text-white text-2xl font-bold leading-none" style={{fontFamily:"'Fraunces',serif"}}>UzRoam</p><p className="text-white/70 text-xs mt-0.5">{t("splash_tagline")}</p></div></div>
+      <div className="relative z-10 flex items-center gap-3 px-6 pt-16"><LogoMark size={44} intro/><div><p className="text-white text-2xl font-bold leading-none" style={{fontFamily:"'Fraunces',serif"}}>UzRoam</p><p className="text-white/70 text-xs mt-0.5">{t("splash_tagline")}</p></div></div>
       <div className="relative z-10 flex justify-end px-4 mt-2"><GeomPattern opacity={0.22}/></div>
       <div className="relative z-10 mt-auto px-6 pb-12">
         <h1 className="text-white font-bold leading-tight mb-3" style={{fontSize:36,fontFamily:"'Fraunces',serif"}}>{t("splash_tagline")}</h1>
@@ -36,7 +36,7 @@ export function OnboardingLang({ onNext }:{ onNext:(l:string)=>void; defaultLang
     <div className="flex flex-col h-full animate-slide-up" style={{background:CREAM}}>
       <div className="relative h-52 flex-shrink-0" style={{background:GREEN}}>
         <div className="absolute inset-0 flex items-center justify-center opacity-15"><GeomPattern opacity={1}/></div>
-        <div className="relative z-10 flex flex-col items-center justify-center h-full gap-3"><LogoMark size={52}/><p className="text-white text-2xl font-bold" style={{fontFamily:"'Fraunces',serif"}}>{t("onb_welcome")}</p><p className="text-white/70 text-sm">{t("onb_choose_lang")}</p></div>
+        <div className="relative z-10 flex flex-col items-center justify-center h-full gap-3"><LogoMark size={52} intro/><p className="text-white text-2xl font-bold" style={{fontFamily:"'Fraunces',serif"}}>{t("onb_welcome")}</p><p className="text-white/70 text-sm">{t("onb_choose_lang")}</p></div>
       </div>
       <div className="flex-1 overflow-y-auto hide-scroll px-4 pt-5 space-y-2.5">
         {LOCALES.map((код)=>{
