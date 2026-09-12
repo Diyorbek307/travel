@@ -40,6 +40,22 @@ jobs:
       - name: Синхронизировать
         run: npx cap sync ios
 
+      - name: Установить поды
+        # cap add ios не всегда доводит pod install до конца, и тогда
+        # App.xcworkspace не создаётся. Ставим сами — обычным pod install
+        # (через CDN, без медленного и капризного --repo-update). Ошибку
+        # выводим в аннотации.
+        run: |
+          cd ios/App
+          set +e
+          pod install 2>&1 | tee ../../pod.log
+          code=${PIPESTATUS[0]}
+          if [ "$code" -ne 0 ]; then
+            grep -iE "error|\[!\]|unable|could not|not found|conflict|require" ../../pod.log | tail -20 | while IFS= read -r l; do echo "::error::$l"; done
+            exit "$code"
+          fi
+          test -d App.xcworkspace && echo "workspace создан" || { echo "::error::App.xcworkspace так и не создан"; exit 1; }
+
       - name: Собрать под симулятор (без подписи)
         # Без -destination: собираем под SDK симулятора. Три флага подписи
         # вместе полностью её выключают. Ошибку xcodebuild выводим через
