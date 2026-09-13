@@ -68,6 +68,11 @@ const ЗАПИСИ: [string, Строка][] = [
   с("Чимганские горы", { en: "Chimgan Mountains", uz: "Chimyon togʻlari", zh: "奇姆甘山", ko: "침간 산맥", de: "Tschimgan-Gebirge", fr: "Montagnes de Tchimgan", ja: "チムガン山地", tr: "Çimgan Dağları", ar: "جبال تشيمغان" }),
   с("Базар Сиаб", { en: "Siab Bazaar", uz: "Siyob bozori", zh: "夏布集市", ko: "시압 시장", de: "Siab-Basar", fr: "Bazar Siab", ja: "シアブ・バザール", tr: "Siab Pazarı", ar: "سوق سياب" }),
 
+  // Названия-штампы паспорта, которых ещё нет выше.
+  с("Регистан", { en: "Registan", uz: "Registon", zh: "雷吉斯坦", ko: "레기스탄", de: "Registan", fr: "Reguistan", ja: "レギスタン", tr: "Registan", ar: "ريغستان" }),
+  с("Арк Бухары", { en: "Ark of Bukhara", uz: "Buxoro Arki", zh: "布哈拉方舟", ko: "부하라 아크", de: "Ark von Buchara", fr: "Arche de Boukhara", ja: "ブハラのアルク城", tr: "Buhara Arkı", ar: "أرك بخارى" }),
+  с("Музей Тимура", { en: "Timur Museum", uz: "Amir Temur muzeyi", zh: "帖木儿博物馆", ko: "티무르 박물관", de: "Timur-Museum", fr: "Musée de Tamerlan", ja: "ティムール博物館", tr: "Timur Müzesi", ar: "متحف تيمور" }),
+
   // ── Названия заведений ───────────────────────────────────────────
   с("Плов-центр Ташкента", { en: "Tashkent Plov Centre", uz: "Toshkent osh markazi", zh: "塔什干抓饭中心", ko: "타슈켄트 플로프 센터", de: "Taschkenter Plov-Zentrum", fr: "Centre du Plov de Tachkent", ja: "タシケント・プロフセンター", tr: "Taşkent Plov Merkezi", ar: "مركز بلوف طشقند" }),
   с("Чайхана Рохат", { en: "Rohat Teahouse", uz: "Rohat choyxonasi", zh: "罗哈特茶馆", ko: "로하트 찻집", de: "Teehaus Rohat", fr: "Maison de thé Rohat", ja: "ロハト茶館", tr: "Rohat Çayhanesi", ar: "مقهى روهات" }),

@@ -7,6 +7,7 @@ import SupportChat from "@/components/support-chat";
 import MyBookings from "@/components/my-bookings";
 import { BORDER, CREAM, GOLD, GREEN, GREEN_LIGHT, MUTED, TEXT, WHITE } from "@/lib/theme";
 import { ACHIEVEMENTS, AI_REPLIES, STAMPS } from "@/data/content";
+import { useVisits } from "@/lib/visits";
 import { useT } from "@/components/lang-provider";
 import { LOCALE_META, LOCALES, type TKey } from "@/lib/i18n";
 import { Badge } from "../ui";
@@ -166,6 +167,23 @@ export function ProfileScreen({ onLogout, user }:{ onLogout:()=>void; user:Publi
    * понимает, что вошёл он, а не сосед.
    */
   const { t, трК, lang } = useT();
+
+  // Штампы паспорта — по-настоящему: город считается посещённым, когда
+  // человек открыл в нём любое место/отель/ресторан (см. lib/visits).
+  const визиты = useVisits();
+  const штампы = STAMPS.map((s) => {
+    const iso = визиты[s.city];
+    return {
+      ...s,
+      earned: !!iso,
+      date: iso
+        ? new Date(iso).toLocaleDateString(lang, { day: "numeric", month: "short" })
+        : "—",
+    };
+  });
+  const заработано = штампы.filter((s) => s.earned).length;
+  const всегоШтампов = штампы.length;
+  const процентШтампов = всегоШтампов ? Math.round((заработано / всегоШтампов) * 100) : 0;
   const имя = user ? `${user.firstName} ${user.lastName}`.trim() : t("prof_traveler");
   const откуда = user?.country ? `🌍 ${user.country}` : `🌍 ${t("prof_traveler")}`;
   const снимок = user?.hasPhoto ? `/api/photo/${user.id}` : null;
@@ -242,15 +260,15 @@ export function ProfileScreen({ onLogout, user }:{ onLogout:()=>void; user:Publi
                   <div className="w-11 h-11 rounded-xl flex items-center justify-center text-2xl flex-shrink-0 overflow-hidden" style={{background:"rgba(255,255,255,0.15)"}}>
                     {snimok(снимок) ?? "👤"}
                   </div>
-                  <div className="min-w-0"><p className="text-white font-semibold text-sm truncate">{имя}</p><p className="text-white/60 text-xs">{t("prof_stamps_count")}</p></div>
-                  <div className="ml-auto flex-shrink-0"><svg width="40" height="40" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="18" stroke={GOLD} strokeWidth="2" strokeDasharray="56.5 56.5" strokeDashoffset="28.3" transform="rotate(-90 20 20)"/><text x="20" y="25" textAnchor="middle" fill={GOLD} fontSize="11" fontWeight="bold">50%</text></svg></div>
+                  <div className="min-w-0"><p className="text-white font-semibold text-sm truncate">{имя}</p><p className="text-white/60 text-xs">{заработано}/{всегоШтампов} · {t("prof_stamps")}</p></div>
+                  <div className="ml-auto flex-shrink-0"><svg width="40" height="40" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="18" stroke="rgba(255,255,255,0.18)" strokeWidth="2"/><circle cx="20" cy="20" r="18" stroke={GOLD} strokeWidth="2" strokeLinecap="round" strokeDasharray={2 * Math.PI * 18} strokeDashoffset={2 * Math.PI * 18 * (1 - процентШтампов / 100)} transform="rotate(-90 20 20)"/><text x="20" y="25" textAnchor="middle" fill={GOLD} fontSize="11" fontWeight="bold">{процентШтампов}%</text></svg></div>
                 </div>
               </div>
               <div className="h-6 flex border-t" style={{borderColor:"rgba(255,255,255,0.1)"}}>{Array.from({length:20}).map((_,i)=><div key={i} className="flex-1 flex items-center justify-center" style={{opacity:0.22}}><div className="w-1.5 h-1.5 rotate-45" style={{background:GOLD}}/></div>)}</div>
             </div>
             <p className="font-bold text-sm mb-3" style={{color:TEXT}}>{t("prof_stamps")}</p>
-            <div className="grid grid-cols-3 gap-2.5 mb-4">{STAMPS.map((s,i)=><div key={i} className="rounded-2xl p-3 aspect-square flex flex-col items-center justify-center text-center shadow-sm" style={s.earned?{background:GREEN}:{background:WHITE,border:`2px dashed ${BORDER}`}}><span className="text-2xl mb-1">{s.icon}</span><p className="font-bold text-[9px] leading-tight" style={{color:s.earned?WHITE:MUTED}}>{s.name}</p><p className="text-[8px] mt-0.5" style={{color:s.earned?GOLD:"#C0B0A0"}}>{s.earned?s.date:трК("Не посещено")}</p></div>)}</div>
-            <div className="bg-white rounded-2xl p-4 mb-3 shadow-sm border" style={{borderColor:BORDER}}><div className="flex items-center justify-between mb-2"><p className="font-semibold text-sm" style={{color:TEXT}}>{t("prof_progress")}</p><p className="text-sm font-bold" style={{color:GREEN}}>3/6</p></div><div className="rounded-full h-2" style={{background:CREAM}}><div className="h-2 rounded-full" style={{background:GREEN,width:"50%"}}/></div><p className="text-xs mt-2" style={{color:MUTED}}>{t("prof_stamps_more")}</p></div>
+            <div className="grid grid-cols-3 gap-2.5 mb-4">{штампы.map((s,i)=><div key={i} className="rounded-2xl p-3 aspect-square flex flex-col items-center justify-center text-center shadow-sm" style={s.earned?{background:GREEN}:{background:WHITE,border:`2px dashed ${BORDER}`}}><span className="text-2xl mb-1">{s.icon}</span><p className="font-bold text-[9px] leading-tight" style={{color:s.earned?WHITE:MUTED}}>{трК(s.name)}</p><p className="text-[8px] mt-0.5" style={{color:s.earned?GOLD:"#C0B0A0"}}>{s.earned?s.date:трК("Не посещено")}</p></div>)}</div>
+            <div className="bg-white rounded-2xl p-4 mb-3 shadow-sm border" style={{borderColor:BORDER}}><div className="flex items-center justify-between mb-2"><p className="font-semibold text-sm" style={{color:TEXT}}>{t("prof_progress")}</p><p className="text-sm font-bold" style={{color:GREEN}}>{заработано}/{всегоШтампов}</p></div><div className="rounded-full h-2" style={{background:CREAM}}><div className="h-2 rounded-full" style={{background:GREEN,width:`${процентШтампов}%`,transition:"width 0.4s"}}/></div><p className="text-xs mt-2" style={{color:MUTED}}>{t("prof_stamps_more")}</p></div>
             <div className="rounded-2xl p-4 mb-4" style={{background:`linear-gradient(135deg,${GOLD},#C17B2F)`}}><p className="font-bold text-sm" style={{color:TEXT}}>🎁 {t("prof_stamps_reward")}</p><p className="text-xs mt-1" style={{color:TEXT+"99"}}>{t("prof_stamps_partners")}</p></div>
             <p className="font-bold text-sm mb-3" style={{color:TEXT}}>{t("prof_achievements")}</p>
             <div className="grid grid-cols-3 gap-2.5 pb-4">{ACHIEVEMENTS.map((a,i)=><div key={i} className="bg-white rounded-2xl p-3 text-center shadow-sm border" style={{borderColor:BORDER,opacity:a.earned?1:0.55}}><div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl mb-1.5 mx-auto" style={{background:a.color+"18"}}>{a.emoji}</div><p className="text-[9px] font-semibold leading-tight" style={{color:TEXT}}>{a.title}</p><p className="text-[8px] mt-0.5" style={{color:a.earned?GREEN:MUTED}}>{a.earned?"✓ Получено":"В процессе"}</p></div>)}</div>

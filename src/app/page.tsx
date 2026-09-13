@@ -30,6 +30,7 @@ import { WeatherProvider } from "@/components/weather-provider";
 import { CurrencyProvider } from "@/components/currency-provider";
 import { AuthSplash, LoginScreen, RegisterScreen } from "@/components/auth-screens";
 import NativeBack from "@/components/native-back";
+import { отметитьВизит } from "@/lib/visits";
 import type { Hotel, Place, PublicUser, Restaurant, Route, Tab } from "@/lib/types";
 
 /**
@@ -153,6 +154,7 @@ function App() {
   const showToast = useCallback((msg: string) => setToast(msg), []);
 
   const openPlace = (value: Place) => {
+    отметитьВизит(value.city); // штамп города в «Цифровой паспорт»
     setDetail({ kind: "place", value });
     setTab("explore");
   };
@@ -162,8 +164,14 @@ function App() {
     setTab("map");
   };
 
-  const openHotel = (value: Hotel) => setDetail({ kind: "hotel", value });
-  const openRestaurant = (value: Restaurant) => setDetail({ kind: "restaurant", value });
+  const openHotel = (value: Hotel) => {
+    отметитьВизит(value.city);
+    setDetail({ kind: "hotel", value });
+  };
+  const openRestaurant = (value: Restaurant) => {
+    отметитьВизит(value.city);
+    setDetail({ kind: "restaurant", value });
+  };
   const openПуть = (название: string, город: string) => setDetail({ kind: "путь", название, город });
   /*
    * Вход по адресу: QR-код ведёт на `?audio=<id>`, а ярлыки приложения на
