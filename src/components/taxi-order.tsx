@@ -45,7 +45,7 @@ export default function TaxiOrder({
   const [откуда, setОткуда] = useState<Geo | null>(null);
   const [подписьОткуда, setПодписьОткуда] = useState(t("taxi_my_location"));
   const [геоОшибка, setГеоОшибка] = useState<string | null>(null);
-  const [куда, setКуда] = useState<{ название: string; geo: Geo; своя?: boolean } | null>(() => {
+  const [куда, setКуда] = useState<{ название: string; geo: Geo; своя?: boolean; текст?: boolean } | null>(() => {
     if (сразуКуда?.geo) return { название: сразуКуда.название, geo: сразуКуда.geo };
     return null;
   });
@@ -115,7 +115,9 @@ export default function TaxiOrder({
 
   // Спрашиваем цену, когда есть обе точки.
   useEffect(() => {
-    if (!куда) return;
+    // Для напечатанного вручную адреса точных координат нет — оценку цены
+    // не показываем (её посчитает Яндекс Go по реальному адресу).
+    if (!куда || куда.текст) return;
     const старт = откуда ?? ГОРОДА[город];
     if (!старт) return;
 
@@ -148,12 +150,17 @@ export default function TaxiOrder({
       п.set("start-lat", старт.lat.toFixed(6));
       п.set("start-lon", старт.lon.toFixed(6));
     }
-    п.set("end-lat", куда.geo.lat.toFixed(6));
-    п.set("end-lon", куда.geo.lon.toFixed(6));
-    // У своей точки имени нет — «Точка на карте · 8 км от…» в приложении
-    // такси выглядело бы адресом, которого не существует. Пусть Яндекс
-    // определит адрес по координатам сам.
-    if (!куда.своя) п.set("end-name", куда.название);
+    if (куда.текст) {
+      // Напечатанный адрес: координат нет, отдаём текст — Яндекс Go найдёт.
+      п.set("end-name", куда.название);
+    } else {
+      п.set("end-lat", куда.geo.lat.toFixed(6));
+      п.set("end-lon", куда.geo.lon.toFixed(6));
+      // У своей точки имени нет — «Точка на карте · 8 км от…» в приложении
+      // такси выглядело бы адресом, которого не существует. Пусть Яндекс
+      // определит адрес по координатам сам.
+      if (!куда.своя) п.set("end-name", куда.название);
+    }
     const ref = process.env.NEXT_PUBLIC_YANDEX_TAXI_REF;
     if (ref) п.set("ref", ref);
     return `https://3.redirect.appmetrica.yandex.com/route?${п.toString()}`;
@@ -204,9 +211,18 @@ export default function TaxiOrder({
         {/* Куда */}
         <div className="mb-3 flex flex-wrap items-center gap-3 rounded-xl border px-3 py-2.5" style={{ borderColor: BORDER }}>
           <span className="h-2 w-2 shrink-0 rounded-sm" style={{ background: GOLD }} />
-          <span className="min-w-0 flex-1 truncate text-sm" style={{ color: куда ? TEXT : MUTED }}>
-            {куда ? трК(куда.название) : t("taxi_where")}
-          </span>
+          {/* Свободный ввод: можно напечатать любой адрес — Яндекс Go найдёт
+              его по названию. Готовые места/карта тоже заполняют это поле. */}
+          <input
+            value={куда ? трК(куда.название) : ""}
+            onChange={(e) => {
+              const v = e.target.value;
+              setКуда(v.trim() ? { название: v, geo: ГОРОДА[город], своя: false, текст: true } : null);
+            }}
+            placeholder={t("taxi_where")}
+            className="min-w-0 flex-1 bg-transparent text-sm outline-none"
+            style={{ color: TEXT }}
+          />
           <button
             onClick={() => setКарта((в) => !в)}
             className="shrink-0 rounded-full border px-3 py-1 text-xs font-semibold"
