@@ -1,8 +1,7 @@
 "use client";
 
-import { useRef, useState } from "react";
 import type { DeckItem, Place } from "@/lib/types";
-import { BORDER, GOLD, GREEN, TEXT, WHITE } from "@/lib/theme";
+import { GOLD, TEXT, WHITE } from "@/lib/theme";
 import { WEATHER } from "@/data/content";
 import { useAppContent } from "./content-provider";
 import { useT } from "@/components/lang-provider";
@@ -132,111 +131,18 @@ export function CardDeckBase({
   title: string;
   onSelect: (i: number) => void;
 }) {
-  const [cur, setCur] = useState(0);
-  const drag = useRef(0);
-  const n = items.length;
-  const go = (d: number) => setCur((c) => (c + d + n) % n);
-
-  /** Карточка в колоде: смещение считается от центральной. */
-  const card = (offset: number) => {
-    const idx = (cur + offset + n) % n;
-    const it = items[idx];
-    const center = offset === 0;
-    const abs = Math.abs(offset);
-    const scale = center ? 1 : abs === 1 ? 0.85 : 0.74;
-    const dim = center ? 1 : abs === 1 ? 0.6 : 0.38;
-
-    return (
-      <button
-        key={`slot${offset}`}
-        onClick={() => (center ? onSelect(idx) : go(offset > 0 ? 1 : -1))}
-        aria-hidden={!center}
-        tabIndex={center ? 0 : -1}
-        className="absolute overflow-hidden rounded-3xl text-left"
-        style={{
-          width: CARD_W,
-          height: CARD_H,
-          left: "50%",
-          marginLeft: -CARD_W / 2,
-          transform: `translateX(${offset * 52}px) translateY(${abs * 8}px) scale(${scale})`,
-          zIndex: 10 - abs * 3,
-          transition: "all 0.42s cubic-bezier(.22,1,.36,1)",
-          filter: `brightness(${dim})`,
-          boxShadow: center
-            ? "0 28px 64px rgba(0,0,0,0.6),0 8px 24px rgba(0,0,0,0.4)"
-            : "0 6px 20px rgba(0,0,0,0.35)",
-        }}
-      >
-        <CardFace it={it} active={center} />
-      </button>
-    );
-  };
-
   return (
-    <div className="px-4 pt-5">
-      <div className="mb-3 flex items-center justify-between">
+    <div className="pt-5">
+      <div className="mb-3 flex items-center justify-between px-4">
         <p className="text-base font-bold" style={{ color: TEXT, fontFamily: "'Fraunces',serif" }}>
           {title}
         </p>
-
-        {/* Стрелки листают только колоду — ленту листают прокруткой. */}
-        <div className="flex items-center gap-2 lg:hidden">
-          <button
-            onClick={() => go(-1)}
-            aria-label="Назад"
-            className="flex h-7 w-7 items-center justify-center rounded-full border"
-            style={{ borderColor: BORDER, background: WHITE }}
-          >
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={TEXT} strokeWidth="2.5">
-              <polyline points="15 18 9 12 15 6" />
-            </svg>
-          </button>
-          <button
-            onClick={() => go(1)}
-            aria-label="Вперёд"
-            className="flex h-7 w-7 items-center justify-center rounded-full"
-            style={{ background: GREEN }}
-          >
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
-              <polyline points="9 18 15 12 9 6" />
-            </svg>
-          </button>
-        </div>
       </div>
 
-      {/* Колода — узкий экран */}
-      <div
-        className="relative lg:hidden"
-        style={{ height: 334 }}
-        onTouchStart={(e) => {
-          drag.current = e.touches[0].clientX;
-        }}
-        onTouchEnd={(e) => {
-          const dx = e.changedTouches[0].clientX - drag.current;
-          if (Math.abs(dx) > 38) go(dx < 0 ? 1 : -1);
-        }}
-      >
-        <div className="absolute inset-0">{[-2, -1, 0, 1, 2].map((o) => card(o))}</div>
-
-        <div className="absolute bottom-2.5 left-0 right-0 z-20 flex justify-center gap-1.5">
-          {items.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setCur(i)}
-              aria-label={`Карточка ${i + 1}`}
-              className="rounded-full transition-all"
-              style={{
-                width: i === cur ? 14 : 4,
-                height: 4,
-                background: i === cur ? GOLD : "rgba(0,0,0,0.2)",
-              }}
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* Лента — широкий экран */}
-      <div className="hide-scroll hidden gap-3 overflow-x-auto pb-1 lg:flex">
+      {/* Горизонтальная лента карточек — как у отелей и ресторанов: все
+          карточки видны и листаются пальцем, а не лежат стопкой друг за
+          другом. Одинаково на всех экранах. */}
+      <div className="hide-scroll flex gap-3 overflow-x-auto px-4 pb-1">
         {items.map((it, i) => (
           <button
             key={i}
