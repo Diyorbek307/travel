@@ -39,7 +39,9 @@ export function GeoProvider({ children }: { children: React.ReactNode }) {
         setReady(true);
       },
       () => setReady(true), // отказ или ошибка — просто нет позиции
-      { enableHighAccuracy: false, maximumAge: 60_000, timeout: 15_000 },
+      // enableHighAccuracy: на телефоне включает GPS (точнее); на ноутбуке
+      // всё равно по Wi-Fi/IP — точнее физически не выйдет без приёмника.
+      { enableHighAccuracy: true, maximumAge: 30_000, timeout: 20_000 },
     );
     return () => navigator.geolocation.clearWatch(id);
   }, []);

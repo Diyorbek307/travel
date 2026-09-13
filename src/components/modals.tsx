@@ -42,10 +42,10 @@ export function NotifsPanel({ onClose }:{ onClose:()=>void }) {
   );
 }
 
-export function SearchModal({ onClose, onPlace }:{ onClose:()=>void; onPlace:(p:Place)=>void }) {
+export function SearchModal({ onClose, onPlace, initialQuery = "" }:{ onClose:()=>void; onPlace:(p:Place)=>void; initialQuery?:string }) {
   const { t, трК } = useT();
   const { PLACES, POPULAR_CITIES } = useAppContent();
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(initialQuery);
   const [results, setResults] = useState<Place[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
   useEffect(()=>{inputRef.current?.focus();},[]);

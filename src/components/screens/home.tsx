@@ -13,7 +13,7 @@ import { glass, glassLight } from "@/lib/theme";
 import TaxiOrder from "@/components/taxi-order";
 
 
-export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, onRestaurant, onMenu, onTab, onTransport, isPremium }:{ onPlace:(p:Place)=>void; onSearch:()=>void; onHotel:(h:Hotel)=>void; onNotifs:()=>void; onPractical:()=>void; onRestaurant:(r:Restaurant)=>void; onMenu:()=>void; onTab:(t:Tab)=>void; onTransport:()=>void; isPremium:boolean; }) {
+export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, onRestaurant, onMenu, onTab, onTransport, isPremium }:{ onPlace:(p:Place)=>void; onSearch:(q?:string)=>void; onHotel:(h:Hotel)=>void; onNotifs:()=>void; onPractical:()=>void; onRestaurant:(r:Restaurant)=>void; onMenu:()=>void; onTab:(t:Tab)=>void; onTransport:()=>void; isPremium:boolean; }) {
   const { EVENTS, HOTELS, PLACES, RESTAURANTS } = useAppContent();
   const { t, lang, трК } = useT();
   const погода = useWeather();
@@ -67,7 +67,7 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
           <h1 className="text-white font-bold leading-tight mb-1" style={{fontSize:34,fontFamily:"'Fraunces',serif"}}>{трК("Самарканд")}</h1>
           <p className="text-white/65 text-xs mb-3">{t("home_city_tagline")}</p>
           {/* Glassmorphism search bar */}
-          <button onClick={onSearch} className="w-full flex items-center gap-3 rounded-2xl px-4 py-3.5" style={{background:"rgba(255,255,255,0.2)",backdropFilter:"blur(20px)",border:"1px solid rgba(255,255,255,0.38)"}}>
+          <button onClick={()=>onSearch()} className="w-full flex items-center gap-3 rounded-2xl px-4 py-3.5" style={{background:"rgba(255,255,255,0.2)",backdropFilter:"blur(20px)",border:"1px solid rgba(255,255,255,0.38)"}}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" strokeWidth="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             <span className="flex-1 text-left text-sm" style={{color:"rgba(255,255,255,0.72)"}}>{t("home_search_ph")}</span>
             <div className="px-2.5 py-1 rounded-lg text-[10px] font-bold" style={{background:GOLD,color:TEXT}}>{t("common_search")}</div>

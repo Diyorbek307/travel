@@ -12,16 +12,19 @@ import { AdBanner } from "@/components/widgets";
 
 
 export function CityPicker({ value, onChange, label, icon }:{ value:string; onChange:(c:string)=>void; label:string; icon:string }) {
-  const { t } = useT();
+  const { t, трК } = useT();
   const [open, setOpen] = useState(false);
   return (
     <>
       <button onClick={()=>setOpen(true)} className="flex-1 flex flex-col gap-0.5 px-3 py-2.5 rounded-2xl text-left" style={{background:"rgba(255,255,255,0.18)"}}>
         <span className="text-[9px] font-bold uppercase tracking-widest" style={{color:"rgba(255,255,255,0.55)"}}>{label}</span>
-        <span className="font-bold text-sm text-white truncate">{icon} {value||t("tr_choose")}</span>
+        <span className="font-bold text-sm text-white truncate">{icon} {value?трК(value):t("tr_choose")}</span>
       </button>
       {open&&(
-        <div className="absolute inset-0 z-50 flex flex-col justify-end" style={{background:"rgba(0,0,0,0.5)",backdropFilter:"blur(4px)"}}>
+        // fixed, а не absolute: пикер лежит внутри двух relative-контейнеров
+        // (зелёная шапка + строка полей), и absolute сжимал лист в шапку.
+        // fixed раскрывает его на весь экран.
+        <div className="fixed inset-0 z-[60] flex flex-col justify-end" style={{background:"rgba(0,0,0,0.5)",backdropFilter:"blur(4px)"}}>
           <div className="rounded-t-3xl overflow-hidden animate-slide-up" style={{background:WHITE,maxHeight:"65%"}}>
             <div className="flex items-center justify-between px-4 pt-4 pb-3 border-b" style={{borderColor:BORDER}}>
               <p className="font-bold text-base" style={{color:TEXT,fontFamily:"'Fraunces',serif"}}>{label}</p>
@@ -33,7 +36,7 @@ export function CityPicker({ value, onChange, label, icon }:{ value:string; onCh
               {UZ_CITIES.map(city=>(
                 <button key={city} onClick={()=>{onChange(city);setOpen(false);}} className="w-full flex items-center gap-3 px-4 py-3.5 border-b text-left active:opacity-60" style={{borderColor:BORDER,background:value===city?GREEN+"08":WHITE}}>
                   <span className="text-lg">📍</span>
-                  <span className="flex-1 font-semibold text-sm" style={{color:value===city?GREEN:TEXT}}>{city}</span>
+                  <span className="flex-1 font-semibold text-sm" style={{color:value===city?GREEN:TEXT}}>{трК(city)}</span>
                   {value===city&&<span style={{color:GREEN}}>✓</span>}
                 </button>
               ))}

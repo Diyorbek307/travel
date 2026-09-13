@@ -118,6 +118,7 @@ function App() {
   const [кодЗаписи, setКодЗаписи] = useState<string | null>(null);
 
   const [showSearch, setShowSearch] = useState(false);
+  const [searchQuery, setSearchQuery] = useState(""); // предзаполнение поиска (напр. клик по городу)
   const [showNotifs, setShowNotifs] = useState(false);
   const [showPractical, setShowPractical] = useState(false);
   const [showTransport, setShowTransport] = useState(false);
@@ -206,6 +207,15 @@ function App() {
   const closeDetail = () => setDetail(null);
 
   const switchTab = (next: Tab) => {
+    // Закрываем все всплывающие слои: иначе на десктопе клик по меню менял
+    // вкладку под открытым экраном «Транспорт»/«Поиск», и казалось, что
+    // навигация не работает.
+    setShowSearch(false);
+    setShowNotifs(false);
+    setShowPractical(false);
+    setShowTransport(false);
+    setShowPremium(false);
+    setShowMenu(false);
     setDetail(null);
     setTab(next);
     setTabKey((k) => k + 1);
@@ -316,6 +326,7 @@ function App() {
           <>
             {showSearch && (
               <SearchModal
+                initialQuery={searchQuery}
                 onClose={() => setShowSearch(false)}
                 onPlace={(p) => {
                   setShowSearch(false);
@@ -374,7 +385,10 @@ function App() {
                   onTab={switchTab}
                   onToast={showToast}
                   onPlay={setMiniAudio}
-                  onSearch={() => setShowSearch(true)}
+                  onSearch={(q?: string) => {
+                    setSearchQuery(q ?? "");
+                    setShowSearch(true);
+                  }}
                   onNotifs={() => setShowNotifs(true)}
                   onPractical={() => setShowPractical(true)}
                   onTransport={() => setShowTransport(true)}
@@ -410,7 +424,7 @@ interface ScreenProps {
   onTab: (t: Tab) => void;
   onToast: (msg: string) => void;
   onPlay: (p: Place) => void;
-  onSearch: () => void;
+  onSearch: (q?: string) => void;
   onNotifs: () => void;
   onPractical: () => void;
   onTransport: () => void;

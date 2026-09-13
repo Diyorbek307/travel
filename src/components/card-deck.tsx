@@ -197,7 +197,7 @@ export function CardDeck({ places, onPlace }: { places: Place[]; onPlace: (p: Pl
   );
 }
 
-export function CityDeck({ onSearch }: { onSearch: () => void }) {
+export function CityDeck({ onSearch }: { onSearch: (city?: string) => void }) {
   const { POPULAR_CITIES } = useAppContent();
   const { t, трК } = useT();
   const погода = useWeather();
@@ -225,5 +225,13 @@ export function CityDeck({ onSearch }: { onSearch: () => void }) {
       pricel: t("card_direction"),
     };
   });
-  return <CardDeckBase items={items} title={t("deck_popular_cities")} onSelect={onSearch} />;
+  // Клик по городу открывает поиск, уже отфильтрованный по этому городу
+  // (раньше открывался пустой поиск — это и смущало).
+  return (
+    <CardDeckBase
+      items={items}
+      title={t("deck_popular_cities")}
+      onSelect={(i) => onSearch(POPULAR_CITIES[i].name)}
+    />
+  );
 }
