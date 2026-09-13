@@ -59,12 +59,15 @@ export function useAppContent() {
    */
   // entry содержит либо цену ($8 — трК вернёт как есть), либо «Бесплатно» —
   // и его переводим: это не ключ поиска, только текст на карточке.
-  const мПлейс = (p: (typeof content.places)[number]) => ({ ...p, type: трК(p.type), desc: трК(p.desc), entry: трК(p.entry) });
+  // name переводим тоже: в неродном интерфейсе кириллическое название рядом
+  // с переведённым текстом читалось как ошибка. city НЕ трогаем — это ключ
+  // поиска погоды; его перевод делается на месте показа (трК на карточке).
+  const мПлейс = (p: (typeof content.places)[number]) => ({ ...p, name: трК(p.name), type: трК(p.type), desc: трК(p.desc), entry: трК(p.entry) });
   // Удобства (facilities) не переводим здесь: иконку в деталях выбирают по
   // русскому ключу, поэтому перевод делается на месте показа (details.tsx),
   // где сырой ключ остаётся для иконки, а рядом рисуется его перевод.
   const мОтель = (h: (typeof content.hotels)[number]) => ({ ...h, tag: трК(h.tag), desc: трК(h.desc) });
-  const мРест = (r: (typeof content.restaurants)[number]) => ({ ...r, cuisine: трК(r.cuisine), desc: трК(r.desc) });
+  const мРест = (r: (typeof content.restaurants)[number]) => ({ ...r, name: трК(r.name), cuisine: трК(r.cuisine), desc: трК(r.desc) });
 
   return {
     PLACES: content.places.map(мПлейс),

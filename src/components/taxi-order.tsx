@@ -181,7 +181,7 @@ export default function TaxiOrder({
                 color: г === город ? WHITE : MUTED,
               }}
             >
-              {г}
+              {трК(г)}
             </button>
           ))}
         </div>
@@ -205,7 +205,7 @@ export default function TaxiOrder({
         <div className="mb-3 flex flex-wrap items-center gap-3 rounded-xl border px-3 py-2.5" style={{ borderColor: BORDER }}>
           <span className="h-2 w-2 shrink-0 rounded-sm" style={{ background: GOLD }} />
           <span className="min-w-0 flex-1 truncate text-sm" style={{ color: куда ? TEXT : MUTED }}>
-            {куда ? куда.название : t("taxi_where")}
+            {куда ? трК(куда.название) : t("taxi_where")}
           </span>
           <button
             onClick={() => setКарта((в) => !в)}
@@ -258,7 +258,7 @@ export default function TaxiOrder({
                 color: TEXT,
               }}
             >
-              {н.название}
+              {трК(н.название)}
             </button>
           ))}
         </div>

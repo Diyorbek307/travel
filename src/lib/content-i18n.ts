@@ -13,10 +13,10 @@ import type { Locale } from "./i18n";
  * записи; она появится, когда редактор будет вводить переводы. Пока же
  * переведено то, что заложено в приложение изначально.
  *
- * Имена-топонимы (Регистан, Гур-э-Амир) сознательно не трогаем: их люди
- * так и ищут, а коверкать по чужим алфавитам «на глаз» — та же ложь, что
- * и рисовать границу по памяти. Переводим то, что переводится точно:
- * категории и общие слова.
+ * Названия достопримечательностей и заведений тоже переведены (по просьбе
+ * пользователя): в неродном интерфейсе кириллица рядом с латиницей читалась
+ * как ошибка. Для топонимов используем общепринятые формы на каждом языке;
+ * само имя-основа (Регистан, Гур-э-Амир) узнаваемо во всех вариантах.
  */
 
 type Строка = Partial<Record<Locale, string>>;
@@ -42,6 +42,40 @@ const ЗАПИСИ: [string, Строка][] = [
   с("Площадь", { en: "Square", uz: "Maydon", zh: "广场", ko: "광장", de: "Platz", fr: "Place", ja: "広場", tr: "Meydan", ar: "ساحة" }),
   с("Старый город", { en: "Old town", uz: "Eski shahar", zh: "古城", ko: "구시가지", de: "Altstadt", fr: "Vieille ville", ja: "旧市街", tr: "Eski şehir", ar: "المدينة القديمة" }),
   с("Обычный", { en: "Place", uz: "Oddiy", zh: "地点", ko: "일반", de: "Ort", fr: "Lieu", ja: "スポット", tr: "Yer", ar: "مكان" }),
+
+  // ── Названия достопримечательностей ──────────────────────────────
+  // По просьбе пользователя переводим и сами названия объектов — иначе в
+  // англоязычном интерфейсе они оставались кириллицей рядом с английскими.
+  // Используем общепринятые латинские/местные формы топонимов.
+  с("Площадь Регистан", { en: "Registan Square", uz: "Registon maydoni", zh: "雷吉斯坦广场", ko: "레기스탄 광장", de: "Registan-Platz", fr: "Place du Reguistan", ja: "レギスタン広場", tr: "Registan Meydanı", ar: "ساحة ريغستان" }),
+  с("Шахи-Зинда", { en: "Shah-i-Zinda", uz: "Shohizinda", zh: "沙赫静达", ko: "샤히진다", de: "Schah-i-Sinda", fr: "Chah-e-Zindeh", ja: "シャーヒ・ズィンダ", tr: "Şah-ı Zinde", ar: "شاهي زيندا" }),
+  с("Бухарская Арка", { en: "Ark of Bukhara", uz: "Buxoro Arki", zh: "布哈拉方舟", ko: "부하라 아크 성채", de: "Ark von Buchara", fr: "Arche de Boukhara", ja: "ブハラのアルク城", tr: "Buhara Arkı", ar: "قلعة أرك بخارى" }),
+  с("Ичан-Кала", { en: "Itchan Kala", uz: "Ichan qalʼa", zh: "伊禅卡拉", ko: "이찬 칼라", de: "Itschan Qalʼa", fr: "Itchan Kala", ja: "イチャン・カラ", tr: "İçan Kale", ar: "إيتشان قلعة" }),
+  с("Минарет Калян", { en: "Kalyan Minaret", uz: "Kalon minorasi", zh: "卡扬宣礼塔", ko: "칼란 미너렛", de: "Kalyan-Minarett", fr: "Minaret Kalian", ja: "カラーン・ミナレット", tr: "Kalyan Minaresi", ar: "مئذنة كليان" }),
+  с("Гур-э-Амир", { en: "Gur-e-Amir", uz: "Goʻri Amir", zh: "古尔·埃米尔陵", ko: "구르 에미르", de: "Gur-e-Amir", fr: "Gour-e Amir", ja: "グーリ・アミール廟", tr: "Gur-i Emir", ar: "كور أمير" }),
+  с("Чарвакское водохранилище", { en: "Charvak Reservoir", uz: "Chorvoq suv ombori", zh: "恰尔瓦克水库", ko: "차르바크 저수지", de: "Tscharwak-Stausee", fr: "Réservoir de Tcharvak", ja: "チャルヴァク貯水池", tr: "Çarvak Barajı", ar: "خزان تشارفاك" }),
+  с("Площадь Мустакиллик", { en: "Mustaqillik Square", uz: "Mustaqillik maydoni", zh: "独立广场", ko: "무스타킬리크 광장", de: "Mustaqillik-Platz", fr: "Place Moustaqillik", ja: "ムスタキリク広場", tr: "Mustakillik Meydanı", ar: "ساحة مستقلليك" }),
+  с("Мечеть Биби-Ханым", { en: "Bibi-Khanym Mosque", uz: "Bibixonim masjidi", zh: "比比哈努姆清真寺", ko: "비비하늠 모스크", de: "Bibi-Chanym-Moschee", fr: "Mosquée Bibi-Khanym", ja: "ビビハニム・モスク", tr: "Bibi-Hanım Camii", ar: "مسجد بيبي خانم" }),
+  с("Обсерватория Улугбека", { en: "Ulugbek Observatory", uz: "Ulugʻbek rasadxonasi", zh: "乌鲁伯格天文台", ko: "울루그베크 천문대", de: "Ulugbek-Observatorium", fr: "Observatoire d'Ulugh Beg", ja: "ウルグベク天文台", tr: "Uluğ Bey Rasathanesi", ar: "مرصد أولوغ بيك" }),
+  с("Ляби-Хауз", { en: "Lyabi-Hauz", uz: "Labi hovuz", zh: "拉比豪兹", ko: "랴비하우즈", de: "Ljabi-Hauz", fr: "Lyabi-Haouz", ja: "リャビ・ハウズ", tr: "Lyabi Havuz", ar: "لابي حوز" }),
+  с("Мавзолей Исмаила Самани", { en: "Ismail Samani Mausoleum", uz: "Ismoil Somoniy maqbarasi", zh: "伊斯梅尔·萨曼尼陵墓", ko: "이스마일 사마니 영묘", de: "Ismail-Samani-Mausoleum", fr: "Mausolée d'Ismaïl Samani", ja: "イスマイール・サーマーニー廟", tr: "İsmail Samani Türbesi", ar: "ضريح إسماعيل الساماني" }),
+  с("Ислам-Ходжа", { en: "Islam Khoja", uz: "Islomxoʻja", zh: "伊斯兰霍加", ko: "이슬람 호자", de: "Islam-Choja", fr: "Islam Khodja", ja: "イスラーム・ホジャ", tr: "İslam Hoca", ar: "إسلام خوجة" }),
+  с("Хаст-Имам", { en: "Khast Imam", uz: "Hastimom", zh: "哈斯特伊玛目", ko: "하스트 이맘", de: "Chast-Imam", fr: "Khast Imam", ja: "ハズラティ・イマーム", tr: "Hast İmam", ar: "خست إمام" }),
+  с("Базар Чорсу", { en: "Chorsu Bazaar", uz: "Chorsu bozori", zh: "乔尔苏集市", ko: "초르수 시장", de: "Chorsu-Basar", fr: "Bazar Chorsu", ja: "チョルスー・バザール", tr: "Çorsu Pazarı", ar: "سوق تشورسو" }),
+  с("Мечеть Минор", { en: "Minor Mosque", uz: "Minor masjidi", zh: "米诺清真寺", ko: "미노르 모스크", de: "Minor-Moschee", fr: "Mosquée Minor", ja: "ミノル・モスク", tr: "Minor Camii", ar: "مسجد مينور" }),
+  с("Крепость Аяз-Кала", { en: "Ayaz-Kala Fortress", uz: "Ayoz qalʼa", zh: "阿亚兹卡拉要塞", ko: "아야즈 칼라 요새", de: "Festung Ayaz-Kala", fr: "Forteresse d'Ayaz-Kala", ja: "アヤズ・カラ要塞", tr: "Ayaz Kale", ar: "قلعة أياز" }),
+  с("Музей Навои", { en: "Navoi Museum", uz: "Navoiy muzeyi", zh: "纳沃伊博物馆", ko: "나보이 박물관", de: "Navoi-Museum", fr: "Musée Navoï", ja: "ナヴォイ博物館", tr: "Nevai Müzesi", ar: "متحف نافوي" }),
+  с("Чимганские горы", { en: "Chimgan Mountains", uz: "Chimyon togʻlari", zh: "奇姆甘山", ko: "침간 산맥", de: "Tschimgan-Gebirge", fr: "Montagnes de Tchimgan", ja: "チムガン山地", tr: "Çimgan Dağları", ar: "جبال تشيمغان" }),
+  с("Базар Сиаб", { en: "Siab Bazaar", uz: "Siyob bozori", zh: "夏布集市", ko: "시압 시장", de: "Siab-Basar", fr: "Bazar Siab", ja: "シアブ・バザール", tr: "Siab Pazarı", ar: "سوق سياب" }),
+
+  // ── Названия заведений ───────────────────────────────────────────
+  с("Плов-центр Ташкента", { en: "Tashkent Plov Centre", uz: "Toshkent osh markazi", zh: "塔什干抓饭中心", ko: "타슈켄트 플로프 센터", de: "Taschkenter Plov-Zentrum", fr: "Centre du Plov de Tachkent", ja: "タシケント・プロフセンター", tr: "Taşkent Plov Merkezi", ar: "مركز بلوف طشقند" }),
+  с("Чайхана Рохат", { en: "Rohat Teahouse", uz: "Rohat choyxonasi", zh: "罗哈特茶馆", ko: "로하트 찻집", de: "Teehaus Rohat", fr: "Maison de thé Rohat", ja: "ロハト茶館", tr: "Rohat Çayhanesi", ar: "مقهى روهات" }),
+  с("Плов-центр Самарканда", { en: "Samarkand Plov Centre", uz: "Samarqand osh markazi", zh: "撒马尔罕抓饭中心", ko: "사마르칸트 플로프 센터", de: "Samarkander Plov-Zentrum", fr: "Centre du Plov de Samarcande", ja: "サマルカンド・プロフセンター", tr: "Semerkant Plov Merkezi", ar: "مركز بلوف سمرقند" }),
+  с("Ляби-Хауз Ресторан", { en: "Lyabi-Hauz Restaurant", uz: "Labi hovuz restorani", zh: "拉比豪兹餐厅", ko: "랴비하우즈 레스토랑", de: "Restaurant Ljabi-Hauz", fr: "Restaurant Lyabi-Haouz", ja: "リャビ・ハウズ・レストラン", tr: "Lyabi Havuz Restoran", ar: "مطعم لابي حوز" }),
+  с("Чайхана у Регистана", { en: "Registan Teahouse", uz: "Registon choyxonasi", zh: "雷吉斯坦茶馆", ko: "레기스탄 찻집", de: "Teehaus am Registan", fr: "Maison de thé du Reguistan", ja: "レギスタン茶館", tr: "Registan Çayhanesi", ar: "مقهى ريغستان" }),
+  с("Бахор Ресторан", { en: "Bahor Restaurant", uz: "Bahor restorani", zh: "巴霍尔餐厅", ko: "바호르 레스토랑", de: "Restaurant Bahor", fr: "Restaurant Bahor", ja: "バホル・レストラン", tr: "Bahor Restoran", ar: "مطعم بهار" }),
+  с("Чайхана Зарафшан", { en: "Zarafshan Teahouse", uz: "Zarafshon choyxonasi", zh: "泽拉夫尚茶馆", ko: "자라프샨 찻집", de: "Teehaus Zarafschan", fr: "Maison de thé Zarafchan", ja: "ザラフシャン茶館", tr: "Zerafşan Çayhanesi", ar: "مقهى زرافشان" }),
   с("Скоростной", { en: "Express", uz: "Tezyurar", zh: "高速", ko: "고속", de: "Schnell", fr: "Express", ja: "特急", tr: "Hızlı", ar: "سريع" }),
 
   // ── Города ───────────────────────────────────────────────────────
