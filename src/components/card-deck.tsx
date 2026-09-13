@@ -2,9 +2,9 @@
 
 import type { DeckItem, Place } from "@/lib/types";
 import { GOLD, TEXT, WHITE } from "@/lib/theme";
-import { WEATHER } from "@/data/content";
 import { useAppContent } from "./content-provider";
 import { useT } from "@/components/lang-provider";
+import { useWeather } from "@/components/weather-provider";
 
 /**
  * Подборка карточек: колода на телефоне, лента на широком экране.
@@ -164,25 +164,29 @@ export function CardDeckBase({
 
 export function CardDeck({ places, onPlace }: { places: Place[]; onPlace: (p: Place) => void }) {
   const { t, трК } = useT();
-  const items: DeckItem[] = places.map((p) => ({
-    img: p.img,
-    title: p.name,
-    sub: `${трК(p.city)} · ${t("uz_country")}`,
-    badge: p.type,
-    badgeColor: "rgba(233,196,106,0.92)",
-    // Погода — чипом в углу, как у отелей.
-    temp: WEATHER[p.city]?.temp,
-    tempIcon: WEATHER[p.city]?.icon,
-    // Три коротких метрики (как у отелей): рейтинг, отзывы, расстояние.
-    stat1: `${p.rating}★`,
-    stat1l: t("card_rating"),
-    stat2: String(p.reviews),
-    stat2l: t("d_reviews_word"),
-    stat3: p.distance,
-    stat3l: t("card_dist"),
-    price: p.entry,
-    pricel: t("card_entry"),
-  }));
+  const погода = useWeather();
+  const items: DeckItem[] = places.map((p) => {
+    const w = погода.get(p.city); // настоящая погода города (Open-Meteo)
+    return {
+      img: p.img,
+      title: p.name,
+      sub: `${трК(p.city)} · ${t("uz_country")}`,
+      badge: p.type,
+      badgeColor: "rgba(233,196,106,0.92)",
+      // Погода — чипом в углу, как у отелей.
+      temp: w ? String(w.temp) : undefined,
+      tempIcon: w?.icon,
+      // Три коротких метрики (как у отелей): рейтинг, отзывы, расстояние.
+      stat1: `${p.rating}★`,
+      stat1l: t("card_rating"),
+      stat2: String(p.reviews),
+      stat2l: t("d_reviews_word"),
+      stat3: p.distance,
+      stat3l: t("card_dist"),
+      price: p.entry,
+      pricel: t("card_entry"),
+    };
+  });
   return (
     <CardDeckBase items={items} title={t("deck_top_sights")} onSelect={(i) => onPlace(places[i])} />
   );
@@ -191,26 +195,30 @@ export function CardDeck({ places, onPlace }: { places: Place[]; onPlace: (p: Pl
 export function CityDeck({ onSearch }: { onSearch: () => void }) {
   const { POPULAR_CITIES } = useAppContent();
   const { t, трК } = useT();
-  const items: DeckItem[] = POPULAR_CITIES.map((c) => ({
-    img: c.img,
-    title: трК(c.name),
-    sub: `${трК(c.sub)} · ${t("uz_country")}`,
-    badge: `🏙️ ${t("deck_city_badge")}`,
-    badgeColor: "rgba(46,125,90,0.85)",
-    // Зелёный бейдж — светлый текст, иначе тёмный на тёмном не читался.
-    badgeTextColor: WHITE,
-    // Погода — чипом в углу, как у отелей.
-    temp: WEATHER[c.name]?.temp,
-    tempIcon: WEATHER[c.name]?.icon,
-    // Три коротких метрики: рейтинг, «ощущается», ветер (единица локализована).
-    stat1: `${c.rating}★`,
-    stat1l: t("card_rating"),
-    stat2: WEATHER[c.name] ? `${WEATHER[c.name].feels}°` : "—",
-    stat2l: t("w_feels"),
-    stat3: WEATHER[c.name] ? `${parseInt(WEATHER[c.name].wind, 10)} ${t("w_wind")}` : "—",
-    stat3l: t("card_wind"),
-    price: t("card_open"),
-    pricel: t("card_direction"),
-  }));
+  const погода = useWeather();
+  const items: DeckItem[] = POPULAR_CITIES.map((c) => {
+    const w = погода.get(c.name); // настоящая погода города (Open-Meteo)
+    return {
+      img: c.img,
+      title: трК(c.name),
+      sub: `${трК(c.sub)} · ${t("uz_country")}`,
+      badge: `🏙️ ${t("deck_city_badge")}`,
+      badgeColor: "rgba(46,125,90,0.85)",
+      // Зелёный бейдж — светлый текст, иначе тёмный на тёмном не читался.
+      badgeTextColor: WHITE,
+      // Погода — чипом в углу, как у отелей.
+      temp: w ? String(w.temp) : undefined,
+      tempIcon: w?.icon,
+      // Три коротких метрики: рейтинг, «ощущается», ветер (единица локализована).
+      stat1: `${c.rating}★`,
+      stat1l: t("card_rating"),
+      stat2: w ? `${w.feels}°` : "—",
+      stat2l: t("w_feels"),
+      stat3: w ? `${w.windKmh} ${t("w_wind")}` : "—",
+      stat3l: t("card_wind"),
+      price: t("card_open"),
+      pricel: t("card_direction"),
+    };
+  });
   return <CardDeckBase items={items} title={t("deck_popular_cities")} onSelect={onSearch} />;
 }
