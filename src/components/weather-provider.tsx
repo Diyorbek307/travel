@@ -1,7 +1,6 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { ГОРОДА } from "@/data/geo";
 import type { TKey } from "@/lib/i18n";
 
 /**
@@ -11,10 +10,10 @@ import type { TKey } from "@/lib/i18n";
  * всегда, хоть в январе. Для приложения про поездки это прямая
  * дезинформация — по такой цифре собирают чемодан.
  *
- * Теперь данные берутся у Open-Meteo. Эта служба бесплатна и не требует
- * ключа или платёжной карты — то, что нужно, чтобы «просто работало» без
- * настройки. Запрашиваем разом все города и держим ответ в памяти:
- * погода меняется не поминутно, дёргать службу на каждый экран незачем.
+ * Данные берём с нашего маршрута /api/weather. Он на сервере ходит в
+ * OpenWeather (если задан ключ OPENWEATHER_API_KEY) или в бесплатный
+ * Open-Meteo — ключ в браузер не попадает. Запрашиваем разом все города
+ * и держим ответ в памяти: погода меняется не поминутно.
  *
  * Если служба недоступна, отдаём null, и экран показывает прочерк вместо
  * выдуманного числа.
@@ -27,20 +26,6 @@ export interface Погода {
   icon: string;
   /** Ключ состояния для перевода — сам текст подставит интерфейс. */
   condKey: TKey;
-}
-
-/** Коды погоды Open-Meteo (WMO) в значок и состояние. */
-function поКоду(code: number): { icon: string; condKey: TKey } {
-  if (code === 0) return { icon: "☀️", condKey: "w_clear" };
-  if (code <= 2) return { icon: "🌤️", condKey: "w_partly" };
-  if (code === 3) return { icon: "☁️", condKey: "w_cloudy" };
-  if (code <= 48) return { icon: "🌫️", condKey: "w_fog" };
-  if (code <= 57) return { icon: "🌦️", condKey: "w_drizzle" };
-  if (code <= 67) return { icon: "🌧️", condKey: "w_rain" };
-  if (code <= 77) return { icon: "❄️", condKey: "w_snow" };
-  if (code <= 82) return { icon: "🌧️", condKey: "w_rain" };
-  if (code <= 86) return { icon: "❄️", condKey: "w_snow" };
-  return { icon: "⛈️", condKey: "w_thunder" };
 }
 
 interface Контекст {
@@ -56,39 +41,21 @@ export function WeatherProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     let живо = true;
-    const города = Object.entries(ГОРОДА);
 
     async function обновить() {
-      const пары = await Promise.all(
-        города.map(async ([имя, geo]) => {
-          try {
-            const url = `https://api.open-meteo.com/v1/forecast?latitude=${geo.lat}&longitude=${geo.lon}&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m`;
-            const r = await fetch(url, { signal: AbortSignal.timeout(8000) });
-            if (!r.ok) return null;
-            const d = await r.json();
-            const c = d.current;
-            if (!c) return null;
-            const { icon, condKey } = поКоду(Number(c.weather_code));
-            const п: Погода = {
-              temp: Math.round(c.temperature_2m),
-              feels: Math.round(c.apparent_temperature ?? c.temperature_2m),
-              windKmh: Math.round(c.wind_speed_10m),
-              icon,
-              condKey,
-            };
-            return [имя, п] as const;
-          } catch {
-            return null;
-          }
-        }),
-      );
-      if (!живо) return;
-      const собрано: Record<string, Погода> = {};
-      for (const п of пары) if (п) собрано[п[0]] = п[1];
-      // Пустой ответ (сеть отвалилась) не затираем прежними данными —
-      // старая правда лучше внезапного прочерка на всех городах.
-      if (Object.keys(собрано).length) setКарта(собрано);
-      setLoading(false);
+      try {
+        const r = await fetch("/api/weather", { signal: AbortSignal.timeout(9000) });
+        if (!r.ok) return;
+        const d = (await r.json()) as { weather?: Record<string, Погода> };
+        if (!живо || !d.weather) return;
+        // Пустой ответ (сеть отвалилась) не затираем прежними данными —
+        // старая правда лучше внезапного прочерка на всех городах.
+        if (Object.keys(d.weather).length) setКарта(d.weather);
+      } catch {
+        // сеть недоступна — оставляем что было
+      } finally {
+        if (живо) setLoading(false);
+      }
     }
 
     обновить();
