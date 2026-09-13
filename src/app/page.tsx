@@ -28,6 +28,7 @@ import { ContentProvider } from "@/components/content-provider";
 import { LangProvider } from "@/components/lang-provider";
 import { WeatherProvider } from "@/components/weather-provider";
 import { CurrencyProvider } from "@/components/currency-provider";
+import { GeoProvider } from "@/components/geo-provider";
 import { AuthSplash, LoginScreen, RegisterScreen } from "@/components/auth-screens";
 import NativeBack from "@/components/native-back";
 import { отметитьВизит } from "@/lib/visits";
@@ -91,7 +92,9 @@ export default function Page() {
       <LangProvider>
         <WeatherProvider>
           <CurrencyProvider>
-            <App />
+            <GeoProvider>
+              <App />
+            </GeoProvider>
           </CurrencyProvider>
         </WeatherProvider>
       </LangProvider>

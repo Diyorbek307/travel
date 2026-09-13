@@ -3,6 +3,8 @@ export type Tab = "home" | "explore" | "map" | "audio" | "profile";
 export interface Place {
   id: string;
   name: string;
+  /** Исходное русское название — ключ для координат места (МЕСТА в geo). */
+  nameRu?: string;
   city: string;
   type: string;
   rating: number;

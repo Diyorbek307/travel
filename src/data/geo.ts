@@ -66,11 +66,32 @@ const РАДИУС_КМ = 6371;
  * что ближе, что дальше.
  */
 export function расстояниеКм(a: Geo, b: Geo): number {
+  return Math.round(_км(a, b));
+}
+
+/** То же расстояние, но без округления — для «от меня» с десятыми. */
+function _км(a: Geo, b: Geo): number {
   const рад = (г: number) => (г * Math.PI) / 180;
   const dф = рад(b.lat - a.lat);
   const dл = рад(b.lon - a.lon);
   const ф1 = рад(a.lat);
   const ф2 = рад(b.lat);
   const h = Math.sin(dф / 2) ** 2 + Math.cos(ф1) * Math.cos(ф2) * Math.sin(dл / 2) ** 2;
-  return Math.round(2 * РАДИУС_КМ * Math.asin(Math.sqrt(h)));
+  return 2 * РАДИУС_КМ * Math.asin(Math.sqrt(h));
+}
+
+/**
+ * Живое расстояние «от меня» до места. null, если нет позиции или координат
+ * места. Считаем от точки места (а если её нет — от центра города).
+ */
+export function дистанцияКм(pos: Geo | null, название: string, город: string): number | null {
+  if (!pos) return null;
+  const т = точка(название, город);
+  return т ? _км(pos, т) : null;
+}
+
+/** Человеко-читаемо: близко — с десятыми, далеко — целыми. */
+export function форматКм(км: number, единица: string): string {
+  const число = км < 10 ? км.toFixed(1) : String(Math.round(км));
+  return `${число} ${единица}`;
 }

@@ -5,6 +5,8 @@ import { GOLD, TEXT, WHITE } from "@/lib/theme";
 import { useAppContent } from "./content-provider";
 import { useT } from "@/components/lang-provider";
 import { useWeather } from "@/components/weather-provider";
+import { useGeo } from "@/components/geo-provider";
+import { дистанцияКм, форматКм } from "@/data/geo";
 
 /**
  * Подборка карточек: колода на телефоне, лента на широком экране.
@@ -165,8 +167,10 @@ export function CardDeckBase({
 export function CardDeck({ places, onPlace }: { places: Place[]; onPlace: (p: Place) => void }) {
   const { t, трК } = useT();
   const погода = useWeather();
+  const { pos } = useGeo();
   const items: DeckItem[] = places.map((p) => {
     const w = погода.get(p.city); // настоящая погода города (Open-Meteo)
+    const км = дистанцияКм(pos, p.nameRu ?? p.name, p.city); // живое расстояние «от меня»
     return {
       img: p.img,
       title: p.name,
@@ -181,7 +185,8 @@ export function CardDeck({ places, onPlace }: { places: Place[]; onPlace: (p: Pl
       stat1l: t("card_rating"),
       stat2: String(p.reviews),
       stat2l: t("d_reviews_word"),
-      stat3: p.distance,
+      // Расстояние — живое от текущей позиции; без геолокации — прежнее.
+      stat3: км != null ? форматКм(км, t("unit_km")) : p.distance,
       stat3l: t("card_dist"),
       price: p.entry,
       pricel: t("card_entry"),

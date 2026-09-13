@@ -8,11 +8,15 @@ import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE } from "@/lib/theme";
 import { LANGS } from "@/data/content";
 import { Badge, GeomPattern, StarRow } from "./ui";
 import { useT } from "@/components/lang-provider";
+import { useGeo } from "@/components/geo-provider";
+import { дистанцияКм, форматКм } from "@/data/geo";
 import { glass } from "@/lib/theme";
 
 
 export function PlaceDetail({ place, onBack, onPlay, onToast, onПуть }:{ place:Place; onBack:()=>void; onPlay:(p:Place)=>void; onToast:(m:string)=>void; onПуть:(название:string,город:string)=>void }) {
   const { t, трК } = useT();
+  const { pos } = useGeo();
+  const дист = дистанцияКм(pos, place.nameRu ?? place.name, place.city); // «от вас»
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [fav, setFav] = useState(false);
@@ -38,7 +42,7 @@ export function PlaceDetail({ place, onBack, onPlay, onToast, onПуть }:{ pla
       </div>
       <div className="flex-1 overflow-y-auto hide-scroll px-4 pt-4">
         <div className="grid grid-cols-4 gap-2 mb-4">
-          {[{e:"📍",v:place.distance,k:"d_distance" as const},{e:"🎫",v:place.entry,k:"d_entry" as const},{e:"🕐",v:place.hours.length>8?t("d_always"):place.hours,k:"d_hours" as const},{e:"⏱",v:"8:42",k:"d_audio" as const}].map(s=>(
+          {[{e:"📍",v:дист!=null?форматКм(дист,t("unit_km")):place.distance,k:"d_distance" as const},{e:"🎫",v:place.entry,k:"d_entry" as const},{e:"🕐",v:place.hours.length>8?t("d_always"):place.hours,k:"d_hours" as const},{e:"⏱",v:"8:42",k:"d_audio" as const}].map(s=>(
             <div key={s.k} className="bg-white rounded-2xl p-2.5 text-center shadow-sm border" style={{borderColor:BORDER}}><p className="text-base">{s.e}</p><p className="font-semibold text-[10px] mt-1 leading-tight" style={{color:TEXT}}>{s.v}</p><p className="text-[8px] mt-0.5" style={{color:MUTED}}>{t(s.k)}</p></div>
           ))}
         </div>

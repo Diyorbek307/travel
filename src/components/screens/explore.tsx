@@ -8,6 +8,8 @@ import type { TKey } from "@/lib/i18n";
 import { useAppContent } from "@/components/content-provider";
 import { useT } from "@/components/lang-provider";
 import { useWeather } from "@/components/weather-provider";
+import { useGeo } from "@/components/geo-provider";
+import { дистанцияКм, форматКм } from "@/data/geo";
 import { Badge, StarRow } from "../ui";
 import { AnimatedBg } from "@/components/animated-bg";
 import { AdBanner } from "@/components/widgets";
@@ -17,6 +19,7 @@ export function ExploreScreen({ onPlace, onHotel, onRestaurant, isPremium }:{ on
   const { HOTELS, PLACES, RESTAURANTS } = useAppContent();
   const { t, трК } = useT();
   const погода = useWeather(); // настоящая погода города (Open-Meteo)
+  const { pos } = useGeo(); // живое местоположение для расстояний
   // Значение фильтра остаётся русским: по нему сверяется тип места в
   // данных. Переводится только подпись на кнопке.
   const подписьФильтра: Record<string, TKey> = {
@@ -78,7 +81,7 @@ export function ExploreScreen({ onPlace, onHotel, onRestaurant, isPremium }:{ on
             {(filter==="Всё"?PLACES.slice(1):filtered).map(p=>(
               <button key={p.id} onClick={()=>onPlace(p)} className="w-full flex gap-3 bg-white rounded-2xl overflow-hidden shadow-sm text-left border active:scale-[0.98]" style={{borderColor:BORDER}}>
                 <div className="w-24 flex-shrink-0 bg-gray-100"><img src={p.img} alt={p.name} className="w-full h-full object-cover" style={{height:96}}/></div>
-                <div className="flex-1 py-3 pr-3 min-w-0"><div className="flex items-center gap-1.5 mb-1"><Badge text={p.type} color={GREEN}/>{p.audio&&<Badge text="🎧" color={MUTED}/>}</div><p className="font-bold text-sm leading-tight" style={{color:TEXT}}>{p.name}</p><p className="text-[10px] mt-0.5" style={{color:MUTED}}>{трК(p.city)} · {p.distance}</p><div className="flex items-center justify-between mt-2"><StarRow rating={p.rating}/><div className="flex items-center gap-2"><span className="text-xs font-bold" style={{color:GREEN}}>{p.entry}</span>{(()=>{const w=погода.get(p.city);return w?<span className="text-[9px] font-semibold" style={{color:MUTED}}>{w.icon}{w.temp}°</span>:null;})()}</div></div></div>
+                <div className="flex-1 py-3 pr-3 min-w-0"><div className="flex items-center gap-1.5 mb-1"><Badge text={p.type} color={GREEN}/>{p.audio&&<Badge text="🎧" color={MUTED}/>}</div><p className="font-bold text-sm leading-tight" style={{color:TEXT}}>{p.name}</p><p className="text-[10px] mt-0.5" style={{color:MUTED}}>{трК(p.city)} · {(()=>{const к=дистанцияКм(pos,p.nameRu??p.name,p.city);return к!=null?форматКм(к,t("unit_km")):p.distance;})()}</p><div className="flex items-center justify-between mt-2"><StarRow rating={p.rating}/><div className="flex items-center gap-2"><span className="text-xs font-bold" style={{color:GREEN}}>{p.entry}</span>{(()=>{const w=погода.get(p.city);return w?<span className="text-[9px] font-semibold" style={{color:MUTED}}>{w.icon}{w.temp}°</span>:null;})()}</div></div></div>
               </button>
             ))}
           </>
