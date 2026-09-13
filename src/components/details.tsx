@@ -72,12 +72,15 @@ export function PlaceDetail({ place, onBack, onPlay, onToast, onПуть }:{ pla
             </div>
           </div>
         )}
-        <div className="flex gap-3 pb-6">
+        <div className="flex gap-3 mb-3">
           <button onClick={()=>onПуть(place.name, place.city)} className="flex-1 py-3.5 rounded-2xl text-white text-sm font-bold active:scale-[0.98] transition-all" style={{background:GREEN}}>📍 {t("d_route")}</button>
           <button onClick={()=>onToast(`✅ «${place.name}» ${t("d_added_route")}`)} className="flex-1 py-3.5 rounded-2xl text-sm font-bold border active:scale-[0.98] transition-all" style={{color:GREEN,borderColor:GREEN,background:WHITE}}>🗺️ {t("d_add_route")}</button>
         </div>
-      </div>
+        {/* Отзывы — внутри прокрутки, иначе на телефоне блок наезжал на
+            аудиоплеер и обрезался. */}
         <ReviewForm placeId={place.id} placeName={place.name} />
+        <div className="pb-6" />
+      </div>
     </div>
   );
 }
@@ -157,9 +160,10 @@ export function HotelDetail({ hotel, onBack, onToast }:{ hotel:Hotel; onBack:()=
             </div>
           ))}
         </div>
-      </div>
         <BookingForm kind="hotel" itemId={hotel.id} itemName={hotel.name} />
         <ReviewForm placeId={hotel.id} placeName={hotel.name} />
+        <div className="pb-6" />
+      </div>
     </div>
   );
 }
@@ -200,13 +204,14 @@ export function RestaurantDetail({ r, onBack, onToast, onПуть }:{ r:Restaura
             ))}
           </div>
         </div>
-        <div className="flex gap-3 pb-6">
+        <div className="flex gap-3 mb-3">
           <button onClick={()=>onПуть(r.name, r.city)} className="flex-1 py-3.5 rounded-2xl text-white text-sm font-bold active:scale-[0.98] transition-all" style={{background:"#C1603A"}}>📍 {t("d_route")}</button>
           <button onClick={()=>onToast(`📞 ${t("d_calling")} «${r.name}»...`)} className="flex-1 py-3.5 rounded-2xl text-sm font-bold border active:scale-[0.98] transition-all" style={{color:"#C1603A",borderColor:"#C1603A",background:WHITE}}>📞 {t("d_call")}</button>
         </div>
-      </div>
         <BookingForm kind="restaurant" itemId={r.id} itemName={r.name} />
         <ReviewForm placeId={r.id} placeName={r.name} />
+        <div className="pb-6" />
+      </div>
     </div>
   );
 }

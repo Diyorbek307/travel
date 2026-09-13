@@ -321,6 +321,48 @@ body {
   animation: silk-road 6s ease-in-out infinite;
 }
 
+/*
+ * Плавный отклик на нажатие — глобально для всех кнопок и ссылок.
+ *
+ * Одно правило даёт «живое» нажатие всему приложению: плавные цвета/тени
+ * и лёгкое «вдавливание» при клике. Кнопки со своим active:scale (колода,
+ * действия) просто переопределяют масштаб — конфликта нет.
+ */
+button,
+a,
+[role="button"] {
+  transition:
+    transform 0.14s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.14s ease,
+    box-shadow 0.2s ease,
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    filter 0.15s ease;
+}
+button:active,
+[role="button"]:active {
+  transform: scale(0.96);
+}
+button:disabled,
+button[aria-disabled="true"] {
+  transform: none;
+}
+/* Плавное появление вкладок/экранов чуть заметнее — с лёгким подъёмом. */
+.app-page {
+  animation: page-enter 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Движение — украшение, а не смысл: тем, кто просил его отключить,
    показываем статичный кадр вместо бесконечных циклов. */
 @media (prefers-reduced-motion: reduce) {
