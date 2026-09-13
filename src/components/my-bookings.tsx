@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BORDER, GREEN, MUTED, TEXT, WHITE } from "@/lib/theme";
+import { BORDER, GREEN, MUTED, TEXT, WHITE, SURFACE } from "@/lib/theme";
 
 /**
  * Заявки, оставленные туристом.
@@ -76,7 +76,7 @@ export default function MyBookings() {
 
       <ul className="grid gap-2.5">
         {брони.map((b) => (
-          <li key={b.id} className="rounded-2xl p-4" style={{ background: WHITE, border: `1px solid ${BORDER}` }}>
+          <li key={b.id} className="rounded-2xl p-4" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
             <div className="mb-1 flex flex-wrap items-center justify-between gap-2">
               <span className="text-[11px]" style={{ color: MUTED }}>
                 {ВИД[b.kind]}

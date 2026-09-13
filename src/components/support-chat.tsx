@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { BORDER, GOLD, GREEN, MUTED, TEXT, WHITE } from "@/lib/theme";
+import { BORDER, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE } from "@/lib/theme";
 import { useT } from "@/components/lang-provider";
 
 /**
@@ -77,7 +77,7 @@ export default function SupportChat({ onBack }: { onBack: () => void }) {
     <div className="flex h-full flex-col" style={{ background: "var(--cream)" }}>
       <header
         className="flex shrink-0 items-center gap-3 px-4 py-3"
-        style={{ background: WHITE, borderBottom: `1px solid ${BORDER}` }}
+        style={{ background: SURFACE, borderBottom: `1px solid ${BORDER}` }}
       >
         <button onClick={onBack} className="text-sm" style={{ color: MUTED }}>
           ← {t("common_back")}
@@ -116,7 +116,7 @@ export default function SupportChat({ onBack }: { onBack: () => void }) {
                 style={
                   свой
                     ? { background: GREEN, color: WHITE }
-                    : { background: WHITE, color: TEXT, border: `1px solid ${BORDER}` }
+                    : { background: SURFACE, color: TEXT, border: `1px solid ${BORDER}` }
                 }
               >
                 <p className="whitespace-pre-wrap break-words">{m.text}</p>
@@ -131,7 +131,7 @@ export default function SupportChat({ onBack }: { onBack: () => void }) {
       <form
         onSubmit={отправить}
         className="flex shrink-0 items-center gap-2 p-3"
-        style={{ background: WHITE, borderTop: `1px solid ${BORDER}` }}
+        style={{ background: SURFACE, borderTop: `1px solid ${BORDER}` }}
       >
         <input
           value={text}

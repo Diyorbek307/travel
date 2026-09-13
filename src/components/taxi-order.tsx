@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BORDER, GOLD, GREEN, MUTED, TEXT, WHITE } from "@/lib/theme";
+import { BORDER, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE } from "@/lib/theme";
 import { ГОРОДА, МЕСТА, расстояниеКм, точка } from "@/data/geo";
 import type { Geo } from "@/lib/types";
 import RealMap from "@/components/real-map";
@@ -174,7 +174,7 @@ export default function TaxiOrder({
         🚖 {t("taxi_title")}
       </p>
 
-      <div className="rounded-2xl border p-4" style={{ background: WHITE, borderColor: BORDER }}>
+      <div className="rounded-2xl border p-4" style={{ background: SURFACE, borderColor: BORDER }}>
         {/* Город. Места для выбора зависят от него, поэтому он первый. */}
         <div className="hide-scroll mb-3 flex gap-2 overflow-x-auto pb-1">
           {Object.keys(ГОРОДА).map((г) => (

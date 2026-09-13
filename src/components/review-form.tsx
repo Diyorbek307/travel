@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BORDER, GOLD, MUTED, TEXT, WHITE } from "@/lib/theme";
+import { BORDER, GOLD, MUTED, TEXT, WHITE, SURFACE } from "@/lib/theme";
 import { useT } from "@/components/lang-provider";
 
 /**
@@ -78,7 +78,7 @@ export default function ReviewForm({ placeId, placeName }: { placeId: string; pl
     отзывы.length > 0 ? (отзывы.reduce((s, r) => s + r.rating, 0) / отзывы.length).toFixed(1) : null;
 
   return (
-    <section className="mx-4 mb-4 rounded-2xl p-4" style={{ background: WHITE, border: `1px solid ${BORDER}` }}>
+    <section className="mx-4 mb-4 rounded-2xl p-4" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <p className="text-sm font-bold" style={{ color: TEXT, fontFamily: "'Fraunces',serif" }}>
           {t("rev_title")}

@@ -289,6 +289,9 @@ export const СЛОВАРЬ = {
   prof_appearance: row("Appearance", "Внешний вид", "Koʻrinish", "外观", "화면", "Darstellung", "Apparence", "外観", "Görünüm", "المظهر"),
   prof_about: row("About the app", "О приложении", "Ilova haqida", "关于应用", "앱 정보", "Über die App", "À propos", "アプリについて", "Uygulama hakkında", "عن التطبيق"),
   prof_send_location: row("Share location", "Отправить геолокацию", "Joylashuvni yuborish", "分享位置", "위치 공유", "Standort teilen", "Partager la position", "位置情報を送る", "Konumu paylaş", "مشاركة الموقع"),
+  sos_sending: row("Sending location…", "Отправляем геолокацию…", "Joylashuv yuborilmoqda…", "正在发送位置…", "위치 전송 중…", "Standort wird gesendet…", "Envoi de la position…", "位置情報を送信中…", "Konum gönderiliyor…", "جارٍ إرسال الموقع…"),
+  sos_sent: row("Location sent — help is on the way.", "Геолокация отправлена — помощь уведомлена.", "Joylashuv yuborildi — yordam xabardor.", "位置已发送 — 已通知救援。", "위치 전송됨 — 도움 요청됨.", "Standort gesendet — Hilfe ist informiert.", "Position envoyée — les secours sont prévenus.", "位置を送信しました — 支援に通知しました。", "Konum gönderildi — yardım bilgilendirildi.", "تم إرسال الموقع — تم إبلاغ المساعدة."),
+  sos_fail: row("Couldn't get location. Allow access and retry.", "Не удалось определить место. Разрешите доступ и повторите.", "Joylashuv aniqlanmadi. Ruxsat bering va qayta urining.", "无法获取位置，请允许权限后重试。", "위치를 가져올 수 없습니다. 권한 허용 후 재시도.", "Standort nicht verfügbar. Zugriff erlauben und erneut versuchen.", "Position indisponible. Autorisez l'accès et réessayez.", "位置を取得できません。アクセスを許可して再試行してください。", "Konum alınamadı. Erişime izin verip tekrar deneyin.", "تعذّر تحديد الموقع. اسمح بالوصول وأعد المحاولة."),
   prof_logout: row("Log out", "Выйти", "Chiqish", "退出登录", "로그아웃", "Abmelden", "Se déconnecter", "ログアウト", "Çıkış yap", "تسجيل الخروج"),
   prof_account: row("Account", "Аккаунт", "Hisob", "账户", "계정", "Konto", "Compte", "アカウント", "Hesap", "الحساب"),
 

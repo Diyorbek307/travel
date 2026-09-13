@@ -12,11 +12,20 @@ export const GREEN_LIGHT = "#3A9E70";
 /** Тёмный лес — плитка логотипа и подложка бренда. */
 export const GREEN_DARK = "#164A30";
 export const GOLD = "#E9C46A";
-export const CREAM = "#F5F1E6";
+
+/*
+ * Нейтрали ссылаются на CSS-переменные — так они переключаются вместе с
+ * темой (светлая/тёмная) без правки компонентов. Бренд (зелёный, золото)
+ * не темизируем. WHITE оставлен литералом: это белый текст/иконки поверх
+ * фотографий и зелёных шапок, он белый в любой теме. Фон карточек —
+ * SURFACE (он и темнеет в тёмной теме).
+ */
+export const CREAM = "var(--cream)";
+export const SURFACE = "var(--surface)";
 export const WHITE = "#FFFFFF";
-export const TEXT = "#2B2B2B";
-export const MUTED = "#7A6E5F";
-export const BORDER = "#EDE8DC";
+export const TEXT = "var(--text)";
+export const MUTED = "var(--muted)";
+export const BORDER = "var(--border)";
 
 /** Стекло поверх фотографии — на тёмной подложке. */
 export const glass: CSSProperties = {

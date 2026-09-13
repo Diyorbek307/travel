@@ -6,7 +6,7 @@ import { ADS } from "@/data/content";
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Hotel, Place } from "@/lib/types";
-import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE } from "@/lib/theme";
+import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE } from "@/lib/theme";
 
 export function MiniPlayer({ place, onClose }:{ place:Place; onClose:()=>void }) {
   const { t } = useT();
@@ -137,7 +137,7 @@ export function AdBanner({ isPremium, cities }:{ isPremium:boolean; cities?:stri
   };
   return (
     <div className="mx-4 mb-3">
-      <div className="rounded-2xl overflow-hidden border" style={{background:WHITE,borderColor:BORDER}}>
+      <div className="rounded-2xl overflow-hidden border" style={{background:SURFACE,borderColor:BORDER}}>
         <div className="flex items-center gap-3 px-3 py-2.5">
           <button onClick={перейти} className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{background:ad.color+"18"}}>{ad.emoji}</button>
           <button onClick={перейти} className="flex-1 min-w-0 text-left">

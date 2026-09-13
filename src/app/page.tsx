@@ -33,6 +33,7 @@ import { GeoProvider } from "@/components/geo-provider";
 import { AuthSplash, LoginScreen, RegisterScreen } from "@/components/auth-screens";
 import NativeBack from "@/components/native-back";
 import { отметитьВизит } from "@/lib/visits";
+import { инитТему } from "@/lib/settings";
 import type { Hotel, Place, PublicUser, Restaurant, Route, Tab } from "@/lib/types";
 
 /**
@@ -136,6 +137,11 @@ function App() {
 
   // Кто вошёл. Сессия живёт три месяца и продлевается при каждом
   // запуске, поэтому постоянный пользователь пароль больше не вводит.
+  // Применяем сохранённую тему сразу при запуске (по умолчанию светлая).
+  useEffect(() => {
+    инитТему();
+  }, []);
+
   useEffect(() => {
     let cancelled = false;
     fetch("/api/auth/me")

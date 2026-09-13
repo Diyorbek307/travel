@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { Hotel, Place, Restaurant } from "@/lib/types";
-import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE } from "@/lib/theme";
+import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE } from "@/lib/theme";
 import { FILTER_TABS } from "@/data/content";
 import type { TKey } from "@/lib/i18n";
 import { useAppContent } from "@/components/content-provider";
@@ -43,7 +43,7 @@ export function ExploreScreen({ onPlace, onHotel, onRestaurant, isPremium }:{ on
         <p className="text-[9px] font-bold mb-0.5 uppercase tracking-widest" style={{color:"rgba(255,255,255,0.6)"}}>{t("explore_kicker")}</p>
         <h1 className="text-xl font-bold mb-3 text-white" style={{fontFamily:"'Fraunces',serif"}}>{t("explore_title")}</h1>
         <div className="flex gap-2 overflow-x-auto hide-scroll">
-          {FILTER_TABS.map(f=><button key={f} onClick={()=>setFilter(f)} className="flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-semibold" style={filter===f?{background:WHITE,color:GREEN}:{background:"rgba(255,255,255,0.18)",color:"rgba(255,255,255,0.75)"}}>{подписьФильтра[f] ? t(подписьФильтра[f]) : f}</button>)}
+          {FILTER_TABS.map(f=><button key={f} onClick={()=>setFilter(f)} className="flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-semibold" style={filter===f?{background:SURFACE,color:GREEN}:{background:"rgba(255,255,255,0.18)",color:"rgba(255,255,255,0.75)"}}>{подписьФильтра[f] ? t(подписьФильтра[f]) : f}</button>)}
         </div>
       </div>
       </div>

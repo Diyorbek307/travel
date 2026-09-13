@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { Route } from "@/lib/types";
-import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE } from "@/lib/theme";
+import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE } from "@/lib/theme";
 
 import { useAppContent } from "@/components/content-provider";
 import { useT } from "@/components/lang-provider";
@@ -91,7 +91,7 @@ export function MapScreen({ onRoute }:{ onRoute:(r:Route)=>void }) {
             )}
             {/* City chips */}
             <div className="flex gap-2 flex-wrap">
-              {Object.keys(ГОРОДА).map(c=><button key={c} onClick={()=>setCity(c)} className="px-3 py-1.5 rounded-full text-xs font-bold shadow-sm" style={city===c?{background:GREEN,color:WHITE}:{background:WHITE,color:TEXT,border:`1px solid ${BORDER}`}}>{трК(c)}</button>)}
+              {Object.keys(ГОРОДА).map(c=><button key={c} onClick={()=>setCity(c)} className="px-3 py-1.5 rounded-full text-xs font-bold shadow-sm" style={city===c?{background:GREEN,color:WHITE}:{background:SURFACE,color:TEXT,border:`1px solid ${BORDER}`}}>{трК(c)}</button>)}
             </div>
           </div>
         )}
@@ -124,7 +124,7 @@ export function MapScreen({ onRoute }:{ onRoute:(r:Route)=>void }) {
                     <div className="bg-white rounded-2xl p-3 flex-1 shadow-sm border mb-2" style={{borderColor:BORDER}}><div className="flex items-start justify-between gap-2"><div><p className="font-bold text-sm" style={{color:TEXT}}>{трК(s.name)}</p><p className="text-[10px] mt-0.5" style={{color:MUTED}}>⏱ {s.dur} · 🎫 {трК(s.entry)}</p></div><span className="text-[10px] font-semibold" style={{color:MUTED}}>{s.time}</span></div><p className="text-xs mt-1.5 font-medium" style={{color:GREEN}}>💡 {трК(s.note)}</p></div>
                   </div>
                 ))}
-                <button onClick={()=>setGenerated(false)} className="w-full py-3.5 rounded-2xl text-sm font-semibold border mt-1 mb-4" style={{color:GREEN,borderColor:GREEN,background:WHITE}}>← {t("map_new_route")}</button>
+                <button onClick={()=>setGenerated(false)} className="w-full py-3.5 rounded-2xl text-sm font-semibold border mt-1 mb-4" style={{color:GREEN,borderColor:GREEN,background:SURFACE}}>← {t("map_new_route")}</button>
               </div>
             )}
           </div>

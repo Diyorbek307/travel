@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useT } from "@/components/lang-provider";
 import type { TKey } from "@/lib/i18n";
 import TaxiOrder from "@/components/taxi-order";
-import { BORDER, CREAM, GREEN, MUTED, TEXT, WHITE } from "@/lib/theme";
+import { BORDER, CREAM, GREEN, MUTED, TEXT, WHITE, SURFACE } from "@/lib/theme";
 import { FLIGHTS, INTERCITY, TRAINS, UZ_CITIES } from "@/data/content";
 import { EmptyRoute } from "../ui";
 import { AnimatedBg } from "@/components/animated-bg";
@@ -25,7 +25,7 @@ export function CityPicker({ value, onChange, label, icon }:{ value:string; onCh
         // (зелёная шапка + строка полей), и absolute сжимал лист в шапку.
         // fixed раскрывает его на весь экран.
         <div className="fixed inset-0 z-[60] flex flex-col justify-end" style={{background:"rgba(0,0,0,0.5)",backdropFilter:"blur(4px)"}}>
-          <div className="rounded-t-3xl overflow-hidden animate-slide-up" style={{background:WHITE,maxHeight:"65%"}}>
+          <div className="rounded-t-3xl overflow-hidden animate-slide-up" style={{background:SURFACE,maxHeight:"65%"}}>
             <div className="flex items-center justify-between px-4 pt-4 pb-3 border-b" style={{borderColor:BORDER}}>
               <p className="font-bold text-base" style={{color:TEXT,fontFamily:"'Fraunces',serif"}}>{label}</p>
               <button onClick={()=>setOpen(false)} className="w-8 h-8 rounded-xl flex items-center justify-center" style={{background:CREAM}}>
@@ -100,7 +100,7 @@ export function TransportScreen({ onBack, isPremium }:{ onBack:()=>void; isPremi
           <div className="flex gap-2">
             {TABS.map(([v,e,l])=>(
               <button key={v} onClick={()=>setMode(v)} className="flex-1 py-2.5 rounded-2xl text-[10px] font-bold flex flex-col items-center gap-0.5"
-                style={mode===v?{background:WHITE,color:GREEN}:{background:"rgba(255,255,255,0.15)",color:"rgba(255,255,255,0.85)"}}>
+                style={mode===v?{background:SURFACE,color:GREEN}:{background:"rgba(255,255,255,0.15)",color:"rgba(255,255,255,0.85)"}}>
                 <span className="text-base">{e}</span><span>{t(l)}</span>
               </button>
             ))}

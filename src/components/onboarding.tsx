@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { BORDER, CREAM, GREEN, MUTED, TEXT, WHITE } from "@/lib/theme";
+import { BORDER, CREAM, GREEN, MUTED, TEXT, WHITE, SURFACE } from "@/lib/theme";
 import { LOCALE_META, LOCALES, type Locale, type TKey } from "@/lib/i18n";
 import { GeomPattern, LogoMark } from "./ui";
 import { useT } from "@/components/lang-provider";
@@ -42,7 +42,7 @@ export function OnboardingLang({ onNext }:{ onNext:(l:string)=>void; defaultLang
         {LOCALES.map((код)=>{
           const выбран = lang===код;
           return (
-          <button key={код} onClick={()=>setLang(код)} className="w-full flex items-center justify-between px-4 py-3.5 rounded-2xl border" style={выбран?{background:GREEN+"10",borderColor:GREEN}:{background:WHITE,borderColor:BORDER}}>
+          <button key={код} onClick={()=>setLang(код)} className="w-full flex items-center justify-between px-4 py-3.5 rounded-2xl border" style={выбран?{background:GREEN+"10",borderColor:GREEN}:{background:SURFACE,borderColor:BORDER}}>
             <span className="text-base font-medium" style={{color:TEXT}}>{LOCALE_META[код].label}</span>
             <div className="w-5 h-5 rounded-full border-2 flex items-center justify-center" style={выбран?{borderColor:GREEN,background:GREEN}:{borderColor:BORDER}}>
               {выбран&&<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>}
@@ -75,7 +75,7 @@ export function OnboardingInterests({ lang:_lang, onDone }:{ lang:string; onDone
       <div className="flex-1 overflow-y-auto hide-scroll px-4 pt-4">
         <div className="grid grid-cols-3 gap-3">
           {items.map(({e,l,k})=>(
-            <button key={l} onClick={()=>toggle(l)} className="flex flex-col items-center gap-2 p-4 rounded-2xl border" style={sel.includes(l)?{background:GREEN,borderColor:GREEN}:{background:WHITE,borderColor:BORDER}}>
+            <button key={l} onClick={()=>toggle(l)} className="flex flex-col items-center gap-2 p-4 rounded-2xl border" style={sel.includes(l)?{background:GREEN,borderColor:GREEN}:{background:SURFACE,borderColor:BORDER}}>
               <span className="text-2xl">{e}</span>
               <span className="text-xs font-semibold" style={{color:sel.includes(l)?WHITE:TEXT}}>{t(k)}</span>
             </button>

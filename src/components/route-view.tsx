@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import RealMap from "@/components/real-map";
 import GoogleMap, { googleКлюч } from "@/components/google-map";
 import { ГОРОДА, МЕСТА, расстояниеКм, точка } from "@/data/geo";
-import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE } from "@/lib/theme";
+import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE } from "@/lib/theme";
 import type { Geo } from "@/lib/types";
 
 type Способ = "авто" | "пешком";
@@ -183,7 +183,7 @@ export default function RouteView({
 
   return (
     <div className="flex h-full flex-col" style={{ background: CREAM }}>
-      <div className="flex items-center gap-3 border-b px-4 pt-14 pb-3" style={{ background: WHITE, borderColor: BORDER }}>
+      <div className="flex items-center gap-3 border-b px-4 pt-14 pb-3" style={{ background: SURFACE, borderColor: BORDER }}>
         <button
           onClick={onBack}
           className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
@@ -206,14 +206,14 @@ export default function RouteView({
 
       <div className="hide-scroll flex-1 overflow-y-auto p-4">
         {!цель ? (
-          <div className="rounded-2xl border p-4" style={{ background: WHITE, borderColor: BORDER }}>
+          <div className="rounded-2xl border p-4" style={{ background: SURFACE, borderColor: BORDER }}>
             <p className="text-sm" style={{ color: MUTED }}>
               Координат этого места у нас нет — маршрут построить не от чего.
             </p>
           </div>
         ) : (
           <>
-            <div className="overflow-hidden rounded-2xl border shadow-sm" style={{ background: WHITE, borderColor: BORDER }}>
+            <div className="overflow-hidden rounded-2xl border shadow-sm" style={{ background: SURFACE, borderColor: BORDER }}>
               {/*
                 Есть ключ Google — показываем его карту с его же маршрутом.
                 Нет ключа — карту OpenStreetMap с линией, которую посчитал
@@ -259,7 +259,7 @@ export default function RouteView({
               </div>
             )}
 
-            <div className="mt-4 rounded-2xl border p-4" style={{ background: WHITE, borderColor: BORDER }}>
+            <div className="mt-4 rounded-2xl border p-4" style={{ background: SURFACE, borderColor: BORDER }}>
               <div className="flex items-center gap-3">
                 <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: "#2f6fd0" }} />
                 <span className="min-w-0 flex-1 truncate text-sm" style={{ color: TEXT }}>

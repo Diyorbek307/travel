@@ -150,6 +150,33 @@ export async function setBookingStatus(bookingId: string, status: BookingStatus)
 }
 
 /* ------------------------------------------------------------------ */
+/* SOS — сигнал «Отправить геолокацию» из экстренной помощи            */
+/* ------------------------------------------------------------------ */
+
+export interface SosAlert {
+  id: string;
+  userId: string | null;
+  userName: string;
+  userInfo: string; // страна/телефон/язык — что известно о туристе
+  lat: number;
+  lon: number;
+  status: "new" | "seen";
+  createdAt: string;
+}
+
+const сигналы = создатьХранилище<SosAlert[]>(path.join(DATA_DIR, "sos.json"), () => []);
+
+export async function listSos(): Promise<SosAlert[]> {
+  return [...(await сигналы.read())].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}
+
+export async function createSos(input: Omit<SosAlert, "id" | "status" | "createdAt">) {
+  const s: SosAlert = { ...input, id: id("sos"), status: "new", createdAt: new Date().toISOString() };
+  await сигналы.update((все) => [[...все, s], undefined]);
+  return s;
+}
+
+/* ------------------------------------------------------------------ */
 /* Отзывы                                                             */
 /* ------------------------------------------------------------------ */
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { BORDER, GOLD, GREEN, MUTED, TEXT, WHITE } from "@/lib/theme";
+import { BORDER, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE } from "@/lib/theme";
 import { useT } from "@/components/lang-provider";
 import type { BookingKind } from "@/lib/types";
 
@@ -57,7 +57,7 @@ export default function BookingForm({
 
   if (итог === "ок") {
     return (
-      <div className="mx-4 mb-3 rounded-2xl p-4" style={{ background: WHITE, border: `1px solid ${BORDER}` }}>
+      <div className="mx-4 mb-3 rounded-2xl p-4" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
         <p className="text-sm font-semibold" style={{ color: GREEN }}>
           {t("bk_sent_title")}
         </p>
@@ -92,7 +92,7 @@ export default function BookingForm({
     <form
       onSubmit={отправить}
       className="mx-4 mb-3 flex flex-col gap-2.5 rounded-2xl p-4"
-      style={{ background: WHITE, border: `1px solid ${BORDER}` }}
+      style={{ background: SURFACE, border: `1px solid ${BORDER}` }}
     >
       <p className="text-sm font-bold" style={{ color: TEXT, fontFamily: "'Fraunces',serif" }}>
         {подпись}

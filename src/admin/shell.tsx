@@ -9,6 +9,7 @@ import Destinations from "./components/Destinations";
 import Tours from "./components/Tours";
 import Hotels from "./components/Hotels";
 import Bookings from "./components/Bookings";
+import Sos from "./components/Sos";
 import Users from "./components/Users";
 import Reviews from "./components/Reviews";
 import Chat from "./components/Chat";
@@ -51,6 +52,7 @@ const NAV_GROUPS = [
     label: "Операции",
     items: [
       { id: "dashboard", label: "Дашборд", icon: "⬡" },
+      { id: "sos", label: "SOS-сигналы", icon: "🆘" },
       { id: "bookings", label: "Бронирования", icon: "◫" },
       { id: "chat", label: "Чат поддержки", icon: "◈", badge: true },
       { id: "analytics", label: "Аналитика", icon: "◎" },
@@ -130,6 +132,7 @@ export default function AdminShell() {
 
   const pages: Record<string, React.ReactElement> = {
     dashboard: <Dashboard onNavigate={setActive} />,
+    sos: <Sos />,
     destinations: <Destinations />,
     tours: <Tours />,
     hotels: <Hotels />,

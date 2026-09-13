@@ -5,9 +5,11 @@ import type { ChatMessage, PublicUser } from "@/lib/types";
 import { PremiumModal } from "@/components/modals";
 import SupportChat from "@/components/support-chat";
 import MyBookings from "@/components/my-bookings";
-import { BORDER, CREAM, GOLD, GREEN, GREEN_LIGHT, MUTED, TEXT, WHITE } from "@/lib/theme";
+import { BORDER, CREAM, GOLD, GREEN, GREEN_LIGHT, MUTED, TEXT, WHITE, SURFACE } from "@/lib/theme";
 import { ACHIEVEMENTS, AI_REPLIES, STAMPS } from "@/data/content";
 import { useVisits } from "@/lib/visits";
+import { useSettings, задатьНастройку } from "@/lib/settings";
+import EmergencyCard from "@/components/emergency-card";
 import { useT } from "@/components/lang-provider";
 import { LOCALE_META, LOCALES, type TKey } from "@/lib/i18n";
 import { Badge } from "../ui";
@@ -17,16 +19,8 @@ import { AdBanner } from "@/components/widgets";
 
 export function SettingsView({ isPremium, onUpgrade, onLogout }:{ isPremium:boolean; onUpgrade:()=>void; onLogout:()=>void }) {
   const { t, lang, setLang } = useT();
-  const [notifNew,   setNotifNew]   = useState(true);
-  const [notifNear,  setNotifNear]  = useState(true);
-  const [notifDeals, setNotifDeals] = useState(false);
-  const [notifNews,  setNotifNews]  = useState(true);
-  const [offline,    setOffline]    = useState(true);
-  const [gps,        setGps]        = useState(true);
-  const [darkMode,   setDarkMode]   = useState(false);
-  const [autoPlay,   setAutoPlay]   = useState(false);
-  const [units,      setUnits]      = useState<"metric"|"imperial">("metric");
-  const [mapStyle,   setMapStyle]   = useState<"diorama"|"sat">("diorama");
+  // Все настройки — из общего хранилища (сохраняются на устройстве).
+  const нст = useSettings();
   const [currency,   setCurrency]   = useState("USD");
 
   const Toggle=({on,set}:{on:boolean;set:(v:boolean)=>void})=>(
@@ -82,10 +76,10 @@ export function SettingsView({ isPremium, onUpgrade, onLogout }:{ isPremium:bool
       {/* Notifications */}
       <div className="bg-white rounded-2xl px-4 shadow-sm border" style={{borderColor:BORDER}}>
         <p className="font-bold text-xs pt-3 pb-1 uppercase tracking-widest" style={{color:MUTED}}>{t("prof_notifications")}</p>
-        <Row icon="📍" label={t("s_nearby")} sub={t("s_nearby_sub")} right={<Toggle on={notifNear} set={setNotifNear}/>}/>
-        <Row icon="🎫" label={t("s_events")} sub={t("s_events_sub")} right={<Toggle on={notifDeals} set={setNotifDeals}/>}/>
-        <Row icon="🆕" label={t("s_news_sub")} right={<Toggle on={notifNew} set={setNotifNew}/>}/>
-        <Row icon="📰" label={t("s_news")} right={<Toggle on={notifNews} set={setNotifNews}/>}/>
+        <Row icon="📍" label={t("s_nearby")} sub={t("s_nearby_sub")} right={<Toggle on={нст.notifNear} set={v=>задатьНастройку("notifNear",v)}/>}/>
+        <Row icon="🎫" label={t("s_events")} sub={t("s_events_sub")} right={<Toggle on={нст.notifEvents} set={v=>задатьНастройку("notifEvents",v)}/>}/>
+        <Row icon="🆕" label={t("s_news_sub")} right={<Toggle on={нст.notifNew} set={v=>задатьНастройку("notifNew",v)}/>}/>
+        <Row icon="📰" label={t("s_news")} right={<Toggle on={нст.notifNews} set={v=>задатьНастройку("notifNews",v)}/>}/>
       </div>
 
       {/* Карта и навигация */}
@@ -93,14 +87,14 @@ export function SettingsView({ isPremium, onUpgrade, onLogout }:{ isPremium:bool
         <p className="font-bold text-xs pt-3 pb-1 uppercase tracking-widest" style={{color:MUTED}}>{t("prof_map_nav")}</p>
         <Row icon="🗺️" label={t("s_map_style")} right={
           <div className="flex rounded-lg overflow-hidden border" style={{borderColor:BORDER}}>
-            {(["diorama","sat"] as const).map(s=><button key={s} onClick={()=>setMapStyle(s)} className="px-2.5 py-1 text-[10px] font-bold" style={mapStyle===s?{background:GREEN,color:WHITE}:{background:CREAM,color:MUTED}}>{s==="diorama"?"3D":t("s_satellite")}</button>)}
+            {([["standard",t("nav_map")],["sat",t("s_satellite")]] as const).map(([s,ярлык])=><button key={s} onClick={()=>задатьНастройку("mapStyle",s)} className="px-2.5 py-1 text-[10px] font-bold" style={нст.mapStyle===s?{background:GREEN,color:WHITE}:{background:CREAM,color:MUTED}}>{ярлык}</button>)}
           </div>
         }/>
-        <Row icon="📡" label={t("s_gps_audio")} sub={t("s_nearby_sub")} right={<Toggle on={gps} set={setGps}/>}/>
-        <Row icon="⬇️" label={t("s_offline_maps")} sub={t("s_offline_sub")} right={<Toggle on={offline} set={setOffline}/>}/>
+        <Row icon="📡" label={t("s_gps_audio")} sub={t("s_nearby_sub")} right={<Toggle on={нст.gps} set={v=>задатьНастройку("gps",v)}/>}/>
+        <Row icon="⬇️" label={t("s_offline_maps")} sub={t("s_offline_sub")} right={<Toggle on={нст.offline} set={v=>задатьНастройку("offline",v)}/>}/>
         <Row icon="📏" label={t("s_units")} right={
           <div className="flex rounded-lg overflow-hidden border" style={{borderColor:BORDER}}>
-            {(["metric","imperial"] as const).map(u=><button key={u} onClick={()=>setUnits(u)} className="px-2.5 py-1 text-[10px] font-bold" style={units===u?{background:GREEN,color:WHITE}:{background:CREAM,color:MUTED}}>{u==="metric"?t("unit_km"):t("unit_mi")}</button>)}
+            {(["metric","imperial"] as const).map(u=><button key={u} onClick={()=>задатьНастройку("units",u)} className="px-2.5 py-1 text-[10px] font-bold" style={нст.units===u?{background:GREEN,color:WHITE}:{background:CREAM,color:MUTED}}>{u==="metric"?t("unit_km"):t("unit_mi")}</button>)}
           </div>
         }/>
       </div>
@@ -108,8 +102,8 @@ export function SettingsView({ isPremium, onUpgrade, onLogout }:{ isPremium:bool
       {/* Внешний вид */}
       <div className="bg-white rounded-2xl px-4 shadow-sm border" style={{borderColor:BORDER}}>
         <p className="font-bold text-xs pt-3 pb-1 uppercase tracking-widest" style={{color:MUTED}}>{t("prof_appearance")}</p>
-        <Row icon="🌙" label={t("s_dark")} sub={t("s_dark_sub")} right={<Toggle on={darkMode} set={setDarkMode}/>}/>
-        <Row icon="🎵" label={t("s_autoplay")} sub={t("s_autoplay_sub")} right={<Toggle on={autoPlay} set={setAutoPlay}/>}/>
+        <Row icon="🌙" label={t("s_dark")} sub={t("s_dark_sub")} right={<Toggle on={нст.theme==="dark"} set={v=>задатьНастройку("theme",v?"dark":"light")}/>}/>
+        <Row icon="🎵" label={t("s_autoplay")} sub={t("s_autoplay_sub")} right={<Toggle on={нст.autoplay} set={v=>задатьНастройку("autoplay",v)}/>}/>
         <Row icon="💱" label={t("s_currency")} right={
           <select value={currency} onChange={e=>setCurrency(e.target.value)} className="text-xs font-bold px-2 py-1 rounded-lg outline-none border" style={{color:GREEN,borderColor:BORDER,background:CREAM}}>
             {["USD","EUR","RUB","GBP","KRW","CNY","JPY"].map(c=><option key={c}>{c}</option>)}
@@ -267,7 +261,7 @@ export function ProfileScreen({ onLogout, user }:{ onLogout:()=>void; user:Publi
               <div className="h-6 flex border-t" style={{borderColor:"rgba(255,255,255,0.1)"}}>{Array.from({length:20}).map((_,i)=><div key={i} className="flex-1 flex items-center justify-center" style={{opacity:0.22}}><div className="w-1.5 h-1.5 rotate-45" style={{background:GOLD}}/></div>)}</div>
             </div>
             <p className="font-bold text-sm mb-3" style={{color:TEXT}}>{t("prof_stamps")}</p>
-            <div className="grid grid-cols-3 gap-2.5 mb-4">{штампы.map((s,i)=><div key={i} className="rounded-2xl p-3 aspect-square flex flex-col items-center justify-center text-center shadow-sm" style={s.earned?{background:GREEN}:{background:WHITE,border:`2px dashed ${BORDER}`}}><span className="text-2xl mb-1">{s.icon}</span><p className="font-bold text-[9px] leading-tight" style={{color:s.earned?WHITE:MUTED}}>{трК(s.name)}</p><p className="text-[8px] mt-0.5" style={{color:s.earned?GOLD:"#C0B0A0"}}>{s.earned?s.date:трК("Не посещено")}</p></div>)}</div>
+            <div className="grid grid-cols-3 gap-2.5 mb-4">{штампы.map((s,i)=><div key={i} className="rounded-2xl p-3 aspect-square flex flex-col items-center justify-center text-center shadow-sm" style={s.earned?{background:GREEN}:{background:SURFACE,border:`2px dashed ${BORDER}`}}><span className="text-2xl mb-1">{s.icon}</span><p className="font-bold text-[9px] leading-tight" style={{color:s.earned?WHITE:MUTED}}>{трК(s.name)}</p><p className="text-[8px] mt-0.5" style={{color:s.earned?GOLD:"#C0B0A0"}}>{s.earned?s.date:трК("Не посещено")}</p></div>)}</div>
             <div className="bg-white rounded-2xl p-4 mb-3 shadow-sm border" style={{borderColor:BORDER}}><div className="flex items-center justify-between mb-2"><p className="font-semibold text-sm" style={{color:TEXT}}>{t("prof_progress")}</p><p className="text-sm font-bold" style={{color:GREEN}}>{заработано}/{всегоШтампов}</p></div><div className="rounded-full h-2" style={{background:CREAM}}><div className="h-2 rounded-full" style={{background:GREEN,width:`${процентШтампов}%`,transition:"width 0.4s"}}/></div><p className="text-xs mt-2" style={{color:MUTED}}>{t("prof_stamps_more")}</p></div>
             <div className="rounded-2xl p-4 mb-4" style={{background:`linear-gradient(135deg,${GOLD},#C17B2F)`}}><p className="font-bold text-sm" style={{color:TEXT}}>🎁 {t("prof_stamps_reward")}</p><p className="text-xs mt-1" style={{color:TEXT+"99"}}>{t("prof_stamps_partners")}</p></div>
             <p className="font-bold text-sm mb-3" style={{color:TEXT}}>{t("prof_achievements")}</p>
@@ -281,7 +275,7 @@ export function ProfileScreen({ onLogout, user }:{ onLogout:()=>void; user:Publi
             {messages.map((m,i)=>(
               <div key={i} className={`flex ${m.role==="user"?"justify-end":"justify-start"}`}>
                 {m.role==="ai"&&<div className="w-7 h-7 rounded-lg flex items-center justify-center mr-2 mt-1 flex-shrink-0 text-white text-[10px] font-bold" style={{background:GREEN}}>AI</div>}
-                <div className="max-w-[78%] rounded-2xl px-4 py-3 shadow-sm" style={m.role==="user"?{background:GREEN,color:WHITE,borderTopRightRadius:4}:{background:WHITE,color:TEXT,border:`1px solid ${BORDER}`,borderTopLeftRadius:4}}>
+                <div className="max-w-[78%] rounded-2xl px-4 py-3 shadow-sm" style={m.role==="user"?{background:GREEN,color:WHITE,borderTopRightRadius:4}:{background:SURFACE,color:TEXT,border:`1px solid ${BORDER}`,borderTopLeftRadius:4}}>
                   <p className="text-sm leading-relaxed whitespace-pre-line">{m.text}</p>
                   <p className="text-[10px] mt-1.5" style={{color:m.role==="user"?"rgba(255,255,255,0.5)":MUTED}}>{m.time}</p>
                 </div>
@@ -301,7 +295,7 @@ export function ProfileScreen({ onLogout, user }:{ onLogout:()=>void; user:Publi
             <div className="grid grid-cols-2 gap-3">{[{e:"🏙️",v:"3",l:t("prof_cnt_cities")},{e:"📍",v:"12",l:t("prof_cnt_places")},{e:"🛣️",v:"847 км",l:t("prof_passed")},{e:"🎧",v:"24",l:t("prof_cnt_audio")}].map(s=><div key={s.l} className="bg-white rounded-2xl p-4 shadow-sm border text-center" style={{borderColor:BORDER}}><p className="text-3xl mb-1">{s.e}</p><p className="text-2xl font-bold" style={{color:GREEN,fontFamily:"'Fraunces',serif"}}>{s.v}</p><p className="text-xs mt-0.5" style={{color:MUTED}}>{s.l}</p></div>)}</div>
             <CurrencyConverter/>
             <div className="bg-white rounded-2xl p-4 shadow-sm border" style={{borderColor:BORDER}}><p className="font-bold text-sm mb-3" style={{color:TEXT}}>{t("prof_activity")}</p>{[{e:"🕌",a:"Посетил",p:"Площадь Регистан",t:"Сегодня, 09:30"},{e:"🎧",a:"Слушал",p:"Гид Шахи-Зинда",t:"Сегодня, 11:15"},{e:"✅",a:"Завершил",p:"Самарканд за 1 день",t:"12 авг"}].map((a,i)=><div key={i} className="flex items-center gap-3 py-2.5 border-b last:border-0" style={{borderColor:"#F0EBE1"}}><span className="text-lg">{a.e}</span><div className="flex-1"><p className="text-sm" style={{color:TEXT}}><span style={{color:MUTED}}>{a.a}</span> {a.p}</p><p className="text-xs" style={{color:"#B0A090"}}>{a.t}</p></div></div>)}</div>
-            <div className="rounded-2xl p-4" style={{background:"#1A1410"}}><p className="font-bold text-sm mb-3" style={{color:GOLD}}>🆘 {t("prof_emergency")}</p><div className="grid grid-cols-2 gap-2">{[{l:t("emg_police"),n:"102",e:"👮"},{l:t("emg_ambulance"),n:"103",e:"🚑"},{l:t("emg_fire"),n:"101",e:"🚒"},{l:t("prof_for_tourists"),n:"1322",e:"ℹ️"}].map(s=><button key={s.l} className="rounded-xl p-3 text-left" style={{background:"rgba(255,255,255,0.08)"}}><span className="text-xl">{s.e}</span><p className="text-white text-xs font-semibold mt-1">{s.l}</p><p className="text-sm font-bold font-mono" style={{color:GOLD}}>{s.n}</p></button>)}</div><button className="mt-3 w-full py-3 rounded-xl text-sm font-bold bg-red-600 text-white flex items-center justify-center gap-2"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>{t("prof_send_location")}</button></div>
+            <EmergencyCard/>
           </div>
         </div>
       )}

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useT } from "@/components/lang-provider";
 import type { Place } from "@/lib/types";
-import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE } from "@/lib/theme";
+import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE } from "@/lib/theme";
 import { NOTIFS, SEARCH_POPULAR } from "@/data/content";
 import { useAppContent } from "./content-provider";
 import { GeomPattern, LogoMark, StarRow } from "./ui";
@@ -80,7 +80,7 @@ export function SearchModal({ onClose, onPlace, initialQuery = "" }:{ onClose:()
             </div>
             <p className="font-bold text-sm mb-2.5" style={{color:TEXT}}>{t("srch_popular")}</p>
             <div className="flex flex-wrap gap-2">
-              {SEARCH_POPULAR.map(s=><button key={s} onClick={()=>setQuery(s)} className="flex items-center gap-1.5 px-3 py-2 rounded-full border text-xs font-medium" style={{background:WHITE,borderColor:BORDER,color:TEXT}}>{s}</button>)}
+              {SEARCH_POPULAR.map(s=><button key={s} onClick={()=>setQuery(s)} className="flex items-center gap-1.5 px-3 py-2 rounded-full border text-xs font-medium" style={{background:SURFACE,borderColor:BORDER,color:TEXT}}>{s}</button>)}
             </div>
           </>
         ):results.length>0?(
@@ -126,7 +126,7 @@ export function LoginModal({ onClose, onLogin }:{ onClose:()=>void; onLogin:()=>
         <p className="text-center text-xs font-semibold mb-5 uppercase tracking-widest" style={{color:MUTED}}>Выберите способ входа</p>
         <div className="space-y-3 mb-6">
           {PROVIDERS.map(p=>(
-            <button key={p.label} onClick={onLogin} className="w-full flex items-center gap-3 py-4 rounded-2xl border font-semibold text-sm transition-all active:scale-[0.98]" style={{background:WHITE,borderColor:BORDER,color:TEXT}}>
+            <button key={p.label} onClick={onLogin} className="w-full flex items-center gap-3 py-4 rounded-2xl border font-semibold text-sm transition-all active:scale-[0.98]" style={{background:SURFACE,borderColor:BORDER,color:TEXT}}>
               <span className="text-xl ml-4">{p.e}</span>
               <span className="flex-1 text-left">{p.label}</span>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={MUTED} strokeWidth="2" className="mr-4"><polyline points="9 18 15 12 9 6"/></svg>

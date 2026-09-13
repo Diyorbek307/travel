@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import BookingForm from "./booking-form";
 import ReviewForm from "./review-form";
 import type { Hotel, Place, Restaurant, Route } from "@/lib/types";
-import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE } from "@/lib/theme";
+import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE } from "@/lib/theme";
 import { LANGS } from "@/data/content";
 import { Badge, GeomPattern, StarRow } from "./ui";
 import { useT } from "@/components/lang-provider";
@@ -76,7 +76,7 @@ export function PlaceDetail({ place, onBack, onPlay, onToast, onПуть }:{ pla
         )}
         <div className="flex gap-3 mb-3">
           <button onClick={()=>onПуть(place.name, place.city)} className="flex-1 py-3.5 rounded-2xl text-white text-sm font-bold active:scale-[0.98] transition-all" style={{background:GREEN}}>📍 {t("d_route")}</button>
-          <button onClick={()=>onToast(`✅ «${place.name}» ${t("d_added_route")}`)} className="flex-1 py-3.5 rounded-2xl text-sm font-bold border active:scale-[0.98] transition-all" style={{color:GREEN,borderColor:GREEN,background:WHITE}}>🗺️ {t("d_add_route")}</button>
+          <button onClick={()=>onToast(`✅ «${place.name}» ${t("d_added_route")}`)} className="flex-1 py-3.5 rounded-2xl text-sm font-bold border active:scale-[0.98] transition-all" style={{color:GREEN,borderColor:GREEN,background:SURFACE}}>🗺️ {t("d_add_route")}</button>
         </div>
         {/* Отзывы — внутри прокрутки, иначе на телефоне блок наезжал на
             аудиоплеер и обрезался. */}
@@ -210,7 +210,7 @@ export function RestaurantDetail({ r, onBack, onToast, onПуть }:{ r:Restaura
         </div>
         <div className="flex gap-3 mb-3">
           <button onClick={()=>onПуть(r.name, r.city)} className="flex-1 py-3.5 rounded-2xl text-white text-sm font-bold active:scale-[0.98] transition-all" style={{background:"#C1603A"}}>📍 {t("d_route")}</button>
-          <button onClick={()=>onToast(`📞 ${t("d_calling")} «${r.name}»...`)} className="flex-1 py-3.5 rounded-2xl text-sm font-bold border active:scale-[0.98] transition-all" style={{color:"#C1603A",borderColor:"#C1603A",background:WHITE}}>📞 {t("d_call")}</button>
+          <button onClick={()=>onToast(`📞 ${t("d_calling")} «${r.name}»...`)} className="flex-1 py-3.5 rounded-2xl text-sm font-bold border active:scale-[0.98] transition-all" style={{color:"#C1603A",borderColor:"#C1603A",background:SURFACE}}>📞 {t("d_call")}</button>
         </div>
         <BookingForm kind="restaurant" itemId={r.id} itemName={r.name} />
         <ReviewForm placeId={r.id} placeName={r.name} />
@@ -249,7 +249,7 @@ export function RouteDetail({ route, onBack }:{ route:Route; onBack:()=>void }) 
         ))}
         <div className="flex gap-3 pb-6 mt-2">
           <button className="flex-1 py-3.5 rounded-2xl text-white text-sm font-bold" style={{background:route.color}}>▶ {t("d_start")}</button>
-          <button className="flex-1 py-3.5 rounded-2xl text-sm font-bold border" style={{color:route.color,borderColor:route.color,background:WHITE}}>💾 {t("d_save")}</button>
+          <button className="flex-1 py-3.5 rounded-2xl text-sm font-bold border" style={{color:route.color,borderColor:route.color,background:SURFACE}}>💾 {t("d_save")}</button>
         </div>
       </div>
         <BookingForm kind="tour" itemId={route.id} itemName={route.title} />

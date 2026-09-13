@@ -12,10 +12,30 @@
   --green: #2e7d5a;
   --green-light: #3a9e70;
   --gold: #e9c46a;
-  --cream: #f5f1e6;
+  /* Нейтрали — темизируемые. Светлая тема (по умолчанию). */
+  --cream: #f5f1e6; /* фон страницы */
+  --surface: #ffffff; /* фон карточек/панелей */
   --text: #2b2b2b;
   --muted: #7a6e5f;
   --border: #ede8dc;
+}
+
+/* Тёмная тема: переопределяем только нейтрали, бренд (зелёный/золото) тот же. */
+html[data-theme="dark"] {
+  --cream: #141a17;
+  --surface: #1e2622;
+  --text: #eef1ee;
+  --muted: #9aa8a0;
+  --border: #2c352f;
+}
+
+/* Утилитарные классы фона Tailwind в тёмной теме переводим на поверхность
+   темы — так карточки с классом bg-white тоже темнеют без правки каждой. */
+html[data-theme="dark"] .bg-white {
+  background-color: var(--surface);
+}
+html[data-theme="dark"] .bg-gray-100 {
+  background-color: var(--border);
 }
 
 * {

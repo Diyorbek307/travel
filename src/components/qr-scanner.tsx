@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { BORDER, GREEN, MUTED, TEXT, WHITE } from "@/lib/theme";
+import { BORDER, GREEN, MUTED, TEXT, WHITE, SURFACE } from "@/lib/theme";
 import { useT } from "@/components/lang-provider";
 
 /**
@@ -125,7 +125,7 @@ export function КнопкаСканера({ onClick }: { onClick: () => void })
     <button
       onClick={onClick}
       className="w-full overflow-hidden rounded-2xl"
-      style={{ border: `2px dashed ${BORDER}`, background: WHITE }}
+      style={{ border: `2px dashed ${BORDER}`, background: SURFACE }}
     >
       <div className="flex items-center gap-4 p-4">
         <div
