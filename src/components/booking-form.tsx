@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { BORDER, GOLD, GREEN, MUTED, TEXT, WHITE } from "@/lib/theme";
+import { useT } from "@/components/lang-provider";
 import type { BookingKind } from "@/lib/types";
 
 /**
@@ -21,6 +22,7 @@ export default function BookingForm({
   itemId: string;
   itemName: string;
 }) {
+  const { t } = useT();
   const [открыта, setОткрыта] = useState(false);
   const [date, setDate] = useState("");
   const [guests, setGuests] = useState(2);
@@ -29,7 +31,7 @@ export default function BookingForm({
   const [идёт, setИдёт] = useState(false);
 
   const подпись =
-    kind === "hotel" ? "Забронировать номер" : kind === "restaurant" ? "Забронировать столик" : "Записаться на тур";
+    kind === "hotel" ? t("bk_hotel") : kind === "restaurant" ? t("bk_rest") : t("bk_tour");
 
   async function отправить(e: React.FormEvent) {
     e.preventDefault();
@@ -57,11 +59,10 @@ export default function BookingForm({
     return (
       <div className="mx-4 mb-3 rounded-2xl p-4" style={{ background: WHITE, border: `1px solid ${BORDER}` }}>
         <p className="text-sm font-semibold" style={{ color: GREEN }}>
-          Заявка отправлена
+          {t("bk_sent_title")}
         </p>
         <p className="mt-1 text-xs leading-relaxed" style={{ color: MUTED }}>
-          Это ещё не подтверждённая бронь: мы свяжемся и подтвердим место. Следить за заявкой можно
-          в профиле.
+          {t("bk_sent_note")}
         </p>
       </div>
     );
@@ -98,7 +99,7 @@ export default function BookingForm({
       </p>
 
       <label className="text-xs" style={{ color: MUTED }}>
-        Дата
+        {t("bk_date")}
         <input
           required
           type="date"
@@ -111,7 +112,7 @@ export default function BookingForm({
       </label>
 
       <label className="text-xs" style={{ color: MUTED }}>
-        Гостей
+        {t("bk_guests")}
         <input
           required
           type="number"
@@ -125,7 +126,7 @@ export default function BookingForm({
       </label>
 
       <label className="text-xs" style={{ color: MUTED }}>
-        Пожелания — необязательно
+        {t("bk_note")}
         <textarea
           rows={2}
           value={note}
@@ -138,12 +139,12 @@ export default function BookingForm({
 
       {итог === "нужен-вход" && (
         <p className="text-xs" style={{ color: "#c1603a" }}>
-          Чтобы оставить заявку, войдите в аккаунт.
+          {t("bk_need_login")}
         </p>
       )}
       {итог === "ошибка" && (
         <p className="text-xs" style={{ color: "#c1603a" }}>
-          Не получилось отправить. Проверьте дату и попробуйте снова.
+          {t("bk_error")}
         </p>
       )}
 
@@ -154,7 +155,7 @@ export default function BookingForm({
           className="rounded-xl px-4 py-2.5 text-sm"
           style={{ color: MUTED, border: `1px solid ${BORDER}` }}
         >
-          Отмена
+          {t("bk_cancel")}
         </button>
         <button
           type="submit"
@@ -162,7 +163,7 @@ export default function BookingForm({
           className="min-w-0 flex-1 rounded-xl py-2.5 text-sm font-bold disabled:opacity-60"
           style={{ background: GOLD, color: TEXT }}
         >
-          {идёт ? "Отправляем…" : "Отправить заявку"}
+          {идёт ? t("rev_sending") : t("bk_send")}
         </button>
       </div>
     </form>

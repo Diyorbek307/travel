@@ -81,7 +81,7 @@ export default function ReviewForm({ placeId, placeName }: { placeId: string; pl
     <section className="mx-4 mb-4 rounded-2xl p-4" style={{ background: WHITE, border: `1px solid ${BORDER}` }}>
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <p className="text-sm font-bold" style={{ color: TEXT, fontFamily: "'Fraunces',serif" }}>
-          Отзывы
+          {t("rev_title")}
         </p>
         {среднее && (
           <span className="text-xs" style={{ color: MUTED }}>
@@ -118,12 +118,12 @@ export default function ReviewForm({ placeId, placeName }: { placeId: string; pl
 
         {итог === "нужен-вход" && (
           <p className="text-xs" style={{ color: "#c1603a" }}>
-            Чтобы оставить отзыв, войдите в аккаунт.
+            {t("rev_need_login")}
           </p>
         )}
         {итог === "ок" && (
           <p className="text-xs" style={{ color: MUTED }}>
-            Спасибо, отзыв опубликован.
+            {t("rev_thanks")}
           </p>
         )}
 
@@ -133,13 +133,13 @@ export default function ReviewForm({ placeId, placeName }: { placeId: string; pl
           className="rounded-xl py-2.5 text-sm font-bold disabled:opacity-60"
           style={{ background: GOLD, color: TEXT }}
         >
-          {идёт ? "Отправляем…" : "Оставить отзыв"}
+          {идёт ? t("rev_sending") : t("rev_submit")}
         </button>
       </form>
 
       {отзывы.length === 0 ? (
         <p className="text-xs" style={{ color: MUTED }}>
-          Отзывов пока нет — ваш будет первым.
+          {t("rev_empty")}
         </p>
       ) : (
         <ul className="grid gap-3">
