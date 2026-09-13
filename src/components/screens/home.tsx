@@ -4,6 +4,8 @@ import { ГОРОДА } from "@/data/geo";
 import { useAppContent } from "@/components/content-provider";
 import { useT } from "@/components/lang-provider";
 import { useWeather } from "@/components/weather-provider";
+import { useGeo } from "@/components/geo-provider";
+import { ближайшийГород } from "@/data/geo";
 import { GeomPattern, LogoMark } from "../ui";
 import { AnimatedBg } from "@/components/animated-bg";
 import { CardDeck, CityDeck } from "@/components/card-deck";
@@ -18,6 +20,8 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
   const { t, lang, трК } = useT();
   const погода = useWeather();
   const самарканд = погода.get("Самарканд");
+  // Город пользователя для таргетинга рекламы (по геолокации).
+  const городРекл = ближайшийГород(useGeo().pos);
   return (
     <div className="flex flex-col h-full overflow-y-auto hide-scroll" style={{background:CREAM}}>
 
@@ -157,7 +161,7 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
       <TaxiOrder/>
 
       {/* ── Ad ── */}
-      <div className="pt-3"><AdBanner isPremium={isPremium}/></div>
+      <div className="pt-3"><AdBanner isPremium={isPremium} cities={городРекл?[городРекл]:undefined}/></div>
 
       {/* ── Flash Deals Hotels — dark image-23 cards ── */}
       <div className="pt-5">

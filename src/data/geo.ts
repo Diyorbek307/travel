@@ -95,3 +95,18 @@ export function форматКм(км: number, единица: string): string {
   const число = км < 10 ? км.toFixed(1) : String(Math.round(км));
   return `${число} ${единица}`;
 }
+
+/** Ближайший к позиции город из списка — чтобы понять, где сейчас турист. */
+export function ближайшийГород(pos: Geo | null): string | null {
+  if (!pos) return null;
+  let лучший: string | null = null;
+  let минимум = Infinity;
+  for (const [имя, geo] of Object.entries(ГОРОДА)) {
+    const d = _км(pos, geo);
+    if (d < минимум) {
+      минимум = d;
+      лучший = имя;
+    }
+  }
+  return лучший;
+}

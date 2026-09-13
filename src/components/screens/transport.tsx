@@ -109,7 +109,8 @@ export function TransportScreen({ onBack, isPremium }:{ onBack:()=>void; isPremi
       </div>
 
       <div className="flex-1 overflow-y-auto hide-scroll p-4 space-y-3">
-        <AdBanner isPremium={isPremium}/>
+        {/* Реклама городов маршрута: куда турист едет — того города и реклама. */}
+        <AdBanner isPremium={isPremium} cities={[fromCity,toCity].filter(Boolean)}/>
 
         {mode==="trains"&&trains.length===0&&<EmptyRoute icon="🚄"/>}
         {mode==="trains"&&trains.map(t=>(
