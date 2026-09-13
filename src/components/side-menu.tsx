@@ -4,8 +4,8 @@ import type { TKey } from "@/lib/i18n";
 import { GOLD, GREEN } from "@/lib/theme";
 import { LogoMark } from "./ui";
 
-export function SideMenu({ onClose, onTab, currentTab, isPremium, onPremium, onLogout, user }:{
-  onClose:()=>void; onTab:(t:Tab)=>void; currentTab:Tab; isPremium:boolean; onPremium:()=>void; onLogout:()=>void; user:PublicUser|null;
+export function SideMenu({ onClose, onTab, currentTab, isPremium, onPremium, onLogout, onFavorites, user }:{
+  onClose:()=>void; onTab:(t:Tab)=>void; currentTab:Tab; isPremium:boolean; onPremium:()=>void; onLogout:()=>void; onFavorites:()=>void; user:PublicUser|null;
 }) {
   const { t } = useT();
   const NAV:[Tab,string,TKey][] = [
@@ -67,7 +67,7 @@ export function SideMenu({ onClose, onTab, currentTab, isPremium, onPremium, onL
           <div className="mx-5 my-3 border-t" style={{borderColor:"rgba(255,255,255,0.06)"}}/>
           <p className="px-5 text-[9px] font-bold tracking-widest uppercase mb-2" style={{color:"rgba(255,255,255,0.3)"}}>{t("menu_more")}</p>
           {EXTRAS.map(([e,k,target])=>(
-            <button key={k} onClick={()=>{if(target){onTab(target);onClose();}}} className="w-full flex items-center gap-3 px-5 py-3 text-left active:opacity-70">
+            <button key={k} onClick={()=>{onClose(); if(k==="menu_favorites"){onFavorites();} else if(target){onTab(target);}}} className="w-full flex items-center gap-3 px-5 py-3 text-left active:opacity-70">
               <span className="text-lg w-6">{e}</span>
               <span className="flex-1 font-medium text-sm" style={{color:"rgba(255,255,255,0.65)"}}>{t(k)}</span>
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"/></svg>

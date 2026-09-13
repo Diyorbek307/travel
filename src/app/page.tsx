@@ -22,6 +22,7 @@ import AudioScreen from "@/components/screens/audio";
 import ProfileScreen from "@/components/screens/profile";
 import TransportScreen from "@/components/screens/transport";
 import PracticalScreen from "@/components/screens/practical";
+import FavoritesScreen from "@/components/screens/favorites";
 import RouteView from "@/components/route-view";
 import { MiniPlayer, Toast } from "@/components/widgets";
 import { ContentProvider } from "@/components/content-provider";
@@ -124,6 +125,7 @@ function App() {
   const [showTransport, setShowTransport] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [showPremium, setShowPremium] = useState(false);
+  const [showFavorites, setShowFavorites] = useState(false);
 
   const [isPremium, setIsPremium] = useState(false);
   const [miniAudio, setMiniAudio] = useState<Place | null>(null);
@@ -216,6 +218,7 @@ function App() {
     setShowTransport(false);
     setShowPremium(false);
     setShowMenu(false);
+    setShowFavorites(false);
     setDetail(null);
     setTab(next);
     setTabKey((k) => k + 1);
@@ -245,12 +248,13 @@ function App() {
     if (showMenu) return setShowMenu(false), true;
     if (showPractical) return setShowPractical(false), true;
     if (showTransport) return setShowTransport(false), true;
+    if (showFavorites) return setShowFavorites(false), true;
     if (detail) return setDetail(null), true;
     if (phase === "register" || phase === "login") return setPhase("splash"), true;
     if (phase === "interests") return setPhase("lang"), true;
     if (phase === "app" && tab !== "home") return switchTab("home"), true;
     return false;
-  }, [showSearch, showNotifs, showPremium, showMenu, showPractical, showTransport, detail, phase, tab]);
+  }, [showSearch, showNotifs, showPremium, showMenu, showPractical, showTransport, showFavorites, detail, phase, tab]);
 
 
   return (
@@ -345,6 +349,16 @@ function App() {
                 <TransportScreen onBack={() => setShowTransport(false)} isPremium={isPremium} />
               </div>
             )}
+            {showFavorites && (
+              <div className="overlay-screen device-safe-top absolute inset-0 z-40">
+                <FavoritesScreen
+                  onBack={() => setShowFavorites(false)}
+                  onPlace={(p) => { setShowFavorites(false); openPlace(p); }}
+                  onHotel={(h) => { setShowFavorites(false); openHotel(h); }}
+                  onRestaurant={(r) => { setShowFavorites(false); openRestaurant(r); }}
+                />
+              </div>
+            )}
             {showMenu && (
               <SideMenu
                 user={user}
@@ -352,6 +366,10 @@ function App() {
                 onTab={switchTab}
                 currentTab={tab}
                 isPremium={isPremium}
+                onFavorites={() => {
+                  setShowMenu(false);
+                  setShowFavorites(true);
+                }}
                 onPremium={() => {
                   setShowMenu(false);
                   setShowPremium(true);

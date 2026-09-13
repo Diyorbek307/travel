@@ -351,6 +351,7 @@ export const СЛОВАРЬ = {
   menu_nav: row("Navigation", "Навигация", "Navigatsiya", "导航", "탐색", "Navigation", "Navigation", "ナビ", "Gezinme", "التنقّل"),
   menu_more: row("More", "Разное", "Boshqa", "更多", "기타", "Mehr", "Autres", "その他", "Diğer", "المزيد"),
   menu_favorites: row("Favourites", "Избранное", "Sevimlilar", "收藏", "즐겨찾기", "Favoriten", "Favoris", "お気に入り", "Favoriler", "المفضلة"),
+  fav_empty: row("No favourites yet — tap ❤ on places you like", "В избранном пусто — жми ❤ на том, что понравилось", "Hozircha bo'sh — yoqqaniga ❤ bosing", "还没有收藏 — 点喜欢的❤", "즐겨찾기 없음 — 마음에 들면 ❤", "Noch keine Favoriten — tippe ❤", "Aucun favori — appuyez sur ❤", "お気に入りなし — ❤をタップ", "Henüz yok — beğendiğine ❤ bas", "لا مفضلة بعد — اضغط ❤"),
   menu_my_routes: row("My routes", "Мои маршруты", "Mening marshrutlarim", "我的路线", "내 경로", "Meine Routen", "Mes itinéraires", "マイルート", "Rotalarım", "مساراتي"),
   menu_downloads: row("Downloads", "Скачанное", "Yuklab olingan", "已下载", "다운로드", "Downloads", "Téléchargements", "ダウンロード", "İndirilenler", "التنزيلات"),
   menu_emergency: row("Emergency", "Экстренная помощь", "Favqulodda yordam", "紧急求助", "긴급", "Notfall", "Urgences", "緊急", "Acil", "الطوارئ"),

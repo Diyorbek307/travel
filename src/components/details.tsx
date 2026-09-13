@@ -9,6 +9,7 @@ import { LANGS } from "@/data/content";
 import { Badge, GeomPattern, StarRow } from "./ui";
 import { useT } from "@/components/lang-provider";
 import { useGeo } from "@/components/geo-provider";
+import { useFavorites, переключитьИзбранное } from "@/lib/favorites";
 import { дистанцияКм, форматКм } from "@/data/geo";
 import { glass } from "@/lib/theme";
 
@@ -19,7 +20,8 @@ export function PlaceDetail({ place, onBack, onPlay, onToast, onПуть }:{ pla
   const дист = дистанцияКм(pos, place.nameRu ?? place.name, place.city); // «от вас»
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [fav, setFav] = useState(false);
+  const избранное = useFavorites();
+  const fav = избранное.some((f) => f.key === `place:${place.id}`);
   const [activeLang, setActiveLang] = useState(1);
   const timerRef = useRef<ReturnType<typeof setInterval>|null>(null);
   useEffect(()=>{
@@ -33,7 +35,7 @@ export function PlaceDetail({ place, onBack, onPlay, onToast, onПуть }:{ pla
         <img src={place.img} alt={place.name} className="w-full h-full object-cover"/>
         <div className="absolute inset-0" style={{background:"linear-gradient(to top,rgba(0,0,0,0.72) 0%,rgba(0,0,0,0.1) 55%,transparent 100%)"}}/>
         <button onClick={onBack} className="absolute top-12 left-4 w-9 h-9 rounded-xl flex items-center justify-center backdrop-blur-sm" style={{...glass}}><svg width="16" height="16" fill="none" stroke="white" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
-        <button onClick={()=>setFav(!fav)} className="absolute top-12 right-4 w-9 h-9 rounded-xl flex items-center justify-center backdrop-blur-sm" style={{...glass}}><svg width="16" height="16" viewBox="0 0 24 24" fill={fav?GOLD:"none"} stroke={fav?GOLD:"white"} strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
+        <button onClick={()=>переключитьИзбранное({id:place.id,kind:"place",name:place.name,city:трК(place.city),img:place.img,rating:place.rating})} className="absolute top-12 right-4 w-9 h-9 rounded-xl flex items-center justify-center backdrop-blur-sm" style={{...glass}}><svg width="16" height="16" viewBox="0 0 24 24" fill={fav?GOLD:"none"} stroke={fav?GOLD:"white"} strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
         <div className="absolute bottom-0 left-0 right-0 p-4">
           <div className="flex items-center gap-1.5 mb-1.5"><Badge text={place.type} color={GREEN}/>{place.audio&&<Badge text={"🎧 "+t("d_audioguide")} color={MUTED}/>}{place.qr&&<Badge text="QR" color={MUTED}/>}</div>
           <h2 className="text-white text-xl font-bold" style={{fontFamily:"'Fraunces',serif"}}>{place.name}</h2>
@@ -92,7 +94,8 @@ export function HotelDetail({ hotel, onBack, onToast }:{ hotel:Hotel; onBack:()=
   const [imgIdx, setImgIdx] = useState(0);
   const [guests, setGuests] = useState(2);
   const [nights, setNights] = useState(2);
-  const [fav, setFav] = useState(false);
+  const избранное = useFavorites();
+  const fav = избранное.some((f) => f.key === `hotel:${hotel.id}`);
   const [booked, setBooked] = useState(false);
   const total = parseInt(hotel.price.replace("$","")) * nights;
   return (
@@ -101,7 +104,7 @@ export function HotelDetail({ hotel, onBack, onToast }:{ hotel:Hotel; onBack:()=
         <img src={hotel.imgs[imgIdx]||hotel.img} alt={hotel.name} className="w-full h-full object-cover"/>
         <div className="absolute inset-0" style={{background:"linear-gradient(to top,rgba(0,0,0,0.6) 0%,transparent 50%)"}}/>
         <button onClick={onBack} className="absolute top-12 left-4 w-9 h-9 rounded-xl flex items-center justify-center backdrop-blur-sm" style={{...glass}}><svg width="16" height="16" fill="none" stroke="white" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
-        <button onClick={()=>setFav(!fav)} className="absolute top-12 right-4 w-9 h-9 rounded-xl flex items-center justify-center backdrop-blur-sm" style={{...glass}}><svg width="16" height="16" viewBox="0 0 24 24" fill={fav?GOLD:"none"} stroke={fav?GOLD:"white"} strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
+        <button onClick={()=>переключитьИзбранное({id:hotel.id,kind:"hotel",name:hotel.name,city:трК(hotel.city),img:(hotel.imgs[0]||hotel.img),rating:hotel.rating})} className="absolute top-12 right-4 w-9 h-9 rounded-xl flex items-center justify-center backdrop-blur-sm" style={{...glass}}><svg width="16" height="16" viewBox="0 0 24 24" fill={fav?GOLD:"none"} stroke={fav?GOLD:"white"} strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
         <div className="absolute bottom-16 left-0 right-0 flex justify-center gap-1.5">
           {hotel.imgs.map((_,i)=><button key={i} onClick={()=>setImgIdx(i)} className="rounded-full transition-all" style={{width:i===imgIdx?18:6,height:6,background:i===imgIdx?WHITE:"rgba(255,255,255,0.5)"}}/>)}
         </div>
@@ -172,14 +175,15 @@ export function HotelDetail({ hotel, onBack, onToast }:{ hotel:Hotel; onBack:()=
 
 export function RestaurantDetail({ r, onBack, onToast, onПуть }:{ r:Restaurant; onBack:()=>void; onToast:(m:string)=>void; onПуть:(название:string,город:string)=>void }) {
   const { t, трК } = useT();
-  const [fav, setFav] = useState(false);
+  const избранное = useFavorites();
+  const fav = избранное.some((f) => f.key === `restaurant:${r.id}`);
   return (
     <div className="flex flex-col h-full animate-slide-up" style={{background:CREAM}}>
       <div className="relative flex-shrink-0" style={{height:240}}>
         <img src={r.img} alt={r.name} className="w-full h-full object-cover"/>
         <div className="absolute inset-0" style={{background:"linear-gradient(to top,rgba(0,0,0,0.72) 0%,transparent 55%)"}}/>
         <button onClick={onBack} className="absolute top-12 left-4 w-9 h-9 rounded-xl flex items-center justify-center backdrop-blur-sm" style={{...glass}}><svg width="16" height="16" fill="none" stroke="white" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
-        <button onClick={()=>setFav(!fav)} className="absolute top-12 right-4 w-9 h-9 rounded-xl flex items-center justify-center backdrop-blur-sm" style={{...glass}}><svg width="16" height="16" viewBox="0 0 24 24" fill={fav?GOLD:"none"} stroke={fav?GOLD:"white"} strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
+        <button onClick={()=>переключитьИзбранное({id:r.id,kind:"restaurant",name:r.name,city:трК(r.city),img:r.img,rating:r.rating})} className="absolute top-12 right-4 w-9 h-9 rounded-xl flex items-center justify-center backdrop-blur-sm" style={{...glass}}><svg width="16" height="16" viewBox="0 0 24 24" fill={fav?GOLD:"none"} stroke={fav?GOLD:"white"} strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
         <div className="absolute bottom-0 left-0 right-0 p-4">
           <div className="flex items-center gap-1.5 mb-1"><Badge text={r.cuisine} color={"#C1603A"}/><Badge text={трК(r.city)} color={GREEN}/></div>
           <p className="text-white text-xl font-bold" style={{fontFamily:"'Fraunces',serif"}}>{r.name}</p>
