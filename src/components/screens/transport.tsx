@@ -8,7 +8,7 @@ import { BORDER, CREAM, GREEN, MUTED, TEXT, WHITE, SURFACE, ACCENT_SOFT } from "
 import { FLIGHTS, INTERCITY, TRAINS, UZ_CITIES } from "@/data/content";
 import { EmptyRoute } from "../ui";
 import { AnimatedBg } from "@/components/animated-bg";
-import { AdBanner } from "@/components/widgets";
+import { AdInline } from "@/components/ads";
 
 
 export function CityPicker({ value, onChange, label, icon }:{ value:string; onChange:(c:string)=>void; label:string; icon:string }) {
@@ -110,7 +110,7 @@ export function TransportScreen({ onBack, isPremium }:{ onBack:()=>void; isPremi
 
       <div className="flex-1 overflow-y-auto hide-scroll p-4 space-y-3">
         {/* Реклама городов маршрута: куда турист едет — того города и реклама. */}
-        <AdBanner isPremium={isPremium} cities={[fromCity,toCity].filter(Boolean)}/>
+        <AdInline isPremium={isPremium} cities={[fromCity,toCity].filter(Boolean)}/>
 
         {mode==="trains"&&trains.length===0&&<EmptyRoute icon="🚄"/>}
         {mode==="trains"&&trains.map(t=>(

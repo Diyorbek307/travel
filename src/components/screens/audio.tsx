@@ -6,7 +6,8 @@ import { BORDER, CREAM, GREEN, MUTED, TEXT, WHITE, ACCENT_SOFT } from "@/lib/the
 import { PRACTICAL } from "@/data/content";
 import { useAppContent } from "@/components/content-provider";
 import { useT } from "@/components/lang-provider";
-import { AdBanner, OfflinePacks } from "@/components/widgets";
+import { OfflinePacks } from "@/components/widgets";
+import { AdInline } from "@/components/ads";
 import QrScanner, { КнопкаСканера } from "@/components/qr-scanner";
 
 /**
@@ -180,7 +181,7 @@ export function AudioScreen({
       </div>
 
       <div className="hide-scroll flex-1 space-y-4 overflow-y-auto p-4">
-        <AdBanner isPremium={isPremium} />
+        <AdInline isPremium={isPremium} />
 
         <КнопкаСканера onClick={() => setСканер(true)} />
 

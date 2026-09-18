@@ -7,6 +7,8 @@ import { useT } from "@/components/lang-provider";
 import { useWeather } from "@/components/weather-provider";
 import { useGeo } from "@/components/geo-provider";
 import { дистанцияКм, форматКм } from "@/data/geo";
+import { ВИДЕО, кадрыГорода } from "@/data/city-reels";
+import CityReel from "./city-reel";
 
 /**
  * Подборка карточек: колода на телефоне, лента на широком экране.
@@ -32,7 +34,13 @@ function CardFace({ it, active }: { it: DeckItem; active: boolean }) {
   return (
     <>
       <div className="absolute inset-0">
-        <img src={it.img} alt={it.title} className="h-full w-full object-cover" />
+        {/* Город «оживает»: несколько кадров с наездом вместо статичного
+            снимка. У мест кадр один — тогда это обычная фотография. */}
+        {it.кадры && it.кадры.length > 1 ? (
+          <CityReel кадры={it.кадры} видео={it.видео} alt={it.title} />
+        ) : (
+          <img src={it.img} alt={it.title} className="h-full w-full object-cover" />
+        )}
         <div
           className="absolute inset-0"
           style={{
@@ -198,13 +206,15 @@ export function CardDeck({ places, onPlace }: { places: Place[]; onPlace: (p: Pl
 }
 
 export function CityDeck({ onSearch }: { onSearch: (city?: string) => void }) {
-  const { POPULAR_CITIES } = useAppContent();
+  const { POPULAR_CITIES, PLACES, HOTELS, RESTAURANTS } = useAppContent();
   const { t, трК } = useT();
   const погода = useWeather();
   const items: DeckItem[] = POPULAR_CITIES.map((c) => {
     const w = погода.get(c.name); // настоящая погода города (Open-Meteo)
     return {
       img: c.img,
+      кадры: кадрыГорода(c.name, c.img, { PLACES, HOTELS, RESTAURANTS }),
+      видео: ВИДЕО[c.name],
       title: трК(c.name),
       sub: `${трК(c.sub)} · ${t("uz_country")}`,
       badge: `🏙️ ${t("deck_city_badge")}`,

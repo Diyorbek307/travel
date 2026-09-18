@@ -12,7 +12,7 @@ import { useGeo } from "@/components/geo-provider";
 import { дистанцияКм, форматКм, ближайшийГород } from "@/data/geo";
 import { Badge, StarRow } from "../ui";
 import { AnimatedBg } from "@/components/animated-bg";
-import { AdBanner } from "@/components/widgets";
+import { AdInline } from "@/components/ads";
 
 
 export function ExploreScreen({ onPlace, onHotel, onRestaurant, isPremium }:{ onPlace:(p:Place)=>void; onHotel:(h:Hotel)=>void; onRestaurant:(r:Restaurant)=>void; isPremium:boolean }) {
@@ -48,7 +48,7 @@ export function ExploreScreen({ onPlace, onHotel, onRestaurant, isPremium }:{ on
       </div>
       </div>
       <div className="flex-1 overflow-y-auto hide-scroll p-4">
-        <div className="mb-3"><AdBanner isPremium={isPremium} cities={(()=>{const г=ближайшийГород(pos);return г?[г]:undefined;})()}/></div>
+        <div className="mb-3"><AdInline isPremium={isPremium} cities={(()=>{const г=ближайшийГород(pos);return г?[г]:undefined;})()}/></div>
         {/*
           Сетка вместо столбца. На телефоне это по-прежнему один столбец,
           а на широком экране карточки встают рядом: иначе каждая

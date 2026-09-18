@@ -188,9 +188,9 @@ export const ADS = [
   // или строит в него маршрут. url — сайт рекламодателя (клик уводит туда).
   { id:"a1", emoji:"🏨", label:"РЕКЛАМА", title:"Registan Plaza Hotel",     sub:"Скидка 20% при бронировании через UzRoam",  cta:"Забронировать", color:"#1B6B8A", city:"Самарканд", url:"https://www.booking.com/" },
   { id:"a2", emoji:"🍽️", label:"РЕКЛАМА", title:"Плов-центр Ташкента",      sub:"Лучший плов с 1978 года. Откройте для себя!", cta:"Смотреть меню", color:"#C1603A", city:"Ташкент",   url:"https://www.tripadvisor.com/" },
-  { id:"a3", emoji:"✈️", label:"РЕКЛАМА", title:"Uzbekistan Airways",        sub:"Прямые рейсы из Самарканда. От $149",         cta:"Купить билет",  color:"#1A5C3A", city:"Самарканд", url:"https://www.uzairways.com/" },
+  { id:"a3", emoji:"✈️", label:"РЕКЛАМА", title:"Uzbekistan Airways",        sub:"Прямые рейсы из Самарканда. От $149",         cta:"Купить билет",  color:"#13544C", city:"Самарканд", url:"https://www.uzairways.com/" },
   { id:"a4", emoji:"🛍️", label:"РЕКЛАМА", title:"Silk & Spice Bazaar",       sub:"Аутентичные сувениры прямо от мастеров",      cta:"Перейти",       color:"#7B4F9E", city:"Бухара",   url:"https://www.etsy.com/" },
-  { id:"a5", emoji:"🚌", label:"РЕКЛАМА", title:"Samarkand Tour Transfers",  sub:"Трансфер аэропорт–город от $8",               cta:"Заказать",      color:"#2E7D5A", city:"Самарканд", url:"https://www.gettransfer.com/" },
+  { id:"a5", emoji:"🚌", label:"РЕКЛАМА", title:"Samarkand Tour Transfers",  sub:"Трансфер аэропорт–город от $8",               cta:"Заказать",      color:"#0E6F66", city:"Самарканд", url:"https://www.gettransfer.com/" },
   // Товары — без города: показываются в любом месте поездки.
   { id:"a6", emoji:"🥤", label:"РЕКЛАМА", title:"Coca-Cola",        sub:"Освежись в жару — ищи в магазинах рядом.", cta:"На сайт", color:"#E61A27", city:"", url:"https://www.coca-cola.com/" },
   { id:"a7", emoji:"🥤", label:"РЕКЛАМА", title:"Pepsi",            sub:"Больше вкуса в каждой поездке.",           cta:"На сайт", color:"#004B93", city:"", url:"https://www.pepsi.com/" },

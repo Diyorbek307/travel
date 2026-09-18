@@ -10,8 +10,10 @@ import { ближайшийГород } from "@/data/geo";
 import { GeomPattern, LogoMark } from "../ui";
 import { AnimatedBg } from "@/components/animated-bg";
 import { CardDeck, CityDeck } from "@/components/card-deck";
+import CityReel from "@/components/city-reel";
+import { ВИДЕО, кадрыГорода } from "@/data/city-reels";
 
-import { AdBanner } from "@/components/widgets";
+import { AdShelf, AdSpotlight } from "@/components/ads";
 import { glass, glassLight } from "@/lib/theme";
 import TaxiOrder from "@/components/taxi-order";
 
@@ -28,7 +30,13 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
 
       {/* ── Glassmorphism Hero ── */}
       <div className="relative h-[400px] flex-shrink-0 lg:h-[480px]">
-        <img src="https://images.unsplash.com/photo-1664602078796-68ee76b3fc59?w=900&h=900&fit=crop&auto=format" alt="Самарканд" className="absolute inset-0 w-full h-full object-cover"/>
+        {/* Шапка — короткий ролик о Самарканде: кадры сменяются с наездом,
+            поэтому главная не выглядит застывшей открыткой. */}
+        <CityReel
+          кадры={кадрыГорода("Самарканд", "https://images.unsplash.com/photo-1664602078796-68ee76b3fc59?w=900&h=900&fit=crop&auto=format", { PLACES, HOTELS, RESTAURANTS })}
+          видео={ВИДЕО["Самарканд"]}
+          alt="Самарканд"
+        />
         <div className="absolute inset-0" style={{background:"linear-gradient(to bottom,rgba(0,0,0,0.32) 0%,rgba(0,0,0,0.04) 38%,rgba(0,0,0,0.75) 100%)"}}/>
         {/* Animated Uzbek overlay */}
         <div className="absolute inset-0 overflow-hidden">
@@ -153,7 +161,8 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
       <TaxiOrder/>
 
       {/* ── Ad ── */}
-      <div className="pt-3"><AdBanner isPremium={isPremium} cities={городРекл?[городРекл]:undefined}/></div>
+      <AdSpotlight isPremium={isPremium} cities={городРекл?[городРекл]:undefined}/>
+      <AdShelf isPremium={isPremium}/>
 
       {/* ── Flash Deals Hotels — dark image-23 cards ── */}
       <div className="pt-5">

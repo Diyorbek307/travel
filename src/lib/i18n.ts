@@ -363,6 +363,15 @@ export const СЛОВАРЬ = {
   wow_welcome: row("Welcome", "Добро пожаловать", "Xush kelibsiz", "欢迎", "환영합니다", "Willkommen", "Bienvenue", "ようこそ", "Hoş geldiniz", "أهلاً بك"),
   wow_sub: row("Uzbekistan is waiting for you", "Узбекистан уже ждёт тебя", "O'zbekiston sizni kutmoqda", "乌兹别克斯坦在等你", "우즈베키스탄이 기다립니다", "Usbekistan wartet auf dich", "L'Ouzbékistan vous attend", "ウズベキスタンが待っています", "Özbekistan seni bekliyor", "أوزبكستان بانتظارك"),
   wow_go: row("Start the journey", "Начать путешествие", "Sayohatni boshlash", "开始旅程", "여행 시작", "Reise beginnen", "Commencer le voyage", "旅を始める", "Yolculuğa başla", "ابدأ الرحلة"),
+  /* Партнёрские блоки. Слово «Партнёр» обязано быть видно: закон о
+     рекламе требует помечать рекламу, как бы красиво она ни выглядела. */
+  ad_partner: row("Partner", "Партнёр", "Hamkor", "合作伙伴", "파트너", "Partner", "Partenaire", "パートナー", "Ortak", "شريك"),
+  ad_offer_title: row("Offer for you", "Предложение для вас", "Siz uchun taklif", "为你推荐", "당신을 위한 제안", "Angebot für dich", "Offre pour vous", "あなたへの提案", "Sana özel teklif", "عرض لك"),
+  ad_shelf_title: row("Handy on the road", "Пригодится в дороге", "Yo'lda asqotadi", "旅途好物", "여행에 유용", "Praktisch unterwegs", "Utile en route", "旅に便利", "Yolda işine yarar", "يفيدك في الطريق"),
+  ad_in_city: row("In your city", "В вашем городе", "Shahringizda", "在你所在城市", "현재 도시에서", "In deiner Stadt", "Dans votre ville", "あなたの街で", "Şehrinde", "في مدينتك"),
+  ad_on_route: row("On your route", "На вашем маршруте", "Marshrutingizda", "在你的路线上", "이동 경로에", "Auf deiner Route", "Sur votre itinéraire", "ルート上", "Rotanda", "على مسارك"),
+  ad_why: row("You see this because it is nearby", "Показываем, потому что это рядом", "Yaqin bo'lgani uchun ko'rsatyapmiz", "因为就在附近", "가까이 있어 보여드려요", "Wird gezeigt, weil es in der Nähe ist", "Affiché car c'est à proximité", "近くにあるため表示しています", "Yakında olduğu için gösteriyoruz", "نعرضه لأنه قريب"),
+  ad_hide: row("Hide ads", "Скрыть рекламу", "Reklamani yashirish", "隐藏广告", "광고 숨기기", "Werbung ausblenden", "Masquer la pub", "広告を隠す", "Reklamı gizle", "إخفاء الإعلانات"),
   fav_empty: row("No favourites yet — tap ❤ on places you like", "В избранном пусто — жми ❤ на том, что понравилось", "Hozircha bo'sh — yoqqaniga ❤ bosing", "还没有收藏 — 点喜欢的❤", "즐겨찾기 없음 — 마음에 들면 ❤", "Noch keine Favoriten — tippe ❤", "Aucun favori — appuyez sur ❤", "お気に入りなし — ❤をタップ", "Henüz yok — beğendiğine ❤ bas", "لا مفضلة بعد — اضغط ❤"),
   menu_my_routes: row("My routes", "Мои маршруты", "Mening marshrutlarim", "我的路线", "내 경로", "Meine Routen", "Mes itinéraires", "マイルート", "Rotalarım", "مساراتي"),
   menu_downloads: row("Downloads", "Скачанное", "Yuklab olingan", "已下载", "다운로드", "Downloads", "Téléchargements", "ダウンロード", "İndirilenler", "التنزيلات"),

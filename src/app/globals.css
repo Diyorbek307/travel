@@ -577,3 +577,11 @@ button[aria-disabled="true"] {
     filter: hue-rotate(360deg) blur(34px);
   }
 }
+
+/* Живая рамка партнёрского блока: перелив по краю, чтобы блок замечали
+   боковым зрением, но ничто не мигало под текстом. */
+@keyframes ad-edge {
+  to {
+    background-position: 200% 0;
+  }
+}

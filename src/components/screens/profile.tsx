@@ -14,7 +14,7 @@ import { useT } from "@/components/lang-provider";
 import { LOCALE_META, LOCALES, type TKey } from "@/lib/i18n";
 import { Badge } from "../ui";
 import { CurrencyConverter } from "@/components/screens/practical";
-import { AdBanner } from "@/components/widgets";
+import { AdInline } from "@/components/ads";
 
 
 export function SettingsView({ isPremium, onUpgrade, onLogout }:{ isPremium:boolean; onUpgrade:()=>void; onLogout:()=>void }) {
@@ -251,7 +251,7 @@ export function ProfileScreen({ onLogout, user }:{ onLogout:()=>void; user:Publi
 
       {view==="passport"&&(
         <div className="flex-1 overflow-y-auto hide-scroll animate-fade-in">
-          <AdBanner isPremium={isPremium}/>
+          <AdInline isPremium={isPremium}/>
           <div className="px-4">
             <div className="rounded-3xl overflow-hidden mb-4 shadow-lg" style={{background:`linear-gradient(135deg,${ACCENT_DEEP} 0%,${GREEN} 55%,${GREEN_LIGHT} 100%)`}}>
               <div className="p-5">
@@ -296,7 +296,7 @@ export function ProfileScreen({ onLogout, user }:{ onLogout:()=>void; user:Publi
       )}
       {view==="stats"&&(
         <div className="flex-1 overflow-y-auto hide-scroll animate-fade-in">
-          <AdBanner isPremium={isPremium}/>
+          <AdInline isPremium={isPremium}/>
           <div className="px-4 space-y-4 pb-4">
             <div className="grid grid-cols-2 gap-3">{[{e:"🏙️",v:"3",l:t("prof_cnt_cities")},{e:"📍",v:"12",l:t("prof_cnt_places")},{e:"🛣️",v:"847 км",l:t("prof_passed")},{e:"🎧",v:"24",l:t("prof_cnt_audio")}].map(s=><div key={s.l} className="bg-white rounded-2xl p-4 shadow-sm border text-center" style={{borderColor:BORDER}}><p className="text-3xl mb-1">{s.e}</p><p className="text-2xl font-bold" style={{color:GREEN,fontFamily:"'Fraunces',serif"}}>{s.v}</p><p className="text-xs mt-0.5" style={{color:MUTED}}>{s.l}</p></div>)}</div>
             <CurrencyConverter/>

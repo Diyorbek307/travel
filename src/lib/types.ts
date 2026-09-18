@@ -86,6 +86,11 @@ export interface DeckItem {
   stat3l: string;
   price: string;
   pricel: string;
+  /** Кадры короткого ролика о месте/городе. Если их больше одного,
+   *  карточка не стоит фотографией, а «оживает». */
+  кадры?: string[];
+  /** Настоящий ролик, если он появится: тогда кадры — только постер. */
+  видео?: string;
 }
 
 export interface ChatMessage {

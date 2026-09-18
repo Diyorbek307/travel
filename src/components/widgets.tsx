@@ -103,60 +103,6 @@ export function OfflinePacks() {
 }
 
 
-export function AdBanner({ isPremium, cities }:{ isPremium:boolean; cities?:string[] }) {
-  const { ADS: live } = useAppContent();
-  const { трК } = useT();
-  // Источник креативов: берём админ-рекламу из базы, только если она в новом
-  // формате (есть ссылка url — значит с таргетингом и кликом на сайт). Старые
-  // записи без url (демо-посев) игнорируем и показываем свежие вшитые ADS —
-  // с UzRoam, товарами и переходом на сайт рекламодателя.
-  const usable = live.filter((a) => (a as { url?: string }).url);
-  const all = usable.length > 0 ? usable : ADS;
-  // Таргетинг: реклама города, где турист сейчас или куда строит маршрут
-  // (cities), плюс товары без города (Coca-Cola и т.п. — показываем везде).
-  // Нет городов (позиция ещё неизвестна) — показываем всё.
-  const ads = useMemo(() => {
-    const rel = all.filter((a) => {
-      const c = (a as { city?: string }).city;
-      return !c || !cities || cities.length === 0 || cities.includes(c);
-    });
-    return rel.length ? rel : all;
-  }, [all, cities]);
-  const [idx, setIdx] = useState(() => Math.floor(Math.random() * 1000));
-  const [dismissed, setDismissed] = useState(false);
-  // Мягкая ротация — раз в 9 сек следующий релевантный баннер.
-  useEffect(() => {
-    const t = setInterval(() => setIdx((i) => i + 1), 9000);
-    return () => clearInterval(t);
-  }, []);
-  // Премиум убирает рекламу полностью.
-  if (isPremium || dismissed || ads.length === 0) return null;
-  const ad = ads[idx % ads.length] as { emoji:string; label:string; title:string; sub:string; cta:string; color:string; url?:string };
-  const перейти = () => {
-    if (ad.url) window.open(ad.url, "_blank", "noopener,noreferrer"); // на сайт рекламодателя
-  };
-  return (
-    <div className="mx-4 mb-3">
-      <div className="rounded-2xl overflow-hidden border" style={{background:SURFACE,borderColor:BORDER}}>
-        <div className="flex items-center gap-3 px-3 py-2.5">
-          <button onClick={перейти} className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{background:ad.color+"18"}}>{ad.emoji}</button>
-          <button onClick={перейти} className="flex-1 min-w-0 text-left">
-            <div className="flex items-center gap-1.5 mb-0.5">
-              <span className="text-[8px] font-bold tracking-widest uppercase px-1.5 py-0.5 rounded" style={{background:BORDER,color:MUTED}}>{трК(ad.label)}</span>
-            </div>
-            <p className="font-bold text-xs leading-tight" style={{color:TEXT}}>{ad.title}</p>
-            <p className="text-[10px] mt-0.5 truncate" style={{color:MUTED}}>{трК(ad.sub)}</p>
-          </button>
-          <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
-            <button onClick={()=>setDismissed(true)} className="text-[10px] font-medium px-1" style={{color:MUTED}}>✕</button>
-            <button onClick={перейти} className="text-[9px] font-bold px-2.5 py-1 rounded-lg text-white" style={{background:ad.color}}>{трК(ad.cta)}</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 // ── Premium Modal ──────────────────────────────────────────────────────────────
 
 export function Toast({ msg, onDone }:{ msg:string; onDone:()=>void }) {
