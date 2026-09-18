@@ -5,6 +5,8 @@ export interface Place {
   name: string;
   /** Исходное русское название — ключ для координат места (МЕСТА в geo). */
   nameRu?: string;
+  /** Тип как в данных, без перевода: по нему сверяется код. */
+  typeRu?: string;
   city: string;
   type: string;
   rating: number;

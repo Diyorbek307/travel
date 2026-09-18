@@ -1,26 +1,28 @@
 "use client";
 
 import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE } from "@/lib/theme";
-import type { Hotel, Place, Restaurant } from "@/lib/types";
+import type { Hotel, Place, Restaurant, Route } from "@/lib/types";
 import { useAppContent } from "@/components/content-provider";
 import { useT } from "@/components/lang-provider";
 import { useFavorites, переключитьИзбранное } from "@/lib/favorites";
 
-const ЗНАЧОК: Record<string, string> = { place: "📍", hotel: "🏨", restaurant: "🍽️" };
+const ЗНАЧОК: Record<string, string> = { place: "📍", hotel: "🏨", restaurant: "🍽️", route: "🗺️" };
 
 export default function FavoritesScreen({
   onBack,
   onPlace,
   onHotel,
   onRestaurant,
+  onRoute,
 }: {
   onBack: () => void;
   onPlace: (p: Place) => void;
   onHotel: (h: Hotel) => void;
   onRestaurant: (r: Restaurant) => void;
+  onRoute: (m: Route) => void;
 }) {
   const { t, трК } = useT();
-  const { PLACES, HOTELS, RESTAURANTS } = useAppContent();
+  const { PLACES, HOTELS, RESTAURANTS, ROUTES } = useAppContent();
   const избранное = useFavorites();
 
   const открыть = (f: (typeof избранное)[number]) => {
@@ -30,9 +32,12 @@ export default function FavoritesScreen({
     } else if (f.kind === "hotel") {
       const h = HOTELS.find((x) => x.id === f.id);
       if (h) onHotel(h);
-    } else {
+    } else if (f.kind === "restaurant") {
       const r = RESTAURANTS.find((x) => x.id === f.id);
       if (r) onRestaurant(r);
+    } else {
+      const m = ROUTES.find((x) => x.id === f.id);
+      if (m) onRoute(m);
     }
   };
 
@@ -71,7 +76,7 @@ export default function FavoritesScreen({
             <button
               onClick={() => переключитьИзбранное({ id: f.id, kind: f.kind, name: f.name, city: f.city, img: f.img, rating: f.rating })}
               className="flex w-12 flex-shrink-0 items-center justify-center"
-              aria-label="убрать из избранного"
+              aria-label={t("a11y_unfav")}
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill={GOLD} stroke={GOLD} strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" /></svg>
             </button>

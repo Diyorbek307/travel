@@ -7,9 +7,10 @@ import { FILTER_TABS } from "@/data/content";
 import type { TKey } from "@/lib/i18n";
 import { useAppContent } from "@/components/content-provider";
 import { useT } from "@/components/lang-provider";
+import { useДистанция } from "@/lib/distance";
 import { useWeather } from "@/components/weather-provider";
 import { useGeo } from "@/components/geo-provider";
-import { дистанцияКм, форматКм, ближайшийГород, статРасстояние } from "@/data/geo";
+import { дистанцияКм, ближайшийГород } from "@/data/geo";
 import { Badge, StarRow } from "../ui";
 import { AnimatedBg } from "@/components/animated-bg";
 import { AdInline } from "@/components/ads";
@@ -20,6 +21,7 @@ export function ExploreScreen({ onPlace, onHotel, onRestaurant, isPremium }:{ on
   const { t, трК } = useT();
   const погода = useWeather(); // настоящая погода города (Open-Meteo)
   const { pos } = useGeo(); // живое местоположение для расстояний
+  const дист = useДистанция(); // км или мили — как выбрано в настройках
   // Значение фильтра остаётся русским: по нему сверяется тип места в
   // данных. Переводится только подпись на кнопке.
   const подписьФильтра: Record<string, TKey> = {
@@ -31,6 +33,9 @@ export function ExploreScreen({ onPlace, onHotel, onRestaurant, isPremium }:{ on
   // четырьмя буквами названия фильтра, и «История» находила единственное
   // место с типом ровно «История» — мавзолеи, крепости, площади и минареты
   // из неё выпадали, хотя это она и есть.
+  //
+  // Сверяем с typeRu: на карточке тип уже переведён, и в неродном языке
+  // сравнение с русским словом не сошлось бы ни разу.
   const типыФильтра: Record<string, string[]> = {
     "История": ["История", "Мавзолей", "Крепость", "Площадь", "Минарет", "Старый город"],
     "Мечети": ["Мечеть"],
@@ -41,7 +46,7 @@ export function ExploreScreen({ onPlace, onHotel, onRestaurant, isPremium }:{ on
   const [filter, setFilter] = useState("Всё");
   const showHotels = filter==="Отели";
   const showRests  = filter==="Рестораны";
-  const filtered = PLACES.filter(p=> filter==="Всё" || (типыФильтра[filter] ?? []).includes(p.type));
+  const filtered = PLACES.filter(p=> filter==="Всё" || (типыФильтра[filter] ?? []).includes(p.typeRu ?? p.type));
   return (
     <div className="flex flex-col h-full" style={{background:CREAM}}>
       <div className="relative pt-14 pb-3 overflow-hidden border-b" style={{borderColor:BORDER,background:GREEN}}>
@@ -91,7 +96,7 @@ export function ExploreScreen({ onPlace, onHotel, onRestaurant, isPremium }:{ on
             {(filter==="Всё"?PLACES.slice(1):filtered).map(p=>(
               <button key={p.id} onClick={()=>onPlace(p)} className="w-full flex gap-3 bg-white rounded-2xl overflow-hidden shadow-sm text-left border active:scale-[0.98]" style={{borderColor:BORDER}}>
                 <div className="w-24 flex-shrink-0 bg-gray-100"><img src={p.img} alt={p.name} className="w-full h-full object-cover" style={{height:96}}/></div>
-                <div className="flex-1 py-3 pr-3 min-w-0"><div className="flex items-center gap-1.5 mb-1"><Badge text={p.type} color={GREEN}/>{p.audio&&<Badge text="🎧" color={MUTED}/>}</div><p className="font-bold text-sm leading-tight" style={{color:TEXT}}>{p.name}</p><p className="text-[10px] mt-0.5" style={{color:MUTED}}>{трК(p.city)} · {(()=>{const к=дистанцияКм(pos,p.nameRu??p.name,p.city);return к!=null?форматКм(к,t("unit_km")):статРасстояние(p.distance,t("dist_center"));})()}</p><div className="flex items-center justify-between mt-2"><StarRow rating={p.rating}/><div className="flex items-center gap-2"><span className="text-xs font-bold" style={{color:GREEN}}>{p.entry}</span>{(()=>{const w=погода.get(p.city);return w?<span className="text-[9px] font-semibold" style={{color:MUTED}}>{w.icon}{w.temp}°</span>:null;})()}</div></div></div>
+                <div className="flex-1 py-3 pr-3 min-w-0"><div className="flex items-center gap-1.5 mb-1"><Badge text={p.type} color={GREEN}/>{p.audio&&<Badge text="🎧" color={MUTED}/>}</div><p className="font-bold text-sm leading-tight" style={{color:TEXT}}>{p.name}</p><p className="text-[10px] mt-0.5" style={{color:MUTED}}>{трК(p.city)} · {(()=>{const к=дистанцияКм(pos,p.nameRu??p.name,p.city);return к!=null?дист.формат(к):дист.изДанных(p.distance);})()}</p><div className="flex items-center justify-between mt-2"><StarRow rating={p.rating}/><div className="flex items-center gap-2"><span className="text-xs font-bold" style={{color:GREEN}}>{p.entry}</span>{(()=>{const w=погода.get(p.city);return w?<span className="text-[9px] font-semibold" style={{color:MUTED}}>{w.icon}{w.temp}°</span>:null;})()}</div></div></div>
               </button>
             ))}
           </>

@@ -10,6 +10,7 @@ import { ближайшийГород } from "@/data/geo";
 import { GeomPattern, LogoMark } from "../ui";
 import { AnimatedBg } from "@/components/animated-bg";
 import { CardDeck, CityDeck } from "@/components/card-deck";
+import { напомнитьОСобытии } from "@/lib/calendar";
 import CityReel from "@/components/city-reel";
 import { ВИДЕО, кадрыГорода } from "@/data/city-reels";
 
@@ -18,7 +19,7 @@ import { glass, glassLight } from "@/lib/theme";
 import TaxiOrder from "@/components/taxi-order";
 
 
-export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, onRestaurant, onMenu, onTab, onTransport, isPremium }:{ onPlace:(p:Place)=>void; onSearch:(q?:string)=>void; onHotel:(h:Hotel)=>void; onNotifs:()=>void; onPractical:()=>void; onRestaurant:(r:Restaurant)=>void; onMenu:()=>void; onTab:(t:Tab)=>void; onTransport:()=>void; isPremium:boolean; }) {
+export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, onRestaurant, onMenu, onTab, onTransport, onToast, isPremium }:{ onPlace:(p:Place)=>void; onSearch:(q?:string)=>void; onHotel:(h:Hotel)=>void; onNotifs:()=>void; onPractical:()=>void; onRestaurant:(r:Restaurant)=>void; onMenu:()=>void; onTab:(t:Tab)=>void; onTransport:()=>void; onToast:(m:string)=>void; isPremium:boolean; }) {
   const { EVENTS, HOTELS, PLACES, RESTAURANTS } = useAppContent();
   const { t, lang, трК } = useT();
   const погода = useWeather();
@@ -152,7 +153,7 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
         </div>
         <div className="flex gap-3 overflow-x-auto hide-scroll px-4 pb-1">
           {EVENTS.map(ev=>(
-            <EventCard key={ev.name} ev={ev} t={t} трК={трК}/>
+            <EventCard key={ev.name} ev={ev} t={t} трК={трК} onToast={onToast}/>
           ))}
         </div>
       </div>
@@ -259,7 +260,7 @@ export default HomeScreen;
  * текста считаем по ней, а не задаём белым: на золотом Наврузе белый
  * не читался.
  */
-function EventCard({ ev, t, трК }:{ ev:{name:string;date:string;city:string;emoji:string;color:string;desc:string}; t:(k:TKey)=>string; трК:(s:string)=>string }) {
+function EventCard({ ev, t, трК, onToast }:{ ev:{name:string;date:string;city:string;emoji:string;color:string;desc:string}; t:(k:TKey)=>string; трК:(s:string)=>string; onToast:(m:string)=>void }) {
   const текст = контрастныйТекст(ev.color);
   const тень = текст === WHITE ? "255,255,255" : "0,0,0";
   return (
@@ -270,7 +271,7 @@ function EventCard({ ev, t, трК }:{ ev:{name:string;date:string;city:string;e
         <p className="font-bold text-sm leading-tight" style={{color:текст}}>{трК(ev.name)}</p>
         <p className="text-[9px] mt-1 font-semibold" style={{color:текст,opacity:0.8}}>{трК(ev.date)} · {трК(ev.city)}</p>
         <p className="text-[9px] mt-2 leading-relaxed" style={{color:текст,opacity:0.72}}>{трК(ev.desc)}</p>
-        <button className="mt-3 px-3 py-1.5 rounded-xl text-[9px] font-bold transition-all active:scale-95" style={{background:`rgba(${тень},0.18)`,color:текст}}>📅 {t("home_remind")}</button>
+        <button onClick={()=>onToast(напомнитьОСобытии({name:трК(ev.name),date:ev.date,city:трК(ev.city),desc:трК(ev.desc)})?t("remind_saved"):t("remind_no_date"))} className="mt-3 px-3 py-1.5 rounded-xl text-[9px] font-bold transition-all active:scale-95" style={{background:`rgba(${тень},0.18)`,color:текст}}>📅 {t("home_remind")}</button>
       </div>
     </div>
   );

@@ -12,7 +12,7 @@ import RealMap from "@/components/real-map";
 import { ГОРОДА } from "@/data/geo";
 
 
-export function MapScreen({ onRoute }:{ onRoute:(r:Route)=>void }) {
+export function MapScreen({ onRoute, onAudio }:{ onRoute:(r:Route)=>void; onAudio:()=>void }) {
   const { ROUTES } = useAppContent();
   const { t, трК } = useT();
   const погода = useWeather();
@@ -85,7 +85,7 @@ export function MapScreen({ onRoute }:{ onRoute:(r:Route)=>void }) {
                 </div>
                 <div className="flex gap-2 mt-3">
                   <button onClick={()=>setMode("routes")} className="flex-1 py-2.5 rounded-xl text-xs font-bold" style={{background:GREEN,color:WHITE}}>🗺️ {t("home_routes")}</button>
-                  <button className="flex-1 py-2.5 rounded-xl text-xs font-bold border" style={{color:GREEN,borderColor:GREEN}}>🎧 {t("d_audioguide")}</button>
+                  <button onClick={onAudio} className="flex-1 py-2.5 rounded-xl text-xs font-bold border transition-all active:scale-95" style={{color:GREEN,borderColor:GREEN}}>🎧 {t("d_audioguide")}</button>
                 </div>
               </div>
             )}

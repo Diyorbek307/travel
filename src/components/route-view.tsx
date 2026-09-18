@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import RealMap from "@/components/real-map";
 import { useT } from "@/components/lang-provider";
+import { useДистанция } from "@/lib/distance";
 import GoogleMap, { googleКлюч } from "@/components/google-map";
 import { ГОРОДА, МЕСТА, расстояниеКм, точка } from "@/data/geo";
 import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE } from "@/lib/theme";
@@ -68,6 +69,7 @@ export default function RouteView({
   onТакси?: () => void;
 }) {
   const { t } = useT();
+  const дист = useДистанция();
   const цель = geo ?? точка(название, город);
   const [откуда, setОткуда] = useState<Geo | null>(null);
   const [состояние, setСостояние] = useState<"ищем" | "нашли" | "отказ">("ищем");
@@ -284,10 +286,10 @@ export default function RouteView({
                 <div className="mt-4 flex flex-wrap gap-6 border-t pt-3" style={{ borderColor: BORDER }}>
                   <div>
                     <p className="text-[10px] uppercase tracking-widest" style={{ color: MUTED }}>
-                      По дороге
+                      {t("route_by_road")}
                     </p>
                     <p className="text-base font-bold" style={{ color: TEXT }}>
-                      {(дорога.метры / 1000).toFixed(1).replace(".", ",")} км
+                      {дист.формат(дорога.метры / 1000)}
                     </p>
                   </div>
                   <div>
@@ -304,10 +306,10 @@ export default function RouteView({
                   <div className="mt-4 flex flex-wrap gap-6 border-t pt-3" style={{ borderColor: BORDER }}>
                     <div>
                       <p className="text-[10px] uppercase tracking-widest" style={{ color: MUTED }}>
-                        По прямой
+                        {t("route_straight")}
                       </p>
                       <p className="text-base font-bold" style={{ color: TEXT }}>
-                        {км.toLocaleString("ru")} км
+                        {дист.формат(км)}
                       </p>
                     </div>
                     {км <= 6 && (

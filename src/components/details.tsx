@@ -4,20 +4,22 @@ import { useEffect, useRef, useState } from "react";
 import BookingForm from "./booking-form";
 import ReviewForm from "./review-form";
 import type { Hotel, Place, Restaurant, Route } from "@/lib/types";
-import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE, ACCENT_SOFT } from "@/lib/theme";
+import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE, ACCENT_SOFT, мягко } from "@/lib/theme";
 import { LANGS } from "@/data/content";
 import { Badge, GeomPattern, StarRow } from "./ui";
 import { useT } from "@/components/lang-provider";
+import { useДистанция } from "@/lib/distance";
 import { useGeo } from "@/components/geo-provider";
 import { useFavorites, переключитьИзбранное } from "@/lib/favorites";
-import { дистанцияКм, форматКм, статРасстояние } from "@/data/geo";
+import { дистанцияКм, точкаИзвестна } from "@/data/geo";
 import { glass } from "@/lib/theme";
 
 
 export function PlaceDetail({ place, onBack, onPlay, onToast, onПуть }:{ place:Place; onBack:()=>void; onPlay:(p:Place)=>void; onToast:(m:string)=>void; onПуть:(название:string,город:string)=>void }) {
   const { t, трК } = useT();
   const { pos } = useGeo();
-  const дист = дистанцияКм(pos, place.nameRu ?? place.name, place.city); // «от вас»
+  const км = дистанцияКм(pos, place.nameRu ?? place.name, place.city); // «от вас»
+  const дист = useДистанция();
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const избранное = useFavorites();
@@ -44,7 +46,7 @@ export function PlaceDetail({ place, onBack, onPlay, onToast, onПуть }:{ pla
       </div>
       <div className="flex-1 overflow-y-auto hide-scroll px-4 pt-4">
         <div className="grid grid-cols-4 gap-2 mb-4">
-          {[{e:"📍",v:дист!=null?форматКм(дист,t("unit_km")):статРасстояние(place.distance,t("dist_center")),k:"d_distance" as const},{e:"🎫",v:place.entry,k:"d_entry" as const},{e:"🕐",v:place.hours.length>8?t("d_always"):place.hours,k:"d_hours" as const},{e:"⏱",v:"8:42",k:"d_audio" as const}].map(s=>(
+          {[{e:"📍",v:км!=null?дист.формат(км):дист.изДанных(place.distance),k:"d_distance" as const},{e:"🎫",v:place.entry,k:"d_entry" as const},{e:"🕐",v:place.hours.length>8?t("d_always"):place.hours,k:"d_hours" as const},{e:"⏱",v:"8:42",k:"d_audio" as const}].map(s=>(
             <div key={s.k} className="bg-white rounded-2xl p-2.5 text-center shadow-sm border" style={{borderColor:BORDER}}><p className="text-base">{s.e}</p><p className="font-semibold text-[10px] mt-1 leading-tight" style={{color:TEXT}}>{s.v}</p><p className="text-[8px] mt-0.5" style={{color:MUTED}}>{t(s.k)}</p></div>
           ))}
         </div>
@@ -65,7 +67,7 @@ export function PlaceDetail({ place, onBack, onPlay, onToast, onПуть }:{ pla
             <div className="flex justify-between text-white/40 text-[9px] mb-3"><span>0:00</span><span>8:42</span></div>
             <div className="flex gap-2 mb-3">
               <button onClick={()=>{setPlaying(!playing);if(!playing)onPlay(place);}} className="flex-1 py-2.5 rounded-xl text-sm font-bold" style={{background:GOLD,color:TEXT}}>{playing?"⏸ "+t("d_pause"):"▶ "+t("d_listen")}</button>
-              <button className="w-10 h-10 rounded-xl flex items-center justify-center" style={{background:"rgba(255,255,255,0.15)"}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></button>
+              
             </div>
             <div className="flex gap-1.5 overflow-x-auto hide-scroll">
               {["🇷🇺 RU","🇬🇧 EN","🇺🇿 UZ","🇨🇳 ZH","🇰🇷 KR","🇩🇪 DE"].map((l,i)=>(
@@ -235,8 +237,16 @@ export function RestaurantDetail({ r, onBack, onToast, onПуть }:{ r:Restaura
 
 // ── Route Detail ───────────────────────────────────────────────────────────────
 
-export function RouteDetail({ route, onBack }:{ route:Route; onBack:()=>void }) {
+export function RouteDetail({ route, onBack, onПуть, onToast }:{ route:Route; onBack:()=>void; onПуть:(название:string,город:string)=>void; onToast:(m:string)=>void }) {
   const { t, трК } = useT();
+  const избранное = useFavorites();
+  const сохранён = избранное.some((f) => f.key === `route:${route.id}`);
+  /*
+   * «Начать» ведёт к первой остановке, координаты которой мы знаем.
+   * У многодневных маршрутов первая строка — «Ташкент → Самарканд», её
+   * на карте не поставить, поэтому берём первую узнаваемую.
+   */
+  const перваяТочка = route.stops.find((s) => точкаИзвестна(s.name));
   return (
     <div className="flex flex-col h-full animate-slide-up" style={{background:CREAM}}>
       <div className="relative px-4 pt-12 pb-5" style={{background:route.color}}>
@@ -261,8 +271,17 @@ export function RouteDetail({ route, onBack }:{ route:Route; onBack:()=>void }) 
           </div>
         ))}
         <div className="flex gap-3 pb-6 mt-2">
-          <button className="flex-1 py-3.5 rounded-2xl text-white text-sm font-bold" style={{background:route.color}}>▶ {t("d_start")}</button>
-          <button className="flex-1 py-3.5 rounded-2xl text-sm font-bold border" style={{color:route.color,borderColor:route.color,background:SURFACE}}>💾 {t("d_save")}</button>
+          <button
+            onClick={()=>{ if(перваяТочка) onПуть(перваяТочка.name, ""); }}
+            disabled={!перваяТочка}
+            className="flex-1 py-3.5 rounded-2xl text-white text-sm font-bold transition-all active:scale-[0.98] disabled:opacity-50"
+            style={{background:route.color}}
+          >▶ {t("d_start")}</button>
+          <button
+            onClick={()=>{ const стало = переключитьИзбранное({id:route.id,kind:"route",name:трК(route.title),city:трК(route.badge),img:"",rating:0}); onToast(стало?`💾 «${трК(route.title)}» — ${t("d_save")}`:`✕ «${трК(route.title)}»`); }}
+            className="flex-1 py-3.5 rounded-2xl text-sm font-bold border transition-all active:scale-[0.98]"
+            style={{color:route.color,borderColor:route.color,background:сохранён?мягко(route.color):SURFACE}}
+          >{сохранён?"✓":"💾"} {t("d_save")}</button>
         </div>
       </div>
         <BookingForm kind="tour" itemId={route.id} itemName={route.title} />

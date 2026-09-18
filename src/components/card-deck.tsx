@@ -4,9 +4,10 @@ import type { DeckItem, Place } from "@/lib/types";
 import { GOLD, TEXT, WHITE } from "@/lib/theme";
 import { useAppContent } from "./content-provider";
 import { useT } from "@/components/lang-provider";
+import { useДистанция } from "@/lib/distance";
 import { useWeather } from "@/components/weather-provider";
 import { useGeo } from "@/components/geo-provider";
-import { дистанцияКм, форматКм, статРасстояние } from "@/data/geo";
+import { дистанцияКм } from "@/data/geo";
 import { ВИДЕО, кадрыГорода } from "@/data/city-reels";
 import CityReel from "./city-reel";
 
@@ -176,6 +177,7 @@ export function CardDeck({ places, onPlace }: { places: Place[]; onPlace: (p: Pl
   const { t, трК } = useT();
   const погода = useWeather();
   const { pos } = useGeo();
+  const дист = useДистанция();
   const items: DeckItem[] = places.map((p) => {
     const w = погода.get(p.city); // настоящая погода города (Open-Meteo)
     const км = дистанцияКм(pos, p.nameRu ?? p.name, p.city); // живое расстояние «от меня»
@@ -194,7 +196,7 @@ export function CardDeck({ places, onPlace }: { places: Place[]; onPlace: (p: Pl
       stat2: String(p.reviews),
       stat2l: t("d_reviews_word"),
       // Расстояние — живое от текущей позиции; без геолокации — прежнее.
-      stat3: км != null ? форматКм(км, t("unit_km")) : статРасстояние(p.distance, t("dist_center")),
+      stat3: км != null ? дист.формат(км) : дист.изДанных(p.distance),
       stat3l: t("card_dist"),
       price: p.entry,
       pricel: t("card_entry"),

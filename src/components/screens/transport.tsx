@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { ГОРОДА } from "@/data/geo";
+import { ссылкаНаЗаказ } from "@/lib/taxi";
 import { useT } from "@/components/lang-provider";
 import type { TKey } from "@/lib/i18n";
 import TaxiOrder from "@/components/taxi-order";
@@ -54,20 +56,35 @@ export function CityPicker({ value, onChange, label, icon }:{ value:string; onCh
 export function TransportScreen({ onBack, isPremium }:{ onBack:()=>void; isPremium:boolean }) {
   const { t } = useT();
   const [mode, setMode] = useState<"trains"|"flights"|"taxi">("trains");
-  const [booked, setBooked] = useState<string|null>(null);
+  /*
+   * Билеты продаёт перевозчик. Раньше «Купить» просто переключало
+   * надпись на «✓ Забронировано» — человек уходил уверенный, что место
+   * за ним, хотя не происходило ничего. Теперь кнопка честно уводит на
+   * сайт продавца.
+   */
+  const САЙТЫ = { trains: "https://eticket.railway.uz/", flights: "https://www.uzairways.com/" } as const;
+  /*
+   * Межгород на такси: кнопка «Заказать» раньше не делала ничего —
+   * обработчика у неё не было вовсе. Ведём в Яндекс Go с уже
+   * подставленными точками; оформляет поездку он, не мы.
+   */
+  function заказатьТакси(откуда: string, куда: string) {
+    const a = ГОРОДА[откуда];
+    const b = ГОРОДА[куда];
+    if (!b) return;
+    window.open(ссылкаНаЗаказ(a ?? null, b, куда), "_blank", "noopener,noreferrer");
+  }
+  const купить = (куда: keyof typeof САЙТЫ) => window.open(САЙТЫ[куда], "_blank", "noopener,noreferrer");
   const [fromCity, setFromCity] = useState("");
   const [toCity,   setToCity]   = useState("");
   const TABS:[typeof mode,string,TKey][] = [["trains","🚄","tr_trains"],["flights","✈️","tr_flights"],["taxi","🚌","tr_taxi"]];
 
-  const TicketCard = ({ children, id, price, onBook }:{ children:React.ReactNode; id:string; price:string; onBook:()=>void }) => (
+  const TicketCard = ({ children, price, onBook }:{ children:React.ReactNode; price:string; onBook:()=>void }) => (
     <div className="bg-white rounded-2xl overflow-hidden shadow-sm border" style={{borderColor:BORDER}}>
       {children}
       <div className="px-4 pb-4 flex items-center justify-between">
         <div><p className="text-[9px] uppercase font-bold tracking-widest" style={{color:MUTED}}>{t("tr_price_pp")}</p><p className="font-bold text-lg" style={{color:GREEN,fontFamily:"'Fraunces',serif"}}>{price}</p></div>
-        {booked===id
-          ? <div className="px-4 py-2.5 rounded-xl text-xs font-bold" style={{background:ACCENT_SOFT,color:GREEN}}>✓ {t("d_book")}</div>
-          : <button onClick={onBook} className="px-4 py-2.5 rounded-xl text-xs font-bold text-white" style={{background:GREEN}}>{t("tr_buy")}</button>
-        }
+        <button onClick={onBook} className="px-4 py-2.5 rounded-xl text-xs font-bold text-white transition-all active:scale-95" style={{background:GREEN}}>{t("tr_buy_ext")} ↗</button>
       </div>
     </div>
   );
@@ -112,9 +129,12 @@ export function TransportScreen({ onBack, isPremium }:{ onBack:()=>void; isPremi
         {/* Реклама городов маршрута: куда турист едет — того города и реклама. */}
         <AdInline isPremium={isPremium} cities={[fromCity,toCity].filter(Boolean)}/>
 
+        {/* Кто на самом деле продаёт билет — сказано сразу, а не после нажатия. */}
+        {mode!=="taxi"&&<p className="px-1 text-[10px] leading-relaxed" style={{color:MUTED}}>{t("tr_seller_note")}</p>}
+
         {mode==="trains"&&trains.length===0&&<EmptyRoute icon="🚄"/>}
         {mode==="trains"&&trains.map(t=>(
-          <TicketCard key={t.id} id={t.id} price={t.price} onBook={()=>setBooked(t.id)}>
+          <TicketCard key={t.id} price={t.price} onBook={()=>купить("trains")}>
             <div className="px-4 pt-4 pb-3">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-[9px] font-bold px-2 py-0.5 rounded-full" style={{background:t.type==="Скоростной"?ACCENT_SOFT:CREAM,color:t.type==="Скоростной"?GREEN:MUTED}}>{t.type}</span>
@@ -141,7 +161,7 @@ export function TransportScreen({ onBack, isPremium }:{ onBack:()=>void; isPremi
 
         {mode==="flights"&&flights.length===0&&<EmptyRoute icon="✈️"/>}
         {mode==="flights"&&flights.map(f=>(
-          <TicketCard key={f.id} id={f.id} price={f.price} onBook={()=>setBooked(f.id)}>
+          <TicketCard key={f.id} price={f.price} onBook={()=>купить("flights")}>
             <div className="px-4 pt-4 pb-3">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-[9px] font-bold px-2 py-0.5 rounded-full" style={{background:"#1B9E8A18",color:"#1B9E8A"}}>{f.airline}</span>
@@ -185,7 +205,7 @@ export function TransportScreen({ onBack, isPremium }:{ onBack:()=>void; isPremi
               </div>
               <div className="mt-3 pt-3 border-t flex items-center justify-between" style={{borderColor:BORDER}}>
                 <div><p className="text-[9px]" style={{color:MUTED}}>{ic.departs}</p><p className="text-xs font-medium mt-0.5" style={{color:TEXT}}>{ic.note}</p></div>
-                <div className="text-right"><p className="font-bold text-base" style={{color:GREEN,fontFamily:"'Fraunces',serif"}}>{ic.price}</p><button className="mt-1 px-3 py-1.5 rounded-lg text-[10px] font-bold text-white" style={{background:GREEN}}>{t("tr_book")}</button></div>
+                <div className="text-right"><p className="font-bold text-base" style={{color:GREEN,fontFamily:"'Fraunces',serif"}}>{ic.price}</p><button onClick={()=>заказатьТакси(ic.from, ic.to)} className="mt-1 transition-all active:scale-95 px-3 py-1.5 rounded-lg text-[10px] font-bold text-white" style={{background:GREEN}}>{t("tr_book")}</button></div>
               </div>
             </div>
           </div>

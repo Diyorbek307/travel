@@ -13,7 +13,7 @@ import { useSyncExternalStore } from "react";
 
 const КЛЮЧ = "uzup.favorites";
 
-export type ВидИзбранного = "place" | "hotel" | "restaurant";
+export type ВидИзбранного = "place" | "hotel" | "restaurant" | "route";
 
 export interface Избранное {
   key: string; // «kind:id» — уникальный ключ

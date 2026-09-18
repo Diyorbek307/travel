@@ -364,6 +364,7 @@ function App() {
                   onPlace={(p) => { setShowFavorites(false); openPlace(p); }}
                   onHotel={(h) => { setShowFavorites(false); openHotel(h); }}
                   onRestaurant={(r) => { setShowFavorites(false); openRestaurant(r); }}
+                  onRoute={(m) => { setShowFavorites(false); openRoute(m); }}
                 />
               </div>
             )}
@@ -491,7 +492,7 @@ function Screen({ tab, detail, ...p }: ScreenProps) {
           />
         );
       case "route":
-        return <RouteDetail route={detail.value} onBack={p.onCloseDetail} />;
+        return <RouteDetail route={detail.value} onBack={p.onCloseDetail} onПуть={p.onПуть} onToast={p.onToast} />;
       case "путь":
         return (
           <RouteView
@@ -517,6 +518,7 @@ function Screen({ tab, detail, ...p }: ScreenProps) {
           onMenu={p.onMenu}
           onTab={p.onTab}
           onTransport={p.onTransport}
+          onToast={p.onToast}
           isPremium={p.isPremium}
         />
       );
@@ -530,7 +532,7 @@ function Screen({ tab, detail, ...p }: ScreenProps) {
         />
       );
     case "map":
-      return <MapScreen onRoute={p.onRoute} />;
+      return <MapScreen onRoute={p.onRoute} onAudio={() => p.onTab("audio")} />;
     case "audio":
       return <AudioScreen onPlay={p.onPlay} isPremium={p.isPremium} сразуИграть={p.кодЗаписи} />;
     case "profile":

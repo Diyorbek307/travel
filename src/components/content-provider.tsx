@@ -62,7 +62,7 @@ export function useAppContent() {
   // name переводим тоже: в неродном интерфейсе кириллическое название рядом
   // с переведённым текстом читалось как ошибка. city НЕ трогаем — это ключ
   // поиска погоды; его перевод делается на месте показа (трК на карточке).
-  const мПлейс = (p: (typeof content.places)[number]) => ({ ...p, nameRu: p.name, name: трК(p.name), type: трК(p.type), desc: трК(p.desc), entry: трК(p.entry) });
+  const мПлейс = (p: (typeof content.places)[number]) => ({ ...p, nameRu: p.name, typeRu: p.type, name: трК(p.name), type: трК(p.type), desc: трК(p.desc), entry: трК(p.entry) });
   // Удобства (facilities) не переводим здесь: иконку в деталях выбирают по
   // русскому ключу, поэтому перевод делается на месте показа (details.tsx),
   // где сырой ключ остаётся для иконки, а рядом рисуется его перевод.
