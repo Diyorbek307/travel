@@ -252,7 +252,7 @@ export default function RouteView({
                     onClick={() => setСпособ(в)}
                     className="flex-1 rounded-xl border py-2 text-xs font-bold"
                     style={{
-                      background: способ === в ? GREEN : WHITE,
+                      background: способ === в ? GREEN : SURFACE,
                       color: способ === в ? WHITE : MUTED,
                       borderColor: способ === в ? GREEN : BORDER,
                     }}

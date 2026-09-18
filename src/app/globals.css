@@ -35,6 +35,10 @@
   /* Тёмный конец акцентных градиентов. */
   --accent-deep: #07685f;
   --accent-light: #2fd0c6;
+  /* Светлое стекло поверх фотографий (карточка погоды). В тёмной теме
+     оно оставалось белым пятном, поэтому тоже токен. */
+  --glass: rgba(255, 255, 255, 0.88);
+  --glass-border: rgba(255, 255, 255, 0.95);
   --cream: #f4f7f7; /* фон страницы */
   --surface: #ffffff; /* фон карточек */
   --text: #0d1715;
@@ -56,6 +60,8 @@
     --accent-2-soft: rgba(212, 255, 79, 0.16);
     --accent-deep: #0a4f52;
     --accent-light: #7ff3ef;
+    --glass: rgba(16, 24, 22, 0.82);
+    --glass-border: rgba(255, 255, 255, 0.14);
   --accent-light: #7ff3ef;
     --cream: #0a0f0e;
     --surface: #131a18;
@@ -74,6 +80,8 @@ html[data-theme="dark"] {
   --accent-2-soft: rgba(212, 255, 79, 0.16);
   --accent-deep: #0a4f52;
   --accent-light: #7ff3ef;
+  --glass: rgba(16, 24, 22, 0.82);
+  --glass-border: rgba(255, 255, 255, 0.14);
   --cream: #0a0f0e;
   --surface: #131a18;
   --text: #e8f1ef;
@@ -615,4 +623,32 @@ button[aria-disabled="true"] {
 }
 html[data-theme="dark"] .brand-mark-auto {
   filter: brightness(0) invert(1);
+}
+
+/* Карта в тёмной теме. Плитки OpenStreetMap светлые, и посреди тёмного
+   экрана карта светила белым прямоугольником. Гасим сами плитки, а не
+   всю карту: метки и подписи приложения должны остаться как есть. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .leaflet-container {
+    background: var(--surface);
+  }
+  :root:not([data-theme="light"]) .leaflet-tile-pane {
+    filter: invert(1) hue-rotate(180deg) brightness(0.92) contrast(0.9);
+  }
+  :root:not([data-theme="light"]) .leaflet-control-attribution,
+  :root:not([data-theme="light"]) .leaflet-bar a {
+    background: var(--surface);
+    color: var(--muted);
+  }
+}
+html[data-theme="dark"] .leaflet-container {
+  background: var(--surface);
+}
+html[data-theme="dark"] .leaflet-tile-pane {
+  filter: invert(1) hue-rotate(180deg) brightness(0.92) contrast(0.9);
+}
+html[data-theme="dark"] .leaflet-control-attribution,
+html[data-theme="dark"] .leaflet-bar a {
+  background: var(--surface);
+  color: var(--muted);
 }

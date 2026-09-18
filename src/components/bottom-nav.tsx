@@ -75,7 +75,7 @@ export default function BottomNav({
       {/* Телефон и планшет: панель внизу, под большим пальцем. */}
       <nav
         className="device-nav absolute bottom-0 left-0 right-0 flex items-center justify-center border-t lg:hidden"
-        style={{ background: "#FFFFFF", borderColor: "var(--border)" }}
+        style={{ background: "var(--surface)", borderColor: "var(--border)" }}
       >
         {/*
           На планшете пять кнопок, растянутых на всю ширину, расползаются

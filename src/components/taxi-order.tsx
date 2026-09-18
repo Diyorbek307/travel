@@ -184,7 +184,7 @@ export default function TaxiOrder({
               className="shrink-0 rounded-full border px-3 py-1.5 text-[11px] font-semibold"
               style={{
                 borderColor: г === город ? GREEN : BORDER,
-                background: г === город ? GREEN : WHITE,
+                background: г === город ? GREEN : SURFACE,
                 color: г === город ? WHITE : MUTED,
               }}
             >
@@ -270,7 +270,7 @@ export default function TaxiOrder({
               className="shrink-0 rounded-full border px-3 py-1.5 text-[11px] font-medium"
               style={{
                 borderColor: куда?.название === н.название ? GREEN : BORDER,
-                background: куда?.название === н.название ? ACCENT_SOFT : WHITE,
+                background: куда?.название === н.название ? ACCENT_SOFT : SURFACE,
                 color: TEXT,
               }}
             >

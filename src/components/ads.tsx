@@ -151,7 +151,7 @@ export function AdSpotlight({ isPremium, cities }: { isPremium: boolean; cities?
                 )}
               </div>
               <p className="font-bold leading-tight" style={{ color: текст, fontSize: 17, fontFamily: "'Fraunces',serif" }}>
-                {ad.title}
+                {трК(ad.title)}
               </p>
               <p className="mt-1 text-[11px] leading-snug" style={{ color: текст, opacity: 0.82 }}>
                 {трК(ad.sub)}
@@ -213,7 +213,7 @@ export function AdShelf({ isPremium }: { isPremium: boolean }) {
               {ad.emoji}
             </span>
             <p className="truncate text-xs font-bold" style={{ color: TEXT }}>
-              {ad.title}
+              {трК(ad.title)}
             </p>
             <p
               className="mt-0.5 overflow-hidden text-[10px] leading-snug"
@@ -264,7 +264,7 @@ export function AdInline({ isPremium, cities }: { isPremium: boolean; cities?: s
             <Пометка тёмный={false} />
           </div>
           <p className="text-xs font-bold leading-tight" style={{ color: TEXT }}>
-            {ad.title}
+            {трК(ad.title)}
           </p>
           <p className="mt-0.5 truncate text-[10px]" style={{ color: MUTED }}>
             {трК(ad.sub)}

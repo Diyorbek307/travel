@@ -180,7 +180,7 @@ export function AudioScreen({
                   className="flex-shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold"
                   style={язык === я ? { background: GREEN, color: WHITE } : { background: CREAM, color: MUTED }}
                 >
-                  {я}
+                  {трК(я)}
                 </button>
               ))}
             </div>
@@ -236,7 +236,7 @@ export function AudioScreen({
                         {трК(а.title)}
                       </p>
                       <p className="mt-0.5 truncate text-xs" style={{ color: MUTED }}>
-                        {а.placeName} · {а.lang}
+                        {трК(а.placeName)} · {трК(а.lang)}
                         {а.seconds ? ` · ${времяИзСекунд(а.seconds)}` : ""}
                       </p>
                     </div>

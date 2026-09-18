@@ -74,7 +74,7 @@ export default function TripScreen({
             <div className="min-w-0 flex-1 p-3">
               <button onClick={() => открыть(точка.id)} className="block w-full text-left">
                 <p className="text-[10px] font-semibold" style={{ color: MUTED }}>📍 {трК(точка.city)}</p>
-                <p className="mt-0.5 truncate text-sm font-bold" style={{ color: TEXT }}>{точка.name}</p>
+                <p className="mt-0.5 truncate text-sm font-bold" style={{ color: TEXT }}>{трК(точка.name)}</p>
               </button>
               <button
                 onClick={() => onПуть(точка.name, точка.city)}

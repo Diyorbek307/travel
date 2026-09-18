@@ -70,7 +70,7 @@ export default function FavoritesScreen({
             </button>
             <button onClick={() => открыть(f)} className="min-w-0 flex-1 p-3 text-left">
               <p className="text-[10px] font-semibold" style={{ color: MUTED }}>{ЗНАЧОК[f.kind]} {трК(f.city)}</p>
-              <p className="mt-0.5 truncate font-bold text-sm" style={{ color: TEXT }}>{f.name}</p>
+              <p className="mt-0.5 truncate font-bold text-sm" style={{ color: TEXT }}>{трК(f.name)}</p>
               <p className="mt-1 text-xs font-semibold" style={{ color: GOLD }}>★ {f.rating}</p>
             </button>
             <button

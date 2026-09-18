@@ -40,12 +40,12 @@ export function MiniPlayer({ place, onClose }:{ place:Place; onClose:()=>void })
 // ── Place Detail ───────────────────────────────────────────────────────────────
 
 export function OfflinePacks() {
-  const { t, трК } = useT();
-  type Pack = { name:string; count:number; size:string; done:boolean };
+  const { t, трК, lang } = useT();
+  type Pack = { name:string; count:number; size:number; done:boolean };
   const [packs, setPacks] = useState<Pack[]>([
-    { name:"Самарканд", count:127, size:"2.4 ГБ", done:true  },
-    { name:"Бухара",    count:98,  size:"1.8 ГБ", done:false },
-    { name:"Хива",      count:63,  size:"1.1 ГБ", done:false },
+    { name:"Самарканд", count:127, size:2.4, done:true  },
+    { name:"Бухара",    count:98,  size:1.8, done:false },
+    { name:"Хива",      count:63,  size:1.1, done:false },
   ]);
   const [progress, setProgress] = useState<Record<string,number>>({});
   const startDownload = (name:string) => {
@@ -78,7 +78,7 @@ export function OfflinePacks() {
                 </div>
                 <div className="flex-1">
                   <p className="font-semibold text-sm" style={{color:TEXT}}>{трК(pack.name)}</p>
-                  <p className="text-xs" style={{color:MUTED}}>{pack.count} {t("off_guides")} · {pack.size}</p>
+                  <p className="text-xs" style={{color:MUTED}}>{pack.count} {t("off_guides")} · {pack.size.toLocaleString(lang)} {t("unit_gb")}</p>
                 </div>
                 {!pack.done&&!downloading&&<button onClick={()=>startDownload(pack.name)} className="px-3 py-1.5 rounded-lg text-xs font-bold" style={{background:GREEN,color:WHITE}}>{t("off_download")}</button>}
                 {pack.done&&<span className="text-xs font-semibold px-2 py-1 rounded-lg" style={{background:ACCENT_SOFT,color:GREEN}}>{t("off_done")}</span>}

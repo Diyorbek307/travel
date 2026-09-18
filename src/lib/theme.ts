@@ -54,10 +54,10 @@ export const glass: CSSProperties = {
 
 /** Стекло на светлом фоне: почти непрозрачное, чтобы текст читался. */
 export const glassLight: CSSProperties = {
-  background: "rgba(255,255,255,0.88)",
+  background: "var(--glass)",
   backdropFilter: "blur(20px)",
-  border: "1px solid rgba(255,255,255,0.95)",
-  boxShadow: "0 4px 24px rgba(0,0,0,0.12)",
+  border: "1px solid var(--glass-border)",
+  boxShadow: "0 4px 24px rgba(0,0,0,0.18)",
 };
 
 /** Затемнённое стекло для панелей поверх карты и фотографий. */
