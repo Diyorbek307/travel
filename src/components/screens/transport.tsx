@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useT } from "@/components/lang-provider";
 import type { TKey } from "@/lib/i18n";
 import TaxiOrder from "@/components/taxi-order";
-import { BORDER, CREAM, GREEN, MUTED, TEXT, WHITE, SURFACE } from "@/lib/theme";
+import { BORDER, CREAM, GREEN, MUTED, TEXT, WHITE, SURFACE, ACCENT_SOFT } from "@/lib/theme";
 import { FLIGHTS, INTERCITY, TRAINS, UZ_CITIES } from "@/data/content";
 import { EmptyRoute } from "../ui";
 import { AnimatedBg } from "@/components/animated-bg";
@@ -34,7 +34,7 @@ export function CityPicker({ value, onChange, label, icon }:{ value:string; onCh
             </div>
             <div className="overflow-y-auto" style={{maxHeight:"calc(65vh - 60px)"}}>
               {UZ_CITIES.map(city=>(
-                <button key={city} onClick={()=>{onChange(city);setOpen(false);}} className="w-full flex items-center gap-3 px-4 py-3.5 border-b text-left active:opacity-60" style={{borderColor:BORDER,background:value===city?GREEN+"08":WHITE}}>
+                <button key={city} onClick={()=>{onChange(city);setOpen(false);}} className="w-full flex items-center gap-3 px-4 py-3.5 border-b text-left active:opacity-60" style={{borderColor:BORDER,background:value===city?ACCENT_SOFT:WHITE}}>
                   <span className="text-lg">📍</span>
                   <span className="flex-1 font-semibold text-sm" style={{color:value===city?GREEN:TEXT}}>{трК(city)}</span>
                   {value===city&&<span style={{color:GREEN}}>✓</span>}
@@ -65,7 +65,7 @@ export function TransportScreen({ onBack, isPremium }:{ onBack:()=>void; isPremi
       <div className="px-4 pb-4 flex items-center justify-between">
         <div><p className="text-[9px] uppercase font-bold tracking-widest" style={{color:MUTED}}>{t("tr_price_pp")}</p><p className="font-bold text-lg" style={{color:GREEN,fontFamily:"'Fraunces',serif"}}>{price}</p></div>
         {booked===id
-          ? <div className="px-4 py-2.5 rounded-xl text-xs font-bold" style={{background:"#EDF7F2",color:GREEN}}>✓ {t("d_book")}</div>
+          ? <div className="px-4 py-2.5 rounded-xl text-xs font-bold" style={{background:ACCENT_SOFT,color:GREEN}}>✓ {t("d_book")}</div>
           : <button onClick={onBook} className="px-4 py-2.5 rounded-xl text-xs font-bold text-white" style={{background:GREEN}}>{t("tr_buy")}</button>
         }
       </div>
@@ -117,7 +117,7 @@ export function TransportScreen({ onBack, isPremium }:{ onBack:()=>void; isPremi
           <TicketCard key={t.id} id={t.id} price={t.price} onBook={()=>setBooked(t.id)}>
             <div className="px-4 pt-4 pb-3">
               <div className="flex items-center justify-between mb-3">
-                <span className="text-[9px] font-bold px-2 py-0.5 rounded-full" style={{background:t.type==="Скоростной"?GREEN+"18":CREAM,color:t.type==="Скоростной"?GREEN:MUTED}}>{t.type}</span>
+                <span className="text-[9px] font-bold px-2 py-0.5 rounded-full" style={{background:t.type==="Скоростной"?ACCENT_SOFT:CREAM,color:t.type==="Скоростной"?GREEN:MUTED}}>{t.type}</span>
                 <span className="text-[9px] font-semibold" style={{color:MUTED}}>{t.name}</span>
               </div>
               <div className="flex items-center gap-3">

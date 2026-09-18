@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Place } from "@/lib/types";
-import { BORDER, CREAM, GREEN, MUTED, TEXT, WHITE } from "@/lib/theme";
+import { BORDER, CREAM, GREEN, MUTED, TEXT, WHITE, ACCENT_SOFT } from "@/lib/theme";
 import { PRACTICAL } from "@/data/content";
 import { useAppContent } from "@/components/content-provider";
 import { useT } from "@/components/lang-provider";
@@ -191,7 +191,7 @@ export function AudioScreen({
         )}
 
         {нужноНажать && (
-          <p className="rounded-xl px-3 py-2 text-xs leading-relaxed" style={{ background: GREEN + "12", color: GREEN }}>
+          <p className="rounded-xl px-3 py-2 text-xs leading-relaxed" style={{ background: ACCENT_SOFT, color: GREEN }}>
             {t("audio_ready")}
           </p>
         )}
@@ -235,7 +235,7 @@ export function AudioScreen({
                       onClick={() => включить(а.id, а.url, а.placeId)}
                       aria-label={это ? "Пауза" : "Слушать"}
                       className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl"
-                      style={{ background: это ? GREEN : GREEN + "15" }}
+                      style={{ background: это ? GREEN : ACCENT_SOFT }}
                     >
                       <svg width="13" height="13" viewBox="0 0 24 24" fill={это ? WHITE : GREEN}>
                         {это ? (

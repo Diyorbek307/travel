@@ -1,6 +1,6 @@
 "use client";
 
-import { GREEN, MUTED } from "@/lib/theme";
+import { GREEN, MUTED, ACCENT_SOFT } from "@/lib/theme";
 import { useT } from "@/components/lang-provider";
 import type { TKey } from "@/lib/i18n";
 import type { Tab } from "@/lib/types";
@@ -144,7 +144,7 @@ export default function BottomNav({
               aria-current={active ? "page" : undefined}
               className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors"
               style={{
-                background: active ? "#F0F8F4" : "transparent",
+                background: active ? ACCENT_SOFT : "transparent",
                 color: active ? GREEN : MUTED,
               }}
             >

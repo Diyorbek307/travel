@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BORDER, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE } from "@/lib/theme";
+import { BORDER, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE, ACCENT_SOFT } from "@/lib/theme";
 import { ГОРОДА, МЕСТА, расстояниеКм, точка } from "@/data/geo";
 import type { Geo } from "@/lib/types";
 import RealMap from "@/components/real-map";
@@ -194,7 +194,7 @@ export default function TaxiOrder({
         </div>
 
         {/* Откуда */}
-        <div className="mb-2 flex flex-wrap items-center gap-3 rounded-xl px-3 py-2.5" style={{ background: "#F0F8F4" }}>
+        <div className="mb-2 flex flex-wrap items-center gap-3 rounded-xl px-3 py-2.5" style={{ background: ACCENT_SOFT }}>
           <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: GREEN }} />
           <span className="min-w-0 flex-1 truncate text-sm" style={{ color: TEXT }}>
             {откуда ? подписьОткуда : `${t("taxi_from_city")} · ${трК(город)}`}
@@ -270,7 +270,7 @@ export default function TaxiOrder({
               className="shrink-0 rounded-full border px-3 py-1.5 text-[11px] font-medium"
               style={{
                 borderColor: куда?.название === н.название ? GREEN : BORDER,
-                background: куда?.название === н.название ? "#F0F8F4" : WHITE,
+                background: куда?.название === н.название ? ACCENT_SOFT : WHITE,
                 color: TEXT,
               }}
             >

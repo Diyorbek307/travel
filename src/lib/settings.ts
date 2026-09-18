@@ -10,7 +10,8 @@ import { useSyncExternalStore } from "react";
  */
 
 export interface Настройки {
-  theme: "light" | "dark";
+  /** «system» — слушаем настройку телефона; иначе ручной выбор. */
+  theme: "system" | "light" | "dark";
   autoplay: boolean; // автозапуск аудиогида при открытии места
   gps: boolean; // GPS-аудиогид у объектов
   offline: boolean; // офлайн-карты
@@ -23,7 +24,7 @@ export interface Настройки {
 }
 
 const ПОУМОЛЧАНИЮ: Настройки = {
-  theme: "light",
+  theme: "system",
   autoplay: false,
   gps: true,
   offline: true,
@@ -49,8 +50,12 @@ function прочитать(): Настройки {
 let снимок: Настройки = прочитать();
 const подписчики = new Set<() => void>();
 
-export function применитьТему(t: "light" | "dark") {
-  if (typeof document !== "undefined") document.documentElement.setAttribute("data-theme", t);
+export function применитьТему(t: "system" | "light" | "dark") {
+  if (typeof document === "undefined") return;
+  // «Системная» — просто снимаем атрибут: дальше решает prefers-color-scheme
+  // в globals.css. Ручной выбор перебивает систему.
+  if (t === "system") document.documentElement.removeAttribute("data-theme");
+  else document.documentElement.setAttribute("data-theme", t);
 }
 
 export function задатьНастройку<K extends keyof Настройки>(k: K, v: Настройки[K]) {
@@ -58,7 +63,7 @@ export function задатьНастройку<K extends keyof Настройк�
   const s: Настройки = { ...прочитать(), [k]: v };
   localStorage.setItem(КЛЮЧ, JSON.stringify(s));
   снимок = s;
-  if (k === "theme") применитьТему(v as "light" | "dark");
+  if (k === "theme") применитьТему(v as "system" | "light" | "dark");
   подписчики.forEach((f) => f());
 }
 

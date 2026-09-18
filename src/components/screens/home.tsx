@@ -1,5 +1,6 @@
 import type { Hotel, Place, Restaurant, Tab } from "@/lib/types";
-import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE } from "@/lib/theme";
+import type { TKey } from "@/lib/i18n";
+import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE, ACCENT_SOFT, ACCENT_DEEP, GLOW, контрастныйТекст } from "@/lib/theme";
 import { ГОРОДА } from "@/data/geo";
 import { useAppContent } from "@/components/content-provider";
 import { useT } from "@/components/lang-provider";
@@ -96,7 +97,7 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
           ))}
         </div>
         {/* Transport wide button */}
-        <button onClick={onTransport} className="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl active:scale-[0.98] transition-all" style={{background:`linear-gradient(135deg,#1A5C3A,${GREEN})`,boxShadow:"0 4px 16px rgba(46,125,90,0.35)"}}>
+        <button onClick={onTransport} className="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl active:scale-[0.98] transition-all" style={{background:`linear-gradient(135deg,${ACCENT_DEEP},${GREEN})`,boxShadow:`0 4px 16px ${GLOW}`}}>
           <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{background:"rgba(255,255,255,0.18)"}}>🚇</div>
           <div className="flex-1 text-left">
             <p className="text-white font-bold text-sm">{t("home_transport")}</p>
@@ -143,16 +144,7 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
         </div>
         <div className="flex gap-3 overflow-x-auto hide-scroll px-4 pb-1">
           {EVENTS.map(ev=>(
-            <div key={ev.name} className="flex-shrink-0 rounded-2xl overflow-hidden shadow-sm" style={{width:200,background:ev.color,position:"relative"}}>
-              <div className="absolute inset-0 flex items-center justify-end pr-2 opacity-10"><GeomPattern opacity={1}/></div>
-              <div className="relative z-10 p-4">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl mb-2.5" style={{background:"rgba(255,255,255,0.22)"}}>{ev.emoji}</div>
-                <p className="font-bold text-sm text-white leading-tight">{трК(ev.name)}</p>
-                <p className="text-[9px] mt-1 font-semibold" style={{color:"rgba(255,255,255,0.75)"}}>{трК(ev.date)} · {трК(ev.city)}</p>
-                <p className="text-[9px] mt-2 leading-relaxed" style={{color:"rgba(255,255,255,0.7)"}}>{трК(ev.desc)}</p>
-                <button className="mt-3 px-3 py-1.5 rounded-xl text-[9px] font-bold" style={{background:"rgba(255,255,255,0.22)",color:"white"}}>📅 {t("home_remind")}</button>
-              </div>
-            </div>
+            <EventCard key={ev.name} ev={ev} t={t} трК={трК}/>
           ))}
         </div>
       </div>
@@ -229,7 +221,7 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
 
       {/* ── Practical info teaser ── */}
       <div className="px-4 pt-4">
-        <button onClick={onPractical} className="w-full rounded-2xl p-4 flex items-center gap-3 text-left active:scale-[0.98] transition-all" style={{background:"#EDF7F2"}}>
+        <button onClick={onPractical} className="w-full rounded-2xl p-4 flex items-center gap-3 text-left active:scale-[0.98] transition-all" style={{background:ACCENT_SOFT}}>
           <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0" style={{background:GREEN}}>💡</div>
           <div className="flex-1"><p className="text-sm font-bold" style={{color:TEXT}}>{t("pr_title")}</p><p className="text-[10px]" style={{color:MUTED}}>{t("home_practical_sub")}</p></div>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={GREEN} strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>
@@ -252,3 +244,25 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
 // ── Explore Screen ─────────────────────────────────────────────────────────────
 
 export default HomeScreen;
+
+/**
+ * Карточка события. Цвет подложки приходит из данных, поэтому цвет
+ * текста считаем по ней, а не задаём белым: на золотом Наврузе белый
+ * не читался.
+ */
+function EventCard({ ev, t, трК }:{ ev:{name:string;date:string;city:string;emoji:string;color:string;desc:string}; t:(k:TKey)=>string; трК:(s:string)=>string }) {
+  const текст = контрастныйТекст(ev.color);
+  const тень = текст === WHITE ? "255,255,255" : "0,0,0";
+  return (
+    <div className="flex-shrink-0 rounded-2xl overflow-hidden shadow-sm" style={{width:200,background:ev.color,position:"relative"}}>
+      <div className="absolute inset-0 flex items-center justify-end pr-2 opacity-10"><GeomPattern opacity={1}/></div>
+      <div className="relative z-10 p-4">
+        <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl mb-2.5" style={{background:`rgba(${тень},0.18)`}}>{ev.emoji}</div>
+        <p className="font-bold text-sm leading-tight" style={{color:текст}}>{трК(ev.name)}</p>
+        <p className="text-[9px] mt-1 font-semibold" style={{color:текст,opacity:0.8}}>{трК(ev.date)} · {трК(ev.city)}</p>
+        <p className="text-[9px] mt-2 leading-relaxed" style={{color:текст,opacity:0.72}}>{трК(ev.desc)}</p>
+        <button className="mt-3 px-3 py-1.5 rounded-xl text-[9px] font-bold transition-all active:scale-95" style={{background:`rgba(${тень},0.18)`,color:текст}}>📅 {t("home_remind")}</button>
+      </div>
+    </div>
+  );
+}

@@ -5,7 +5,7 @@ import type { ChatMessage, PublicUser } from "@/lib/types";
 import { PremiumModal } from "@/components/modals";
 import SupportChat from "@/components/support-chat";
 import MyBookings from "@/components/my-bookings";
-import { BORDER, CREAM, GOLD, GREEN, GREEN_LIGHT, MUTED, TEXT, WHITE, SURFACE } from "@/lib/theme";
+import { BORDER, CREAM, GOLD, GREEN, GREEN_LIGHT, MUTED, TEXT, WHITE, SURFACE, ACCENT_SOFT, ACCENT_DEEP } from "@/lib/theme";
 import { ACHIEVEMENTS, AI_REPLIES, STAMPS } from "@/data/content";
 import { useVisits } from "@/lib/visits";
 import { useSettings, задатьНастройку } from "@/lib/settings";
@@ -29,7 +29,7 @@ export function SettingsView({ isPremium, onUpgrade, onLogout }:{ isPremium:bool
     </button>
   );
   const Row=({icon,label,sub,right}:{icon:string;label:string;sub?:string;right:React.ReactNode})=>(
-    <div className="flex items-center gap-3 py-3 border-b last:border-0" style={{borderColor:"#F0EBE1"}}>
+    <div className="flex items-center gap-3 py-3 border-b last:border-0" style={{borderColor:BORDER}}>
       <span className="text-lg w-6 text-center flex-shrink-0">{icon}</span>
       <div className="flex-1 min-w-0"><p className="text-sm font-medium" style={{color:TEXT}}>{label}</p>{sub&&<p className="text-[10px]" style={{color:MUTED}}>{sub}</p>}</div>
       {right}
@@ -63,7 +63,7 @@ export function SettingsView({ isPremium, onUpgrade, onLogout }:{ isPremium:bool
             const [флаг,...имя]=LOCALE_META[код].label.split(" ");
             const выбран=lang===код;
             return (
-              <button key={код} onClick={()=>setLang(код)} className="flex items-center gap-2 px-3 py-2 rounded-xl border text-left" style={выбран?{background:GREEN+"12",borderColor:GREEN}:{borderColor:BORDER}}>
+              <button key={код} onClick={()=>setLang(код)} className="flex items-center gap-2 px-3 py-2 rounded-xl border text-left" style={выбран?{background:ACCENT_SOFT,borderColor:GREEN}:{borderColor:BORDER}}>
                 <span className="text-base leading-none">{флаг}</span>
                 <span className="text-xs font-medium truncate" style={{color:выбран?GREEN:TEXT}}>{имя.join(" ")}</span>
                 {выбран&&<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={GREEN} strokeWidth="3" className="ml-auto flex-shrink-0"><polyline points="20 6 9 17 4 12"/></svg>}
@@ -102,7 +102,13 @@ export function SettingsView({ isPremium, onUpgrade, onLogout }:{ isPremium:bool
       {/* Внешний вид */}
       <div className="bg-white rounded-2xl px-4 shadow-sm border" style={{borderColor:BORDER}}>
         <p className="font-bold text-xs pt-3 pb-1 uppercase tracking-widest" style={{color:MUTED}}>{t("prof_appearance")}</p>
-        <Row icon="🌙" label={t("s_dark")} sub={t("s_dark_sub")} right={<Toggle on={нст.theme==="dark"} set={v=>задатьНастройку("theme",v?"dark":"light")}/>}/>
+        <Row icon="🌙" label={t("s_theme")} sub={t("s_dark_sub")} right={
+          <div className="flex rounded-lg overflow-hidden border" style={{borderColor:BORDER}}>
+            {([["system",t("s_theme_system")],["light",t("s_theme_light")],["dark",t("s_theme_dark")]] as const).map(([v,ярлык])=>(
+              <button key={v} onClick={()=>задатьНастройку("theme",v)} className="px-2 py-1 text-[10px] font-bold" style={нст.theme===v?{background:GREEN,color:WHITE}:{background:CREAM,color:MUTED}}>{ярлык}</button>
+            ))}
+          </div>
+        }/>
         <Row icon="🎵" label={t("s_autoplay")} sub={t("s_autoplay_sub")} right={<Toggle on={нст.autoplay} set={v=>задатьНастройку("autoplay",v)}/>}/>
         <Row icon="💱" label={t("s_currency")} right={
           <select value={currency} onChange={e=>setCurrency(e.target.value)} className="text-xs font-bold px-2 py-1 rounded-lg outline-none border" style={{color:GREEN,borderColor:BORDER,background:CREAM}}>
@@ -247,7 +253,7 @@ export function ProfileScreen({ onLogout, user }:{ onLogout:()=>void; user:Publi
         <div className="flex-1 overflow-y-auto hide-scroll animate-fade-in">
           <AdBanner isPremium={isPremium}/>
           <div className="px-4">
-            <div className="rounded-3xl overflow-hidden mb-4 shadow-lg" style={{background:`linear-gradient(135deg,#1A5C3A 0%,${GREEN} 55%,${GREEN_LIGHT} 100%)`}}>
+            <div className="rounded-3xl overflow-hidden mb-4 shadow-lg" style={{background:`linear-gradient(135deg,${ACCENT_DEEP} 0%,${GREEN} 55%,${GREEN_LIGHT} 100%)`}}>
               <div className="p-5">
                 <div className="flex items-start justify-between mb-4"><div><p className="text-[9px] font-bold tracking-widest uppercase" style={{color:GOLD}}>UzRoam · Uzbekistan Travel</p><p className="text-white text-xl mt-0.5" style={{fontFamily:"'Fraunces',serif",fontWeight:600}}>{t("prof_digital_passport")}</p></div><div className="text-right"><p className="text-white/40 text-[9px]">{t("prof_passport_no")}</p><p className="text-[10px] font-mono font-bold" style={{color:GOLD}}>UZT-2026-0841</p></div></div>
                 <div className="flex items-center gap-3 rounded-2xl p-3" style={{background:"rgba(255,255,255,0.12)"}}>
@@ -294,7 +300,7 @@ export function ProfileScreen({ onLogout, user }:{ onLogout:()=>void; user:Publi
           <div className="px-4 space-y-4 pb-4">
             <div className="grid grid-cols-2 gap-3">{[{e:"🏙️",v:"3",l:t("prof_cnt_cities")},{e:"📍",v:"12",l:t("prof_cnt_places")},{e:"🛣️",v:"847 км",l:t("prof_passed")},{e:"🎧",v:"24",l:t("prof_cnt_audio")}].map(s=><div key={s.l} className="bg-white rounded-2xl p-4 shadow-sm border text-center" style={{borderColor:BORDER}}><p className="text-3xl mb-1">{s.e}</p><p className="text-2xl font-bold" style={{color:GREEN,fontFamily:"'Fraunces',serif"}}>{s.v}</p><p className="text-xs mt-0.5" style={{color:MUTED}}>{s.l}</p></div>)}</div>
             <CurrencyConverter/>
-            <div className="bg-white rounded-2xl p-4 shadow-sm border" style={{borderColor:BORDER}}><p className="font-bold text-sm mb-3" style={{color:TEXT}}>{t("prof_activity")}</p>{[{e:"🕌",a:"Посетил",p:"Площадь Регистан",t:"Сегодня, 09:30"},{e:"🎧",a:"Слушал",p:"Гид Шахи-Зинда",t:"Сегодня, 11:15"},{e:"✅",a:"Завершил",p:"Самарканд за 1 день",t:"12 авг"}].map((a,i)=><div key={i} className="flex items-center gap-3 py-2.5 border-b last:border-0" style={{borderColor:"#F0EBE1"}}><span className="text-lg">{a.e}</span><div className="flex-1"><p className="text-sm" style={{color:TEXT}}><span style={{color:MUTED}}>{a.a}</span> {a.p}</p><p className="text-xs" style={{color:"#B0A090"}}>{a.t}</p></div></div>)}</div>
+            <div className="bg-white rounded-2xl p-4 shadow-sm border" style={{borderColor:BORDER}}><p className="font-bold text-sm mb-3" style={{color:TEXT}}>{t("prof_activity")}</p>{[{e:"🕌",a:"Посетил",p:"Площадь Регистан",t:"Сегодня, 09:30"},{e:"🎧",a:"Слушал",p:"Гид Шахи-Зинда",t:"Сегодня, 11:15"},{e:"✅",a:"Завершил",p:"Самарканд за 1 день",t:"12 авг"}].map((a,i)=><div key={i} className="flex items-center gap-3 py-2.5 border-b last:border-0" style={{borderColor:BORDER}}><span className="text-lg">{a.e}</span><div className="flex-1"><p className="text-sm" style={{color:TEXT}}><span style={{color:MUTED}}>{a.a}</span> {a.p}</p><p className="text-xs" style={{color:MUTED}}>{a.t}</p></div></div>)}</div>
             <EmergencyCard/>
           </div>
         </div>

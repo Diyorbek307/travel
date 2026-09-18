@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { Route } from "@/lib/types";
-import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE } from "@/lib/theme";
+import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE, ACCENT_SOFT, ACCENT_BORDER } from "@/lib/theme";
 
 import { useAppContent } from "@/components/content-provider";
 import { useT } from "@/components/lang-provider";
@@ -48,7 +48,7 @@ export function MapScreen({ onRoute }:{ onRoute:(r:Route)=>void }) {
         {mode==="map"&&(
           <div className="p-4 space-y-4">
             {/* Instruction */}
-            <div className="rounded-2xl px-4 py-3 flex items-center gap-2" style={{background:GREEN+"15",border:`1px solid ${GREEN}30`}}>
+            <div className="rounded-2xl px-4 py-3 flex items-center gap-2" style={{background:ACCENT_SOFT,border:`1px solid ${ACCENT_BORDER}`}}>
               <span className="text-lg">🗺️</span>
               <div className="min-w-0 flex-1">
                 <p className="text-xs font-bold" style={{color:GREEN}}>{t("map_uz")}</p>

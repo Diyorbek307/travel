@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { BORDER, CREAM, GREEN, MUTED, TEXT } from "@/lib/theme";
+import { BORDER, CREAM, GREEN, MUTED, TEXT, ACCENT_SOFT } from "@/lib/theme";
 import { useCurrency, СИМВОЛЫ, ГЛАВНЫЕ } from "@/components/currency-provider";
 import { useT } from "@/components/lang-provider";
 
@@ -86,7 +86,7 @@ export function CurrencyConverter() {
         </div>
       </div>
 
-      <div className="rounded-xl p-3 text-center" style={{ background: "#EDF7F2" }}>
+      <div className="rounded-xl p-3 text-center" style={{ background: ACCENT_SOFT }}>
         {результат !== null ? (
           <p className="text-lg font-bold" style={{ color: GREEN, fontFamily: "'Fraunces',serif" }}>
             {результат.toLocaleString(lang, { maximumFractionDigits: 2 })} {СИМВОЛЫ[to] ?? to}

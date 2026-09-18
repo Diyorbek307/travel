@@ -35,6 +35,7 @@ import NativeBack from "@/components/native-back";
 import { отметитьВизит } from "@/lib/visits";
 import { инитТему } from "@/lib/settings";
 import type { Hotel, Place, PublicUser, Restaurant, Route, Tab } from "@/lib/types";
+import WelcomeWow from "@/components/welcome-wow";
 
 /**
  * Оболочка приложения.
@@ -62,7 +63,7 @@ type Detail =
  * мигало бы экраном входа тому, кто уже вошёл: сессия живёт в куке, и
  * узнать о ней можно только запросом.
  */
-type Phase = "checking" | "splash" | "register" | "login" | "lang" | "interests" | "app";
+type Phase = "checking" | "splash" | "register" | "login" | "lang" | "interests" | "welcome" | "app";
 
 /**
  * Язык по настройкам телефона.
@@ -276,14 +277,7 @@ function App() {
 
         {phase === "splash" && (
           <div className="absolute inset-0 z-40">
-            {/*
-             * ВРЕМЕННО (демо): обе кнопки ведут сразу в приложение, минуя
-             * регистрацию и вход — чтобы показывать его другим без аккаунта.
-             * Гость идёт как «Путешественник» (профиль это уже умеет).
-             * Вернуть настоящий вход: onStart → setPhase("register"),
-             *                         onLogin → setPhase("login").
-             */}
-            <SplashScreen onStart={() => setPhase("app")} onLogin={() => setPhase("app")} />
+            <SplashScreen onStart={() => setPhase("register")} onLogin={() => setPhase("login")} />
           </div>
         )}
 
@@ -328,7 +322,15 @@ function App() {
 
         {phase === "interests" && (
           <div className="overlay-screen device-safe-top absolute inset-0 z-40">
-            <OnboardingInterests lang={lang} onDone={() => setPhase("app")} />
+            <OnboardingInterests lang={lang} onDone={() => setPhase("welcome")} />
+          </div>
+        )}
+
+        {/* Между онбордингом и приложением — экран-«вау». Он только у тех,
+            кто прошёл регистрацию целиком: при обычном входе не мешает. */}
+        {phase === "welcome" && (
+          <div className="absolute inset-0 z-40">
+            <WelcomeWow name={user?.firstName} onDone={() => setPhase("app")} />
           </div>
         )}
 

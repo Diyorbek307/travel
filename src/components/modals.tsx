@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useT } from "@/components/lang-provider";
 import type { Place } from "@/lib/types";
-import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE } from "@/lib/theme";
+import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE, ACCENT_SOFT } from "@/lib/theme";
 import { NOTIFS, SEARCH_POPULAR } from "@/data/content";
 import { useAppContent } from "./content-provider";
 import { GeomPattern, LogoMark, StarRow } from "./ui";
@@ -29,11 +29,11 @@ export function NotifsPanel({ onClose }:{ onClose:()=>void }) {
       <div className="flex-1 overflow-y-auto hide-scroll p-4 space-y-2.5">
         {notifs.map((n,i)=>(
           <button key={i} onClick={()=>setNotifs(p=>p.map((x,j)=>j===i?{...x,unread:false}:x))} className="w-full bg-white rounded-2xl p-4 border text-left flex items-start gap-3 shadow-sm" style={{borderColor:n.unread?GREEN:BORDER,borderWidth:n.unread?"1.5px":"1px"}}>
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{background:n.unread?GREEN+"15":CREAM}}>{n.emoji}</div>
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{background:n.unread?ACCENT_SOFT:CREAM}}>{n.emoji}</div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between gap-2"><p className="font-bold text-sm" style={{color:TEXT}}>{трК(n.title)}</p>{n.unread&&<div className="w-2 h-2 rounded-full flex-shrink-0" style={{background:GREEN}}/>}</div>
               <p className="text-xs mt-0.5 leading-relaxed" style={{color:MUTED}}>{трК(n.body)}</p>
-              <p className="text-[10px] mt-1.5" style={{color:n.unread?GREEN:"#B0A090"}}>{n.time}</p>
+              <p className="text-[10px] mt-1.5" style={{color:n.unread?GREEN:MUTED}}>{n.time}</p>
             </div>
           </button>
         ))}
@@ -228,7 +228,7 @@ export function PremiumModal({ onClose, onActivate }:{ onClose:()=>void; onActiv
         <div className="space-y-2.5 mb-4">
           {PERKS.map((p,i)=>(
             <div key={i} className="flex items-center gap-3 bg-white rounded-2xl px-4 py-3 shadow-sm border" style={{borderColor:BORDER}}>
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{background:GREEN+"15"}}>{p.e}</div>
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{background:ACCENT_SOFT}}>{p.e}</div>
               <div><p className="font-bold text-sm" style={{color:TEXT}}>{t(p.tk)}</p><p className="text-[10px] mt-0.5" style={{color:MUTED}}>{t(p.sk)}</p></div>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={GREEN} strokeWidth="2.5" className="ml-auto flex-shrink-0"><polyline points="20 6 9 17 4 12"/></svg>
             </div>

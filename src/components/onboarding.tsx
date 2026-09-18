@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { BORDER, CREAM, GREEN, MUTED, TEXT, WHITE, SURFACE } from "@/lib/theme";
+import { BORDER, CREAM, GREEN, MUTED, TEXT, WHITE, SURFACE, ACCENT_SOFT } from "@/lib/theme";
 import { LOCALE_META, LOCALES, type Locale, type TKey } from "@/lib/i18n";
 import { GeomPattern, LogoMark } from "./ui";
 import { useT } from "@/components/lang-provider";
@@ -11,7 +11,7 @@ export function SplashScreen({ onStart, onLogin }:{ onStart:()=>void; onLogin:()
   return (
     <div className="flex flex-col h-full relative overflow-hidden">
       <img src="https://images.unsplash.com/photo-1664602078796-68ee76b3fc59?w=800&h=1000&fit=crop&auto=format" alt="Регистан" className="absolute inset-0 w-full h-full object-cover"/>
-      <div className="absolute inset-0" style={{background:"linear-gradient(180deg,rgba(46,125,90,0.5) 0%,rgba(0,0,0,0.1) 40%,rgba(0,0,0,0.82) 100%)"}}/>
+      <div className="absolute inset-0" style={{background:"linear-gradient(180deg,rgba(7,120,111,0.5) 0%,rgba(0,0,0,0.1) 40%,rgba(0,0,0,0.82) 100%)"}}/>
       <div className="relative z-10 flex items-center gap-3 px-6 pt-16"><LogoMark size={44} intro/><div><p className="text-white text-2xl font-bold leading-none" style={{fontFamily:"'Fraunces',serif"}}>UzRoam</p><p className="text-white/70 text-xs mt-0.5">{t("splash_tagline")}</p></div></div>
       <div className="relative z-10 flex justify-end px-4 mt-2"><GeomPattern opacity={0.22}/></div>
       <div className="relative z-10 mt-auto px-6 pb-12">
@@ -42,7 +42,7 @@ export function OnboardingLang({ onNext }:{ onNext:(l:string)=>void; defaultLang
         {LOCALES.map((код)=>{
           const выбран = lang===код;
           return (
-          <button key={код} onClick={()=>setLang(код)} className="w-full flex items-center justify-between px-4 py-3.5 rounded-2xl border" style={выбран?{background:GREEN+"10",borderColor:GREEN}:{background:SURFACE,borderColor:BORDER}}>
+          <button key={код} onClick={()=>setLang(код)} className="w-full flex items-center justify-between px-4 py-3.5 rounded-2xl border" style={выбран?{background:ACCENT_SOFT,borderColor:GREEN}:{background:SURFACE,borderColor:BORDER}}>
             <span className="text-base font-medium" style={{color:TEXT}}>{LOCALE_META[код].label}</span>
             <div className="w-5 h-5 rounded-full border-2 flex items-center justify-center" style={выбран?{borderColor:GREEN,background:GREEN}:{borderColor:BORDER}}>
               {выбран&&<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>}

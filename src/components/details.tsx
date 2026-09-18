@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import BookingForm from "./booking-form";
 import ReviewForm from "./review-form";
 import type { Hotel, Place, Restaurant, Route } from "@/lib/types";
-import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE } from "@/lib/theme";
+import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE, ACCENT_SOFT } from "@/lib/theme";
 import { LANGS } from "@/data/content";
 import { Badge, GeomPattern, StarRow } from "./ui";
 import { useT } from "@/components/lang-provider";
@@ -141,7 +141,7 @@ export function HotelDetail({ hotel, onBack, onToast }:{ hotel:Hotel; onBack:()=
             <div className="text-right"><p className="text-[10px] font-semibold" style={{color:MUTED}}>{t("d_total")}</p><p className="text-xl font-bold mt-1" style={{color:GREEN,fontFamily:"'Fraunces',serif"}}>${total}</p><p className="text-[9px]" style={{color:MUTED}}>{hotel.price}{t("d_per_night")} × {nights}</p></div>
           </div>
           {booked?(
-            <div className="rounded-2xl p-5 text-center" style={{background:"#EDF7F2",border:`1.5px solid ${GREEN}`}}>
+            <div className="rounded-2xl p-5 text-center" style={{background:ACCENT_SOFT,border:`1.5px solid ${GREEN}`}}>
               <p className="text-4xl mb-2">🎉</p>
               <p className="font-bold text-base" style={{color:GREEN}}>{t("d_book_confirmed")}</p>
               <p className="text-xs mt-1.5" style={{color:MUTED}}>{t("d_book_email")}</p>

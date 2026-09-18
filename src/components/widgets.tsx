@@ -6,7 +6,7 @@ import { ADS } from "@/data/content";
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Hotel, Place } from "@/lib/types";
-import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE } from "@/lib/theme";
+import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE, ACCENT_SOFT } from "@/lib/theme";
 
 export function MiniPlayer({ place, onClose }:{ place:Place; onClose:()=>void }) {
   const { t } = useT();
@@ -20,7 +20,7 @@ export function MiniPlayer({ place, onClose }:{ place:Place; onClose:()=>void })
   },[playing]);
   return (
     <div className="absolute bottom-16 left-0 right-0 z-20 px-3 pb-1">
-      <div className="rounded-2xl overflow-hidden shadow-lg border" style={{background:GREEN,borderColor:GREEN+"44"}}>
+      <div className="rounded-2xl overflow-hidden shadow-lg border" style={{background:GREEN,borderColor:ACCENT_SOFT}}>
         <div className="h-0.5 w-full" style={{background:"rgba(255,255,255,0.2)"}}><div className="h-0.5" style={{background:GOLD,width:`${progress}%`,transition:"width 0.2s linear"}}/></div>
         <div className="flex items-center gap-3 px-3 py-2.5">
           <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0"><img src={place.img} alt={place.name} className="w-full h-full object-cover"/></div>
@@ -73,7 +73,7 @@ export function OfflinePacks() {
           return (
             <div key={pack.name} className="bg-white rounded-2xl p-3.5 shadow-sm border" style={{borderColor:BORDER}}>
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0" style={{background:pack.done?GREEN+"18":CREAM}}>
+                <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0" style={{background:pack.done?ACCENT_SOFT:CREAM}}>
                   <span style={{color:pack.done?GREEN:MUTED}}>{pack.done?"✓":"⬇"}</span>
                 </div>
                 <div className="flex-1">
@@ -81,7 +81,7 @@ export function OfflinePacks() {
                   <p className="text-xs" style={{color:MUTED}}>{pack.count} {t("off_guides")} · {pack.size}</p>
                 </div>
                 {!pack.done&&!downloading&&<button onClick={()=>startDownload(pack.name)} className="px-3 py-1.5 rounded-lg text-xs font-bold" style={{background:GREEN,color:WHITE}}>{t("off_download")}</button>}
-                {pack.done&&<span className="text-xs font-semibold px-2 py-1 rounded-lg" style={{background:GREEN+"18",color:GREEN}}>{t("off_done")}</span>}
+                {pack.done&&<span className="text-xs font-semibold px-2 py-1 rounded-lg" style={{background:ACCENT_SOFT,color:GREEN}}>{t("off_done")}</span>}
               </div>
               {downloading&&(
                 <div className="mt-2.5">
@@ -142,7 +142,7 @@ export function AdBanner({ isPremium, cities }:{ isPremium:boolean; cities?:stri
           <button onClick={перейти} className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{background:ad.color+"18"}}>{ad.emoji}</button>
           <button onClick={перейти} className="flex-1 min-w-0 text-left">
             <div className="flex items-center gap-1.5 mb-0.5">
-              <span className="text-[8px] font-bold tracking-widest uppercase px-1.5 py-0.5 rounded" style={{background:"#F0EBE1",color:MUTED}}>{трК(ad.label)}</span>
+              <span className="text-[8px] font-bold tracking-widest uppercase px-1.5 py-0.5 rounded" style={{background:BORDER,color:MUTED}}>{трК(ad.label)}</span>
             </div>
             <p className="font-bold text-xs leading-tight" style={{color:TEXT}}>{ad.title}</p>
             <p className="text-[10px] mt-0.5 truncate" style={{color:MUTED}}>{трК(ad.sub)}</p>

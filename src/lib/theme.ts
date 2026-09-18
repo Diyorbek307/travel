@@ -7,10 +7,28 @@ import type { CSSProperties } from "react";
  * они нужны там, где цвет вычисляется в JS (градиенты по маршрутам,
  * инлайновые стили карточек), а переменная не подойдёт.
  */
-export const GREEN = "#2E7D5A";
-export const GREEN_LIGHT = "#3A9E70";
+/*
+ * Акцент приложения — бирюза (купола Самарканда). Это переменная темы:
+ * на тёмном она неоновая, на светлом глубже. Имя GREEN оставлено, чтобы
+ * не переписывать 170 мест — цвет теперь задаёт тема.
+ */
+export const GREEN = "var(--accent)";
+/** Полупрозрачные подложки акцента: раньше склеивались как GREEN + "15",
+ *  с переменной так нельзя — держим отдельными токенами. */
+export const ACCENT_SOFT = "var(--accent-soft)";
+export const ACCENT_BORDER = "var(--accent-border)";
+/** Свечение для «вау»-экранов. */
+export const GLOW = "var(--glow)";
+/** Второй акцент (лайм) — точечно, чтобы что-то выделялось из общего ряда. */
+export const LIME = "var(--accent-2)";
+export const LIME_SOFT = "var(--accent-2-soft)";
+/** Тёмный конец акцентных градиентов. */
+export const ACCENT_DEEP = "var(--accent-deep)";
+
+/* Знак бренда остаётся своим цветом в любой теме. */
+export const GREEN_LIGHT = "var(--accent-light)";
 /** Тёмный лес — плитка логотипа и подложка бренда. */
-export const GREEN_DARK = "#164A30";
+export const GREEN_DARK = "var(--accent-deep)";
 export const GOLD = "#E9C46A";
 
 /*
@@ -48,3 +66,19 @@ export const glassDark: CSSProperties = {
   backdropFilter: "blur(16px)",
   border: "1px solid rgba(255,255,255,0.18)",
 };
+
+/**
+ * Цвет текста, читаемый на заданной подложке.
+ *
+ * Карточки событий красятся цветом из данных, и на светлых (например,
+ * золотом Навруза) белый текст сливался. Считаем яркость по sRGB;
+ * если подложка — CSS-переменная, её значение здесь неизвестно, и мы
+ * исходим из того, что акцент тёмный настолько, чтобы держать белый.
+ */
+export function контрастныйТекст(фон: string): string {
+  const m = /^#([0-9a-f]{6})$/i.exec(фон.trim());
+  if (!m) return WHITE;
+  const n = parseInt(m[1], 16);
+  const яркость = (0.299 * ((n >> 16) & 255) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255;
+  return яркость > 0.62 ? "#14201d" : WHITE;
+}

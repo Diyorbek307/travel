@@ -82,7 +82,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#2E7D5A",
+  themeColor: "#0fb3ac",
   width: "device-width",
   initialScale: 1,
   // Экран карты и колода карточек живут на жестах — двойной тап по ним

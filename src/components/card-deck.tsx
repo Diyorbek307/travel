@@ -208,7 +208,7 @@ export function CityDeck({ onSearch }: { onSearch: (city?: string) => void }) {
       title: трК(c.name),
       sub: `${трК(c.sub)} · ${t("uz_country")}`,
       badge: `🏙️ ${t("deck_city_badge")}`,
-      badgeColor: "rgba(46,125,90,0.85)",
+      badgeColor: "rgba(7,120,111,0.85)",
       // Зелёный бейдж — светлый текст, иначе тёмный на тёмном не читался.
       badgeTextColor: WHITE,
       // Погода — чипом в углу, как у отелей.

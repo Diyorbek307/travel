@@ -15,7 +15,7 @@ export function AnimatedBg() {
     <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
       {/* Silk Road path */}
       <path d="M 0,60 Q 15,45 30,50 Q 50,55 65,42 Q 80,30 100,38" fill="none" stroke="rgba(233,196,106,0.25)" strokeWidth="0.4" className="silk-road-path"/>
-      <path d="M 0,72 Q 20,58 45,65 Q 70,72 100,55" fill="none" stroke="rgba(46,125,90,0.2)" strokeWidth="0.3" className="silk-road-path" style={{animationDelay:"2s"}}/>
+      <path d="M 0,72 Q 20,58 45,65 Q 70,72 100,55" fill="none" stroke="rgba(7,120,111,0.2)" strokeWidth="0.3" className="silk-road-path" style={{animationDelay:"2s"}}/>
       {/* Floating stars */}
       {shapes.map((s,i)=>(
         <g key={"star"+i} className={s.cls} style={{animationDelay:`${s.delay}s`,transformOrigin:`${s.x}% ${s.y}%`}}>

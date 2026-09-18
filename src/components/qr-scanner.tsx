@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { BORDER, GREEN, MUTED, TEXT, WHITE, SURFACE } from "@/lib/theme";
+import { BORDER, GREEN, MUTED, TEXT, WHITE, SURFACE, ACCENT_SOFT, ACCENT_BORDER } from "@/lib/theme";
 import { useT } from "@/components/lang-provider";
 
 /**
@@ -130,7 +130,7 @@ export function КнопкаСканера({ onClick }: { onClick: () => void })
       <div className="flex items-center gap-4 p-4">
         <div
           className="relative flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-2xl"
-          style={{ background: GREEN + "12", border: `2px solid ${GREEN}30` }}
+          style={{ background: ACCENT_SOFT, border: `2px solid ${ACCENT_BORDER}` }}
         >
           <div className="grid grid-cols-3 gap-0.5">
             {[1, 1, 0, 1, 0, 1, 0, 1, 1].map((v, i) => (

@@ -1,7 +1,7 @@
 import type { PublicUser, Tab } from "@/lib/types";
 import { useT } from "@/components/lang-provider";
 import type { TKey } from "@/lib/i18n";
-import { GOLD, GREEN, SURFACE, CREAM, TEXT, MUTED, BORDER } from "@/lib/theme";
+import { GOLD, GREEN, SURFACE, CREAM, TEXT, MUTED, BORDER, ACCENT_BORDER } from "@/lib/theme";
 import { LogoMark } from "./ui";
 
 export function SideMenu({ onClose, onTab, currentTab, isPremium, onPremium, onLogout, onFavorites, user }:{
@@ -58,7 +58,7 @@ export function SideMenu({ onClose, onTab, currentTab, isPremium, onPremium, onL
           {/* Main nav */}
           <p className="px-5 text-[9px] font-bold tracking-widest uppercase mb-2" style={{color:MUTED}}>{t("menu_nav")}</p>
           {NAV.map(([таб,e,k])=>(
-            <button key={таб} onClick={()=>{onTab(таб);onClose();}} className="w-full flex items-center gap-3 px-5 py-3 text-left transition-all" style={currentTab===таб?{background:`${GREEN}22`,borderRight:`3px solid ${GREEN}`}:{borderRight:"3px solid transparent"}}>
+            <button key={таб} onClick={()=>{onTab(таб);onClose();}} className="w-full flex items-center gap-3 px-5 py-3 text-left transition-all" style={currentTab===таб?{background:`${ACCENT_BORDER}`,borderRight:`3px solid ${GREEN}`}:{borderRight:"3px solid transparent"}}>
               <span className="text-lg w-6">{e}</span>
               <span className="font-semibold text-sm" style={{color:currentTab===таб?GREEN:TEXT}}>{t(k)}</span>
               {currentTab===таб&&<div className="ml-auto w-1.5 h-1.5 rounded-full" style={{background:GREEN}}/>}
