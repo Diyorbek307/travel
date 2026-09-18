@@ -53,25 +53,27 @@ export function SearchModal({ onClose, onPlace, initialQuery = "" }:{ onClose:()
   const { t, трК } = useT();
   const { PLACES, POPULAR_CITIES } = useAppContent();
   const [query, setQuery] = useState(initialQuery);
-  const [results, setResults] = useState<Place[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
   useEffect(()=>{inputRef.current?.focus();},[]);
-  useEffect(()=>{
-    if(!query.trim()){setResults([]);return;}
-    /*
-     * Ищем по словам, а не по всей строке целиком. Подсказки вроде
-     * «Регистан Самарканд» не находили ничего: такой строки нет ни в
-     * названии («Площадь Регистан»), ни в городе («Самарканд») — а
-     * вместе они есть. Требуем, чтобы каждое слово нашлось хоть где-то.
-     */
+  /*
+   * Результат считаем прямо при отрисовке, а не через состояние в
+   * эффекте: useAppContent отдаёт новый массив на каждый рендер, и
+   * эффект с ним в зависимостях зацикливался («Maximum update depth»).
+   *
+   * Ищем по словам, а не по строке целиком. Подсказки вроде «Регистан
+   * Самарканд» не находили ничего: такой строки нет ни в названии
+   * («Площадь Регистан»), ни в городе («Самарканд») — а вместе они есть.
+   */
+  const results = (() => {
     const слова = query.toLowerCase().split(/\s+/).filter(Boolean);
-    setResults(PLACES.filter(p=>{
+    if (слова.length === 0) return [] as Place[];
+    return PLACES.filter(p=>{
       // Город в данных остаётся русским (по нему ищется погода), поэтому
       // в стог кладём и его перевод — иначе «Samarkand» ничего не находит.
       const стог = `${p.name} ${p.nameRu ?? ""} ${p.city} ${трК(p.city)} ${p.type}`.toLowerCase();
       return слова.every(с=>стог.includes(с));
-    }));
-  },[query,PLACES,трК]);
+    });
+  })();
   return (
     <div className="overlay-screen absolute inset-0 z-50 flex flex-col animate-slide-up" style={{background:CREAM}}>
       <div className="bg-white px-4 pt-14 pb-3 border-b" style={{borderColor:BORDER}}>
