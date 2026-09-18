@@ -23,6 +23,14 @@ export function SplashScreen({ onStart, onLogin }:{ onStart:()=>void; onLogin:()
         </button>
         <button onClick={onLogin} className="w-full py-3 rounded-2xl text-sm font-semibold border" style={{color:"white",borderColor:"rgba(255,255,255,0.3)"}}>{t("splash_login")}</button>
         <div className="flex justify-center gap-8 mt-8">{[["500+",t("splash_places")],["10",t("splash_langs")],["4.9",t("splash_rating")]].map(([v,l])=><div key={l} className="text-center"><p className="text-white font-bold text-lg leading-none" style={{fontFamily:"'Fraunces',serif"}}>{v}</p><p className="text-white/60 text-[10px] mt-0.5">{l}</p></div>)}</div>
+        {/* Знак национального туристического бренда — на белой плашке,
+            как того требует любое фирменное руководство: поверх фотографии
+            тёмно-синие буквы знака иначе тонут. */}
+        <div className="mt-6 flex justify-center">
+          <span className="rounded-2xl px-4 py-2" style={{background:"rgba(255,255,255,0.92)"}}>
+            <img src="/uzbekistan-brand.png" alt="Uzbekistan" style={{height:26,width:"auto"}}/>
+          </span>
+        </div>
       </div>
     </div>
   );

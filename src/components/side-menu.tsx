@@ -88,6 +88,13 @@ export function SideMenu({ onClose, onTab, currentTab, isPremium, onPremium, onL
         </div>
         {/* Footer */}
         <div className="px-5 py-4 border-t" style={{borderColor:BORDER}}>
+          {/* Знак национального туристического бренда. На светлой плашке
+              в обеих темах: тёмно-синие буквы знака на тёмном фоне не
+              читались бы, а перекрашивать чужой знак нельзя. */}
+          <div className="mb-3 flex items-center gap-3 rounded-2xl px-3 py-2.5" style={{background:"#ffffff",border:`1px solid ${BORDER}`}}>
+            <img src="/uzbekistan-brand.png" alt="Uzbekistan" style={{height:26,width:"auto"}}/>
+            <p className="text-[9px] leading-tight" style={{color:"#6b7d79"}}>{t("brand_uz")}</p>
+          </div>
           <div className="flex items-center justify-between">
             <p className="text-[10px]" style={{color:MUTED}}>UzRoam v2.4.1 · 🇺🇿 {t("menu_made")}</p>
             <button onClick={()=>{onClose();onLogout();}} className="text-[10px] font-semibold" style={{color:MUTED}}>🚪 {t("prof_logout")}</button>
