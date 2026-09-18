@@ -14,7 +14,7 @@ import { useTrip } from "@/lib/trip";
 import { useSettings, задатьНастройку } from "@/lib/settings";
 import EmergencyCard from "@/components/emergency-card";
 import { useT } from "@/components/lang-provider";
-import { LOCALE_META, LOCALES, type TKey } from "@/lib/i18n";
+import { LOCALE_META, LOCALES, type TKey, датаСловами } from "@/lib/i18n";
 import { Badge } from "../ui";
 import { CurrencyConverter } from "@/components/screens/practical";
 import { AdInline } from "@/components/ads";
@@ -124,7 +124,7 @@ export function SettingsView({ isPremium, onUpgrade, onLogout }:{ isPremium:bool
       <div className="bg-white rounded-2xl px-4 shadow-sm border" style={{borderColor:BORDER}}>
         <p className="font-bold text-xs pt-3 pb-1 uppercase tracking-widest" style={{color:MUTED}}>{t("prof_account")}</p>
         {[{e:"👤",l:t("s_edit_profile")},{e:"🔐",l:t("s_security")},{e:"🔗",l:t("s_linked")},{e:"📊",l:t("s_privacy")},{e:"🗑️",l:t("s_delete")}].map((item,i)=>(
-          <Row key={i} icon={item.e} label={item.l} right={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={MUTED} strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>}/>
+          <Row key={i} icon={item.e} label={item.l} right={<svg className="rtl-flip" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={MUTED} strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>}/>
         ))}
       </div>
 
@@ -132,7 +132,7 @@ export function SettingsView({ isPremium, onUpgrade, onLogout }:{ isPremium:bool
       <div className="bg-white rounded-2xl px-4 shadow-sm border" style={{borderColor:BORDER}}>
         <p className="font-bold text-xs pt-3 pb-1 uppercase tracking-widest" style={{color:MUTED}}>{t("prof_support")}</p>
         {[{e:"❓",l:t("s_help")},{e:"💬",l:t("s_write_support")},{e:"⭐",l:t("s_rate")},{e:"📢",l:t("s_share")},{e:"📄",l:t("s_terms")},{e:"🔒",l:t("s_privacy_policy")}].map((item,i)=>(
-          <Row key={i} icon={item.e} label={item.l} right={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={MUTED} strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>}/>
+          <Row key={i} icon={item.e} label={item.l} right={<svg className="rtl-flip" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={MUTED} strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>}/>
         ))}
       </div>
 
@@ -186,7 +186,7 @@ export function ProfileScreen({ onLogout, user, startView }:{ onLogout:()=>void;
       ...s,
       earned: !!iso,
       date: iso
-        ? new Date(iso).toLocaleDateString(lang, { day: "numeric", month: "short" })
+        ? датаСловами(new Date(iso), lang, "short")
         : "—",
     };
   });

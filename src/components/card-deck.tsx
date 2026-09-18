@@ -123,7 +123,7 @@ function CardFace({ it, active }: { it: DeckItem; active: boolean }) {
             className="flex h-9 w-9 items-center justify-center rounded-full"
             style={{ background: active ? GOLD : "rgba(255,255,255,0.15)" }}
           >
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={active ? TEXT : "white"} strokeWidth="2.5">
+            <svg className="rtl-flip" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={active ? TEXT : "white"} strokeWidth="2.5">
               <polyline points="9 18 15 12 9 6" />
             </svg>
           </div>

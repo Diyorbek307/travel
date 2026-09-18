@@ -1,5 +1,6 @@
 import type { Hotel, Place, Restaurant, Tab } from "@/lib/types";
 import type { TKey } from "@/lib/i18n";
+import { датаСловами } from "@/lib/i18n";
 import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE, ACCENT_SOFT, ACCENT_DEEP, GLOW, контрастныйТекст } from "@/lib/theme";
 import { ГОРОДА } from "@/data/geo";
 import { useAppContent } from "@/components/content-provider";
@@ -81,7 +82,7 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
         <div className="absolute bottom-0 left-0 right-0 px-4 pb-4 z-10">
           <div className="flex items-center gap-2 mb-1">
             <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"/>
-            <p className="text-white/65 text-xs">{t("home_welcome")} · {new Date().toLocaleDateString(lang,{day:"numeric",month:"long"})}</p>
+            <p className="text-white/65 text-xs">{t("home_welcome")} · {датаСловами(new Date(), lang)}</p>
           </div>
           <h1 className="text-white font-bold leading-tight mb-1" style={{fontSize:34,fontFamily:"'Fraunces',serif"}}>{трК("Самарканд")}</h1>
           <p className="text-white/65 text-xs mb-3">{t("home_city_tagline")}</p>
@@ -120,7 +121,7 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
           <div className="flex gap-1.5 mr-2">
             <span className="text-base">✈️</span><span className="text-base">🚄</span><span className="text-base">🚌</span>
           </div>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          <svg className="rtl-flip" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
       </div>
 
@@ -196,7 +197,7 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
                 </div>
                 <div className="flex items-center justify-between">
                   <div><p className="text-[7px]" style={{color:"rgba(255,255,255,0.4)"}}>{t("home_per_night")}</p><p className="text-white font-bold text-sm">{h.price}</p></div>
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{background:GOLD}}><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={TEXT} strokeWidth="2.5"><polyline points="9 18 15 12 9 6"/></svg></div>
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{background:GOLD}}><svg className="rtl-flip" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={TEXT} strokeWidth="2.5"><polyline points="9 18 15 12 9 6"/></svg></div>
                 </div>
               </div>
             </button>
@@ -226,7 +227,7 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
                 </div>
                 <div className="flex items-center justify-between">
                   <div><p className="text-[7px]" style={{color:"rgba(255,255,255,0.4)"}}>{t("d_price")}</p><p className="text-white font-bold text-xs">{r.price}</p></div>
-                  <div className="w-7 h-7 rounded-full flex items-center justify-center" style={{background:"#C1603A"}}><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"/></svg></div>
+                  <div className="w-7 h-7 rounded-full flex items-center justify-center" style={{background:"#C1603A"}}><svg className="rtl-flip" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"/></svg></div>
                 </div>
               </div>
             </button>
@@ -239,7 +240,7 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
         <button onClick={onPractical} className="w-full rounded-2xl p-4 flex items-center gap-3 text-left active:scale-[0.98] transition-all" style={{background:ACCENT_SOFT}}>
           <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0" style={{background:GREEN}}>💡</div>
           <div className="flex-1"><p className="text-sm font-bold" style={{color:TEXT}}>{t("pr_title")}</p><p className="text-[10px]" style={{color:MUTED}}>{t("home_practical_sub")}</p></div>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={GREEN} strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>
+          <svg className="rtl-flip" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={GREEN} strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
       </div>
 

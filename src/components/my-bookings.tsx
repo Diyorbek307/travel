@@ -72,9 +72,9 @@ export default function MyBookings() {
 
       {!загрузка && !нуженВход && брони.length === 0 && (
         <p className="py-10 text-center text-sm leading-relaxed" style={{ color: MUTED }}>
-          Заявок пока нет.
+          {t("bk_empty")}
           <br />
-          Забронировать номер, столик или тур можно на их страницах.
+          {t("bk_empty_hint")}
         </p>
       )}
 

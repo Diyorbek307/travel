@@ -19,7 +19,7 @@ export function SplashScreen({ onStart, onLogin }:{ onStart:()=>void; onLogin:()
         <p className="text-white/75 text-sm mb-8 leading-relaxed">{t("splash_sub")}</p>
         <button onClick={onStart} className="w-full py-4 rounded-2xl text-base font-bold mb-3 flex items-center justify-center gap-2" style={{background:GREEN}}>
           <span className="text-white">{t("splash_start")}</span>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          <svg className="rtl-flip" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
         <button onClick={onLogin} className="w-full py-3 rounded-2xl text-sm font-semibold border" style={{color:"white",borderColor:"rgba(255,255,255,0.3)"}}>{t("splash_login")}</button>
         <div className="flex justify-center gap-8 mt-8">{[["500+",t("splash_places")],["10",t("splash_langs")],["4.9",t("splash_rating")]].map(([v,l])=><div key={l} className="text-center"><p className="text-white font-bold text-lg leading-none" style={{fontFamily:"'Fraunces',serif"}}>{v}</p><p className="text-white/60 text-[10px] mt-0.5">{l}</p></div>)}</div>
@@ -58,7 +58,7 @@ export function OnboardingLang({ onNext }:{ onNext:(l:string)=>void; defaultLang
         })}
       </div>
       <div className="px-4 pb-8 pt-3">
-        <button onClick={()=>onNext(lang)} className="w-full py-4 rounded-2xl text-white font-bold text-sm flex items-center justify-center gap-2" style={{background:GREEN}}>{t("onb_continue")} <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"/></svg></button>
+        <button onClick={()=>onNext(lang)} className="w-full py-4 rounded-2xl text-white font-bold text-sm flex items-center justify-center gap-2" style={{background:GREEN}}>{t("onb_continue")} <svg className="rtl-flip" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"/></svg></button>
         <div className="flex items-center justify-center gap-2 mt-4"><div className="w-6 h-1.5 rounded-full" style={{background:GREEN}}/><div className="w-1.5 h-1.5 rounded-full" style={{background:BORDER}}/></div>
       </div>
     </div>

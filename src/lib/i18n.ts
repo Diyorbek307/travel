@@ -416,6 +416,9 @@ export const СЛОВАРЬ = {
   ach_earned: row("Earned", "Получено", "Olingan", "已获得", "획득함", "Erhalten", "Obtenu", "獲得済み", "Alındı", "تم الحصول عليه"),
   ach_progress: row("In progress", "В процессе", "Jarayonda", "进行中", "진행 중", "In Arbeit", "En cours", "進行中", "Devam ediyor", "قيد التقدم"),
   unit_gb: row("GB", "ГБ", "GB", "GB", "GB", "GB", "Go", "GB", "GB", "غب"),
+  bk_empty: row("No requests yet.", "Заявок пока нет.", "Hozircha so'rovlar yo'q.", "暂无申请。", "아직 신청이 없어요.", "Noch keine Anfragen.", "Aucune demande pour l'instant.", "まだ申し込みはありません。", "Henüz talep yok.", "لا توجد طلبات بعد."),
+  bk_empty_hint: row("A room, a table or a tour can be requested on its own page.", "Забронировать номер, столик или тур можно на их страницах.", "Xona, stol yoki turni ularning sahifasida band qilish mumkin.", "房间、餐位或旅行团可在各自页面预订。", "객실·테이블·투어는 각 페이지에서 신청할 수 있어요.", "Zimmer, Tisch oder Tour lassen sich auf der jeweiligen Seite anfragen.", "Chambre, table ou circuit se réservent sur leur page.", "部屋・席・ツアーは各ページから申し込めます。", "Oda, masa veya tur kendi sayfasından istenebilir.", "يمكن طلب غرفة أو طاولة أو جولة من صفحتها."),
+  tr_seats: row("seats", "мест", "o'rin", "座", "석", "Plätze", "places", "席", "koltuk", "مقعد"),
   dist_center: row("in the centre", "в центре", "markazda", "在市中心", "도심", "im Zentrum", "au centre", "中心部", "merkezde", "في المركز"),
   explore_empty: row("Nothing in this category yet", "В этой категории пока пусто", "Bu turkumda hozircha bo'sh", "该分类暂时没有内容", "이 분류는 아직 비어 있어요", "In dieser Kategorie ist noch nichts", "Rien dans cette catégorie", "このカテゴリはまだ空です", "Bu kategoride henüz bir şey yok", "لا شيء في هذه الفئة بعد"),
   fav_empty: row("No favourites yet — tap ❤ on places you like", "В избранном пусто — жми ❤ на том, что понравилось", "Hozircha bo'sh — yoqqaniga ❤ bosing", "还没有收藏 — 点喜欢的❤", "즐겨찾기 없음 — 마음에 들면 ❤", "Noch keine Favoriten — tippe ❤", "Aucun favori — appuyez sur ❤", "お気に入りなし — ❤をタップ", "Henüz yok — beğendiğine ❤ bas", "لا مفضلة بعد — اضغط ❤"),
@@ -690,4 +693,32 @@ export function языкУстройства(): Locale {
   if (typeof navigator === "undefined") return "en";
   const код = navigator.language.slice(0, 2).toLowerCase();
   return (LOCALES as readonly string[]).includes(код) ? (код as Locale) : "en";
+}
+
+/**
+ * Дата словами.
+ *
+ * У браузера нет узбекских названий месяцев: Intl отдаёт «M09 19», и на
+ * главной вместо «19 сентября» стояло непонятное «M09 19». Для
+ * узбекского собираем строку сами, остальным языкам Intl справляется.
+ */
+const МЕСЯЦЫ_UZ = [
+  "yanvar", "fevral", "mart", "aprel", "may", "iyun",
+  "iyul", "avgust", "sentabr", "oktabr", "noyabr", "dekabr",
+];
+const МЕСЯЦЫ_UZ_КР = [
+  "yan", "fev", "mar", "apr", "may", "iyn",
+  "iyl", "avg", "sen", "okt", "noy", "dek",
+];
+
+export function датаСловами(
+  d: Date,
+  lang: string,
+  вид: "long" | "short" = "long",
+): string {
+  if (lang === "uz") {
+    const м = вид === "long" ? МЕСЯЦЫ_UZ : МЕСЯЦЫ_UZ_КР;
+    return `${d.getDate()} ${м[d.getMonth()]}`;
+  }
+  return d.toLocaleDateString(lang, { day: "numeric", month: вид });
 }

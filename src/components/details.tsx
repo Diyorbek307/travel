@@ -5,7 +5,7 @@ import BookingForm from "./booking-form";
 import ReviewForm from "./review-form";
 import type { Hotel, Place, Restaurant, Route } from "@/lib/types";
 import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE, ACCENT_SOFT, мягко } from "@/lib/theme";
-import { LOCALES, LOCALE_META } from "@/lib/i18n";
+import { LOCALES, LOCALE_META, датаСловами } from "@/lib/i18n";
 import { Badge, GeomPattern, StarRow } from "./ui";
 import { useT } from "@/components/lang-provider";
 import { useДистанция } from "@/lib/distance";
@@ -49,7 +49,7 @@ export function PlaceDetail({ place, onBack, onPlay, onToast, onПуть }:{ pla
       <div className="relative flex-shrink-0" style={{height:260}}>
         <img src={place.img} alt={place.name} className="w-full h-full object-cover"/>
         <div className="absolute inset-0" style={{background:"linear-gradient(to top,rgba(0,0,0,0.72) 0%,rgba(0,0,0,0.1) 55%,transparent 100%)"}}/>
-        <button onClick={onBack} className="absolute top-12 left-4 w-9 h-9 rounded-xl flex items-center justify-center backdrop-blur-sm" style={{...glass}}><svg width="16" height="16" fill="none" stroke="white" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+        <button onClick={onBack} className="absolute top-12 left-4 w-9 h-9 rounded-xl flex items-center justify-center backdrop-blur-sm" style={{...glass}}><svg className="rtl-flip" width="16" height="16" fill="none" stroke="white" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
         <button onClick={()=>переключитьИзбранное({id:place.id,kind:"place",name:place.name,city:трК(place.city),img:place.img,rating:place.rating})} className="absolute top-12 right-4 w-9 h-9 rounded-xl flex items-center justify-center backdrop-blur-sm" style={{...glass}}><svg width="16" height="16" viewBox="0 0 24 24" fill={fav?GOLD:"none"} stroke={fav?GOLD:"white"} strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
         <div className="absolute bottom-0 left-0 right-0 p-4">
           <div className="flex items-center gap-1.5 mb-1.5"><Badge text={place.type} color={GREEN}/>{place.audio&&<Badge text={"🎧 "+t("d_audioguide")} color={MUTED}/>}{place.qr&&<Badge text="QR" color={MUTED}/>}</div>
@@ -116,7 +116,7 @@ export function PlaceDetail({ place, onBack, onPlay, onToast, onПуть }:{ pla
 function датаЗаезда(черезНочей: number, lang: string): string {
   const d = new Date();
   d.setDate(d.getDate() + 1 + черезНочей);
-  return d.toLocaleDateString(lang, { day: "numeric", month: "short" });
+  return датаСловами(d, lang, "short");
 }
 
 // ── Hotel Detail ───────────────────────────────────────────────────────────────
@@ -134,7 +134,7 @@ export function HotelDetail({ hotel, onBack, onToast }:{ hotel:Hotel; onBack:()=
       <div className="relative flex-shrink-0" style={{height:250}}>
         <img src={hotel.imgs[imgIdx]||hotel.img} alt={hotel.name} className="w-full h-full object-cover"/>
         <div className="absolute inset-0" style={{background:"linear-gradient(to top,rgba(0,0,0,0.6) 0%,transparent 50%)"}}/>
-        <button onClick={onBack} className="absolute top-12 left-4 w-9 h-9 rounded-xl flex items-center justify-center backdrop-blur-sm" style={{...glass}}><svg width="16" height="16" fill="none" stroke="white" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+        <button onClick={onBack} className="absolute top-12 left-4 w-9 h-9 rounded-xl flex items-center justify-center backdrop-blur-sm" style={{...glass}}><svg className="rtl-flip" width="16" height="16" fill="none" stroke="white" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
         <button onClick={()=>переключитьИзбранное({id:hotel.id,kind:"hotel",name:hotel.name,city:трК(hotel.city),img:(hotel.imgs[0]||hotel.img),rating:hotel.rating})} className="absolute top-12 right-4 w-9 h-9 rounded-xl flex items-center justify-center backdrop-blur-sm" style={{...glass}}><svg width="16" height="16" viewBox="0 0 24 24" fill={fav?GOLD:"none"} stroke={fav?GOLD:"white"} strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
         <div className="absolute bottom-16 left-0 right-0 flex justify-center gap-1.5">
           {hotel.imgs.map((_,i)=><button key={i} onClick={()=>setImgIdx(i)} className="rounded-full transition-all" style={{width:i===imgIdx?18:6,height:6,background:i===imgIdx?WHITE:"rgba(255,255,255,0.5)"}}/>)}
@@ -204,7 +204,7 @@ export function RestaurantDetail({ r, onBack, onToast, onПуть }:{ r:Restaura
       <div className="relative flex-shrink-0" style={{height:240}}>
         <img src={r.img} alt={r.name} className="w-full h-full object-cover"/>
         <div className="absolute inset-0" style={{background:"linear-gradient(to top,rgba(0,0,0,0.72) 0%,transparent 55%)"}}/>
-        <button onClick={onBack} className="absolute top-12 left-4 w-9 h-9 rounded-xl flex items-center justify-center backdrop-blur-sm" style={{...glass}}><svg width="16" height="16" fill="none" stroke="white" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+        <button onClick={onBack} className="absolute top-12 left-4 w-9 h-9 rounded-xl flex items-center justify-center backdrop-blur-sm" style={{...glass}}><svg className="rtl-flip" width="16" height="16" fill="none" stroke="white" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
         <button onClick={()=>переключитьИзбранное({id:r.id,kind:"restaurant",name:r.name,city:трК(r.city),img:r.img,rating:r.rating})} className="absolute top-12 right-4 w-9 h-9 rounded-xl flex items-center justify-center backdrop-blur-sm" style={{...glass}}><svg width="16" height="16" viewBox="0 0 24 24" fill={fav?GOLD:"none"} stroke={fav?GOLD:"white"} strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
         <div className="absolute bottom-0 left-0 right-0 p-4">
           <div className="flex items-center gap-1.5 mb-1"><Badge text={r.cuisine} color={"#C1603A"}/><Badge text={трК(r.city)} color={GREEN}/></div>
@@ -256,7 +256,7 @@ export function RouteDetail({ route, onBack, onПуть, onToast }:{ route:Route
     <div className="flex flex-col h-full animate-slide-up" style={{background:CREAM}}>
       <div className="relative px-4 pt-12 pb-5" style={{background:route.color}}>
         <div className="absolute inset-0 flex items-center justify-end pr-4 opacity-15"><GeomPattern opacity={1}/></div>
-        <button onClick={onBack} className="mb-3 w-9 h-9 rounded-xl flex items-center justify-center relative z-10" style={{background:"rgba(255,255,255,0.2)"}}><svg width="16" height="16" fill="none" stroke="white" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+        <button onClick={onBack} className="mb-3 w-9 h-9 rounded-xl flex items-center justify-center relative z-10" style={{background:"rgba(255,255,255,0.2)"}}><svg className="rtl-flip" width="16" height="16" fill="none" stroke="white" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
         <div className="relative z-10">
           <Badge text={трК(route.badge)} color="rgba(255,255,255,0.9)"/>
           <h2 className="text-white text-xl font-bold mt-1 leading-tight" style={{fontFamily:"'Fraunces',serif"}}>{route.icon} {трК(route.title)}</h2>

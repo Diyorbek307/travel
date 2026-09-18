@@ -54,7 +54,7 @@ export function CityPicker({ value, onChange, label, icon }:{ value:string; onCh
 // ── Transport Screen ───────────────────────────────────────────────────────────
 
 export function TransportScreen({ onBack, isPremium }:{ onBack:()=>void; isPremium:boolean }) {
-  const { t } = useT();
+  const { t, трК } = useT();
   const [mode, setMode] = useState<"trains"|"flights"|"taxi">("trains");
   /*
    * Билеты продаёт перевозчик. Раньше «Купить» просто переключало
@@ -84,13 +84,13 @@ export function TransportScreen({ onBack, isPremium }:{ onBack:()=>void; isPremi
       {children}
       <div className="px-4 pb-4 flex items-center justify-between">
         <div><p className="text-[9px] uppercase font-bold tracking-widest" style={{color:MUTED}}>{t("tr_price_pp")}</p><p className="font-bold text-lg" style={{color:GREEN,fontFamily:"'Fraunces',serif"}}>{price}</p></div>
-        <button onClick={onBook} className="px-4 py-2.5 rounded-xl text-xs font-bold text-white transition-all active:scale-95" style={{background:GREEN}}>{t("tr_buy_ext")} ↗</button>
+        <button onClick={onBook} className="px-4 py-2.5 rounded-xl text-xs font-bold text-white transition-all active:scale-95" style={{background:GREEN}}>{t("tr_buy_ext")} <span className="rtl-flip inline-block">↗</span></button>
       </div>
     </div>
   );
 
   const modeIcon = mode==="trains"?"🚄":mode==="flights"?"✈️":"🚌";
-  const trains  = TRAINS.filter(t=>(!fromCity||t.from===fromCity)&&(!toCity||t.to===toCity));
+  const trains  = TRAINS.filter(п=>(!fromCity||п.from===fromCity)&&(!toCity||п.to===toCity));
   const flights = FLIGHTS.filter(f=>(!fromCity||f.from===fromCity)&&(!toCity||f.to===toCity));
   const taxis   = INTERCITY.filter(i=>(!fromCity||i.from===fromCity)&&(!toCity||i.to===toCity));
 
@@ -100,7 +100,7 @@ export function TransportScreen({ onBack, isPremium }:{ onBack:()=>void; isPremi
         <div className="absolute inset-0 opacity-20 pointer-events-none"><AnimatedBg/></div>
         <div className="relative z-10">
           <button onClick={onBack} className="mb-3 w-9 h-9 rounded-xl flex items-center justify-center" style={{background:"rgba(255,255,255,0.2)"}}>
-            <svg width="16" height="16" fill="none" stroke="white" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+            <svg className="rtl-flip" width="16" height="16" fill="none" stroke="white" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
           </button>
           <p className="text-white/60 text-[10px] font-bold uppercase tracking-widest mb-0.5">{t("tr_kicker")}</p>
           <h1 className="text-white text-xl font-bold mb-3" style={{fontFamily:"'Fraunces',serif"}}>{t("tr_subtitle")}</h1>
@@ -133,26 +133,26 @@ export function TransportScreen({ onBack, isPremium }:{ onBack:()=>void; isPremi
         {mode!=="taxi"&&<p className="px-1 text-[10px] leading-relaxed" style={{color:MUTED}}>{t("tr_seller_note")}</p>}
 
         {mode==="trains"&&trains.length===0&&<EmptyRoute icon="🚄"/>}
-        {mode==="trains"&&trains.map(t=>(
-          <TicketCard key={t.id} price={t.price} onBook={()=>купить("trains")}>
+        {mode==="trains"&&trains.map(п=>(
+          <TicketCard key={п.id} price={п.price} onBook={()=>купить("trains")}>
             <div className="px-4 pt-4 pb-3">
               <div className="flex items-center justify-between mb-3">
-                <span className="text-[9px] font-bold px-2 py-0.5 rounded-full" style={{background:t.type==="Скоростной"?ACCENT_SOFT:CREAM,color:t.type==="Скоростной"?GREEN:MUTED}}>{t.type}</span>
-                <span className="text-[9px] font-semibold" style={{color:MUTED}}>{t.name}</span>
+                <span className="text-[9px] font-bold px-2 py-0.5 rounded-full" style={{background:п.type==="Скоростной"?ACCENT_SOFT:CREAM,color:п.type==="Скоростной"?GREEN:MUTED}}>{трК(п.type)}</span>
+                <span className="text-[9px] font-semibold" style={{color:MUTED}}>{трК(п.name)}</span>
               </div>
               <div className="flex items-center gap-3">
                 <div className="flex-1">
-                  <p className="text-2xl font-bold" style={{color:TEXT,fontFamily:"'Fraunces',serif"}}>{t.dep}</p>
-                  <p className="text-xs font-semibold mt-0.5" style={{color:MUTED}}>{t.from}</p>
+                  <p className="text-2xl font-bold" style={{color:TEXT,fontFamily:"'Fraunces',serif"}}>{п.dep}</p>
+                  <p className="text-xs font-semibold mt-0.5" style={{color:MUTED}}>{трК(п.from)}</p>
                 </div>
                 <div className="flex flex-col items-center gap-1 flex-shrink-0">
-                  <p className="text-[9px]" style={{color:MUTED}}>{t.dur}</p>
+                  <p className="text-[9px]" style={{color:MUTED}}>{трК(п.dur)}</p>
                   <div className="flex items-center gap-1"><div className="w-10 h-px" style={{background:BORDER}}/><span className="text-base">🚄</span><div className="w-10 h-px" style={{background:BORDER}}/></div>
-                  <p className="text-[9px]" style={{color:GREEN}}>{t.seats} мест</p>
+                  <p className="text-[9px]" style={{color:GREEN}}>{п.seats} {t("tr_seats")}</p>
                 </div>
                 <div className="flex-1 text-right">
-                  <p className="text-2xl font-bold" style={{color:TEXT,fontFamily:"'Fraunces',serif"}}>{t.arr}</p>
-                  <p className="text-xs font-semibold mt-0.5" style={{color:MUTED}}>{t.to}</p>
+                  <p className="text-2xl font-bold" style={{color:TEXT,fontFamily:"'Fraunces',serif"}}>{п.arr}</p>
+                  <p className="text-xs font-semibold mt-0.5" style={{color:MUTED}}>{трК(п.to)}</p>
                 </div>
               </div>
             </div>
@@ -170,7 +170,7 @@ export function TransportScreen({ onBack, isPremium }:{ onBack:()=>void; isPremi
               <div className="flex items-center gap-3">
                 <div className="flex-1">
                   <p className="text-2xl font-bold" style={{color:TEXT,fontFamily:"'Fraunces',serif"}}>{f.dep}</p>
-                  <p className="text-xs font-semibold mt-0.5" style={{color:MUTED}}>{f.from}</p>
+                  <p className="text-xs font-semibold mt-0.5" style={{color:MUTED}}>{трК(f.from)}</p>
                 </div>
                 <div className="flex flex-col items-center gap-1 flex-shrink-0">
                   <div className="flex items-center gap-1"><div className="w-8 h-px" style={{background:BORDER}}/><span className="text-lg">✈️</span><div className="w-8 h-px" style={{background:BORDER}}/></div>
@@ -178,7 +178,7 @@ export function TransportScreen({ onBack, isPremium }:{ onBack:()=>void; isPremi
                 </div>
                 <div className="flex-1 text-right">
                   <p className="text-2xl font-bold" style={{color:TEXT,fontFamily:"'Fraunces',serif"}}>{f.arr}</p>
-                  <p className="text-xs font-semibold mt-0.5" style={{color:MUTED}}>{f.to}</p>
+                  <p className="text-xs font-semibold mt-0.5" style={{color:MUTED}}>{трК(f.to)}</p>
                 </div>
               </div>
             </div>
@@ -191,20 +191,20 @@ export function TransportScreen({ onBack, isPremium }:{ onBack:()=>void; isPremi
             <div className="px-4 pt-4 pb-3">
               <div className="flex items-center gap-3">
                 <div className="flex-1">
-                  <p className="font-bold text-base" style={{color:TEXT}}>{ic.from}</p>
+                  <p className="font-bold text-base" style={{color:TEXT}}>{трК(ic.from)}</p>
                   <p className="text-[9px] mt-0.5" style={{color:MUTED}}>{t("tr_departure")}</p>
                 </div>
                 <div className="flex flex-col items-center gap-1 flex-shrink-0">
-                  <p className="text-[9px]" style={{color:MUTED}}>{ic.dur}</p>
+                  <p className="text-[9px]" style={{color:MUTED}}>{трК(ic.dur)}</p>
                   <div className="flex items-center gap-1"><div className="w-8 h-px" style={{background:BORDER}}/><span className="text-lg">🚌</span><div className="w-8 h-px" style={{background:BORDER}}/></div>
                 </div>
                 <div className="flex-1 text-right">
-                  <p className="font-bold text-base" style={{color:TEXT}}>{ic.to}</p>
+                  <p className="font-bold text-base" style={{color:TEXT}}>{трК(ic.to)}</p>
                   <p className="text-[9px] mt-0.5" style={{color:MUTED}}>{t("tr_arrival")}</p>
                 </div>
               </div>
               <div className="mt-3 pt-3 border-t flex items-center justify-between" style={{borderColor:BORDER}}>
-                <div><p className="text-[9px]" style={{color:MUTED}}>{ic.departs}</p><p className="text-xs font-medium mt-0.5" style={{color:TEXT}}>{ic.note}</p></div>
+                <div><p className="text-[9px]" style={{color:MUTED}}>{трК(ic.departs)}</p><p className="text-xs font-medium mt-0.5" style={{color:TEXT}}>{трК(ic.note)}</p></div>
                 <div className="text-right"><p className="font-bold text-base" style={{color:GREEN,fontFamily:"'Fraunces',serif"}}>{ic.price}</p><button onClick={()=>заказатьТакси(ic.from, ic.to)} className="mt-1 transition-all active:scale-95 px-3 py-1.5 rounded-lg text-[10px] font-bold text-white" style={{background:GREEN}}>{t("tr_book")}</button></div>
               </div>
             </div>

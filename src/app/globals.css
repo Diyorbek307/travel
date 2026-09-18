@@ -652,3 +652,9 @@ html[data-theme="dark"] .leaflet-bar a {
   background: var(--surface);
   color: var(--muted);
 }
+
+/* Указатели направления в арабском смотрят в другую сторону. Помечаем
+   их классом: «назад» и «вперёд» — это смысл, а не украшение. */
+[dir="rtl"] .rtl-flip {
+  transform: scaleX(-1);
+}

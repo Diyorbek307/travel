@@ -126,7 +126,7 @@ export function PracticalScreen({ onBack }:{ onBack:()=>void }) {
     <div className="flex flex-col h-full animate-slide-up" style={{background:CREAM}}>
       <div className="bg-white px-4 pt-14 pb-4 border-b" style={{borderColor:BORDER}}>
         <div className="flex items-center gap-3">
-          <button onClick={onBack} className="w-9 h-9 rounded-xl flex items-center justify-center" style={{background:CREAM}}><svg width="16" height="16" fill="none" stroke={TEXT} strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+          <button onClick={onBack} className="w-9 h-9 rounded-xl flex items-center justify-center" style={{background:CREAM}}><svg className="rtl-flip" width="16" height="16" fill="none" stroke={TEXT} strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
           <div><p className="text-xs font-medium" style={{color:GREEN,letterSpacing:"0.1em"}}>{t("pr_kicker")}</p><h1 className="text-xl font-bold" style={{color:TEXT,fontFamily:"'Fraunces',serif"}}>{t("pr_title")}</h1></div>
         </div>
       </div>
@@ -137,7 +137,7 @@ export function PracticalScreen({ onBack }:{ onBack:()=>void }) {
             <button onClick={()=>setOpen(open===i?null:i)} className="w-full flex items-center gap-3 p-4 text-left">
               <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{background:s.color+"15"}}>{s.icon}</div>
               <div className="flex-1"><p className="font-bold text-sm" style={{color:TEXT}}>{t(s.tk)}</p></div>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={MUTED} strokeWidth="2" className="flex-shrink-0" style={{transform:open===i?"rotate(90deg)":"none",transition:"transform 0.2s"}}><polyline points="9 18 15 12 9 6"/></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={MUTED} strokeWidth="2" className="rtl-flip flex-shrink-0" style={{transform:open===i?"rotate(90deg)":"none",transition:"transform 0.2s"}}><polyline points="9 18 15 12 9 6"/></svg>
             </button>
             {open===i&&<div className="px-4 pb-4 border-t" style={{borderColor:BORDER}}><ul className="space-y-2 mt-3">{s.items.map((item,j)=><li key={j} className="flex items-start gap-2.5"><div className="w-1.5 h-1.5 rounded-full flex-shrink-0 mt-1.5" style={{background:s.color}}/><p className="text-xs leading-relaxed" style={{color:MUTED}}>{трК(item)}</p></li>)}</ul></div>}
           </div>

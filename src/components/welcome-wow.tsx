@@ -173,7 +173,7 @@ export default function WelcomeWow({ name, onDone }: { name?: string; onDone: ()
               boxShadow: "0 10px 34px rgba(63,224,220,0.35)",
             }}
           >
-            {t("wow_go")} →
+            {t("wow_go")} <span className="rtl-flip inline-block">→</span>
           </button>
         </div>
 

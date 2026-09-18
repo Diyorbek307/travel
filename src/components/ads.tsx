@@ -143,8 +143,8 @@ export function AdSpotlight({ isPremium, cities }: { isPremium: boolean; cities?
                 <Пометка тёмный={текст === WHITE} />
                 {ad.city && (
                   <span
-                    className="text-[8px] font-bold uppercase"
-                    style={{ letterSpacing: "0.1em", color: текст, opacity: 0.72 }}
+                    className="min-w-0 text-[8px] font-bold uppercase leading-tight"
+                    style={{ letterSpacing: "0.1em", color: текст, opacity: 0.72, overflowWrap: "anywhere" }}
                   >
                     📍 {трК(ad.city)} · {вГороде ? t("ad_in_city") : t("ad_on_route")}
                   </span>
@@ -170,7 +170,7 @@ export function AdSpotlight({ isPremium, cities }: { isPremium: boolean; cities?
                 color: текст === WHITE ? "#14201d" : WHITE,
               }}
             >
-              {трК(ad.cta)} →
+              {трК(ad.cta)} <span className="rtl-flip inline-block">→</span>
             </span>
           </div>
         </button>
@@ -222,7 +222,7 @@ export function AdShelf({ isPremium }: { isPremium: boolean }) {
               {трК(ad.sub)}
             </p>
             <span className="mt-2 text-[10px] font-bold" style={{ color: ad.color }}>
-              {трК(ad.cta)} →
+              {трК(ad.cta)} <span className="rtl-flip inline-block">→</span>
             </span>
           </button>
         ))}

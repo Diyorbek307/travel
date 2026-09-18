@@ -74,7 +74,7 @@ export function SideMenu({ onClose, onTab, currentTab, isPremium, onPremium, onL
             <button key={k} onClick={()=>{onClose(); if(k==="menu_favorites"){onFavorites();} else if(k==="trip_title"){onTrip();} else if(k==="cur_title"||k==="menu_emergency"){onProfileStats();} else if(target){onTab(target);}}} className="w-full flex items-center gap-3 px-5 py-3 text-left active:opacity-70">
               <span className="text-lg w-6">{e}</span>
               <span className="flex-1 font-medium text-sm" style={{color:TEXT}}>{t(k)}</span>
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={MUTED} strokeWidth="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+              <svg className="rtl-flip" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={MUTED} strokeWidth="2.5"><polyline points="9 18 15 12 9 6"/></svg>
             </button>
           ))}
           <div className="mx-5 my-3 border-t" style={{borderColor:BORDER}}/>
@@ -86,7 +86,7 @@ export function SideMenu({ onClose, onTab, currentTab, isPremium, onPremium, onL
                 <p className="font-bold text-sm" style={{color:GOLD}}>UzRoam Premium</p>
                 <p className="text-[9px]" style={{color:MUTED}}>{t("pay_no_ads")} · $4.99/{t("pay_month")}</p>
               </div>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={GOLD} strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>
+              <svg className="rtl-flip" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={GOLD} strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>
             </button>
           )}
         </div>
