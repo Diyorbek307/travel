@@ -11,6 +11,7 @@ import { useT } from "@/components/lang-provider";
 import { useДистанция } from "@/lib/distance";
 import { useGeo } from "@/components/geo-provider";
 import { useFavorites, переключитьИзбранное } from "@/lib/favorites";
+import { useTrip, переключитьВМаршруте } from "@/lib/trip";
 import { дистанцияКм, точкаИзвестна } from "@/data/geo";
 import { glass } from "@/lib/theme";
 
@@ -24,6 +25,8 @@ export function PlaceDetail({ place, onBack, onPlay, onToast, onПуть }:{ pla
   const [progress, setProgress] = useState(0);
   const избранное = useFavorites();
   const fav = избранное.some((f) => f.key === `place:${place.id}`);
+  const маршрут = useTrip();
+  const вМаршруте = маршрут.some((x) => x.id === place.id);
   /*
    * Языки озвучки берём из общего списка локалей. Раньше подпись шла из
    * LANGS, а кнопки — из отдельного списка в другом порядке, и
@@ -88,7 +91,11 @@ export function PlaceDetail({ place, onBack, onPlay, onToast, onПуть }:{ pla
         )}
         <div className="flex gap-3 mb-3">
           <button onClick={()=>onПуть(place.name, place.city)} className="flex-1 py-3.5 rounded-2xl text-white text-sm font-bold active:scale-[0.98] transition-all" style={{background:GREEN}}>📍 {t("d_route")}</button>
-          <button onClick={()=>onToast(`✅ «${place.name}» ${t("d_added_route")}`)} className="flex-1 py-3.5 rounded-2xl text-sm font-bold border active:scale-[0.98] transition-all" style={{color:GREEN,borderColor:GREEN,background:SURFACE}}>🗺️ {t("d_add_route")}</button>
+          <button
+            onClick={()=>{ const стало = переключитьВМаршруте({id:place.id,name:place.name,city:place.city,img:place.img}); onToast(стало?`✅ «${place.name}» — ${t("trip_added")}`:`✕ «${place.name}» — ${t("trip_removed")}`); }}
+            className="flex-1 py-3.5 rounded-2xl text-sm font-bold border active:scale-[0.98] transition-all"
+            style={{color:GREEN,borderColor:GREEN,background:вМаршруте?ACCENT_SOFT:SURFACE}}
+          >{вМаршруте?`✓ ${t("trip_in")}`:`🗺️ ${t("d_add_route")}`}</button>
         </div>
         {/* Отзывы — внутри прокрутки, иначе на телефоне блок наезжал на
             аудиоплеер и обрезался. */}
@@ -212,20 +219,18 @@ export function RestaurantDetail({ r, onBack, onToast, onПуть }:{ r:Restaura
           ))}
         </div>
         <div className="bg-white rounded-2xl p-4 mb-3 shadow-sm border" style={{borderColor:BORDER}}><p className="font-bold text-sm mb-2" style={{color:TEXT}}>{t("d_about_rest")}</p><p className="text-sm leading-relaxed" style={{color:MUTED}}>{r.desc}</p></div>
-        <div className="bg-white rounded-2xl p-4 mb-3 shadow-sm border" style={{borderColor:BORDER}}>
-          <p className="font-bold text-sm mb-2" style={{color:TEXT}}>{t("d_signature")}</p>
-          <div className="space-y-2">
-            {["Плов", "Шашлык из баранины", "Самса тандырная", "Лагман", "Нон горячий"].map((dish,i)=>(
-              <div key={i} className="flex items-center justify-between py-2 border-b last:border-0" style={{borderColor:BORDER}}>
-                <span className="text-sm" style={{color:TEXT}}>{трК(dish)}</span>
-                <span className="text-xs font-bold" style={{color:GREEN}}>${3+i*2}–${5+i*3}</span>
-              </div>
-            ))}
-          </div>
-        </div>
+        {/*
+          Здесь был список «фирменных блюд»: одни и те же пять узбекских
+          названий у каждого ресторана, включая неузбекские, и цены,
+          посчитанные из номера строки ($3+i*2) — нон выходил дороже
+          плова. Меню в данных нет, а выдуманное меню хуже никакого.
+          Вернуть блок можно, когда блюда появятся в панели.
+        */}
         <div className="flex gap-3 mb-3">
+          {/* Кнопка «Позвонить» показывала «звоним…» и ничего не набирала:
+              телефона заведения в данных нет. Убрана до появления номера. */}
           <button onClick={()=>onПуть(r.name, r.city)} className="flex-1 py-3.5 rounded-2xl text-white text-sm font-bold active:scale-[0.98] transition-all" style={{background:"#C1603A"}}>📍 {t("d_route")}</button>
-          <button onClick={()=>onToast(`📞 ${t("d_calling")} «${r.name}»...`)} className="flex-1 py-3.5 rounded-2xl text-sm font-bold border active:scale-[0.98] transition-all" style={{color:"#C1603A",borderColor:"#C1603A",background:SURFACE}}>📞 {t("d_call")}</button>
+          
         </div>
         <BookingForm kind="restaurant" itemId={r.id} itemName={r.name} />
         <ReviewForm placeId={r.id} placeName={r.name} />

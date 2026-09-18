@@ -8,6 +8,8 @@ import MyBookings from "@/components/my-bookings";
 import { BORDER, CREAM, GOLD, GREEN, GREEN_LIGHT, MUTED, TEXT, WHITE, SURFACE, ACCENT_SOFT, ACCENT_DEEP } from "@/lib/theme";
 import { ACHIEVEMENTS, AI_REPLIES, STAMPS } from "@/data/content";
 import { useVisits } from "@/lib/visits";
+import { useFavorites } from "@/lib/favorites";
+import { useTrip } from "@/lib/trip";
 import { useSettings, задатьНастройку } from "@/lib/settings";
 import EmergencyCard from "@/components/emergency-card";
 import { useT } from "@/components/lang-provider";
@@ -156,7 +158,7 @@ function snimok(адрес: string | null) {
   return <img src={адрес} alt="" className="h-full w-full object-cover" />;
 }
 
-export function ProfileScreen({ onLogout, user }:{ onLogout:()=>void; user:PublicUser|null }) {
+export function ProfileScreen({ onLogout, user, startView }:{ onLogout:()=>void; user:PublicUser|null; startView?:"passport"|"bookings"|"support"|"chat"|"stats"|"settings" }) {
   /*
    * Имя берём из учётной записи, а не из образца.
    *
@@ -171,6 +173,10 @@ export function ProfileScreen({ onLogout, user }:{ onLogout:()=>void; user:Publi
   // Штампы паспорта — по-настоящему: город считается посещённым, когда
   // человек открыл в нём любое место/отель/ресторан (см. lib/visits).
   const визиты = useVisits();
+  // Числа в статистике раньше были вписаны руками («3 города, 847 км»)
+  // и не менялись ни от чего. Считаем по тому, что человек правда сделал.
+  const избранноеСписок = useFavorites();
+  const маршрутСписок = useTrip();
   const штампы = STAMPS.map((s) => {
     const iso = визиты[s.city];
     return {
@@ -187,7 +193,10 @@ export function ProfileScreen({ onLogout, user }:{ onLogout:()=>void; user:Publi
   const имя = user ? `${user.firstName} ${user.lastName}`.trim() : t("prof_traveler");
   const откуда = user?.country ? `🌍 ${user.country}` : `🌍 ${t("prof_traveler")}`;
   const снимок = user?.hasPhoto ? `/api/photo/${user.id}` : null;
-  const [view, setView] = useState<"passport"|"bookings"|"support"|"chat"|"stats"|"settings">("passport");
+  // Из бокового меню приходят прямо в нужный раздел: «Конвертер валют»
+  // и «Экстренная помощь» живут внутри профиля, и открывать вместо них
+  // паспорт — значит бросить человека искать самому.
+  const [view, setView] = useState<"passport"|"bookings"|"support"|"chat"|"stats"|"settings">(startView ?? "passport");
   const [isPremium, setIsPremium] = useState(false);
   const [showPremium, setShowPremium] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([{role:"ai",text:трК("Assalomu alaykum! 👋 Я ваш AI-гид. Спрашивайте всё — история, маршруты, рестораны, транспорт, валюта!"),time:"09:41"}]);
@@ -298,7 +307,7 @@ export function ProfileScreen({ onLogout, user }:{ onLogout:()=>void; user:Publi
         <div className="flex-1 overflow-y-auto hide-scroll animate-fade-in">
           <AdInline isPremium={isPremium}/>
           <div className="px-4 space-y-4 pb-4">
-            <div className="grid grid-cols-2 gap-3">{[{e:"🏙️",v:"3",l:t("prof_cnt_cities")},{e:"📍",v:"12",l:t("prof_cnt_places")},{e:"🛣️",v:"847 км",l:t("prof_passed")},{e:"🎧",v:"24",l:t("prof_cnt_audio")}].map(s=><div key={s.l} className="bg-white rounded-2xl p-4 shadow-sm border text-center" style={{borderColor:BORDER}}><p className="text-3xl mb-1">{s.e}</p><p className="text-2xl font-bold" style={{color:GREEN,fontFamily:"'Fraunces',serif"}}>{s.v}</p><p className="text-xs mt-0.5" style={{color:MUTED}}>{s.l}</p></div>)}</div>
+            <div className="grid grid-cols-2 gap-3">{[{e:"🏙️",v:String(Object.keys(визиты).length),l:t("prof_cnt_cities")},{e:"🏅",v:`${заработано}/${всегоШтампов}`,l:t("prof_cnt_stamps")},{e:"❤️",v:String(избранноеСписок.length),l:t("prof_cnt_fav")},{e:"📋",v:String(маршрутСписок.length),l:t("prof_cnt_trip")}].map(s=><div key={s.l} className="bg-white rounded-2xl p-4 shadow-sm border text-center" style={{borderColor:BORDER}}><p className="text-3xl mb-1">{s.e}</p><p className="text-2xl font-bold" style={{color:GREEN,fontFamily:"'Fraunces',serif"}}>{s.v}</p><p className="text-xs mt-0.5" style={{color:MUTED}}>{s.l}</p></div>)}</div>
             <CurrencyConverter/>
             <div className="bg-white rounded-2xl p-4 shadow-sm border" style={{borderColor:BORDER}}><p className="font-bold text-sm mb-3" style={{color:TEXT}}>{t("prof_activity")}</p>{[{e:"🕌",a:"Посетил",p:"Площадь Регистан",t:"Сегодня, 09:30"},{e:"🎧",a:"Слушал",p:"Гид Шахи-Зинда",t:"Сегодня, 11:15"},{e:"✅",a:"Завершил",p:"Самарканд за 1 день",t:"12 авг"}].map((a,i)=><div key={i} className="flex items-center gap-3 py-2.5 border-b last:border-0" style={{borderColor:BORDER}}><span className="text-lg">{a.e}</span><div className="flex-1"><p className="text-sm" style={{color:TEXT}}><span style={{color:MUTED}}>{a.a}</span> {a.p}</p><p className="text-xs" style={{color:MUTED}}>{a.t}</p></div></div>)}</div>
             <EmergencyCard/>

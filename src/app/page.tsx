@@ -36,6 +36,7 @@ import { отметитьВизит } from "@/lib/visits";
 import { инитТему } from "@/lib/settings";
 import type { Hotel, Place, PublicUser, Restaurant, Route, Tab } from "@/lib/types";
 import WelcomeWow from "@/components/welcome-wow";
+import TripScreen from "@/components/screens/trip";
 
 /**
  * Оболочка приложения.
@@ -128,6 +129,9 @@ function App() {
   const [showMenu, setShowMenu] = useState(false);
   const [showPremium, setShowPremium] = useState(false);
   const [showFavorites, setShowFavorites] = useState(false);
+  const [showTrip, setShowTrip] = useState(false);
+  // С какого раздела открыть профиль, когда в него ведут из меню.
+  const [profileView, setProfileView] = useState<"stats"|undefined>(undefined);
 
   const [isPremium, setIsPremium] = useState(false);
   const [miniAudio, setMiniAudio] = useState<Place | null>(null);
@@ -226,6 +230,8 @@ function App() {
     setShowPremium(false);
     setShowMenu(false);
     setShowFavorites(false);
+    setShowTrip(false);
+    setProfileView(undefined);
     setDetail(null);
     setTab(next);
     setTabKey((k) => k + 1);
@@ -256,12 +262,13 @@ function App() {
     if (showPractical) return setShowPractical(false), true;
     if (showTransport) return setShowTransport(false), true;
     if (showFavorites) return setShowFavorites(false), true;
+    if (showTrip) return setShowTrip(false), true;
     if (detail) return setDetail(null), true;
     if (phase === "register" || phase === "login") return setPhase("splash"), true;
     if (phase === "interests") return setPhase("lang"), true;
     if (phase === "app" && tab !== "home") return switchTab("home"), true;
     return false;
-  }, [showSearch, showNotifs, showPremium, showMenu, showPractical, showTransport, showFavorites, detail, phase, tab]);
+  }, [showSearch, showNotifs, showPremium, showMenu, showPractical, showTransport, showFavorites, showTrip, detail, phase, tab]);
 
 
   return (
@@ -357,6 +364,15 @@ function App() {
                 <TransportScreen onBack={() => setShowTransport(false)} isPremium={isPremium} />
               </div>
             )}
+            {showTrip && (
+              <div className="overlay-screen device-safe-top absolute inset-0 z-40">
+                <TripScreen
+                  onBack={() => setShowTrip(false)}
+                  onPlace={(p) => { setShowTrip(false); openPlace(p); }}
+                  onПуть={(название, город) => { setShowTrip(false); openПуть(название, город); }}
+                />
+              </div>
+            )}
             {showFavorites && (
               <div className="overlay-screen device-safe-top absolute inset-0 z-40">
                 <FavoritesScreen
@@ -378,6 +394,16 @@ function App() {
                 onFavorites={() => {
                   setShowMenu(false);
                   setShowFavorites(true);
+                }}
+                onTrip={() => {
+                  setShowMenu(false);
+                  setShowTrip(true);
+                }}
+                onProfileStats={() => {
+                  setShowMenu(false);
+                  switchTab("profile");
+                  // После switchTab: он сбрасывает раздел, а нам нужен «Стат.».
+                  setProfileView("stats");
                 }}
                 onPremium={() => {
                   setShowMenu(false);
@@ -408,6 +434,7 @@ function App() {
                   onHotel={openHotel}
                   onRestaurant={openRestaurant}
                   onПуть={openПуть}
+                  profileView={profileView}
                   кодЗаписи={кодЗаписи}
                   onTab={switchTab}
                   onToast={showToast}
@@ -447,6 +474,7 @@ interface ScreenProps {
   onHotel: (h: Hotel) => void;
   onRestaurant: (r: Restaurant) => void;
   onПуть: (название: string, город: string) => void;
+  profileView?: "stats";
   кодЗаписи: string | null;
   onTab: (t: Tab) => void;
   onToast: (msg: string) => void;
@@ -536,6 +564,6 @@ function Screen({ tab, detail, ...p }: ScreenProps) {
     case "audio":
       return <AudioScreen onPlay={p.onPlay} isPremium={p.isPremium} сразуИграть={p.кодЗаписи} />;
     case "profile":
-      return <ProfileScreen onLogout={p.onLogout} user={p.user} />;
+      return <ProfileScreen onLogout={p.onLogout} user={p.user} startView={p.profileView} />;
   }
 }
