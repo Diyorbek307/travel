@@ -11,6 +11,8 @@ import { GeomPattern, LogoMark } from "../ui";
 import { AnimatedBg } from "@/components/animated-bg";
 import { CardDeck, CityDeck } from "@/components/card-deck";
 import { напомнитьОСобытии } from "@/lib/calendar";
+import { useПрочитанные } from "@/lib/notifs-read";
+import { NOTIFS } from "@/data/content";
 import CityReel from "@/components/city-reel";
 import { ВИДЕО, кадрыГорода } from "@/data/city-reels";
 
@@ -26,6 +28,9 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
   const самарканд = погода.get("Самарканд");
   // Город пользователя для таргетинга рекламы (по геолокации).
   const городРекл = ближайшийГород(useGeo().pos);
+  // Точка на колокольчике раньше горела всегда — даже после «Прочитать все».
+  const прочитанные = useПрочитанные();
+  const естьНепрочитанные = NOTIFS.some((n) => n.unread && !прочитанные.includes(n.title));
   return (
     <div className="flex flex-col h-full overflow-y-auto hide-scroll" style={{background:CREAM}}>
 
@@ -55,7 +60,7 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
           </div>
           <button onClick={onNotifs} className="w-9 h-9 rounded-xl flex items-center justify-center relative" style={{...glass}}>
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500"/>
+            {естьНепрочитанные&&<span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500"/>}
           </button>
         </div>
 

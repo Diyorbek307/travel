@@ -43,14 +43,14 @@ export function SettingsView({ isPremium, onUpgrade, onLogout }:{ isPremium:bool
 
       {/* Premium banner if not subscribed */}
       {!isPremium&&(
-        <button onClick={onUpgrade} className="w-full rounded-2xl p-4 flex items-center gap-3 text-left active:scale-[0.98] transition-all" style={{background:`linear-gradient(135deg,#1A1A2E,#0F3460)`}}>
+        <button onClick={onUpgrade} className="w-full rounded-2xl p-4 flex items-center gap-3 text-left active:scale-[0.98] transition-all" style={{background:`linear-gradient(135deg,#0a1f20,#0e3b38)`}}>
           <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0" style={{background:GOLD}}>👑</div>
           <div className="flex-1"><p className="text-white font-bold text-sm">UzRoam Premium</p><p className="text-white/60 text-xs">{t("pay_no_ads")} · UzRoam Pro</p></div>
           <div className="px-3 py-1.5 rounded-xl text-xs font-bold" style={{background:GOLD,color:TEXT}}>$4.99</div>
         </button>
       )}
       {isPremium&&(
-        <div className="rounded-2xl p-4 flex items-center gap-3" style={{background:`linear-gradient(135deg,#1A1A2E,#0F3460)`}}>
+        <div className="rounded-2xl p-4 flex items-center gap-3" style={{background:`linear-gradient(135deg,#0a1f20,#0e3b38)`}}>
           <div className="w-10 h-10 rounded-2xl flex items-center justify-center text-xl" style={{background:GOLD}}>👑</div>
           <div><p className="text-white font-bold text-sm">{t("prof_premium_active")}</p><p className="text-white/50 text-xs">{t("prof_updated")}</p></div>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={GOLD} strokeWidth="2.5" className="ml-auto"><polyline points="20 6 9 17 4 12"/></svg>
@@ -248,10 +248,10 @@ export function ProfileScreen({ onLogout, user, startView }:{ onLogout:()=>void;
             <div className="flex gap-1.5 mt-1">
               <Badge text="EXPLORER" color={GREEN}/>
               <Badge text="★ 3" color={GOLD}/>
-              {isPremium&&<Badge text="PREMIUM" color="#1A1A2E"/>}
+              {isPremium&&<Badge text="PREMIUM" color="#0a1f20"/>}
             </div>
           </div>
-          {!isPremium&&<button onClick={()=>setShowPremium(true)} className="px-3 py-1.5 rounded-xl text-[10px] font-bold" style={{background:`linear-gradient(135deg,#1A1A2E,#0F3460)`,color:GOLD}}>👑 Pro</button>}
+          {!isPremium&&<button onClick={()=>setShowPremium(true)} className="px-3 py-1.5 rounded-xl text-[10px] font-bold" style={{background:`linear-gradient(135deg,#0a1f20,#0e3b38)`,color:GOLD}}>👑 Pro</button>}
         </div>
         <div className="flex gap-1.5">
           {TABS.map(([v,e,l])=><button key={v} onClick={()=>setView(v)} className="flex-1 py-2 rounded-xl text-[10px] font-semibold flex flex-col items-center gap-0.5" style={view===v?{background:GREEN,color:WHITE}:{background:CREAM,color:MUTED}}><span>{e}</span><span>{t(l)}</span></button>)}

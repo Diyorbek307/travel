@@ -80,7 +80,7 @@ export function SideMenu({ onClose, onTab, currentTab, isPremium, onPremium, onL
           <div className="mx-5 my-3 border-t" style={{borderColor:BORDER}}/>
           {/* Premium */}
           {!isPremium&&(
-            <button onClick={()=>{onPremium();onClose();}} className="mx-4 w-[calc(100%-32px)] rounded-2xl p-4 flex items-center gap-3 glow-pulse" style={{background:`linear-gradient(135deg,#1A1A2E,#2C1810)`}}>
+            <button onClick={()=>{onPremium();onClose();}} className="mx-4 w-[calc(100%-32px)] rounded-2xl p-4 flex items-center gap-3 glow-pulse" style={{background:`linear-gradient(135deg,#0a1f20,#2C1810)`}}>
               <span className="text-2xl">👑</span>
               <div className="text-left flex-1">
                 <p className="font-bold text-sm" style={{color:GOLD}}>UzRoam Premium</p>

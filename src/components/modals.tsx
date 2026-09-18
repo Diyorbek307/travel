@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useT } from "@/components/lang-provider";
+import { useПрочитанные, отметитьПрочитанным } from "@/lib/notifs-read";
 import type { Place } from "@/lib/types";
 import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE, ACCENT_SOFT } from "@/lib/theme";
 import { NOTIFS, SEARCH_POPULAR } from "@/data/content";
@@ -13,7 +14,13 @@ import { AnimatedBg } from "@/components/animated-bg";
 export function NotifsPanel({ onClose }:{ onClose:()=>void }) {
   const { t, трК } = useT();
   const { PLACES, POPULAR_CITIES } = useAppContent();
-  const [notifs, setNotifs] = useState(NOTIFS);
+  /*
+   * Прочитанное хранится на устройстве: раньше отметка жила в состоянии
+   * панели и пропадала вместе с ней, а точка на колокольчике оставалась
+   * гореть даже после «Прочитать все».
+   */
+  const прочитанные = useПрочитанные();
+  const notifs = NOTIFS.map((n)=>({ ...n, unread: n.unread && !прочитанные.includes(n.title) }));
   const unread = notifs.filter(n=>n.unread).length;
   return (
     <div className="overlay-screen absolute inset-0 z-50 flex flex-col animate-slide-up" style={{background:CREAM}}>
@@ -21,14 +28,14 @@ export function NotifsPanel({ onClose }:{ onClose:()=>void }) {
         <div className="flex items-center justify-between">
           <div><h2 className="font-bold text-xl" style={{color:TEXT,fontFamily:"'Fraunces',serif"}}>{t("prof_notifications")}</h2>{unread>0&&<p className="text-xs mt-0.5" style={{color:GREEN}}>{unread} непрочитанных</p>}</div>
           <div className="flex items-center gap-3">
-            {unread>0&&<button onClick={()=>setNotifs(p=>p.map(n=>({...n,unread:false})))} className="text-xs font-semibold" style={{color:GREEN}}>{t("notif_read_all")}</button>}
+            {unread>0&&<button onClick={()=>отметитьПрочитанным(NOTIFS.map(n=>n.title))} className="text-xs font-semibold" style={{color:GREEN}}>{t("notif_read_all")}</button>}
             <button onClick={onClose} className="w-9 h-9 rounded-xl flex items-center justify-center" style={{background:CREAM}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={TEXT} strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
           </div>
         </div>
       </div>
       <div className="flex-1 overflow-y-auto hide-scroll p-4 space-y-2.5">
         {notifs.map((n,i)=>(
-          <button key={i} onClick={()=>setNotifs(p=>p.map((x,j)=>j===i?{...x,unread:false}:x))} className="w-full bg-white rounded-2xl p-4 border text-left flex items-start gap-3 shadow-sm" style={{borderColor:n.unread?GREEN:BORDER,borderWidth:n.unread?"1.5px":"1px"}}>
+          <button key={i} onClick={()=>отметитьПрочитанным([n.title])} className="w-full bg-white rounded-2xl p-4 border text-left flex items-start gap-3 shadow-sm" style={{borderColor:n.unread?GREEN:BORDER,borderWidth:n.unread?"1.5px":"1px"}}>
             <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{background:n.unread?ACCENT_SOFT:CREAM}}>{n.emoji}</div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between gap-2"><p className="font-bold text-sm" style={{color:TEXT}}>{трК(n.title)}</p>{n.unread&&<div className="w-2 h-2 rounded-full flex-shrink-0" style={{background:GREEN}}/>}</div>
@@ -92,7 +99,7 @@ export function SearchModal({ onClose, onPlace, initialQuery = "" }:{ onClose:()
               </button>
             ))}
           </div>
-        ):<div className="flex flex-col items-center justify-center py-16 text-center"><span className="text-5xl mb-3">🔍</span><p className="font-semibold" style={{color:TEXT}}>{t("srch_none")}</p><p className="text-sm mt-1" style={{color:MUTED}}>{t("srch_none")}</p></div>}
+        ):<div className="flex flex-col items-center justify-center py-16 text-center"><span className="text-5xl mb-3">🔍</span><p className="font-semibold" style={{color:TEXT}}>{t("srch_none")}</p><p className="text-sm mt-1" style={{color:MUTED}}>{t("srch_none_hint")}</p></div>}
       </div>
     </div>
   );
@@ -154,7 +161,7 @@ export function PremiumModal({ onClose, onActivate }:{ onClose:()=>void; onActiv
   return (
     <div className="overlay-screen absolute inset-0 z-50 flex flex-col animate-slide-up" style={{background:CREAM}}>
       {/* Header */}
-      <div className="relative overflow-hidden px-4 pt-14 pb-6" style={{background:`linear-gradient(135deg,#1A1A2E 0%,#16213E 50%,#0F3460 100%)`}}>
+      <div className="relative overflow-hidden px-4 pt-14 pb-6" style={{background:`linear-gradient(135deg,#071011 0%,#0a1f20 55%,#0e3b38 100%)`}}>
         <div className="absolute inset-0 flex items-center justify-end opacity-10 pr-2"><GeomPattern opacity={1}/></div>
         <button onClick={onClose} className="absolute top-12 right-4 w-8 h-8 rounded-xl flex items-center justify-center" style={{background:"rgba(255,255,255,0.1)"}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
         <div className="relative z-10">
@@ -167,7 +174,7 @@ export function PremiumModal({ onClose, onActivate }:{ onClose:()=>void; onActiv
             {(["month","year"] as const).map(p=>(
               <button key={p} onClick={()=>setPlan(p)} className="flex-1 py-3 text-center relative" style={plan===p?{background:GOLD}:{background:"rgba(255,255,255,0.06)"}}>
                 {p==="year"&&<span className="absolute -top-1 left-1/2 -translate-x-1/2 text-[8px] font-bold px-1.5 py-0.5 rounded-full" style={{background:"#E74C3C",color:WHITE}}>-40%</span>}
-                <p className="font-bold text-sm" style={{color:plan===p?TEXT:WHITE}}>{p==="month"?t("pay_month"):t("prem_year")}</p>
+                <p className="font-bold text-sm" style={{color:plan===p?TEXT:WHITE}}>{p==="month"?t("prem_month"):t("prem_year")}</p>
                 <p className="text-[10px] mt-0.5" style={{color:plan===p?TEXT+"99":"rgba(255,255,255,0.5)"}}>{p==="month"?`39 000 ${t("cur_uzs_word")}${t("prem_per_month")}`:`349 000 ${t("cur_uzs_word")}${t("prem_per_year")}`}</p>
               </button>
             ))}
