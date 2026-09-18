@@ -38,6 +38,9 @@ export async function POST(request: Request) {
 
   const отзыв = await createReview({
     userId: user.id,
+    // Имя сохраняем при создании: отзыв без автора читается как
+    // безликий, а тянуть имя при каждом чтении — лишний запрос.
+    userName: user.firstName,
     placeId,
     placeName,
     rating,

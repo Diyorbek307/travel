@@ -494,6 +494,10 @@ button[aria-disabled="true"] {
 }
 
 /* Кнопки в шапке уходили бы под вырез в режиме приложения. */
+.device-safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
 .device-safe-top {
   padding-top: env(safe-area-inset-top, 0px);
 }

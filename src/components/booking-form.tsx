@@ -57,7 +57,7 @@ export default function BookingForm({
 
   if (итог === "ок") {
     return (
-      <div className="mx-4 mb-3 rounded-2xl p-4" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
+      <div id="заявка" className="mx-4 mb-3 rounded-2xl p-4" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
         <p className="text-sm font-semibold" style={{ color: GREEN }}>
           {t("bk_sent_title")}
         </p>
@@ -70,7 +70,7 @@ export default function BookingForm({
 
   if (!открыта) {
     return (
-      <div className="mx-4 mb-3">
+      <div id="заявка" className="mx-4 mb-3">
         <button
           onClick={() => setОткрыта(true)}
           className="w-full rounded-2xl py-3.5 text-sm font-bold"
@@ -90,6 +90,7 @@ export default function BookingForm({
 
   return (
     <form
+      id="заявка"
       onSubmit={отправить}
       className="mx-4 mb-3 flex flex-col gap-2.5 rounded-2xl p-4"
       style={{ background: SURFACE, border: `1px solid ${BORDER}` }}

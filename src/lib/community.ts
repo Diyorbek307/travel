@@ -185,6 +185,8 @@ export type ReviewStatus = "published" | "hidden";
 export interface Review {
   id: string;
   userId: string;
+  /** Имя автора для показа. Только имя: фамилия отзыву не нужна. */
+  userName?: string;
   placeId: string;
   placeName: string;
   rating: number;

@@ -19,6 +19,8 @@ interface Review {
   rating: number;
   text: string;
   createdAt: string;
+  /** Имя автора. У отзывов, оставленных до его сохранения, отсутствует. */
+  userName?: string;
 }
 
 function Звёзды({ n, размер = 14 }: { n: number; размер?: number }) {
@@ -147,6 +149,11 @@ export default function ReviewForm({ placeId, placeName }: { placeId: string; pl
             <li key={r.id} className="border-t pt-3" style={{ borderColor: BORDER }}>
               <div className="mb-1 flex flex-wrap items-center gap-2">
                 <Звёзды n={r.rating} размер={12} />
+                {r.userName && (
+                  <span className="text-[11px] font-semibold" style={{ color: TEXT }}>
+                    {r.userName}
+                  </span>
+                )}
                 <span className="text-[11px]" style={{ color: MUTED }}>
                   {r.createdAt.slice(0, 10)}
                 </span>

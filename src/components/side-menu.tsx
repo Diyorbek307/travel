@@ -87,13 +87,15 @@ export function SideMenu({ onClose, onTab, currentTab, isPremium, onPremium, onL
           )}
         </div>
         {/* Footer */}
-        <div className="px-5 py-4 border-t" style={{borderColor:BORDER}}>
+        <div className="device-safe-bottom px-5 pt-3 pb-4 border-t" style={{borderColor:BORDER}}>
           {/* Знак национального туристического бренда. На светлой плашке
               в обеих темах: тёмно-синие буквы знака на тёмном фоне не
               читались бы, а перекрашивать чужой знак нельзя. */}
-          <div className="mb-3 flex items-center gap-3">
-            <img src="/uzbekistan-brand.png" alt="Uzbekistan" className="brand-mark-auto" style={{height:24,width:"auto",opacity:0.8}}/>
-            <p className="text-[9px] leading-tight" style={{color:MUTED}}>{t("brand_uz")}</p>
+          {/* Знак национального бренда — компактно: подвал и так делит
+              высоту с навигацией, а в полный рост он её съедал. */}
+          <div className="mb-2.5 flex items-center gap-2.5">
+            <img src="/uzbekistan-brand.png" alt="Uzbekistan" className="brand-mark-auto flex-shrink-0" style={{height:18,width:"auto",opacity:0.75}}/>
+            <p className="text-[8px] leading-tight" style={{color:MUTED}}>{t("brand_uz")}</p>
           </div>
           <div className="flex items-center justify-between">
             <p className="text-[10px]" style={{color:MUTED}}>UzRoam v2.4.1 · 🇺🇿 {t("menu_made")}</p>

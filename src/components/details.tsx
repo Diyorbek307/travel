@@ -5,7 +5,7 @@ import BookingForm from "./booking-form";
 import ReviewForm from "./review-form";
 import type { Hotel, Place, Restaurant, Route } from "@/lib/types";
 import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE, ACCENT_SOFT, мягко } from "@/lib/theme";
-import { LANGS } from "@/data/content";
+import { LOCALES, LOCALE_META } from "@/lib/i18n";
 import { Badge, GeomPattern, StarRow } from "./ui";
 import { useT } from "@/components/lang-provider";
 import { useДистанция } from "@/lib/distance";
@@ -16,7 +16,7 @@ import { glass } from "@/lib/theme";
 
 
 export function PlaceDetail({ place, onBack, onPlay, onToast, onПуть }:{ place:Place; onBack:()=>void; onPlay:(p:Place)=>void; onToast:(m:string)=>void; onПуть:(название:string,город:string)=>void }) {
-  const { t, трК } = useT();
+  const { t, трК, lang } = useT();
   const { pos } = useGeo();
   const км = дистанцияКм(pos, place.nameRu ?? place.name, place.city); // «от вас»
   const дист = useДистанция();
@@ -24,7 +24,17 @@ export function PlaceDetail({ place, onBack, onPlay, onToast, onПуть }:{ pla
   const [progress, setProgress] = useState(0);
   const избранное = useFavorites();
   const fav = избранное.some((f) => f.key === `place:${place.id}`);
-  const [activeLang, setActiveLang] = useState(1);
+  /*
+   * Языки озвучки берём из общего списка локалей. Раньше подпись шла из
+   * LANGS, а кнопки — из отдельного списка в другом порядке, и
+   * подсвеченная кнопка никогда не совпадала с названием под ней.
+   * Начинаем с языка интерфейса: на нём человек и слушает.
+   */
+  const озвучка = LOCALES.slice(0, 6);
+  const [activeLang, setActiveLang] = useState(() => {
+    const i = озвучка.indexOf(lang as (typeof озвучка)[number]);
+    return i >= 0 ? i : 0;
+  });
   const timerRef = useRef<ReturnType<typeof setInterval>|null>(null);
   useEffect(()=>{
     if(playing) timerRef.current = setInterval(()=>setProgress(p=>Math.min(p+0.5,100)),200);
@@ -58,7 +68,7 @@ export function PlaceDetail({ place, onBack, onPlay, onToast, onПуть }:{ pla
           <div className="rounded-2xl p-4 mb-3" style={{background:GREEN}}>
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{background:GOLD}}><svg width="13" height="13" viewBox="0 0 24 24" fill={TEXT}><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
-              <div className="flex-1"><p className="text-white font-semibold text-sm">{t("d_audioguide")}</p><p className="text-white/60 text-xs">{LANGS[activeLang]} · 8:42</p></div>
+              <div className="flex-1"><p className="text-white font-semibold text-sm">{t("d_audioguide")}</p><p className="text-white/60 text-xs">{LOCALE_META[озвучка[activeLang]].label} · 8:42</p></div>
               <span className="text-white/50 text-xs">{Math.floor(progress*8.42/100/60)}:{String(Math.floor(progress*8.42/100%60)).padStart(2,"0")} / 8:42</span>
             </div>
             <div className="rounded-full h-1.5 mb-1 cursor-pointer" style={{background:"rgba(255,255,255,0.2)"}} onClick={e=>{const r=(e.target as HTMLElement).getBoundingClientRect();setProgress(((e.clientX-r.left)/r.width)*100);}}>
@@ -70,8 +80,8 @@ export function PlaceDetail({ place, onBack, onPlay, onToast, onПуть }:{ pla
               
             </div>
             <div className="flex gap-1.5 overflow-x-auto hide-scroll">
-              {["🇷🇺 RU","🇬🇧 EN","🇺🇿 UZ","🇨🇳 ZH","🇰🇷 KR","🇩🇪 DE"].map((l,i)=>(
-                <button key={l} onClick={()=>setActiveLang(i)} className="flex-shrink-0 px-2.5 py-1 rounded-lg text-[10px] font-bold" style={activeLang===i?{background:GOLD,color:TEXT}:{background:"rgba(255,255,255,0.12)",color:"rgba(255,255,255,0.7)"}}>{l}</button>
+              {озвучка.map((код,i)=>(
+                <button key={код} onClick={()=>setActiveLang(i)} className="flex-shrink-0 px-2.5 py-1 rounded-lg text-[10px] font-bold" style={activeLang===i?{background:GOLD,color:TEXT}:{background:"rgba(255,255,255,0.12)",color:"rgba(255,255,255,0.7)"}}>{LOCALE_META[код].label}</button>
               ))}
             </div>
           </div>
@@ -111,7 +121,6 @@ export function HotelDetail({ hotel, onBack, onToast }:{ hotel:Hotel; onBack:()=
   const [nights, setNights] = useState(2);
   const избранное = useFavorites();
   const fav = избранное.some((f) => f.key === `hotel:${hotel.id}`);
-  const [booked, setBooked] = useState(false);
   const total = parseInt(hotel.price.replace("$","")) * nights;
   return (
     <div className="flex flex-col h-full animate-slide-up" style={{background:CREAM}}>
@@ -155,28 +164,19 @@ export function HotelDetail({ hotel, onBack, onToast }:{ hotel:Hotel; onBack:()=
             ))}
             <div className="text-right"><p className="text-[10px] font-semibold" style={{color:MUTED}}>{t("d_total")}</p><p className="text-xl font-bold mt-1" style={{color:GREEN,fontFamily:"'Fraunces',serif"}}>${total}</p><p className="text-[9px]" style={{color:MUTED}}>{hotel.price}{t("d_per_night")} × {nights}</p></div>
           </div>
-          {booked?(
-            <div className="rounded-2xl p-5 text-center" style={{background:ACCENT_SOFT,border:`1.5px solid ${GREEN}`}}>
-              <p className="text-4xl mb-2">🎉</p>
-              <p className="font-bold text-base" style={{color:GREEN}}>{t("d_book_confirmed")}</p>
-              <p className="text-xs mt-1.5" style={{color:MUTED}}>{t("d_book_email")}</p>
-              <p className="font-mono text-xs font-bold mt-2 px-3 py-1.5 rounded-xl inline-block" style={{background:GREEN,color:WHITE}}>№ UZH-2026-{hotel.id.toUpperCase()}{nights}{guests}</p>
-            </div>
-          ):(
-            <>
-              <button onClick={()=>{setBooked(true);onToast(t("d_booked"));}} className="w-full py-4 rounded-2xl text-white font-bold text-sm active:scale-[0.98] transition-all" style={{background:GREEN}}>{t("d_book")} — ${total}</button>
-              <p className="text-center text-[10px] mt-2" style={{color:MUTED}}>{t("d_book_terms")}</p>
-            </>
-          )}
-        </div>
-        <div className="bg-white rounded-2xl p-4 mb-6 shadow-sm border" style={{borderColor:BORDER}}>
-          <div className="flex items-center justify-between mb-3"><p className="font-bold text-sm" style={{color:TEXT}}>{t("d_reviews_title")}</p><StarRow rating={hotel.rating}/></div>
-          {[{name:"Sophie M.",flag:"🇩🇪",text:трК("Потрясающий вид. Персонал отзывчивый."),stars:5},{name:"James T.",flag:"🇺🇸",text:"Exceeded all expectations. Unforgettable.",stars:4}].map((r,i)=>(
-            <div key={i} className="py-3 border-b last:border-0" style={{borderColor:BORDER}}>
-              <div className="flex items-center gap-2 mb-1"><span className="text-lg">{r.flag}</span><span className="text-sm font-semibold" style={{color:TEXT}}>{r.name}</span><span className="text-xs ml-auto" style={{color:GOLD}}>{"★".repeat(r.stars)}</span></div>
-              <p className="text-xs leading-relaxed" style={{color:MUTED}}>{r.text}</p>
-            </div>
-          ))}
+          {/*
+            Раньше эта кнопка сама показывала «🎉 Бронь подтверждена»,
+            письмо на почту и номер брони — при том, что ничего не
+            происходило: ни запроса, ни письма, ни номера. Теперь она
+            ведёт к настоящей форме заявки ниже, её принимает
+            администратор.
+          */}
+          <button
+            onClick={()=>document.getElementById("заявка")?.scrollIntoView({behavior:"smooth",block:"center"})}
+            className="w-full py-4 rounded-2xl text-white font-bold text-sm active:scale-[0.98] transition-all"
+            style={{background:GREEN}}
+          >{t("d_book")} — ${total}</button>
+          <p className="text-center text-[10px] mt-2" style={{color:MUTED}}>{t("d_book_terms")}</p>
         </div>
         <BookingForm kind="hotel" itemId={hotel.id} itemName={hotel.name} />
         <ReviewForm placeId={hotel.id} placeName={hotel.name} />
