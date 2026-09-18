@@ -35,8 +35,8 @@ const ОШИБКИ: Record<string, TKey> = {
 
 function поле(): React.CSSProperties {
   return {
-    background: "rgba(255,255,255,0.1)",
-    border: "1px solid rgba(255,255,255,0.22)",
+    background: "rgba(255,255,255,0.06)",
+    border: "1px solid rgba(255,255,255,0.14)",
     color: WHITE,
   };
 }
@@ -55,9 +55,22 @@ function Обёртка({
   const { t } = useT();
   return (
     <div
-      className="flex h-full flex-col overflow-y-auto px-6 pb-10 pt-12"
-      style={{ background: `linear-gradient(160deg, ${GREEN} 0%, #14402c 100%)` }}
+      className="relative flex h-full flex-col overflow-y-auto px-6 pb-10 pt-12"
+      // Тёмная сцена с бирюзовым отсветом, как на экране после
+      // регистрации. Плоская заливка акцентом выглядела грязно: акцент
+      // яркий, и во весь экран он давит.
+      style={{ background: "linear-gradient(170deg,#0a1517 0%,#071011 55%,#050b0c 100%)" }}
     >
+      {/* Отсвет вверху — чтобы экран не был глухой стеной. */}
+      <div
+        className="pointer-events-none absolute -top-16 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full"
+        style={{ background: "var(--accent)", filter: "blur(80px)", opacity: 0.42 }}
+      />
+      <div
+        className="pointer-events-none absolute -right-20 top-40 h-56 w-56 rounded-full"
+        style={{ background: "var(--accent-2)", filter: "blur(100px)", opacity: 0.18 }}
+      />
+      <div className="relative">
       {/*
         Колонка ограниченной ширины. Поле ввода во весь ноутбук выглядит
         не как форма, а как ошибка вёрстки: глаз не связывает подпись
@@ -83,6 +96,7 @@ function Обёртка({
       </p>
 
       {children}
+      </div>
       </div>
     </div>
   );
@@ -195,7 +209,7 @@ export function RegisterScreen({
           type="button"
           onClick={() => файл.current?.click()}
           className="mx-auto mb-2 flex h-24 w-24 items-center justify-center overflow-hidden rounded-full"
-          style={{ background: "rgba(255,255,255,0.12)", border: "1px dashed rgba(255,255,255,0.4)" }}
+          style={{ background: "var(--accent-soft)", border: "1px dashed var(--accent-border)" }}
         >
           {фото ? (
             <img src={фото} alt="" className="h-full w-full object-cover" />
@@ -276,7 +290,7 @@ export function RegisterScreen({
           type="submit"
           disabled={идёт}
           className="mt-2 rounded-2xl py-4 text-base font-bold disabled:opacity-60"
-          style={{ background: GOLD, color: TEXT }}
+          style={{ background: "linear-gradient(120deg,var(--accent-2),var(--accent))", color: "#05100f", boxShadow: "0 8px 26px var(--accent-soft)" }}
         >
           {идёт ? t("reg_submitting") : t("reg_title")}
         </button>
@@ -402,7 +416,7 @@ export function VerifyScreen({
           type="submit"
           disabled={идёт || code.length !== 6}
           className="mt-2 rounded-2xl py-4 text-base font-bold disabled:opacity-60"
-          style={{ background: GOLD, color: TEXT }}
+          style={{ background: "linear-gradient(120deg,var(--accent-2),var(--accent))", color: "#05100f", boxShadow: "0 8px 26px var(--accent-soft)" }}
         >
           {идёт ? t("verify_checking") : t("verify_submit")}
         </button>
@@ -521,7 +535,7 @@ export function LoginScreen({
           type="submit"
           disabled={идёт}
           className="mt-2 rounded-2xl py-4 text-base font-bold disabled:opacity-60"
-          style={{ background: GOLD, color: TEXT }}
+          style={{ background: "linear-gradient(120deg,var(--accent-2),var(--accent))", color: "#05100f", boxShadow: "0 8px 26px var(--accent-soft)" }}
         >
           {идёт ? t("login_submitting") : t("login_submit")}
         </button>
@@ -613,7 +627,7 @@ function ForgotScreen({ onBack, email: начальный }: { onBack: () => voi
           type="submit"
           disabled={идёт}
           className="mt-2 rounded-2xl py-4 text-base font-bold disabled:opacity-60"
-          style={{ background: GOLD, color: TEXT }}
+          style={{ background: "linear-gradient(120deg,var(--accent-2),var(--accent))", color: "#05100f", boxShadow: "0 8px 26px var(--accent-soft)" }}
         >
           {идёт ? t("reset_submitting") : t("reset_submit")}
         </button>

@@ -27,9 +27,7 @@ export function SplashScreen({ onStart, onLogin }:{ onStart:()=>void; onLogin:()
             как того требует любое фирменное руководство: поверх фотографии
             тёмно-синие буквы знака иначе тонут. */}
         <div className="mt-6 flex justify-center">
-          <span className="rounded-2xl px-4 py-2" style={{background:"rgba(255,255,255,0.92)"}}>
-            <img src="/uzbekistan-brand.png" alt="Uzbekistan" style={{height:26,width:"auto"}}/>
-          </span>
+          <img src="/uzbekistan-brand.png" alt="Uzbekistan" className="brand-mark-invert" style={{height:26,width:"auto",opacity:0.85}}/>
         </div>
       </div>
     </div>

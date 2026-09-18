@@ -101,7 +101,7 @@ export function AudioScreen({
     const звук = new Audio(url);
     звук.onerror = () => {
       setИграет(null);
-      setОшибка("Запись не открылась. Возможно, ссылка устарела.");
+      setОшибка(t("audio_failed"));
     };
     звук.onended = () => setИграет(null);
     проигрыватель.current = звук;
@@ -114,9 +114,13 @@ export function AudioScreen({
         const место = PLACES.find((п) => п.id === placeId);
         if (место) onPlay(место);
       })
-      .catch(() => {
-        if (самоНачало) setНужноНажать(true);
-        else setОшибка("Браузер не дал включить звук. Нажмите ещё раз.");
+      .catch((e: unknown) => {
+        // NotAllowedError — это автозапуск без жеста, тут правда надо
+        // нажать ещё раз. Всё остальное (файла нет, формат не тот) —
+        // проблема самой записи, и «нажмите ещё раз» только злит.
+        const запрет = e instanceof DOMException && e.name === "NotAllowedError";
+        if (самоНачало && запрет) setНужноНажать(true);
+        else setОшибка(запрет ? t("audio_blocked") : t("audio_failed"));
       });
   }
 

@@ -33,7 +33,7 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
         {/* Шапка — короткий ролик о Самарканде: кадры сменяются с наездом,
             поэтому главная не выглядит застывшей открыткой. */}
         <CityReel
-          кадры={кадрыГорода("Самарканд", "https://images.unsplash.com/photo-1664602078796-68ee76b3fc59?w=900&h=900&fit=crop&auto=format", { PLACES, HOTELS, RESTAURANTS })}
+          кадры={кадрыГорода("Самарканд", "https://images.unsplash.com/photo-1664602078796-68ee76b3fc59?w=900&h=900&fit=crop&auto=format", { PLACES })}
           видео={ВИДЕО["Самарканд"]}
           alt="Самарканд"
         />

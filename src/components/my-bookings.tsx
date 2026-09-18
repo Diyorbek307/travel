@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { BORDER, GREEN, MUTED, TEXT, WHITE, SURFACE } from "@/lib/theme";
+import { useT } from "@/components/lang-provider";
+import type { TKey } from "@/lib/i18n";
 
 /**
  * Заявки, оставленные туристом.
@@ -21,19 +23,21 @@ interface Booking {
   createdAt: string;
 }
 
-const ВИД: Record<Booking["kind"], string> = {
-  hotel: "🏨 Отель",
-  restaurant: "🍽️ Ресторан",
-  tour: "🗺️ Тур",
+// Подписи переводятся на месте показа: словарь ключей, а не готовых слов.
+const ВИД: Record<Booking["kind"], { значок: string; ключ: TKey }> = {
+  hotel: { значок: "🏨", ключ: "bk_kind_hotel" },
+  restaurant: { значок: "🍽️", ключ: "bk_kind_restaurant" },
+  tour: { значок: "🗺️", ключ: "bk_kind_tour" },
 };
 
-const СТАТУС: Record<Booking["status"], { текст: string; цвет: string }> = {
-  new: { текст: "Ждёт подтверждения", цвет: "#c1802f" },
-  confirmed: { текст: "Подтверждена", цвет: GREEN },
-  cancelled: { текст: "Отменена", цвет: "#c1603a" },
+const СТАТУС: Record<Booking["status"], { ключ: TKey; цвет: string }> = {
+  new: { ключ: "bk_new", цвет: "#c1802f" },
+  confirmed: { ключ: "bk_confirmed", цвет: GREEN },
+  cancelled: { ключ: "bk_cancelled", цвет: "#c1603a" },
 };
 
 export default function MyBookings() {
+  const { t } = useT();
   const [брони, setБрони] = useState<Booking[]>([]);
   const [загрузка, setЗагрузка] = useState(true);
   const [нуженВход, setНуженВход] = useState(false);
@@ -79,10 +83,10 @@ export default function MyBookings() {
           <li key={b.id} className="rounded-2xl p-4" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
             <div className="mb-1 flex flex-wrap items-center justify-between gap-2">
               <span className="text-[11px]" style={{ color: MUTED }}>
-                {ВИД[b.kind]}
+                {ВИД[b.kind].значок} {t(ВИД[b.kind].ключ)}
               </span>
               <span className="text-[11px] font-semibold" style={{ color: СТАТУС[b.status].цвет }}>
-                {СТАТУС[b.status].текст}
+                {t(СТАТУС[b.status].ключ)}
               </span>
             </div>
             <p className="text-sm font-bold" style={{ color: TEXT, fontFamily: "'Fraunces',serif" }}>

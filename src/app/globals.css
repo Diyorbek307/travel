@@ -585,3 +585,18 @@ button[aria-disabled="true"] {
     background-position: 200% 0;
   }
 }
+
+/* Знак UZBEKISTAN. На тёмном фоне его тёмно-синие буквы не читаются,
+   поэтому там показываем одноцветную белую версию — это штатный
+   «вывернутый» вариант, а не перекраска знака. */
+.brand-mark-invert {
+  filter: brightness(0) invert(1);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .brand-mark-auto {
+    filter: brightness(0) invert(1);
+  }
+}
+html[data-theme="dark"] .brand-mark-auto {
+  filter: brightness(0) invert(1);
+}

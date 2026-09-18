@@ -106,8 +106,8 @@ export default function TaxiOrder({
       setКуда({ название: рядом.название, geo: рядом.geo });
     } else {
       const подпись = рядом
-        ? `Точка на карте · ${рядом.км} км от «${рядом.название}»`
-        : "Точка на карте";
+        ? `${t("taxi_map_point")} · ${рядом.км} ${t("unit_km")} ${t("common_from")} «${рядом.название}»`
+        : t("taxi_map_point");
       setКуда({ название: подпись, geo: g, своя: true });
     }
     setКарта(false);

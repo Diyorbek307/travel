@@ -69,12 +69,25 @@ export function useAppContent() {
   const мОтель = (h: (typeof content.hotels)[number]) => ({ ...h, tag: трК(h.tag), desc: трК(h.desc) });
   const мРест = (r: (typeof content.restaurants)[number]) => ({ ...r, name: трК(r.name), cuisine: трК(r.cuisine), desc: трК(r.desc) });
 
+  /*
+   * База засеяна старой зеленью #2E7D5A/#1A5C3A — до смены палитры на
+   * бирюзу. Записи в базе мы не переписываем (их мог менять редактор),
+   * но на показе подменяем: иначе шапка маршрута оставалась зелёной
+   * посреди бирюзового приложения.
+   *
+   * Подставляем конкретный цвет, а не переменную темы: по этому цвету
+   * считается контраст текста на карточке, а значение переменной в JS
+   * неизвестно.
+   */
+  const СТАРАЯ_ЗЕЛЕНЬ = new Set(["#2E7D5A", "#2e7d5a", "#1A5C3A", "#1a5c3a"]);
+  const мЦвет = (цвет: string) => (СТАРАЯ_ЗЕЛЕНЬ.has(цвет) ? "#0E6F66" : цвет);
+
   return {
     PLACES: content.places.map(мПлейс),
     HOTELS: content.hotels.map(мОтель),
     RESTAURANTS: content.restaurants.map(мРест),
-    ROUTES: content.routes,
-    EVENTS: content.events,
+    ROUTES: content.routes.map((r) => ({ ...r, color: мЦвет(r.color) })),
+    EVENTS: content.events.map((e) => ({ ...e, color: мЦвет(e.color) })),
     // На главной показываются только отмеченные города; порядок задаёт
     // редактор в панели.
     POPULAR_CITIES: content.cities.filter((c) => c.featured),
@@ -82,6 +95,6 @@ export function useAppContent() {
     // Скрытый в панели аудиогид сразу пропадает у туристов.
     AUDIO: (content.audio ?? []).filter((a) => a.active),
     // Приостановленная в панели кампания сразу исчезает из приложения.
-    ADS: content.ads.filter((a) => a.status === "active"),
+    ADS: content.ads.filter((a) => a.status === "active").map((a) => ({ ...a, color: мЦвет(a.color) })),
   };
 }

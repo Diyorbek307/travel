@@ -6,7 +6,7 @@ import { useAppContent } from "./content-provider";
 import { useT } from "@/components/lang-provider";
 import { useWeather } from "@/components/weather-provider";
 import { useGeo } from "@/components/geo-provider";
-import { дистанцияКм, форматКм } from "@/data/geo";
+import { дистанцияКм, форматКм, статРасстояние } from "@/data/geo";
 import { ВИДЕО, кадрыГорода } from "@/data/city-reels";
 import CityReel from "./city-reel";
 
@@ -194,7 +194,7 @@ export function CardDeck({ places, onPlace }: { places: Place[]; onPlace: (p: Pl
       stat2: String(p.reviews),
       stat2l: t("d_reviews_word"),
       // Расстояние — живое от текущей позиции; без геолокации — прежнее.
-      stat3: км != null ? форматКм(км, t("unit_km")) : p.distance,
+      stat3: км != null ? форматКм(км, t("unit_km")) : статРасстояние(p.distance, t("dist_center")),
       stat3l: t("card_dist"),
       price: p.entry,
       pricel: t("card_entry"),
@@ -206,14 +206,14 @@ export function CardDeck({ places, onPlace }: { places: Place[]; onPlace: (p: Pl
 }
 
 export function CityDeck({ onSearch }: { onSearch: (city?: string) => void }) {
-  const { POPULAR_CITIES, PLACES, HOTELS, RESTAURANTS } = useAppContent();
+  const { POPULAR_CITIES, PLACES } = useAppContent();
   const { t, трК } = useT();
   const погода = useWeather();
   const items: DeckItem[] = POPULAR_CITIES.map((c) => {
     const w = погода.get(c.name); // настоящая погода города (Open-Meteo)
     return {
       img: c.img,
-      кадры: кадрыГорода(c.name, c.img, { PLACES, HOTELS, RESTAURANTS }),
+      кадры: кадрыГорода(c.name, c.img, { PLACES }),
       видео: ВИДЕО[c.name],
       title: трК(c.name),
       sub: `${трК(c.sub)} · ${t("uz_country")}`,

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ADS } from "@/data/content";
 import { useAppContent } from "./content-provider";
 import { useT } from "@/components/lang-provider";
-import { BORDER, LIME, MUTED, SURFACE, TEXT, WHITE, контрастныйТекст } from "@/lib/theme";
+import { BORDER, LIME, MUTED, SURFACE, TEXT, WHITE, контрастныйТекст, мягко } from "@/lib/theme";
 
 /**
  * Партнёрские блоки.
@@ -208,7 +208,7 @@ export function AdShelf({ isPremium }: { isPremium: boolean }) {
           >
             <span
               className="mb-2 flex h-11 w-11 items-center justify-center rounded-xl text-xl"
-              style={{ background: ad.color + "1f" }}
+              style={{ background: мягко(ad.color, 12) }}
             >
               {ad.emoji}
             </span>
@@ -255,7 +255,7 @@ export function AdInline({ isPremium, cities }: { isPremium: boolean; cities?: s
         <button
           onClick={() => перейти(ad)}
           className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl text-xl transition-all active:scale-90"
-          style={{ background: ad.color + "1f" }}
+          style={{ background: мягко(ad.color, 12) }}
         >
           {ad.emoji}
         </button>

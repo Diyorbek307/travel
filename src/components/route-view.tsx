@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import RealMap from "@/components/real-map";
+import { useT } from "@/components/lang-provider";
 import GoogleMap, { googleКлюч } from "@/components/google-map";
 import { ГОРОДА, МЕСТА, расстояниеКм, точка } from "@/data/geo";
 import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE } from "@/lib/theme";
@@ -66,6 +67,7 @@ export default function RouteView({
   onBack: () => void;
   onТакси?: () => void;
 }) {
+  const { t } = useT();
   const цель = geo ?? точка(название, город);
   const [откуда, setОткуда] = useState<Geo | null>(null);
   const [состояние, setСостояние] = useState<"ищем" | "нашли" | "отказ">("ищем");
@@ -188,7 +190,7 @@ export default function RouteView({
           onClick={onBack}
           className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
           style={{ background: CREAM }}
-          aria-label="Назад"
+          aria-label={t("common_back")}
         >
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={TEXT} strokeWidth="2.5">
             <path d="M15 18l-6-6 6-6" />
@@ -253,7 +255,7 @@ export default function RouteView({
                       borderColor: способ === в ? GREEN : BORDER,
                     }}
                   >
-                    {в === "авто" ? "На машине" : "Пешком"}
+                    {в === "авто" ? t("route_mode_car") : t("route_mode_walk")}
                   </button>
                 ))}
               </div>
@@ -264,10 +266,10 @@ export default function RouteView({
                 <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: "#2f6fd0" }} />
                 <span className="min-w-0 flex-1 truncate text-sm" style={{ color: TEXT }}>
                   {состояние === "нашли"
-                    ? "Вы здесь"
+                    ? t("geo_you_here")
                     : состояние === "ищем"
-                      ? "Определяем, где вы…"
-                      : "Местоположение недоступно"}
+                      ? t("geo_searching")
+                      : t("geo_unavailable")}
                 </span>
               </div>
               <div className="my-1 ml-1 h-6 w-px" style={{ background: BORDER }} />
@@ -290,7 +292,7 @@ export default function RouteView({
                   </div>
                   <div>
                     <p className="text-[10px] uppercase tracking-widest" style={{ color: MUTED }}>
-                      {способ === "пешком" ? "Пешком" : "На машине"}
+                      {способ === "пешком" ? t("route_mode_walk") : t("route_mode_car")}
                     </p>
                     <p className="text-base font-bold" style={{ color: TEXT }}>
                       {времяВПути(дорога.секунды)}
@@ -311,7 +313,7 @@ export default function RouteView({
                     {км <= 6 && (
                       <div>
                         <p className="text-[10px] uppercase tracking-widest" style={{ color: MUTED }}>
-                          Пешком примерно
+                          {t("route_walk_about")}
                         </p>
                         <p className="text-base font-bold" style={{ color: TEXT }}>
                           {времяПешком(км)}
@@ -324,14 +326,14 @@ export default function RouteView({
 
               <p className="mt-3 text-[11px] leading-relaxed" style={{ color: MUTED }}>
                 {состояние === "отказ"
-                  ? "Разрешите доступ к местоположению — тогда покажем расстояние от вас."
+                  ? t("geo_denied_hint")
                   : считаем
-                    ? "Считаем дорогу…"
+                    ? t("route_calc")
                     : дорога
-                      ? `Маршрут по улицам, считал ${дорога.источник}. Время без учёта пробок.`
+                      ? t("route_by_streets").replace("{s}", дорога.источник)
                       : способы.length > 0
-                        ? "Дорогу посчитать не удалось — показываем прямую между точками."
-                        : "Линия прямая: улицы и повороты знает навигатор, у него дорога выйдет длиннее."}
+                        ? t("route_calc_failed")
+                        : t("route_straight_note")}
               </p>
             </div>
 

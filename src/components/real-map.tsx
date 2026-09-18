@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import type { Map as LMap, LayerGroup } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { GOLD, GREEN } from "@/lib/theme";
+import { useT } from "@/components/lang-provider";
 import type { Geo } from "@/lib/types";
 
 /**
@@ -61,6 +62,11 @@ export default function RealMap({
   onТочка?: (g: Geo) => void;
   onВыбор?: (т: Точка) => void;
 }) {
+  const { t } = useT();
+  // Всплывающую подпись рисует Leaflet вне React, поэтому берём её
+  // заранее и кладём в зависимости эффекта — иначе после смены языка
+  // на карте оставалось бы старое слово.
+  const подписьВыЗдесь = t("geo_you_here");
   const узел = useRef<HTMLDivElement>(null);
   const карта = useRef<LMap | null>(null);
   const слой = useRef<LayerGroup | null>(null);
@@ -149,7 +155,7 @@ export default function RealMap({
         fillOpacity: 1,
       })
         .addTo(с)
-        .bindTooltip("Вы здесь", { direction: "top" });
+        .bindTooltip(подписьВыЗдесь, { direction: "top" });
     }
 
     if (!приблизить) return;
@@ -167,7 +173,7 @@ export default function RealMap({
   useEffect(() => {
     void нарисовать();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [точки, откуда, путь, приблизить]);
+  }, [точки, откуда, путь, приблизить, подписьВыЗдесь]);
 
   return <div ref={узел} style={{ height: высота, width: "100%", zIndex: 0 }} />;
 }

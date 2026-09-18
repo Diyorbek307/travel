@@ -10,7 +10,7 @@ import { Badge, GeomPattern, StarRow } from "./ui";
 import { useT } from "@/components/lang-provider";
 import { useGeo } from "@/components/geo-provider";
 import { useFavorites, переключитьИзбранное } from "@/lib/favorites";
-import { дистанцияКм, форматКм } from "@/data/geo";
+import { дистанцияКм, форматКм, статРасстояние } from "@/data/geo";
 import { glass } from "@/lib/theme";
 
 
@@ -44,7 +44,7 @@ export function PlaceDetail({ place, onBack, onPlay, onToast, onПуть }:{ pla
       </div>
       <div className="flex-1 overflow-y-auto hide-scroll px-4 pt-4">
         <div className="grid grid-cols-4 gap-2 mb-4">
-          {[{e:"📍",v:дист!=null?форматКм(дист,t("unit_km")):place.distance,k:"d_distance" as const},{e:"🎫",v:place.entry,k:"d_entry" as const},{e:"🕐",v:place.hours.length>8?t("d_always"):place.hours,k:"d_hours" as const},{e:"⏱",v:"8:42",k:"d_audio" as const}].map(s=>(
+          {[{e:"📍",v:дист!=null?форматКм(дист,t("unit_km")):статРасстояние(place.distance,t("dist_center")),k:"d_distance" as const},{e:"🎫",v:place.entry,k:"d_entry" as const},{e:"🕐",v:place.hours.length>8?t("d_always"):place.hours,k:"d_hours" as const},{e:"⏱",v:"8:42",k:"d_audio" as const}].map(s=>(
             <div key={s.k} className="bg-white rounded-2xl p-2.5 text-center shadow-sm border" style={{borderColor:BORDER}}><p className="text-base">{s.e}</p><p className="font-semibold text-[10px] mt-1 leading-tight" style={{color:TEXT}}>{s.v}</p><p className="text-[8px] mt-0.5" style={{color:MUTED}}>{t(s.k)}</p></div>
           ))}
         </div>
@@ -87,10 +87,23 @@ export function PlaceDetail({ place, onBack, onPlay, onToast, onПуть }:{ pla
   );
 }
 
+/**
+ * Дата заезда и выезда для карточки брони.
+ *
+ * Раньше даты стояли строками «30 авг 2026» — и к сентябрю заезд
+ * оказался в прошлом, а месяц не переводился. Считаем от завтрашнего
+ * дня и форматируем языком интерфейса.
+ */
+function датаЗаезда(черезНочей: number, lang: string): string {
+  const d = new Date();
+  d.setDate(d.getDate() + 1 + черезНочей);
+  return d.toLocaleDateString(lang, { day: "numeric", month: "short" });
+}
+
 // ── Hotel Detail ───────────────────────────────────────────────────────────────
 
 export function HotelDetail({ hotel, onBack, onToast }:{ hotel:Hotel; onBack:()=>void; onToast:(m:string)=>void }) {
-  const { t, трК } = useT();
+  const { t, трК, lang } = useT();
   const [imgIdx, setImgIdx] = useState(0);
   const [guests, setGuests] = useState(2);
   const [nights, setNights] = useState(2);
@@ -125,7 +138,7 @@ export function HotelDetail({ hotel, onBack, onToast }:{ hotel:Hotel; onBack:()=
         <div className="bg-white rounded-2xl p-4 mb-3 shadow-sm border" style={{borderColor:BORDER}}>
           <p className="font-bold text-sm mb-3" style={{color:TEXT}}>{t("d_booking")}</p>
           <div className="grid grid-cols-2 gap-3 mb-3">
-            {[{l:t("d_checkin"),v:"30 авг 2026"},{l:t("d_checkout"),v:`${1+nights} сент 2026`}].map(d=><div key={d.l} className="rounded-xl p-3 border" style={{background:CREAM,borderColor:BORDER}}><p className="text-[10px] font-semibold mb-0.5" style={{color:MUTED}}>{d.l}</p><p className="text-sm font-bold" style={{color:TEXT}}>{d.v}</p></div>)}
+            {[{l:t("d_checkin"),v:датаЗаезда(0,lang)},{l:t("d_checkout"),v:датаЗаезда(nights,lang)}].map(d=><div key={d.l} className="rounded-xl p-3 border" style={{background:CREAM,borderColor:BORDER}}><p className="text-[10px] font-semibold mb-0.5" style={{color:MUTED}}>{d.l}</p><p className="text-sm font-bold" style={{color:TEXT}}>{d.v}</p></div>)}
           </div>
           <div className="flex items-center justify-between mb-3">
             {[{l:t("d_nights"),v:nights,set:setNights,min:1},{l:t("d_guests"),v:guests,set:setGuests,min:1}].map(c=>(

@@ -100,53 +100,6 @@ export function SearchModal({ onClose, onPlace, initialQuery = "" }:{ onClose:()
 
 // ── Mini Audio Player ──────────────────────────────────────────────────────────
 
-export function LoginModal({ onClose, onLogin }:{ onClose:()=>void; onLogin:()=>void }) {
-  const { t, трК } = useT();
-  const { PLACES, POPULAR_CITIES } = useAppContent();
-  const PROVIDERS = [
-    { e:"🌐", label:"Продолжить с Google",    color:"#4285F4" },
-    { e:"🍎", label:"Продолжить с Apple",     color:TEXT      },
-    { e:"📧", label:"Войти по email",          color:GREEN         },
-  ];
-  return (
-    <div className="overlay-screen absolute inset-0 z-50 flex flex-col animate-slide-up" style={{background:CREAM}}>
-      <div className="relative overflow-hidden flex-shrink-0" style={{height:240,background:`linear-gradient(135deg,#0F3460 0%,#16213E 60%,#1A1A2E 100%)`}}>
-        <div className="absolute inset-0 flex items-center justify-center opacity-10"><GeomPattern opacity={1}/></div>
-        <div className="absolute inset-0 opacity-25"><AnimatedBg/></div>
-        <button onClick={onClose} className="absolute top-12 left-4 w-9 h-9 rounded-xl flex items-center justify-center z-10" style={{background:"rgba(255,255,255,0.12)"}}>
-          <svg width="16" height="16" fill="none" stroke="white" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-        </button>
-        <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
-          <LogoMark size={52} intro/>
-          <p className="text-white text-2xl font-bold mt-3" style={{fontFamily:"'Fraunces',serif"}}>UzRoam</p>
-          <p className="text-white/60 text-sm mt-1">Войди в аккаунт</p>
-        </div>
-      </div>
-      <div className="flex-1 px-6 pt-8">
-        <p className="text-center text-xs font-semibold mb-5 uppercase tracking-widest" style={{color:MUTED}}>Выберите способ входа</p>
-        <div className="space-y-3 mb-6">
-          {PROVIDERS.map(p=>(
-            <button key={p.label} onClick={onLogin} className="w-full flex items-center gap-3 py-4 rounded-2xl border font-semibold text-sm transition-all active:scale-[0.98]" style={{background:SURFACE,borderColor:BORDER,color:TEXT}}>
-              <span className="text-xl ml-4">{p.e}</span>
-              <span className="flex-1 text-left">{p.label}</span>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={MUTED} strokeWidth="2" className="mr-4"><polyline points="9 18 15 12 9 6"/></svg>
-            </button>
-          ))}
-        </div>
-        <div className="flex items-center gap-3 mb-5">
-          <div className="flex-1 h-px" style={{background:BORDER}}/>
-          <span className="text-xs" style={{color:MUTED}}>или</span>
-          <div className="flex-1 h-px" style={{background:BORDER}}/>
-        </div>
-        <button onClick={onClose} className="w-full py-3.5 rounded-2xl text-sm font-semibold border" style={{color:MUTED,borderColor:BORDER}}>
-          Продолжить без аккаунта
-        </button>
-        <p className="text-center text-[10px] mt-4 leading-relaxed" style={{color:MUTED}}>Нажимая «Войти», вы соглашаетесь<br/>с Условиями использования и Политикой конфиденциальности</p>
-      </div>
-    </div>
-  );
-}
-
 // ── Currency Converter ─────────────────────────────────────────────────────────
 
 export function PremiumModal({ onClose, onActivate }:{ onClose:()=>void; onActivate:()=>void }) {

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { Route } from "@/lib/types";
-import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE, ACCENT_SOFT, ACCENT_BORDER } from "@/lib/theme";
+import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE, ACCENT_SOFT, ACCENT_BORDER, мягко } from "@/lib/theme";
 
 import { useAppContent } from "@/components/content-provider";
 import { useT } from "@/components/lang-provider";
@@ -99,7 +99,7 @@ export function MapScreen({ onRoute }:{ onRoute:(r:Route)=>void }) {
           <div className="p-4 space-y-3">
             {ROUTES.map(r=>(
               <button key={r.id} onClick={()=>onRoute(r)} className="w-full bg-white rounded-2xl p-4 shadow-sm border text-left active:scale-[0.98]" style={{borderColor:BORDER}}>
-                <div className="flex items-center gap-3"><div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0" style={{background:r.color+"18"}}>{r.icon}</div><div className="flex-1 min-w-0"><div className="flex items-center gap-2"><p className="font-bold text-sm" style={{color:TEXT}}>{трК(r.title)}</p><Badge text={трК(r.badge)} color={r.color}/></div><p className="text-[10px] mt-0.5" style={{color:MUTED}}>{трК(r.sub)}</p><p className="text-xs font-semibold mt-1" style={{color:r.color}}>⏱ {r.duration}</p></div><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={MUTED} strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+                <div className="flex items-center gap-3"><div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0" style={{background:мягко(r.color)}}>{r.icon}</div><div className="flex-1 min-w-0"><div className="flex items-center gap-2"><p className="font-bold text-sm" style={{color:TEXT}}>{трК(r.title)}</p><Badge text={трК(r.badge)} color={r.color}/></div><p className="text-[10px] mt-0.5" style={{color:MUTED}}>{трК(r.sub)}</p><p className="text-xs font-semibold mt-1" style={{color:r.color}}>⏱ {r.duration}</p></div><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={MUTED} strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg></div>
               </button>
             ))}
           </div>
