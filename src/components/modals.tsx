@@ -40,7 +40,7 @@ export function NotifsPanel({ onClose }:{ onClose:()=>void }) {
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between gap-2"><p className="font-bold text-sm" style={{color:TEXT}}>{трК(n.title)}</p>{n.unread&&<div className="w-2 h-2 rounded-full flex-shrink-0" style={{background:GREEN}}/>}</div>
               <p className="text-xs mt-0.5 leading-relaxed" style={{color:MUTED}}>{трК(n.body)}</p>
-              <p className="text-[10px] mt-1.5" style={{color:n.unread?GREEN:MUTED}}>{n.time}</p>
+              <p className="text-[10px] mt-1.5" style={{color:n.unread?GREEN:MUTED}}>{трК(n.time)}</p>
             </div>
           </button>
         ))}
@@ -58,8 +58,20 @@ export function SearchModal({ onClose, onPlace, initialQuery = "" }:{ onClose:()
   useEffect(()=>{inputRef.current?.focus();},[]);
   useEffect(()=>{
     if(!query.trim()){setResults([]);return;}
-    setResults(PLACES.filter(p=>p.name.toLowerCase().includes(query.toLowerCase())||p.city.toLowerCase().includes(query.toLowerCase())||p.type.toLowerCase().includes(query.toLowerCase())));
-  },[query]);
+    /*
+     * Ищем по словам, а не по всей строке целиком. Подсказки вроде
+     * «Регистан Самарканд» не находили ничего: такой строки нет ни в
+     * названии («Площадь Регистан»), ни в городе («Самарканд») — а
+     * вместе они есть. Требуем, чтобы каждое слово нашлось хоть где-то.
+     */
+    const слова = query.toLowerCase().split(/\s+/).filter(Boolean);
+    setResults(PLACES.filter(p=>{
+      // Город в данных остаётся русским (по нему ищется погода), поэтому
+      // в стог кладём и его перевод — иначе «Samarkand» ничего не находит.
+      const стог = `${p.name} ${p.nameRu ?? ""} ${p.city} ${трК(p.city)} ${p.type}`.toLowerCase();
+      return слова.every(с=>стог.includes(с));
+    }));
+  },[query,PLACES,трК]);
   return (
     <div className="overlay-screen absolute inset-0 z-50 flex flex-col animate-slide-up" style={{background:CREAM}}>
       <div className="bg-white px-4 pt-14 pb-3 border-b" style={{borderColor:BORDER}}>
@@ -87,7 +99,7 @@ export function SearchModal({ onClose, onPlace, initialQuery = "" }:{ onClose:()
             </div>
             <p className="font-bold text-sm mb-2.5" style={{color:TEXT}}>{t("srch_popular")}</p>
             <div className="flex flex-wrap gap-2">
-              {SEARCH_POPULAR.map(s=><button key={s} onClick={()=>setQuery(s)} className="flex items-center gap-1.5 px-3 py-2 rounded-full border text-xs font-medium" style={{background:SURFACE,borderColor:BORDER,color:TEXT}}>{s}</button>)}
+              {SEARCH_POPULAR.map(s=><button key={s} onClick={()=>setQuery(трК(s))} className="flex items-center gap-1.5 px-3 py-2 rounded-full border text-xs font-medium" style={{background:SURFACE,borderColor:BORDER,color:TEXT}}>{трК(s)}</button>)}
             </div>
           </>
         ):results.length>0?(
@@ -95,7 +107,7 @@ export function SearchModal({ onClose, onPlace, initialQuery = "" }:{ onClose:()
             {results.map(p=>(
               <button key={p.id} onClick={()=>{onPlace(p);onClose();}} className="w-full flex gap-3 bg-white rounded-2xl overflow-hidden shadow-sm text-left border" style={{borderColor:BORDER}}>
                 <div className="w-20 flex-shrink-0 bg-gray-100"><img src={p.img} alt={p.name} className="w-full h-full object-cover" style={{height:80}}/></div>
-                <div className="flex-1 py-2.5 pr-3 min-w-0"><p className="font-bold text-sm" style={{color:TEXT}}>{p.name}</p><p className="text-xs mt-0.5" style={{color:MUTED}}>{p.city} · {p.type}</p><div className="flex items-center gap-3 mt-1.5"><StarRow rating={p.rating}/><span className="text-xs font-semibold" style={{color:GREEN}}>{p.entry}</span></div></div>
+                <div className="flex-1 py-2.5 pr-3 min-w-0"><p className="font-bold text-sm" style={{color:TEXT}}>{p.name}</p><p className="text-xs mt-0.5" style={{color:MUTED}}>{трК(p.city)} · {p.type}</p><div className="flex items-center gap-3 mt-1.5"><StarRow rating={p.rating}/><span className="text-xs font-semibold" style={{color:GREEN}}>{p.entry}</span></div></div>
               </button>
             ))}
           </div>

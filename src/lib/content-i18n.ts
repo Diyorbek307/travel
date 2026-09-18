@@ -152,6 +152,17 @@ const ЗАПИСИ: [string, Строка][] = [
   с("Световое шоу сегодня", { en: "Light show today", uz: "Bugun yorugʻlik shousi", zh: "今晚灯光秀", ko: "오늘 라이트 쇼", de: "Lichtshow heute", fr: "Spectacle de lumière aujourd'hui", ja: "今夜ライトショー", tr: "Bugün ışık gösterisi", ar: "عرض ضوئي اليوم" }),
   с("Регистан · 21:00 · Билеты от $10. Осталось 12 мест!", { en: "Registan · 21:00 · Tickets from $10. 12 seats left!", uz: "Registon · 21:00 · Chiptalar $10 dan. 12 joy qoldi!", zh: "雷吉斯坦 · 21:00 · 门票$10起，仅剩12座！", ko: "레기스탄 · 21:00 · 티켓 $10부터. 12석 남음!", de: "Registan · 21:00 · Tickets ab 10 $. Noch 12 Plätze!", fr: "Registan · 21:00 · Billets dès 10 $. 12 places restantes !", ja: "レギスタン · 21:00 · チケット$10～。残り12席！", tr: "Registan · 21:00 · Bilet 10$'dan. 12 yer kaldı!", ar: "ريغستان · 21:00 · التذاكر من 10$. بقي 12 مقعداً!" }),
   с("Скидка 15% на отели", { en: "15% off hotels", uz: "Mehmonxonalarga 15% chegirma", zh: "酒店 85 折", ko: "호텔 15% 할인", de: "15 % Rabatt auf Hotels", fr: "-15 % sur les hôtels", ja: "ホテル15%オフ", tr: "Otellerde %15 indirim", ar: "خصم 15% على الفنادق" }),
+  /* Время уведомлений и популярные запросы поиска. */
+  с("Сейчас", { en: "Just now", uz: "Hozir", zh: "刚刚", ko: "방금", de: "Gerade eben", fr: "À l'instant", ja: "たった今", tr: "Az önce", ar: "الآن" }),
+  с("1 ч назад", { en: "1 h ago", uz: "1 soat oldin", zh: "1小时前", ko: "1시간 전", de: "vor 1 Std.", fr: "il y a 1 h", ja: "1時間前", tr: "1 saat önce", ar: "قبل ساعة" }),
+  с("3 ч назад", { en: "3 h ago", uz: "3 soat oldin", zh: "3小时前", ko: "3시간 전", de: "vor 3 Std.", fr: "il y a 3 h", ja: "3時間前", tr: "3 saat önce", ar: "قبل 3 ساعات" }),
+  с("Вчера", { en: "Yesterday", uz: "Kecha", zh: "昨天", ko: "어제", de: "Gestern", fr: "Hier", ja: "昨日", tr: "Dün", ar: "أمس" }),
+  с("2 дня назад", { en: "2 days ago", uz: "2 kun oldin", zh: "2天前", ko: "2일 전", de: "vor 2 Tagen", fr: "il y a 2 jours", ja: "2日前", tr: "2 gün önce", ar: "قبل يومين" }),
+  с("Регистан Самарканд", { en: "Registan Samarkand", uz: "Registon Samarqand", zh: "雷吉斯坦 撒马尔罕", ko: "레기스탄 사마르칸트", de: "Registan Samarkand", fr: "Registan Samarcande", ja: "レギスタン サマルカンド", tr: "Registan Semerkant", ar: "ريجستان سمرقند" }),
+  с("Бухара старый город", { en: "Bukhara old town", uz: "Buxoro eski shahar", zh: "布哈拉老城", ko: "부하라 구시가", de: "Buchara Altstadt", fr: "Boukhara vieille ville", ja: "ブハラ旧市街", tr: "Buhara eski şehir", ar: "بخارى المدينة القديمة" }),
+  с("Хива Ичан-Кала", { en: "Khiva Ichan-Kala", uz: "Xiva Ichan-Qal'a", zh: "希瓦 伊禅卡拉", ko: "히바 이찬칼라", de: "Chiwa Itchan Kala", fr: "Khiva Itchan Kala", ja: "ヒヴァ イチャンカラ", tr: "Hiva İçan Kala", ar: "خيوة إيتشان قلعة" }),
+  с("Чарвак озеро", { en: "Charvak lake", uz: "Chorvoq ko'li", zh: "恰尔瓦克湖", ko: "차르박 호수", de: "Tscharwak-See", fr: "Lac Tcharvak", ja: "チャルヴァク湖", tr: "Çarvak gölü", ar: "بحيرة تشارفاك" }),
+  с("Плов Ташкент", { en: "Plov Tashkent", uz: "Osh Toshkent", zh: "抓饭 塔什干", ko: "플로프 타슈켄트", de: "Plov Taschkent", fr: "Plov Tachkent", ja: "プロフ タシケント", tr: "Plov Taşkent", ar: "بلاف طشقند" }),
   /* Расписания: длительности, интервалы, названия поездов. */
   с("1.5 ч", { en: "1.5 h", uz: "1.5 soat", zh: "1.5小时", ko: "1.5시간", de: "1,5 Std.", fr: "1,5 h", ja: "1.5時間", tr: "1,5 sa", ar: "1.5 س" }),
   с("1ч 30м", { en: "1h 30m", uz: "1 s 30 d", zh: "1小时30分", ko: "1시간 30분", de: "1 Std. 30 Min.", fr: "1 h 30", ja: "1時間30分", tr: "1 sa 30 dk", ar: "1س 30د" }),

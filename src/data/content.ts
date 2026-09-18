@@ -161,7 +161,7 @@ export const AI_REPLIES: Record<string,string> = {
 };
 export const LANGS = ["🇬🇧 English","🇷🇺 Русский","🇺🇿 O'zbek","🇨🇳 中文","🇰🇷 한국어","🇩🇪 Deutsch","🇫🇷 Français","🇯🇵 日本語","🇹🇷 Türkçe","🇸🇦 العربية"];
 export const FILTER_TABS = ["Всё","История","Мечети","Музеи","Природа","Базары","Отели","Рестораны"];
-export const SEARCH_POPULAR = ["Регистан Самарканд","Бухара старый город","Хива Ичан-Кала","Чарвак озеро","Плов Ташкент","Базар Сиаб"];
+export const SEARCH_POPULAR = ["Регистан","Бухара","Ичан-Кала","Чарвак","Базар Сиаб","Мечеть"];
 export const NOTIFS = [
   { emoji:"📍",title:"Вы рядом с Регистаном",body:"Нажмите, чтобы включить аудиогид — 8 мин истории.",time:"Сейчас",unread:true },
   { emoji:"🎫",title:"Световое шоу сегодня",body:"Регистан · 21:00 · Билеты от $10. Осталось 12 мест!",time:"1 ч назад",unread:true },
