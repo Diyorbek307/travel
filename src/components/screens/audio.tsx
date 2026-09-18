@@ -6,6 +6,7 @@ import { BORDER, CREAM, GREEN, MUTED, TEXT, WHITE, ACCENT_SOFT } from "@/lib/the
 import { PRACTICAL } from "@/data/content";
 import { useAppContent } from "@/components/content-provider";
 import { useT } from "@/components/lang-provider";
+import { useCurrency } from "@/components/currency-provider";
 import { OfflinePacks } from "@/components/widgets";
 import { AdInline } from "@/components/ads";
 import QrScanner, { КнопкаСканера } from "@/components/qr-scanner";
@@ -42,7 +43,10 @@ export function AudioScreen({
   сразуИграть?: string | null;
 }) {
   const { AUDIO, PLACES } = useAppContent();
-  const { t, трК } = useT();
+  const { t, трК, lang } = useT();
+  // Живой курс для карточки «Валюта»: вписанный в данные уже устарел.
+  const { rates } = useCurrency();
+  const курсUZS = rates["UZS"];
   const [язык, setЯзык] = useState<string | null>(null);
   const [сканер, setСканер] = useState(false);
   const [играет, setИграет] = useState<string | null>(null);
@@ -268,7 +272,12 @@ export function AudioScreen({
                   {п.icon} {трК(п.title)}
                 </p>
                 <p className="mt-1 text-xs leading-relaxed" style={{ color: MUTED }}>
-                  {трК(п.body)}
+                  {/* Курс в данных вписан навсегда («$1 = 12 740 сум») и уже
+                      разошёлся с живым курсом в конвертере. Показываем живой,
+                      а к вписанному не возвращаемся. */}
+                  {п.title === "Валюта" && курсUZS
+                    ? `$1 ≈ ${курсUZS.toLocaleString(lang, { maximumFractionDigits: 0 })} UZS. ${t("cur_live_hint")}`
+                    : трК(п.body)}
                 </p>
               </div>
             ))}

@@ -8,6 +8,7 @@ import MyBookings from "@/components/my-bookings";
 import { BORDER, CREAM, GOLD, GREEN, GREEN_LIGHT, MUTED, TEXT, WHITE, SURFACE, ACCENT_SOFT, ACCENT_DEEP } from "@/lib/theme";
 import { ACHIEVEMENTS, AI_REPLIES, STAMPS } from "@/data/content";
 import { useVisits } from "@/lib/visits";
+import { useCurrency } from "@/components/currency-provider";
 import { useFavorites } from "@/lib/favorites";
 import { useTrip } from "@/lib/trip";
 import { useSettings, задатьНастройку } from "@/lib/settings";
@@ -172,6 +173,8 @@ export function ProfileScreen({ onLogout, user, startView }:{ onLogout:()=>void;
 
   // Штампы паспорта — по-настоящему: город считается посещённым, когда
   // человек открыл в нём любое место/отель/ресторан (см. lib/visits).
+  const { rates } = useCurrency();
+  const курсUZS = rates["UZS"];
   const визиты = useVisits();
   // Числа в статистике раньше были вписаны руками («3 города, 847 км»)
   // и не менялись ни от чего. Считаем по тому, что человек правда сделал.
@@ -215,10 +218,19 @@ export function ProfileScreen({ onLogout, user, startView }:{ onLogout:()=>void;
     setInput("");setTyping(true);
     setTimeout(()=>{
       const рус=AI_REPLIES[вопрос]??"Отличный вопрос! Рекомендую посещать рано утром — свет, тишина, минимум туристов.";
-      setMessages(p=>[...p,{role:"ai",text:трК(рус),time:new Date().toLocaleTimeString(lang,{hour:"2-digit",minute:"2-digit"})}]);
+      // Курс в заготовленном ответе вписан навсегда и уже устарел.
+      // Подставляем живой из того же источника, что и конвертер.
+      const текст = вопрос === "Курс валюты?" && курсUZS
+        ? `💱 ${t("cur_title")}:
+
+$1 ≈ ${курсUZS.toLocaleString(lang, { maximumFractionDigits: 0 })} UZS
+
+${t("cur_live_hint")}`
+        : трК(рус);
+      setMessages(p=>[...p,{role:"ai",text:текст,time:new Date().toLocaleTimeString(lang,{hour:"2-digit",minute:"2-digit"})}]);
       setTyping(false);
     },1400);
-  },[трК,lang]);
+  },[трК,lang,t,курсUZS]);
   useEffect(()=>{bottomRef.current?.scrollIntoView({behavior:"smooth"});},[messages,typing]);
 
   const TABS: [typeof view, string, TKey][] = [

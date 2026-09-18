@@ -20,6 +20,10 @@
  * светлом — глубже, иначе она не читается на белом.
  */
 :root {
+  /* Объявляем схему браузеру: без неё он рисует системные полосы
+     прокрутки, поля ввода и выпадающие списки светлыми поверх тёмной
+     темы — справа оставалась белая полоса. */
+  color-scheme: light;
   --gold: #e9c46a;
   --accent: #0fb3ac;
   --accent-soft: rgba(15, 179, 172, 0.12);
@@ -44,6 +48,7 @@
    «тёмная» и человек не выбрал светлую вручную — либо выбрал тёмную сам. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
+    color-scheme: dark;
     --accent: #3fe0dc;
     --accent-soft: rgba(63, 224, 220, 0.14);
     --accent-border: rgba(63, 224, 220, 0.32);
@@ -61,6 +66,7 @@
   }
 }
 html[data-theme="dark"] {
+  color-scheme: dark;
   --accent: #3fe0dc;
   --accent-soft: rgba(63, 224, 220, 0.14);
   --accent-border: rgba(63, 224, 220, 0.32);
@@ -102,6 +108,12 @@ body {
   height: 100%;
   margin: 0;
   padding: 0;
+}
+
+/* Фон и на html: при оттягивании экрана и там, где тело его не красит,
+   иначе из-под приложения выглядывает белое. */
+html {
+  background: var(--cream);
 }
 
 body {
