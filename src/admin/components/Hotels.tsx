@@ -102,7 +102,7 @@ export default function Hotels() {
               className="px-3 py-1.5 rounded text-xs font-medium transition-all cursor-pointer capitalize"
               style={{
                 background: filter === c ? "var(--color-amber)" : "var(--color-panel)",
-                color: filter === c ? "#0d0c0a" : "var(--color-muted)",
+                color: filter === c ? "var(--color-on-accent)" : "var(--color-muted)",
                 border: "1px solid var(--color-border)",
                 fontFamily: "var(--font-mono)",
               }}

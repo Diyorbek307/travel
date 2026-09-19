@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { PageHeader, Badge, Btn, SectionTitle } from "./shared";
+import { PageHeader, Badge, Btn, SectionTitle, ДемоРаздел } from "./shared";
 
 type Permission =
   | "dashboard" | "bookings" | "calendar" | "analytics"
@@ -160,6 +160,7 @@ export default function Staff() {
 
   return (
     <div className="p-4 sm:p-7">
+      <ДемоРаздел что="Учётных записей сотрудников в системе нет — вход в панель один, общий по паролю." />
       <PageHeader
         title="Сотрудники"
         subtitle={`${staff.filter(s => s.status === "active").length} активных · ${staff.filter(s => s.status === "pending").length} ожидают`}
@@ -186,7 +187,7 @@ export default function Staff() {
         {["все", "активные", "ожидание", "заблокированные"].map(f => (
           <button key={f} onClick={() => setFilter(f)}
             className="px-3 py-1.5 rounded text-xs cursor-pointer capitalize"
-            style={{ background: filter === f ? "var(--color-amber)" : "var(--color-panel)", color: filter === f ? "#0d0c0a" : "var(--color-muted)", border: "1px solid var(--color-border)", fontFamily: "var(--font-mono)" }}
+            style={{ background: filter === f ? "var(--color-amber)" : "var(--color-panel)", color: filter === f ? "var(--color-on-accent)" : "var(--color-muted)", border: "1px solid var(--color-border)", fontFamily: "var(--font-mono)" }}
           >{f}</button>
         ))}
       </div>
@@ -279,7 +280,7 @@ export default function Staff() {
                             className="rounded px-2 py-0.5 text-xs transition-all"
                             style={{
                               background: active ? "var(--color-amber)" : "var(--color-surface)",
-                              color: active ? "#0d0c0a" : "var(--color-muted)",
+                              color: active ? "var(--color-on-accent)" : "var(--color-muted)",
                               border: "1px solid var(--color-border)",
                               fontFamily: "var(--font-mono)",
                               cursor: editing ? "pointer" : "default",
@@ -362,7 +363,7 @@ export default function Staff() {
                           <button key={p.id}
                             onClick={() => togglePerm(p.id, invite.permissions, (perms) => setInvite(prev => ({ ...prev, permissions: perms })))}
                             className="rounded px-2 py-0.5 text-xs cursor-pointer transition-all"
-                            style={{ background: on ? "var(--color-amber)" : "var(--color-surface)", color: on ? "#0d0c0a" : "var(--color-muted)", border: "1px solid var(--color-border)", fontFamily: "var(--font-mono)" }}
+                            style={{ background: on ? "var(--color-amber)" : "var(--color-surface)", color: on ? "var(--color-on-accent)" : "var(--color-muted)", border: "1px solid var(--color-border)", fontFamily: "var(--font-mono)" }}
                           >{p.label}</button>
                         );
                       })}

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { PageHeader, Badge, Btn, SectionTitle } from "./shared";
+import { PageHeader, Badge, Btn, SectionTitle, ДемоРаздел } from "./shared";
 
 type Role = {
   id: number;
@@ -75,6 +75,7 @@ export default function AccessControl() {
 
   return (
     <div className="p-4 sm:p-7">
+      <ДемоРаздел что="Ролей и прав в системе нет — панель открывается одним общим паролем." />
       <PageHeader
         title="Управление доступом"
         subtitle="Роли, права и управление командой администраторов"
@@ -86,7 +87,7 @@ export default function AccessControl() {
         {([["roles", "Роли и права"], ["users", "Администраторы"], ["audit", "Журнал аудита"]] as const).map(([id, label]) => (
           <button key={id} onClick={() => setTab(id)}
             className="px-4 py-2 rounded text-sm cursor-pointer transition-all"
-            style={{ background: tab === id ? "var(--color-amber)" : "var(--color-panel)", color: tab === id ? "#0d0c0a" : "var(--color-muted)", border: "1px solid var(--color-border)", fontFamily: "var(--font-body)" }}
+            style={{ background: tab === id ? "var(--color-amber)" : "var(--color-panel)", color: tab === id ? "var(--color-on-accent)" : "var(--color-muted)", border: "1px solid var(--color-border)", fontFamily: "var(--font-body)" }}
           >{label}</button>
         ))}
       </div>
@@ -179,8 +180,8 @@ export default function AccessControl() {
                 <div className="flex items-center gap-2 mb-0.5 flex-wrap">
                   <span className="font-medium text-sm" style={{ color: "var(--color-text)" }}>{u.name}</span>
                   <span className="text-xs rounded px-2 py-0.5" style={{ background: roleColor(u.role) + "22", color: roleColor(u.role), fontFamily: "var(--font-mono)" }}>{u.role}</span>
-                  {u.twofa && <span className="text-xs rounded px-2 py-0.5" style={{ background: "rgba(42,141,122,0.15)", color: "var(--color-teal)", fontFamily: "var(--font-mono)" }}>2FA ✓</span>}
-                  {!u.twofa && <span className="text-xs rounded px-2 py-0.5" style={{ background: "rgba(196,90,66,0.1)", color: "var(--color-rose)", fontFamily: "var(--font-mono)" }}>Без 2FA</span>}
+                  {u.twofa && <span className="text-xs rounded px-2 py-0.5" style={{ background: "color-mix(in srgb, var(--color-teal) 15%, transparent)", color: "var(--color-teal)", fontFamily: "var(--font-mono)" }}>2FA ✓</span>}
+                  {!u.twofa && <span className="text-xs rounded px-2 py-0.5" style={{ background: "color-mix(in srgb, var(--color-rose) 10%, transparent)", color: "var(--color-rose)", fontFamily: "var(--font-mono)" }}>Без 2FA</span>}
                 </div>
                 <div className="text-xs" style={{ color: "var(--color-muted)" }}>{u.email} · {u.lastActive}</div>
               </div>

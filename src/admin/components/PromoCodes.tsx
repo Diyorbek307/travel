@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { PageHeader, Badge, Btn, Card, SectionTitle } from "./shared";
+import { PageHeader, Badge, Btn, Card, SectionTitle, ДемоРаздел } from "./shared";
 
 type Promo = {
   id: number;
@@ -77,6 +77,7 @@ export default function PromoCodes() {
 
   return (
     <div className="p-4 sm:p-7">
+      <ДемоРаздел что="Промокоды нигде не проверяются: приложение о них не знает." />
       <PageHeader
         title="Промокоды и скидки"
         subtitle={`${activeCount} активных · ${totalUsed.toLocaleString()} использований · $${totalRevenue.toLocaleString()} влияние на выручку`}
@@ -105,7 +106,7 @@ export default function PromoCodes() {
             className="px-3 py-1.5 rounded text-xs cursor-pointer transition-all"
             style={{
               background: filter === f ? "var(--color-amber)" : "var(--color-panel)",
-              color: filter === f ? "#0d0c0a" : "var(--color-muted)",
+              color: filter === f ? "var(--color-on-accent)" : "var(--color-muted)",
               border: "1px solid var(--color-border)", fontFamily: "var(--font-mono)",
             }}
           >{label}</button>
@@ -205,7 +206,7 @@ export default function PromoCodes() {
                   {([["percent", "Процент"], ["fixed", "Фикс. сумма"], ["free_transport", "Бесплатное такси"], ["upgrade", "Апгрейд"]] as [string, string][]).map(([t, tLabel]) => (
                     <button key={t} onClick={() => setNewCode(p => ({ ...p, type: t }))}
                       className="px-2.5 py-1 rounded text-xs cursor-pointer"
-                      style={{ background: newCode.type === t ? "var(--color-amber)" : "var(--color-surface)", color: newCode.type === t ? "#0d0c0a" : "var(--color-muted)", border: "1px solid var(--color-border)" }}
+                      style={{ background: newCode.type === t ? "var(--color-amber)" : "var(--color-surface)", color: newCode.type === t ? "var(--color-on-accent)" : "var(--color-muted)", border: "1px solid var(--color-border)" }}
                     >{tLabel}</button>
                   ))}
                 </div>
@@ -216,7 +217,7 @@ export default function PromoCodes() {
                   {([["all", "Всё"], ["tours", "Туры"], ["hotels", "Отели"], ["transport", "Транспорт"]] as [string, string][]).map(([c, cLabel]) => (
                     <button key={c} onClick={() => setNewCode(p => ({ ...p, category: c }))}
                       className="px-2.5 py-1 rounded text-xs cursor-pointer"
-                      style={{ background: newCode.category === c ? "var(--color-amber)" : "var(--color-surface)", color: newCode.category === c ? "#0d0c0a" : "var(--color-muted)", border: "1px solid var(--color-border)" }}
+                      style={{ background: newCode.category === c ? "var(--color-amber)" : "var(--color-surface)", color: newCode.category === c ? "var(--color-on-accent)" : "var(--color-muted)", border: "1px solid var(--color-border)" }}
                     >{cLabel}</button>
                   ))}
                 </div>

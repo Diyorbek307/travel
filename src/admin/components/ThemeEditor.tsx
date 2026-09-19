@@ -54,8 +54,8 @@ const PRESETS: Array<{ name: string; theme: Partial<ThemeVars> }> = [
     name: "Шёлковый путь (тёмная)",
     theme: {
       colorBg: "#09080a", colorSurface: "#110f14", colorPanel: "#181520",
-      colorBorder: "#26223a", colorAmber: "#e8a030", colorTeal: "#18b89a",
-      colorRose: "#e05a42", colorText: "#f4eefc", colorMuted: "#8070a0",
+      colorBorder: "#26223a", colorAmber: "var(--color-amber)", colorTeal: "#18b89a",
+      colorRose: "var(--color-rose)", colorText: "var(--color-text)", colorMuted: "var(--color-muted)",
       colorDim: "#382e50", radiusCard: "10px", radiusBtn: "8px",
     },
   },
@@ -137,7 +137,7 @@ export default function ThemeEditor() {
         {([["editor", "Редактор"], ["presets", "Пресеты"], ["history", `История (${history.length})`]] as const).map(([id, label]) => (
           <button key={id} onClick={() => setTab(id)}
             className="px-4 py-2 rounded text-sm cursor-pointer transition-all"
-            style={{ background: tab === id ? "var(--color-amber)" : "var(--color-panel)", color: tab === id ? "#0d0c0a" : "var(--color-muted)", border: "1px solid var(--color-border)", fontFamily: "var(--font-body)" }}
+            style={{ background: tab === id ? "var(--color-amber)" : "var(--color-panel)", color: tab === id ? "var(--color-on-accent)" : "var(--color-muted)", border: "1px solid var(--color-border)", fontFamily: "var(--font-body)" }}
           >{label}</button>
         ))}
       </div>
@@ -231,7 +231,7 @@ export default function ThemeEditor() {
                           style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", color: "var(--color-text)", fontFamily: "var(--font-mono)" }}
                         />
                         <div className="flex gap-1.5 flex-wrap">
-                          {["#d4872a", "#2a8d7a", "#c45a42", "#3b82f6", "#10b981", "#8b5cf6", "#f59e0b", "#ef4444", "#06b6d4", "#ec4899", "#84cc16", "#ffffff", "#000000"].map(c => (
+                          {["var(--color-amber)", "var(--color-teal)", "var(--color-rose)", "#3b82f6", "#10b981", "#8b5cf6", "#f59e0b", "#ef4444", "#06b6d4", "#ec4899", "#84cc16", "#ffffff", "#000000"].map(c => (
                             <button key={c} onClick={() => setVar(selected, c)}
                               className="w-5 h-5 rounded cursor-pointer hover:scale-110 transition-transform border"
                               style={{ background: c, border: theme[selected] === c ? "2px solid var(--color-text)" : "1px solid var(--color-border)" }}
@@ -248,7 +248,7 @@ export default function ThemeEditor() {
                           className="px-3 py-2 rounded text-xs cursor-pointer transition-all"
                           style={{
                             background: theme[selected] === opt ? "var(--color-amber)" : "var(--color-surface)",
-                            color: theme[selected] === opt ? "#0d0c0a" : "var(--color-muted)",
+                            color: theme[selected] === opt ? "var(--color-on-accent)" : "var(--color-muted)",
                             border: "1px solid var(--color-border)",
                             fontFamily: prop.key.includes("font") ? opt.split(",")[0].replace(/'/g, "").trim() : "var(--font-mono)",
                           }}
@@ -277,7 +277,7 @@ export default function ThemeEditor() {
                   <div className="text-xs mb-2" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>КНОПКИ</div>
                   <div className="flex gap-3 flex-wrap">
                     <button className="px-4 py-2 text-sm font-medium cursor-pointer hover:opacity-80 transition-opacity"
-                      style={{ background: "var(--color-amber)", color: "#0d0c0a", borderRadius: "var(--radius-btn)", border: "none", fontFamily: "var(--font-body)" }}>
+                      style={{ background: "var(--color-amber)", color: "var(--color-on-accent)", borderRadius: "var(--radius-btn)", border: "none", fontFamily: "var(--font-body)" }}>
                       Основной
                     </button>
                     <button className="px-4 py-2 text-sm cursor-pointer hover:opacity-80 transition-opacity"
@@ -285,7 +285,7 @@ export default function ThemeEditor() {
                       Вторичный
                     </button>
                     <button className="px-4 py-2 text-sm cursor-pointer hover:opacity-80 transition-opacity"
-                      style={{ background: "rgba(196,90,66,0.15)", color: "var(--color-rose)", borderRadius: "var(--radius-btn)", border: "1px solid rgba(196,90,66,0.3)", fontFamily: "var(--font-body)" }}>
+                      style={{ background: "color-mix(in srgb, var(--color-rose) 15%, transparent)", color: "var(--color-rose)", borderRadius: "var(--radius-btn)", border: "1px solid color-mix(in srgb, var(--color-rose) 30%, transparent)", fontFamily: "var(--font-body)" }}>
                       Опасность
                     </button>
                   </div>
@@ -302,8 +302,8 @@ export default function ThemeEditor() {
                       The Registan was the ancient heart of the Silk Road city of Samarkand, now in Uzbekistan.
                     </p>
                     <div className="flex flex-wrap gap-2 mt-3">
-                      <span className="text-xs px-2 py-0.5 rounded" style={{ background: "rgba(212,135,42,0.15)", color: "var(--color-amber)", fontFamily: "var(--font-mono)" }}>active</span>
-                      <span className="text-xs px-2 py-0.5 rounded" style={{ background: "rgba(42,141,122,0.15)", color: "var(--color-teal)", fontFamily: "var(--font-mono)" }}>featured</span>
+                      <span className="text-xs px-2 py-0.5 rounded" style={{ background: "color-mix(in srgb, var(--color-amber) 15%, transparent)", color: "var(--color-amber)", fontFamily: "var(--font-mono)" }}>active</span>
+                      <span className="text-xs px-2 py-0.5 rounded" style={{ background: "color-mix(in srgb, var(--color-teal) 15%, transparent)", color: "var(--color-teal)", fontFamily: "var(--font-mono)" }}>featured</span>
                     </div>
                   </div>
                 </div>
@@ -362,22 +362,22 @@ export default function ThemeEditor() {
               style={{ border: "1px solid var(--color-border)" }}
             >
               {/* Color preview */}
-              <div className="h-28 relative" style={{ background: preset.theme.colorBg ?? "#0d0c0a" }}>
+              <div className="h-28 relative" style={{ background: preset.theme.colorBg ?? "var(--color-on-accent)" }}>
                 {/* Mock sidebar */}
-                <div className="absolute left-0 top-0 bottom-0 w-16" style={{ background: preset.theme.colorSurface ?? "#151410", borderRight: `1px solid ${preset.theme.colorBorder ?? "#2a261e"}` }}>
+                <div className="absolute left-0 top-0 bottom-0 w-16" style={{ background: preset.theme.colorSurface ?? "#151410", borderRight: `1px solid ${preset.theme.colorBorder ?? "var(--color-border)"}` }}>
                   <div className="mt-3 mx-2 flex flex-col gap-1.5">
                     {[1, 2, 3, 4].map(i => (
-                      <div key={i} className="h-1.5 rounded-full" style={{ background: i === 1 ? (preset.theme.colorAmber ?? "#d4872a") : (preset.theme.colorDim ?? "#4a4237"), width: i === 1 ? "80%" : `${50 + i * 8}%` }} />
+                      <div key={i} className="h-1.5 rounded-full" style={{ background: i === 1 ? (preset.theme.colorAmber ?? "var(--color-amber)") : (preset.theme.colorDim ?? "#4a4237"), width: i === 1 ? "80%" : `${50 + i * 8}%` }} />
                     ))}
                   </div>
                 </div>
                 {/* Mock content */}
                 <div className="absolute left-20 top-3 right-3">
-                  <div className="h-3 w-24 rounded mb-2" style={{ background: preset.theme.colorText ?? "#f0ebe0", opacity: 0.9 }} />
+                  <div className="h-3 w-24 rounded mb-2" style={{ background: preset.theme.colorText ?? "var(--color-text)", opacity: 0.9 }} />
                   <div className="flex flex-wrap gap-2 mb-2">
                     {[preset.theme.colorAmber, preset.theme.colorTeal, preset.theme.colorRose].map((c, i) => (
-                      <div key={i} className="h-10 min-w-0 flex-1 rounded" style={{ background: preset.theme.colorPanel ?? "#1c1a15", border: `1px solid ${preset.theme.colorBorder ?? "#2a261e"}` }}>
-                        <div className="h-1 mt-3 mx-2 rounded" style={{ background: c ?? "#d4872a", opacity: 0.8 }} />
+                      <div key={i} className="h-10 min-w-0 flex-1 rounded" style={{ background: preset.theme.colorPanel ?? "#1c1a15", border: `1px solid ${preset.theme.colorBorder ?? "var(--color-border)"}` }}>
+                        <div className="h-1 mt-3 mx-2 rounded" style={{ background: c ?? "var(--color-amber)", opacity: 0.8 }} />
                       </div>
                     ))}
                   </div>

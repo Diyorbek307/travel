@@ -54,7 +54,7 @@ export default function Tours() {
                 className="px-3 py-1.5 rounded text-xs font-medium transition-all cursor-pointer"
                 style={{
                   background: filter === f ? "var(--color-amber)" : "var(--color-panel)",
-                  color: filter === f ? "#0d0c0a" : "var(--color-muted)",
+                  color: filter === f ? "var(--color-on-accent)" : "var(--color-muted)",
                   border: "1px solid var(--color-border)",
                   fontFamily: "var(--font-mono)",
                 }}
@@ -75,9 +75,9 @@ export default function Tours() {
               onClick={() => setCatFilter(c)}
               className="px-3 py-1.5 rounded text-xs transition-all cursor-pointer capitalize"
               style={{
-                background: catFilter === c ? "rgba(212,135,42,0.15)" : "transparent",
+                background: catFilter === c ? "color-mix(in srgb, var(--color-amber) 15%, transparent)" : "transparent",
                 color: catFilter === c ? "var(--color-amber)" : "var(--color-muted)",
-                border: `1px solid ${catFilter === c ? "rgba(212,135,42,0.4)" : "var(--color-border)"}`,
+                border: `1px solid ${catFilter === c ? "color-mix(in srgb, var(--color-amber) 40%, transparent)" : "var(--color-border)"}`,
                 fontFamily: "var(--font-mono)",
               }}
             >
@@ -137,7 +137,7 @@ export default function Tours() {
                   {["Cultural","Adventure","Craft","Expedition","Food & Wine","Urban"].map(c => (
                     <button key={c} onClick={() => setNewTour(p => ({ ...p, category: c }))}
                       className="px-2.5 py-1 rounded text-xs cursor-pointer"
-                      style={{ background: newTour.category === c ? "var(--color-amber)" : "var(--color-surface)", color: newTour.category === c ? "#0d0c0a" : "var(--color-muted)", border: "1px solid var(--color-border)" }}
+                      style={{ background: newTour.category === c ? "var(--color-amber)" : "var(--color-surface)", color: newTour.category === c ? "var(--color-on-accent)" : "var(--color-muted)", border: "1px solid var(--color-border)" }}
                     >{c}</button>
                   ))}
                 </div>
@@ -152,7 +152,7 @@ export default function Tours() {
                   price: Number(newTour.price) || 100, difficulty: "Easy" as const, category: newTour.category,
                   bookings: 0, maxGroup: Number(newTour.maxGroup) || 12, status: "draft" as const,
                   nextDep: "TBD", guide: newTour.guide || "Не назначен", rating: 0,
-                  sub: newTour.category, icon: "🗺️", color: "#2E7D5A",
+                  sub: newTour.category, icon: "🗺️", color: "var(--color-teal)",
                   badge: newTour.category, stops: [],
                 }]);
                 setShowAdd(false);

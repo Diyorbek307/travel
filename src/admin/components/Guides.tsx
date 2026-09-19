@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { PageHeader, Badge, Btn, Card, SectionTitle } from "./shared";
+import { PageHeader, Badge, Btn, Card, SectionTitle, ДемоРаздел } from "./shared";
 
 type Guide = {
   id: number;
@@ -133,6 +133,7 @@ export default function Guides() {
 
   return (
     <div className="p-4 sm:p-7">
+      <ДемоРаздел что="Гиды заводятся вручную и нигде не хранятся: список пропадёт при перезагрузке страницы." />
       <PageHeader
         title="Гиды"
         subtitle={`${guides.length} гидов · ${onTour} в туре · ${available} доступно`}
@@ -170,7 +171,7 @@ export default function Guides() {
               className="px-3 py-1.5 rounded text-xs cursor-pointer capitalize transition-all"
               style={{
                 background: filter === f ? "var(--color-amber)" : "var(--color-panel)",
-                color: filter === f ? "#0d0c0a" : "var(--color-muted)",
+                color: filter === f ? "var(--color-on-accent)" : "var(--color-muted)",
                 border: "1px solid var(--color-border)", fontFamily: "var(--font-mono)",
               }}
             >{{ all: "все", available: "активен", on_tour: "в туре", off_duty: "не в туре", suspended: "отстранён" }[f]}</button>
@@ -181,9 +182,9 @@ export default function Guides() {
             <button key={c} onClick={() => setCityFilter(c)}
               className="px-3 py-1.5 rounded text-xs cursor-pointer transition-all"
               style={{
-                background: cityFilter === c ? "rgba(212,135,42,0.15)" : "transparent",
+                background: cityFilter === c ? "color-mix(in srgb, var(--color-amber) 15%, transparent)" : "transparent",
                 color: cityFilter === c ? "var(--color-amber)" : "var(--color-muted)",
-                border: `1px solid ${cityFilter === c ? "rgba(212,135,42,0.4)" : "var(--color-border)"}`,
+                border: `1px solid ${cityFilter === c ? "color-mix(in srgb, var(--color-amber) 40%, transparent)" : "var(--color-border)"}`,
                 fontFamily: "var(--font-mono)",
               }}
             >{c}</button>
@@ -199,10 +200,10 @@ export default function Guides() {
             className="rounded-xl p-5 cursor-pointer transition-all"
             style={{
               background: "var(--color-panel)",
-              border: `1px solid ${g.status === "on_tour" ? "rgba(212,135,42,0.3)" : "var(--color-border)"}`,
+              border: `1px solid ${g.status === "on_tour" ? "color-mix(in srgb, var(--color-amber) 30%, transparent)" : "var(--color-border)"}`,
             }}
             onMouseEnter={e => (e.currentTarget.style.borderColor = "var(--color-amber)")}
-            onMouseLeave={e => (e.currentTarget.style.borderColor = g.status === "on_tour" ? "rgba(212,135,42,0.3)" : "var(--color-border)")}
+            onMouseLeave={e => (e.currentTarget.style.borderColor = g.status === "on_tour" ? "color-mix(in srgb, var(--color-amber) 30%, transparent)" : "var(--color-border)")}
             onClick={() => setSelected(g)}
           >
             <div className="flex flex-wrap items-start gap-3 mb-3">
@@ -243,7 +244,7 @@ export default function Guides() {
             {/* Specialties */}
             <div className="flex flex-wrap gap-1 mb-3">
               {g.specialties.map(s => (
-                <span key={s} className="text-xs px-2 py-0.5 rounded" style={{ background: "rgba(212,135,42,0.08)", color: "var(--color-amber)", fontFamily: "var(--font-mono)" }}>
+                <span key={s} className="text-xs px-2 py-0.5 rounded" style={{ background: "color-mix(in srgb, var(--color-amber) 8%, transparent)", color: "var(--color-amber)", fontFamily: "var(--font-mono)" }}>
                   {s}
                 </span>
               ))}
@@ -383,7 +384,7 @@ export default function Guides() {
                   <div className="text-xs mb-2" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>ГОРОДА</div>
                   <div className="flex flex-wrap gap-1">
                     {selected.cities.map(c => (
-                      <span key={c} className="text-xs px-2 py-0.5 rounded" style={{ background: "rgba(212,135,42,0.08)", color: "var(--color-amber)" }}>{c}</span>
+                      <span key={c} className="text-xs px-2 py-0.5 rounded" style={{ background: "color-mix(in srgb, var(--color-amber) 8%, transparent)", color: "var(--color-amber)" }}>{c}</span>
                     ))}
                   </div>
                 </div>
@@ -393,7 +394,7 @@ export default function Guides() {
                 <div className="text-xs mb-2" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>СЕРТИФИКАТЫ</div>
                 <div className="flex flex-wrap gap-1.5">
                   {selected.certifications.map(c => (
-                    <span key={c} className="text-xs px-2 py-1 rounded" style={{ background: "rgba(42,141,122,0.1)", border: "1px solid rgba(42,141,122,0.2)", color: "var(--color-teal)" }}>{c}</span>
+                    <span key={c} className="text-xs px-2 py-1 rounded" style={{ background: "color-mix(in srgb, var(--color-teal) 10%, transparent)", border: "1px solid rgba(42,141,122,0.2)", color: "var(--color-teal)" }}>{c}</span>
                   ))}
                 </div>
               </div>

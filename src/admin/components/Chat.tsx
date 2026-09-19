@@ -213,7 +213,7 @@ export default function Chat() {
                           className="max-w-[80%] rounded-lg px-3 py-2 text-sm"
                           style={{
                             background: оператор ? "var(--color-amber)" : "var(--color-bg)",
-                            color: оператор ? "#0d0c0a" : "var(--color-text)",
+                            color: оператор ? "var(--color-on-accent)" : "var(--color-text)",
                           }}
                         >
                           <p className="whitespace-pre-wrap break-words">{m.text}</p>

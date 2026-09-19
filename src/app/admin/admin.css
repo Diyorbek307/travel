@@ -12,17 +12,19 @@
  */
 
 :root {
-  --color-bg: #09080a;
-  --color-surface: #110f14;
-  --color-panel: #181520;
-  --color-border: #26223a;
-  --color-amber: #e8a030;
-  --color-amber-light: #e8a84a;
-  --color-teal: #18b89a;
-  --color-rose: #e05a42;
-  --color-text: #f4eefc;
-  --color-muted: #8070a0;
-  --color-dim: #382e50;
+  --color-bg: #070d0c;
+  --color-surface: #0d1716;
+  --color-panel: #131a18;
+  --color-border: #202b28;
+  --color-amber: #3fe0dc;
+  --color-amber-light: #7ff3ef;
+  --color-teal: #c9f24a;
+  --color-rose: #ff6b5a;
+  --color-text: #e8f1ef;
+  --color-muted: #8a9b96;
+  --color-dim: #26332f;
+  /* Текст на заливке акцентом: акцент светлый, белым по нему не видно. */
+  --color-on-accent: #05100f;
 
   --radius-card: 10px;
   --radius-btn: 8px;

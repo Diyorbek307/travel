@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { PageHeader, Badge, Btn, Card, SectionTitle } from "./shared";
+import { PageHeader, Badge, Btn, Card, SectionTitle, ДемоРаздел } from "./shared";
 
 type Campaign = {
   id: number;
@@ -47,6 +47,7 @@ export default function PushCampaigns() {
 
   return (
     <div className="p-4 sm:p-7">
+      <ДемоРаздел что="Push-уведомления не подключены, рассылка никуда не уходит." />
       <PageHeader
         title="Push-уведомления"
         subtitle="Мобильные кампании, сегменты и аналитика доставки"
@@ -73,7 +74,7 @@ export default function PushCampaigns() {
         {([["campaigns", "Кампании"], ["compose", "Создать"], ["segments", "Сегменты"]] as const).map(([id, label]) => (
           <button key={id} onClick={() => setTab(id)}
             className="px-4 py-2 rounded text-sm cursor-pointer transition-all"
-            style={{ background: tab === id ? "var(--color-amber)" : "var(--color-panel)", color: tab === id ? "#0d0c0a" : "var(--color-muted)", border: "1px solid var(--color-border)", fontFamily: "var(--font-body)" }}
+            style={{ background: tab === id ? "var(--color-amber)" : "var(--color-panel)", color: tab === id ? "var(--color-on-accent)" : "var(--color-muted)", border: "1px solid var(--color-border)", fontFamily: "var(--font-body)" }}
           >{label}</button>
         ))}
       </div>
@@ -84,7 +85,7 @@ export default function PushCampaigns() {
             {["all", "sent", "scheduled", "draft"].map(f => (
               <button key={f} onClick={() => setFilter(f)}
                 className="px-3 py-1.5 rounded text-xs cursor-pointer"
-                style={{ background: filter === f ? "var(--color-amber)" : "var(--color-panel)", color: filter === f ? "#0d0c0a" : "var(--color-muted)", border: "1px solid var(--color-border)", fontFamily: "var(--font-mono)" }}
+                style={{ background: filter === f ? "var(--color-amber)" : "var(--color-panel)", color: filter === f ? "var(--color-on-accent)" : "var(--color-muted)", border: "1px solid var(--color-border)", fontFamily: "var(--font-mono)" }}
               >{{ all:"Все", sent:"Отправлено", scheduled:"Запланировано", draft:"Черновик" }[f]}</button>
             ))}
           </div>
@@ -195,7 +196,7 @@ export default function PushCampaigns() {
                   {["now", "schedule"].map(s => (
                     <button key={s} onClick={() => setCompose(p => ({ ...p, schedule: s }))}
                       className="px-3 py-1.5 rounded text-xs cursor-pointer capitalize"
-                      style={{ background: compose.schedule === s ? "var(--color-amber)" : "var(--color-surface)", color: compose.schedule === s ? "#0d0c0a" : "var(--color-muted)", border: "1px solid var(--color-border)" }}
+                      style={{ background: compose.schedule === s ? "var(--color-amber)" : "var(--color-surface)", color: compose.schedule === s ? "var(--color-on-accent)" : "var(--color-muted)", border: "1px solid var(--color-border)" }}
                     >{s === "now" ? "Отправить сейчас" : "Запланировать"}</button>
                   ))}
                 </div>
@@ -236,7 +237,7 @@ export default function PushCampaigns() {
                 {/* Notification bubble */}
                 <div className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.12)", backdropFilter: "blur(12px)" }}>
                   <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                    <div className="w-5 h-5 rounded-md flex items-center justify-center text-xs" style={{ background: "var(--color-amber)", color: "#0d0c0a" }}>UZ</div>
+                    <div className="w-5 h-5 rounded-md flex items-center justify-center text-xs" style={{ background: "var(--color-amber)", color: "var(--color-on-accent)" }}>UZ</div>
                     <span className="text-xs font-medium text-white">Uzbekistan Travel</span>
                     <span className="text-xs ml-auto" style={{ color: "rgba(255,255,255,0.5)" }}>сейчас</span>
                   </div>

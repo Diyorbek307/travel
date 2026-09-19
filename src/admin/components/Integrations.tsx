@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { PageHeader, Badge, Btn, SectionTitle, Card } from "./shared";
+import { PageHeader, Badge, Btn, SectionTitle, Card, ДемоРаздел } from "./shared";
 
 type ApiKey = {
   id: number;
@@ -61,6 +61,7 @@ export default function Integrations() {
 
   return (
     <div className="p-4 sm:p-7">
+      <ДемоРаздел что="Ни один из перечисленных сервисов пока не подключён — это список кандидатов." />
       <PageHeader
         title="API и интеграции"
         subtitle="API-ключи, сторонние сервисы и вебхуки"
@@ -72,7 +73,7 @@ export default function Integrations() {
         {([["keys", "API-ключи"], ["integrations", "Сервисы"], ["webhooks", "Вебхуки"]] as const).map(([id, label]) => (
           <button key={id} onClick={() => setTab(id)}
             className="px-4 py-2 rounded text-sm cursor-pointer transition-all"
-            style={{ background: tab === id ? "var(--color-amber)" : "var(--color-panel)", color: tab === id ? "#0d0c0a" : "var(--color-muted)", border: "1px solid var(--color-border)", fontFamily: "var(--font-body)" }}
+            style={{ background: tab === id ? "var(--color-amber)" : "var(--color-panel)", color: tab === id ? "var(--color-on-accent)" : "var(--color-muted)", border: "1px solid var(--color-border)", fontFamily: "var(--font-body)" }}
           >{label}</button>
         ))}
       </div>
@@ -132,14 +133,14 @@ export default function Integrations() {
             {categories.map(c => (
               <button key={c} onClick={() => setCatFilter(c)}
                 className="px-3 py-1.5 rounded text-xs cursor-pointer"
-                style={{ background: catFilter === c ? "var(--color-amber)" : "var(--color-panel)", color: catFilter === c ? "#0d0c0a" : "var(--color-muted)", border: "1px solid var(--color-border)", fontFamily: "var(--font-mono)" }}
+                style={{ background: catFilter === c ? "var(--color-amber)" : "var(--color-panel)", color: catFilter === c ? "var(--color-on-accent)" : "var(--color-muted)", border: "1px solid var(--color-border)", fontFamily: "var(--font-mono)" }}
               >{c}</button>
             ))}
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {filteredIntegrations.map(intg => (
-              <div key={intg.name} className="rounded-xl p-4 flex flex-wrap items-start gap-3" style={{ background: "var(--color-panel)", border: `1px solid ${intg.status === "error" ? "rgba(196,90,66,0.3)" : "var(--color-border)"}` }}>
+              <div key={intg.name} className="rounded-xl p-4 flex flex-wrap items-start gap-3" style={{ background: "var(--color-panel)", border: `1px solid ${intg.status === "error" ? "color-mix(in srgb, var(--color-rose) 30%, transparent)" : "var(--color-border)"}` }}>
                 <div className="text-2xl leading-none shrink-0 mt-0.5">{intg.logo}</div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-0.5 flex-wrap">
@@ -174,7 +175,7 @@ export default function Integrations() {
             { url: "https://erp.uztravel.uz/incoming/payment", events: ["payment.succeeded", "payment.failed", "refund.issued"], lastDelivery: "1h ago", success: true },
             { url: "https://slack-proxy.uztravel.uz/alerts", events: ["review.flagged", "guide.application", "booking.cancelled"], lastDelivery: "3h ago", success: false },
           ].map((wh, i) => (
-            <div key={i} className="rounded-xl p-4" style={{ background: "var(--color-panel)", border: `1px solid ${wh.success ? "var(--color-border)" : "rgba(196,90,66,0.3)"}` }}>
+            <div key={i} className="rounded-xl p-4" style={{ background: "var(--color-panel)", border: `1px solid ${wh.success ? "var(--color-border)" : "color-mix(in srgb, var(--color-rose) 30%, transparent)"}` }}>
               <div className="flex flex-wrap items-start gap-3">
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-2 mb-1.5">
@@ -221,7 +222,7 @@ export default function Integrations() {
                   {PERMS.map(p => (
                     <button key={p} onClick={() => setNewKey(prev => ({ ...prev, perms: prev.perms.includes(p) ? prev.perms.filter(x => x !== p) : [...prev.perms, p] }))}
                       className="px-2.5 py-1 rounded text-xs cursor-pointer transition-all"
-                      style={{ background: newKey.perms.includes(p) ? "var(--color-amber)" : "var(--color-surface)", color: newKey.perms.includes(p) ? "#0d0c0a" : "var(--color-muted)", border: "1px solid var(--color-border)", fontFamily: "var(--font-mono)" }}
+                      style={{ background: newKey.perms.includes(p) ? "var(--color-amber)" : "var(--color-surface)", color: newKey.perms.includes(p) ? "var(--color-on-accent)" : "var(--color-muted)", border: "1px solid var(--color-border)", fontFamily: "var(--font-mono)" }}
                     >{p}</button>
                   ))}
                 </div>

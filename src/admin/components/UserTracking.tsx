@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { USERS, User } from "../data/mockData";
-import { Badge } from "./shared";
+import { Badge, ДемоРаздел } from "./shared";
 
 // Uzbekistan city coordinates mapped to SVG space (800x500)
 const CITIES: Record<string, { x: number; y: number; label: string }> = {
@@ -26,7 +26,7 @@ function latLngToXY(lat: number, lng: number): { x: number; y: number } {
 }
 
 const USER_COLORS = [
-  "#d4872a", "#2a8d7a", "#c45a42", "#7a5fd4", "#2a6d8d",
+  "var(--color-amber)", "var(--color-teal)", "var(--color-rose)", "#7a5fd4", "#2a6d8d",
   "#8d2a5f", "#5fd47a", "#d4c42a", "#8d5f2a",
 ];
 
@@ -43,6 +43,7 @@ export default function UserTracking() {
 
   return (
     <div className="p-4 sm:p-7">
+      <ДемоРаздел что="Слежение за перемещениями не ведётся: люди и их точки на карте придуманы." />
       <div className="flex flex-wrap items-start justify-between gap-3 mb-6">
         <div>
           <h1
@@ -61,7 +62,7 @@ export default function UserTracking() {
             className="px-3 py-1.5 rounded text-xs cursor-pointer transition-all"
             style={{
               background: showAll && !selectedUser ? "var(--color-amber)" : "var(--color-panel)",
-              color: showAll && !selectedUser ? "#0d0c0a" : "var(--color-muted)",
+              color: showAll && !selectedUser ? "var(--color-on-accent)" : "var(--color-muted)",
               border: "1px solid var(--color-border)",
               fontFamily: "var(--font-mono)",
             }}
@@ -200,7 +201,7 @@ export default function UserTracking() {
                           y={pos.y + 4}
                           textAnchor="middle"
                           fontSize="7"
-                          fill="#0d0c0a"
+                          fill="var(--color-on-accent)"
                           fontWeight="bold"
                           style={{ fontFamily: "var(--font-body)", pointerEvents: "none" }}
                         >
@@ -222,7 +223,7 @@ export default function UserTracking() {
                               y={pos.y - 17}
                               textAnchor="middle"
                               fontSize="8"
-                              fill="#0d0c0a"
+                              fill="var(--color-on-accent)"
                               fontWeight="bold"
                             >
                               {user.name.split(" ")[0]}
@@ -240,7 +241,7 @@ export default function UserTracking() {
           {/* Legend */}
           <div
             className="absolute bottom-4 left-4 rounded-lg px-3 py-2 flex flex-wrap gap-2"
-            style={{ background: "rgba(13,12,10,0.85)", border: "1px solid var(--color-border)" }}
+            style={{ background: "color-mix(in srgb, var(--color-bg) 85%, transparent)", border: "1px solid var(--color-border)" }}
           >
             {displayUsers.map((u) => (
               <div key={u.id} className="flex flex-wrap items-center gap-1.5 text-xs" style={{ fontFamily: "var(--font-mono)" }}>
@@ -270,7 +271,7 @@ export default function UserTracking() {
               <div className="flex flex-wrap items-center gap-3 mb-4">
                 <div
                   className="w-10 h-10 rounded-full flex items-center justify-center font-semibold"
-                  style={{ background: getUserColor(selectedUser.id), color: "#0d0c0a" }}
+                  style={{ background: getUserColor(selectedUser.id), color: "var(--color-on-accent)" }}
                 >
                   {selectedUser.avatar}
                 </div>

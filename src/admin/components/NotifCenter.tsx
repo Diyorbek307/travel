@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { PageHeader, Badge, Btn, SectionTitle } from "./shared";
+import { PageHeader, Badge, Btn, SectionTitle, ДемоРаздел } from "./shared";
 
 type NotifItem = {
   id: number;
@@ -65,6 +65,7 @@ export default function NotifCenter({ onNavigate }: { onNavigate?: (page: string
 
   return (
     <div className="p-4 sm:p-7">
+      <ДемоРаздел что="Уведомления панели пока не приходят из системы, список составлен для примера." />
       <PageHeader
         title="Уведомления"
         subtitle={`${unreadCount} непрочитанных`}
@@ -78,7 +79,7 @@ export default function NotifCenter({ onNavigate }: { onNavigate?: (page: string
             className="px-3 py-1.5 rounded text-xs cursor-pointer transition-all"
             style={{
               background: filter === f ? "var(--color-amber)" : "var(--color-panel)",
-              color: filter === f ? "#0d0c0a" : "var(--color-muted)",
+              color: filter === f ? "var(--color-on-accent)" : "var(--color-muted)",
               border: "1px solid var(--color-border)", fontFamily: "var(--font-mono)",
             }}
           >
@@ -100,7 +101,7 @@ export default function NotifCenter({ onNavigate }: { onNavigate?: (page: string
               className="rounded-xl p-4 flex flex-wrap gap-3 cursor-pointer transition-all"
               style={{
                 background: selected?.id === n.id ? "var(--color-panel)" : n.read ? "transparent" : "rgba(212,135,42,0.04)",
-                border: `1px solid ${selected?.id === n.id ? "var(--color-amber)" : n.read ? "var(--color-border)" : "rgba(212,135,42,0.2)"}`,
+                border: `1px solid ${selected?.id === n.id ? "var(--color-amber)" : n.read ? "var(--color-border)" : "color-mix(in srgb, var(--color-amber) 20%, transparent)"}`,
               }}
             >
               {/* Icon */}

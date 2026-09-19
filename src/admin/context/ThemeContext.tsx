@@ -22,17 +22,24 @@ export type ThemeVars = {
   spacingBase: string;
 };
 
+/*
+ * Гамма та же, что в приложении: бирюза куполов и лайм вторым акцентом.
+ * Имена переменных остались от прежней палитры (amber/teal) — их читает
+ * весь интерфейс и редактор темы, поэтому переименование значило бы
+ * править три десятка файлов ради одних только имён. Смысл такой:
+ * amber — основной акцент, teal — успех и подтверждение.
+ */
 export const DARK_THEME: ThemeVars = {
-  colorBg: "#09080a",
-  colorSurface: "#110f14",
-  colorPanel: "#181520",
-  colorBorder: "#26223a",
-  colorAmber: "#e8a030",
-  colorTeal: "#18b89a",
-  colorRose: "#e05a42",
-  colorText: "#f4eefc",
-  colorMuted: "#8070a0",
-  colorDim: "#382e50",
+  colorBg: "#070d0c",
+  colorSurface: "#0d1716",
+  colorPanel: "#131a18",
+  colorBorder: "#202b28",
+  colorAmber: "#3fe0dc",
+  colorTeal: "#c9f24a",
+  colorRose: "#ff6b5a",
+  colorText: "#e8f1ef",
+  colorMuted: "#8a9b96",
+  colorDim: "#26332f",
   radiusCard: "10px",
   radiusBtn: "8px",
   fontDisplay: "'Fraunces', Georgia, serif",
@@ -43,16 +50,16 @@ export const DARK_THEME: ThemeVars = {
 };
 
 export const LIGHT_THEME: ThemeVars = {
-  colorBg: "#f7f4fc",
-  colorSurface: "#eeeaf6",
-  colorPanel: "#e4dfef",
-  colorBorder: "#ccc6de",
-  colorAmber: "#c07010",
-  colorTeal: "#0e8a72",
-  colorRose: "#c03828",
-  colorText: "#150f22",
-  colorMuted: "#6a5a88",
-  colorDim: "#c0b8d4",
+  colorBg: "#eef4f3",
+  colorSurface: "#ffffff",
+  colorPanel: "#ffffff",
+  colorBorder: "#dfeae8",
+  colorAmber: "#0e9a94",
+  colorTeal: "#5d8a00",
+  colorRose: "#c0392b",
+  colorText: "#0d1715",
+  colorMuted: "#5f7873",
+  colorDim: "#d5e3e1",
   radiusCard: "8px",
   radiusBtn: "6px",
   fontDisplay: "'Fraunces', Georgia, serif",

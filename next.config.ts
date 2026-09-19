@@ -26,10 +26,11 @@ const SECURITY_HEADERS = [
   // Не угадывать тип файла по содержимому: закрывает подмену, когда
   // загруженные данные браузер решает выполнить как скрипт.
   { key: "X-Content-Type-Options", value: "nosniff" },
-  // Нельзя открыть сайт внутри чужого iframe — это защита от кликджекинга,
-  // особенно важная для админки. Своих встраиваний у приложения нет.
-  { key: "X-Frame-Options", value: "DENY" },
-  { key: "Content-Security-Policy", value: "frame-ancestors 'none'" },
+  // Чужой сайт открыть нас в iframe не может — это защита от кликджекинга,
+  // особенно важная для админки. Своё встраивание одно: превью
+  // приложения в панели, поэтому 'self', а не полный запрет.
+  { key: "X-Frame-Options", value: "SAMEORIGIN" },
+  { key: "Content-Security-Policy", value: "frame-ancestors 'self'" },
   // Наружу уходит только origin, а не полный адрес с параметрами.
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   // Камера (QR-сканер) и геолокация (карта) — только самому приложению;

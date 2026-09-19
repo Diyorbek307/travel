@@ -24,7 +24,7 @@ export default function Events() {
 
   const catColors: Record<string, string> = {
     Festival: "var(--color-amber)", Concert: "var(--color-teal)", Exhibition: "var(--color-muted)",
-    Sport: "var(--color-rose)", Cultural: "#7a5fd4", Food: "#d4872a",
+    Sport: "var(--color-rose)", Cultural: "#7a5fd4", Food: "var(--color-amber)",
   };
 
   const catLabels: Record<string, string> = {
@@ -34,7 +34,7 @@ export default function Events() {
 
   const addEvent = () => {
     setEvents(prev => [{
-      id: `new-${Date.now()}`, emoji: "🎫", color: "#2E7D5A",
+      id: `new-${Date.now()}`, emoji: "🎫", color: "var(--color-teal)",
       name: newEvent.name || "New Event", city: newEvent.city || "Tashkent",
       category: newEvent.category as Event["category"], date: newEvent.date || "TBD", endDate: newEvent.date || "TBD",
       venue: newEvent.venue || "TBD", capacity: Number(newEvent.capacity) || 500, ticketsSold: 0,
@@ -57,14 +57,14 @@ export default function Events() {
         {[["all", "все"], ["upcoming", "предстоящие"], ["ongoing", "сейчас"], ["past", "прошедшие"], ["cancelled", "отменены"]].map(([f, label]) => (
           <button key={f} onClick={() => setFilter(f)}
             className="px-3 py-1.5 rounded text-xs cursor-pointer capitalize transition-all"
-            style={{ background: filter === f ? "var(--color-amber)" : "var(--color-panel)", color: filter === f ? "#0d0c0a" : "var(--color-muted)", border: "1px solid var(--color-border)", fontFamily: "var(--font-mono)" }}
+            style={{ background: filter === f ? "var(--color-amber)" : "var(--color-panel)", color: filter === f ? "var(--color-on-accent)" : "var(--color-muted)", border: "1px solid var(--color-border)", fontFamily: "var(--font-mono)" }}
           >{label}</button>
         ))}
         <div className="w-px h-5 self-center" style={{ background: "var(--color-border)" }} />
         {cities.map(c => (
           <button key={c} onClick={() => setCityFilter(c)}
             className="px-3 py-1.5 rounded text-xs cursor-pointer transition-all"
-            style={{ background: cityFilter === c ? "rgba(212,135,42,0.15)" : "transparent", color: cityFilter === c ? "var(--color-amber)" : "var(--color-muted)", border: `1px solid ${cityFilter === c ? "rgba(212,135,42,0.4)" : "var(--color-border)"}`, fontFamily: "var(--font-mono)" }}
+            style={{ background: cityFilter === c ? "color-mix(in srgb, var(--color-amber) 15%, transparent)" : "transparent", color: cityFilter === c ? "var(--color-amber)" : "var(--color-muted)", border: `1px solid ${cityFilter === c ? "color-mix(in srgb, var(--color-amber) 40%, transparent)" : "var(--color-border)"}`, fontFamily: "var(--font-mono)" }}
           >{c}</button>
         ))}
       </div>
@@ -78,12 +78,12 @@ export default function Events() {
             >
               <div className="relative h-40 overflow-hidden" style={{ background: "var(--color-dim)" }}>
                 <img src={e.img} alt={e.name} className="w-full h-full object-cover" />
-                <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(13,12,10,0.85) 0%, transparent 50%)" }} />
+                <div className="absolute inset-0" style={{ background: "linear-gradient(to top, color-mix(in srgb, var(--color-bg) 85%, transparent) 0%, transparent 50%)" }} />
                 <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
                   <span className="text-xs px-2 py-0.5 rounded font-medium" style={{ background: catColors[e.category] + "22", color: catColors[e.category], border: `1px solid ${catColors[e.category]}44`, fontFamily: "var(--font-mono)" }}>
                     {catLabels[e.category] ?? e.category}
                   </span>
-                  {e.featured && <span className="text-xs px-2 py-0.5 rounded font-medium" style={{ background: "var(--color-amber)", color: "#0d0c0a", fontFamily: "var(--font-mono)" }}>★ Рекомендуемое</span>}
+                  {e.featured && <span className="text-xs px-2 py-0.5 rounded font-medium" style={{ background: "var(--color-amber)", color: "var(--color-on-accent)", fontFamily: "var(--font-mono)" }}>★ Рекомендуемое</span>}
                 </div>
                 <div className="absolute top-3 right-3">
                   <Badge label={e.status} color={statusColor(e.status) as any} />
@@ -159,7 +159,7 @@ export default function Events() {
                   {[["Festival", "Фестиваль"], ["Concert", "Концерт"], ["Exhibition", "Выставка"], ["Sport", "Спорт"], ["Cultural", "Культура"], ["Food", "Еда"]].map(([c, label]) => (
                     <button key={c} onClick={() => setNewEvent(p => ({ ...p, category: c }))}
                       className="px-2.5 py-1 rounded text-xs cursor-pointer transition-all"
-                      style={{ background: newEvent.category === c ? "var(--color-amber)" : "var(--color-surface)", color: newEvent.category === c ? "#0d0c0a" : "var(--color-muted)", border: "1px solid var(--color-border)" }}
+                      style={{ background: newEvent.category === c ? "var(--color-amber)" : "var(--color-surface)", color: newEvent.category === c ? "var(--color-on-accent)" : "var(--color-muted)", border: "1px solid var(--color-border)" }}
                     >{label}</button>
                   ))}
                 </div>

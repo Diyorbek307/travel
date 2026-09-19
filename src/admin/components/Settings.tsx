@@ -39,7 +39,7 @@ export default function Settings({ onNavigate }: { onNavigate?: (page: string) =
         <Card className="p-5">
           <SectionTitle>Профиль</SectionTitle>
           <div className="flex flex-wrap items-center gap-4 mb-5">
-            <div className="w-14 h-14 rounded-full flex items-center justify-center text-xl font-bold" style={{ background: "var(--color-amber)", color: "#0d0c0a" }}>
+            <div className="w-14 h-14 rounded-full flex items-center justify-center text-xl font-bold" style={{ background: "var(--color-amber)", color: "var(--color-on-accent)" }}>
               АД
             </div>
             <div>
@@ -137,7 +137,7 @@ export default function Settings({ onNavigate }: { onNavigate?: (page: string) =
             </div>
             <button onClick={toggleMode}
               className="flex flex-wrap items-center gap-2 px-4 py-2 rounded-lg cursor-pointer transition-all font-medium text-sm"
-              style={{ background: "var(--color-amber)", color: "#0d0c0a", fontFamily: "var(--font-body)" }}
+              style={{ background: "var(--color-amber)", color: "var(--color-on-accent)", fontFamily: "var(--font-body)" }}
             >
               {isDark ? "☀ Светлая" : "☾ Тёмная"}
             </button>
@@ -147,9 +147,9 @@ export default function Settings({ onNavigate }: { onNavigate?: (page: string) =
           <div className="text-xs mb-2" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>ЦВЕТОВЫЕ ПАЛИТРЫ</div>
           <div className="flex gap-2 flex-wrap mb-4">
             {[
-              { name: "Янтарь", bg: theme.colorBg, accent: "#d4872a" },
-              { name: "Бирюза", bg: theme.colorBg, accent: "#2a8d7a" },
-              { name: "Малина", bg: theme.colorBg, accent: "#c45a42" },
+              { name: "Янтарь", bg: theme.colorBg, accent: "var(--color-amber)" },
+              { name: "Бирюза", bg: theme.colorBg, accent: "var(--color-teal)" },
+              { name: "Малина", bg: theme.colorBg, accent: "var(--color-rose)" },
               { name: "Синий", bg: theme.colorBg, accent: "#7a8fff" },
               { name: "Аметист", bg: theme.colorBg, accent: "#c47ae8" },
             ].map(p => (
@@ -207,7 +207,7 @@ export default function Settings({ onNavigate }: { onNavigate?: (page: string) =
 
         {/* Опасная зона */}
         <div className="col-span-2">
-          <Card className="p-5" style={{ border: "1px solid rgba(196,90,66,0.3)" } as React.CSSProperties}>
+          <Card className="p-5" style={{ border: "1px solid color-mix(in srgb, var(--color-rose) 30%, transparent)" } as React.CSSProperties}>
             <SectionTitle>Опасная зона</SectionTitle>
             <div className="flex gap-4 flex-wrap">
               <div className="flex-1 min-w-0 sm:min-w-60">

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { PageHeader, Badge, Card, SectionTitle, Btn } from "./shared";
+import { PageHeader, Badge, Card, SectionTitle, Btn, ДемоРаздел } from "./shared";
 
 const TRANSACTIONS = [
   { id: "TXN-8841", date: "1 сен 2026", customer: "Ahmed Khalil", type: "Бронирование тура", amount: 5670, fee: 284, net: 5386, method: "Visa", status: "settled" },
@@ -67,6 +67,7 @@ export default function Finance() {
 
   return (
     <div className="p-4 sm:p-7">
+      <ДемоРаздел что="Платёжной системы к панели пока не подключено, поэтому транзакции, выплаты и возвраты здесь вымышленные." />
       <PageHeader
         title="Финансовые отчёты"
         subtitle="Выручка, выплаты, транзакции и счета"
@@ -77,7 +78,7 @@ export default function Finance() {
         {([["overview", "Обзор"], ["transactions", "Транзакции"], ["payouts", "Выплаты гидам"], ["invoices", "Счета"]] as const).map(([id, label]) => (
           <button key={id} onClick={() => setTab(id)}
             className="px-4 py-2 rounded text-sm cursor-pointer transition-all"
-            style={{ background: tab === id ? "var(--color-amber)" : "var(--color-panel)", color: tab === id ? "#0d0c0a" : "var(--color-muted)", border: "1px solid var(--color-border)", fontFamily: "var(--font-body)" }}
+            style={{ background: tab === id ? "var(--color-amber)" : "var(--color-panel)", color: tab === id ? "var(--color-on-accent)" : "var(--color-muted)", border: "1px solid var(--color-border)", fontFamily: "var(--font-body)" }}
           >{label}</button>
         ))}
       </div>
@@ -167,7 +168,7 @@ export default function Finance() {
             {([["all", "Все"], ["income", "Доходы"], ["payout", "Выплаты"], ["refund", "Возвраты"]] as [string, string][]).map(([f, label]) => (
               <button key={f} onClick={() => setTxFilter(f)}
                 className="px-3 py-1.5 rounded text-xs cursor-pointer transition-all"
-                style={{ background: txFilter === f ? "var(--color-amber)" : "var(--color-panel)", color: txFilter === f ? "#0d0c0a" : "var(--color-muted)", border: "1px solid var(--color-border)", fontFamily: "var(--font-mono)" }}
+                style={{ background: txFilter === f ? "var(--color-amber)" : "var(--color-panel)", color: txFilter === f ? "var(--color-on-accent)" : "var(--color-muted)", border: "1px solid var(--color-border)", fontFamily: "var(--font-mono)" }}
               >{label}</button>
             ))}
           </div>
@@ -265,7 +266,7 @@ export default function Finance() {
         <div>
           <div className="grid gap-3">
             {invoices.map(inv => (
-              <div key={inv.id} className="rounded-xl p-4 flex flex-wrap items-center gap-4" style={{ background: "var(--color-panel)", border: `1px solid ${inv.status === "overdue" ? "rgba(196,90,66,0.3)" : "var(--color-border)"}` }}>
+              <div key={inv.id} className="rounded-xl p-4 flex flex-wrap items-center gap-4" style={{ background: "var(--color-panel)", border: `1px solid ${inv.status === "overdue" ? "color-mix(in srgb, var(--color-rose) 30%, transparent)" : "var(--color-border)"}` }}>
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2.5 mb-1">
                     <span className="font-medium text-sm" style={{ color: "var(--color-text)" }}>{inv.id}</span>

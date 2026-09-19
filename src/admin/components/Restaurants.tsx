@@ -38,7 +38,7 @@ export default function Restaurants() {
       {items.filter(r => r.status === "pending").length > 0 && (
         <div
           className="rounded-lg px-4 py-3 mb-6 text-sm flex flex-wrap items-center gap-2"
-          style={{ background: "rgba(212,135,42,0.08)", border: "1px solid rgba(212,135,42,0.2)", color: "var(--color-amber-light)" }}
+          style={{ background: "color-mix(in srgb, var(--color-amber) 8%, transparent)", border: "1px solid color-mix(in srgb, var(--color-amber) 20%, transparent)", color: "var(--color-amber-light)" }}
         >
           ⚠ {items.filter(r => r.status === "pending").length} ресторан(ов) на рассмотрении
           <button className="ml-2 underline cursor-pointer text-xs" onClick={() => setFilter("pending")}>Просмотреть</button>
@@ -52,7 +52,7 @@ export default function Restaurants() {
               className="px-3 py-1.5 rounded text-xs cursor-pointer capitalize transition-all"
               style={{
                 background: filter === f ? "var(--color-amber)" : "var(--color-panel)",
-                color: filter === f ? "#0d0c0a" : "var(--color-muted)",
+                color: filter === f ? "var(--color-on-accent)" : "var(--color-muted)",
                 border: "1px solid var(--color-border)", fontFamily: "var(--font-mono)",
               }}
             >{label}</button>
@@ -62,9 +62,9 @@ export default function Restaurants() {
             <button key={c} onClick={() => setCityFilter(c)}
               className="px-3 py-1.5 rounded text-xs cursor-pointer capitalize transition-all"
               style={{
-                background: cityFilter === c ? "rgba(212,135,42,0.15)" : "transparent",
+                background: cityFilter === c ? "color-mix(in srgb, var(--color-amber) 15%, transparent)" : "transparent",
                 color: cityFilter === c ? "var(--color-amber)" : "var(--color-muted)",
-                border: `1px solid ${cityFilter === c ? "rgba(212,135,42,0.4)" : "var(--color-border)"}`,
+                border: `1px solid ${cityFilter === c ? "color-mix(in srgb, var(--color-amber) 40%, transparent)" : "var(--color-border)"}`,
                 fontFamily: "var(--font-mono)",
               }}
             >{c}</button>

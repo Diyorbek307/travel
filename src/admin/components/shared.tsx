@@ -67,9 +67,9 @@ export function StatCard({
 
 export function Badge({ label, color }: { label: string; color?: "amber" | "teal" | "rose" | "dim" }) {
   const colors = {
-    amber: { bg: "rgba(212,135,42,0.15)", text: "var(--color-amber)" },
-    teal: { bg: "rgba(42,141,122,0.15)", text: "var(--color-teal)" },
-    rose: { bg: "rgba(196,90,66,0.15)", text: "var(--color-rose)" },
+    amber: { bg: "color-mix(in srgb, var(--color-amber) 15%, transparent)", text: "var(--color-amber)" },
+    teal: { bg: "color-mix(in srgb, var(--color-teal) 15%, transparent)", text: "var(--color-teal)" },
+    rose: { bg: "color-mix(in srgb, var(--color-rose) 15%, transparent)", text: "var(--color-rose)" },
     dim: { bg: "rgba(74,66,55,0.4)", text: "var(--color-muted)" },
   };
   const c = colors[color ?? "dim"];
@@ -97,7 +97,7 @@ export function Btn({
   const styles = {
     primary: {
       background: "var(--color-amber)",
-      color: "#0d0c0a",
+      color: "var(--color-on-accent)",
       border: "none",
     },
     ghost: {
@@ -106,9 +106,9 @@ export function Btn({
       border: "1px solid var(--color-border)",
     },
     danger: {
-      background: "rgba(196,90,66,0.15)",
+      background: "color-mix(in srgb, var(--color-rose) 15%, transparent)",
       color: "var(--color-rose)",
-      border: "1px solid rgba(196,90,66,0.3)",
+      border: "1px solid color-mix(in srgb, var(--color-rose) 30%, transparent)",
     },
   };
   return (
@@ -202,6 +202,33 @@ export function SectionTitle({ children }: { children: React.ReactNode }) {
       style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
     >
       {children}
+    </div>
+  );
+}
+
+/**
+ * Пометка раздела, который пока показывает придуманные строки.
+ *
+ * Цифры в таких разделах выглядят как настоящая выручка, настоящие
+ * выплаты гидам и настоящие кампании — по ним можно принять решение и
+ * ошибиться. Пока к разделу не подключён живой источник, об этом
+ * сказано прямо на экране, а не в документации.
+ */
+export function ДемоРаздел({ что }: { что: string }) {
+  return (
+    <div
+      className="mb-5 flex items-start gap-3 rounded-lg px-4 py-3 text-sm"
+      style={{
+        background: "color-mix(in srgb, var(--color-rose) 12%, transparent)",
+        border: "1px solid color-mix(in srgb, var(--color-rose) 35%, transparent)",
+        color: "var(--color-text)",
+      }}
+    >
+      <span className="text-base leading-none">⚠️</span>
+      <span>
+        <b>Данные примерные.</b> {что} Цифрам на этом экране верить нельзя — это образец
+        того, как раздел будет выглядеть с настоящим источником.
+      </span>
     </div>
   );
 }

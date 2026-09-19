@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { PageHeader, Badge, Btn } from "./shared";
+import { PageHeader, Badge, Btn, ДемоРаздел } from "./shared";
 
 type CalEvent = {
   id: number;
@@ -70,6 +70,7 @@ export default function TourCalendar() {
 
   return (
     <div className="p-4 sm:p-7">
+      <ДемоРаздел что="Календарь не связан с настоящими бронированиями — они в разделе «Бронирования»." />
       <PageHeader
         title="Расписание туров"
         subtitle="Сентябрь 2026 — все отправления"
@@ -125,7 +126,7 @@ export default function TourCalendar() {
                           className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium mb-1"
                           style={{
                             background: isToday ? "var(--color-amber)" : "transparent",
-                            color: isToday ? "#0d0c0a" : "var(--color-muted)",
+                            color: isToday ? "var(--color-on-accent)" : "var(--color-muted)",
                             fontFamily: "var(--font-mono)",
                           }}
                         >{day}</div>

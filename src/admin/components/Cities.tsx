@@ -30,7 +30,7 @@ export default function Cities() {
         {[["all", "все"], ["featured", "на главной"], ["active", "активные"], ["draft", "черновик"]].map(([f, label]) => (
           <button key={f} onClick={() => setFilter(f)}
             className="px-3 py-1.5 rounded text-xs cursor-pointer capitalize transition-all"
-            style={{ background: filter === f ? "var(--color-amber)" : "var(--color-panel)", color: filter === f ? "#0d0c0a" : "var(--color-muted)", border: "1px solid var(--color-border)", fontFamily: "var(--font-mono)" }}
+            style={{ background: filter === f ? "var(--color-amber)" : "var(--color-panel)", color: filter === f ? "var(--color-on-accent)" : "var(--color-muted)", border: "1px solid var(--color-border)", fontFamily: "var(--font-mono)" }}
           >{label}</button>
         ))}
       </div>
@@ -46,7 +46,7 @@ export default function Cities() {
               <img src={city.img} alt={city.name} className="w-full h-full object-cover" />
               <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(13,12,10,0.9) 0%, transparent 60%)" }} />
               <div className="absolute top-3 right-3 flex flex-wrap gap-1.5">
-                {city.featured && <span className="text-xs px-2 py-0.5 rounded font-medium" style={{ background: "var(--color-amber)", color: "#0d0c0a", fontFamily: "var(--font-mono)" }}>★ На главной</span>}
+                {city.featured && <span className="text-xs px-2 py-0.5 rounded font-medium" style={{ background: "var(--color-amber)", color: "var(--color-on-accent)", fontFamily: "var(--font-mono)" }}>★ На главной</span>}
                 <Badge label={city.status} color={city.status === "active" ? "teal" : "dim"} />
               </div>
               <div className="absolute bottom-4 left-4 right-4">
@@ -129,7 +129,7 @@ export default function Cities() {
           <div className="rounded-xl w-full max-w-lg overflow-hidden" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }} onClick={e => e.stopPropagation()}>
             <div className="relative h-44" style={{ background: "var(--color-dim)" }}>
               <img src={selected.img} alt={selected.name} className="w-full h-full object-cover" />
-              <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(13,12,10,0.85) 0%, transparent 60%)" }} />
+              <div className="absolute inset-0" style={{ background: "linear-gradient(to top, color-mix(in srgb, var(--color-bg) 85%, transparent) 0%, transparent 60%)" }} />
               <div className="absolute bottom-4 left-5">
                 <h2 className="text-2xl font-semibold text-white" style={{ fontFamily: "var(--font-display)" }}>{selected.name}</h2>
                 <div className="text-sm text-white opacity-60 mt-0.5">{selected.region} Регион</div>

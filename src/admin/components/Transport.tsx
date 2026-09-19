@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { PageHeader, Badge, Btn, Card, SectionTitle } from "./shared";
+import { PageHeader, Badge, Btn, Card, SectionTitle, ДемоРаздел } from "./shared";
 
 type Flight = {
   id: string; from: string; to: string; airline: string; dep: string; arr: string;
@@ -69,6 +69,7 @@ export default function Transport() {
 
   return (
     <div className="p-4 sm:p-7">
+      <ДемоРаздел что="Расписания берутся из вшитого набора, а не от перевозчиков: правки здесь в приложение не попадут." />
       <PageHeader title="Транспорт" subtitle="Управление всеми транспортными интеграциями" />
 
       {/* Tab nav */}
@@ -82,7 +83,7 @@ export default function Transport() {
         ] as const).map(([id, label]) => (
           <button key={id} onClick={() => setTab(id)}
             className="px-4 py-2 rounded text-sm cursor-pointer transition-all"
-            style={{ background: tab === id ? "var(--color-amber)" : "var(--color-panel)", color: tab === id ? "#0d0c0a" : "var(--color-muted)", border: "1px solid var(--color-border)", fontFamily: "var(--font-body)" }}
+            style={{ background: tab === id ? "var(--color-amber)" : "var(--color-panel)", color: tab === id ? "var(--color-on-accent)" : "var(--color-muted)", border: "1px solid var(--color-border)", fontFamily: "var(--font-body)" }}
           >{label}</button>
         ))}
       </div>
@@ -109,7 +110,7 @@ export default function Transport() {
             <Card className="p-5">
               <SectionTitle>Яндекс Такси</SectionTitle>
               <div className={`rounded-lg p-4 mb-4 ${yandexConnected ? "" : ""}`}
-                style={{ background: yandexConnected ? "rgba(42,141,122,0.08)" : "rgba(212,135,42,0.08)", border: `1px solid ${yandexConnected ? "rgba(42,141,122,0.3)" : "rgba(212,135,42,0.3)"}` }}
+                style={{ background: yandexConnected ? "rgba(42,141,122,0.08)" : "color-mix(in srgb, var(--color-amber) 8%, transparent)", border: `1px solid ${yandexConnected ? "color-mix(in srgb, var(--color-teal) 30%, transparent)" : "color-mix(in srgb, var(--color-amber) 30%, transparent)"}` }}
               >
                 <div className="flex flex-wrap items-center gap-2 mb-1">
                   <div className="w-2 h-2 rounded-full" style={{ background: yandexConnected ? "var(--color-teal)" : "var(--color-amber)" }} />
@@ -194,7 +195,7 @@ export default function Transport() {
           <Card className="p-6 mb-5">
             <SectionTitle>Интеграция Яндекс Такси</SectionTitle>
             <div className={`rounded-lg p-4 mb-5`}
-              style={{ background: yandexConnected ? "rgba(42,141,122,0.08)" : "rgba(212,135,42,0.08)", border: `1px solid ${yandexConnected ? "rgba(42,141,122,0.3)" : "rgba(212,135,42,0.3)"}` }}
+              style={{ background: yandexConnected ? "rgba(42,141,122,0.08)" : "color-mix(in srgb, var(--color-amber) 8%, transparent)", border: `1px solid ${yandexConnected ? "color-mix(in srgb, var(--color-teal) 30%, transparent)" : "color-mix(in srgb, var(--color-amber) 30%, transparent)"}` }}
             >
               <div className="flex flex-wrap items-center gap-3 mb-2">
                 <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-lg font-bold" style={{ background: "#FC3F1D" }}>Y</div>

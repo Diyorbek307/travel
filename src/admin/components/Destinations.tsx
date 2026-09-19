@@ -46,7 +46,7 @@ export default function Destinations() {
                 className="px-3 py-1.5 rounded text-xs font-medium transition-all cursor-pointer"
                 style={{
                   background: filter === f ? "var(--color-amber)" : "var(--color-panel)",
-                  color: filter === f ? "#0d0c0a" : "var(--color-muted)",
+                  color: filter === f ? "var(--color-on-accent)" : "var(--color-muted)",
                   border: "1px solid var(--color-border)",
                   fontFamily: "var(--font-mono)",
                 }}
@@ -161,7 +161,7 @@ export default function Destinations() {
               <img src={selected.img} alt={selected.name} className="w-full h-full object-cover" />
               <div
                 className="absolute inset-0"
-                style={{ background: "linear-gradient(to top, rgba(13,12,10,0.85) 0%, transparent 50%)" }}
+                style={{ background: "linear-gradient(to top, color-mix(in srgb, var(--color-bg) 85%, transparent) 0%, transparent 50%)" }}
               />
               <div className="absolute bottom-4 left-5">
                 <h2

@@ -219,7 +219,7 @@ export default function AdminShell() {
         >
           <div
             className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shrink-0"
-            style={{ background: "var(--color-amber)", color: "#0d0c0a" }}
+            style={{ background: "var(--color-amber)", color: "var(--color-on-accent)" }}
           >
             UZ
           </div>
@@ -308,7 +308,7 @@ export default function AdminShell() {
             >
               <div
                 className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold shrink-0"
-                style={{ background: "var(--color-amber)", color: "#0d0c0a" }}
+                style={{ background: "var(--color-amber)", color: "var(--color-on-accent)" }}
               >
                 AD
               </div>
@@ -321,7 +321,7 @@ export default function AdminShell() {
         )}
         {sidebarCollapsed && (
           <div className="flex justify-center py-3" style={{ borderTop: "1px solid var(--color-border)" }}>
-            <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold" style={{ background: "var(--color-amber)", color: "#0d0c0a" }}>
+            <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold" style={{ background: "var(--color-amber)", color: "var(--color-on-accent)" }}>
               AD
             </div>
           </div>

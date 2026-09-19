@@ -115,7 +115,7 @@ export default function AdsManager() {
             className="px-4 py-2 rounded text-sm cursor-pointer transition-all"
             style={{
               background: tab === id ? "var(--color-amber)" : "var(--color-panel)",
-              color: tab === id ? "#0d0c0a" : "var(--color-muted)",
+              color: tab === id ? "var(--color-on-accent)" : "var(--color-muted)",
               border: "1px solid var(--color-border)",
               fontFamily: "var(--font-body)",
             }}
@@ -200,7 +200,7 @@ export default function AdsManager() {
         <div>
           <div
             className="rounded-lg px-4 py-3 mb-5 text-sm"
-            style={{ background: "rgba(212,135,42,0.08)", border: "1px solid rgba(212,135,42,0.2)", color: "var(--color-amber-light)" }}
+            style={{ background: "color-mix(in srgb, var(--color-amber) 8%, transparent)", border: "1px solid color-mix(in srgb, var(--color-amber) 20%, transparent)", color: "var(--color-amber-light)" }}
           >
             💰 Бизнесы платят ежемесячную плату для повышения позиции в результатах поиска. Рейтинг ниже показывает продвинутую позицию по сравнению с органической.
           </div>
@@ -212,12 +212,12 @@ export default function AdsManager() {
                 className="rounded-lg p-4 flex flex-wrap items-center gap-4"
                 style={{
                   background: "var(--color-panel)",
-                  border: `1px solid ${p.active ? "rgba(212,135,42,0.3)" : "var(--color-border)"}`,
+                  border: `1px solid ${p.active ? "color-mix(in srgb, var(--color-amber) 30%, transparent)" : "var(--color-border)"}`,
                 }}
               >
                 <div
                   className="w-8 h-8 rounded flex items-center justify-center text-sm font-bold shrink-0"
-                  style={{ background: p.active ? "var(--color-amber)" : "var(--color-dim)", color: p.active ? "#0d0c0a" : "var(--color-muted)" }}
+                  style={{ background: p.active ? "var(--color-amber)" : "var(--color-dim)", color: p.active ? "var(--color-on-accent)" : "var(--color-muted)" }}
                 >
                   #{idx + 1}
                 </div>
@@ -305,7 +305,7 @@ export default function AdsManager() {
                     className="px-3 py-1.5 rounded text-xs cursor-pointer transition-all"
                     style={{
                       background: newAd.type === t ? "var(--color-amber)" : "var(--color-surface)",
-                      color: newAd.type === t ? "#0d0c0a" : "var(--color-muted)",
+                      color: newAd.type === t ? "var(--color-on-accent)" : "var(--color-muted)",
                       border: "1px solid var(--color-border)",
                     }}
                   >
@@ -352,7 +352,7 @@ export default function AdsManager() {
                   {(["restaurant","hotel","tour","attraction"] as const).map(c => (
                     <button key={c} onClick={() => setNewPromo(p => ({ ...p, category: c }))}
                       className="px-3 py-1.5 rounded text-xs cursor-pointer capitalize"
-                      style={{ background: newPromo.category === c ? "var(--color-amber)" : "var(--color-surface)", color: newPromo.category === c ? "#0d0c0a" : "var(--color-muted)", border: "1px solid var(--color-border)", fontFamily: "var(--font-mono)" }}
+                      style={{ background: newPromo.category === c ? "var(--color-amber)" : "var(--color-surface)", color: newPromo.category === c ? "var(--color-on-accent)" : "var(--color-muted)", border: "1px solid var(--color-border)", fontFamily: "var(--font-mono)" }}
                     >{{ restaurant: "Ресторан", hotel: "Отель", tour: "Тур", attraction: "Достопримечательность" }[c]}</button>
                   ))}
                 </div>

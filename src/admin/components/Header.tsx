@@ -109,7 +109,7 @@ export default function Header({ active, onNavigate, sidebarCollapsed, onToggleS
         <button
           onClick={onToggleSidebar}
           className="w-7 h-7 flex flex-col items-center justify-center gap-1 rounded cursor-pointer hover:opacity-70 transition-opacity shrink-0"
-          title="Toggle sidebar"
+          title="Свернуть боковое меню"
         >
           {[0, 1, 2].map(i => (
             <div
@@ -244,7 +244,7 @@ export default function Header({ active, onNavigate, sidebarCollapsed, onToggleS
         >
           <div
             className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold"
-            style={{ background: "var(--color-amber)", color: "#0d0c0a" }}
+            style={{ background: "var(--color-amber)", color: "var(--color-on-accent)" }}
           >
             AD
           </div>
@@ -288,13 +288,13 @@ export default function Header({ active, onNavigate, sidebarCollapsed, onToggleS
                       onClick={() => { onNavigate(item.id); setShowSearch(false); setQuery(""); }}
                       className="w-full flex flex-wrap items-center gap-3 px-4 py-2.5 text-sm text-left cursor-pointer transition-colors hover:opacity-80"
                       style={{
-                        background: active === item.id ? "rgba(212,135,42,0.1)" : "transparent",
+                        background: active === item.id ? "color-mix(in srgb, var(--color-amber) 10%, transparent)" : "transparent",
                         color: active === item.id ? "var(--color-amber)" : "var(--color-text)",
                         fontFamily: "var(--font-body)",
                         borderLeft: active === item.id ? "2px solid var(--color-amber)" : "2px solid transparent",
                       }}
                       onMouseEnter={e => (e.currentTarget.style.background = "var(--color-surface)")}
-                      onMouseLeave={e => (e.currentTarget.style.background = active === item.id ? "rgba(212,135,42,0.1)" : "transparent")}
+                      onMouseLeave={e => (e.currentTarget.style.background = active === item.id ? "color-mix(in srgb, var(--color-amber) 10%, transparent)" : "transparent")}
                     >
                       <span style={{ color: "var(--color-dim)", fontSize: "12px" }}>→</span>
                       {item.label}
