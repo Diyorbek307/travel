@@ -199,7 +199,7 @@ export default function AudioGuides() {
                   <p className="text-xs" style={{ color: "var(--color-muted)" }}>
                     {г.placeName} · {г.city} · {времяИзСекунд(г.seconds)}
                   </p>
-                  <p className="mt-1 truncate text-[11px]" style={{ color: "var(--color-dim)" }}>
+                  <p className="mt-1 truncate text-[11px]" style={{ color: "var(--color-faint)" }}>
                     {г.url}
                   </p>
 
@@ -281,7 +281,7 @@ function ОкноКода({ гид, onClose }: { гид: ManagedAudio; onClose: 
           <>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={картинка} alt="QR-код аудиогида" className="w-full rounded-xl bg-white" />
-            <p className="mt-3 break-all text-[11px]" style={{ color: "var(--color-dim)" }}>
+            <p className="mt-3 break-all text-[11px]" style={{ color: "var(--color-faint)" }}>
               {адрес}
             </p>
           </>

@@ -41,7 +41,7 @@ export default function LoginForm({ defaultPassword }: { defaultPassword: boolea
         <label
           htmlFor="password"
           className="mb-2 block text-xs uppercase tracking-widest"
-          style={{ color: "var(--color-dim)" }}
+          style={{ color: "var(--color-faint)" }}
         >
           Пароль
         </label>

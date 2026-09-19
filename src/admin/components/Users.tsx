@@ -177,7 +177,7 @@ export default function Users() {
                   ["MAIL_FROM", почта.настройки.from],
                 ].map(([k, v]) => (
                   <div key={k} className="flex flex-wrap justify-between gap-2">
-                    <dt style={{ color: "var(--color-dim)", fontFamily: "var(--font-mono)" }}>{k}</dt>
+                    <dt style={{ color: "var(--color-faint)", fontFamily: "var(--font-mono)" }}>{k}</dt>
                     <dd className="min-w-0 truncate" style={{ color: "var(--color-muted)" }}>
                       {v}
                     </dd>
@@ -403,7 +403,7 @@ export default function Users() {
               ))}
             </dl>
 
-            <p className="mb-4 text-xs" style={{ color: "var(--color-dim)" }}>
+            <p className="mb-4 text-xs" style={{ color: "var(--color-faint)" }}>
               Паспортные данные не собираются.
             </p>
 

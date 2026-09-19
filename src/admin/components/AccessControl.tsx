@@ -277,11 +277,11 @@ export default function AccessControl() {
                   onMouseEnter={e => (e.currentTarget.style.background = "var(--color-panel)")}
                   onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
                 >
-                  <td className="px-4 py-2.5" style={{ color: "var(--color-dim)", fontFamily: "var(--font-mono)", fontSize: "12px" }}>{row.time}</td>
+                  <td className="px-4 py-2.5" style={{ color: "var(--color-faint)", fontFamily: "var(--font-mono)", fontSize: "12px" }}>{row.time}</td>
                   <td className="px-4 py-2.5" style={{ color: "var(--color-amber)", fontSize: "13px" }}>{row.admin}</td>
                   <td className="px-4 py-2.5" style={{ color: "var(--color-text)", fontSize: "13px" }}>{row.action}</td>
                   <td className="px-4 py-2.5" style={{ color: "var(--color-muted)", fontSize: "13px" }}>{row.target}</td>
-                  <td className="px-4 py-2.5" style={{ color: "var(--color-dim)", fontFamily: "var(--font-mono)", fontSize: "11px" }}>{row.ip}</td>
+                  <td className="px-4 py-2.5" style={{ color: "var(--color-faint)", fontFamily: "var(--font-mono)", fontSize: "11px" }}>{row.ip}</td>
                 </tr>
               ))}
             </tbody>

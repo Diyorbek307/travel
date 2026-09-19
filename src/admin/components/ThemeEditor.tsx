@@ -19,7 +19,8 @@ const GROUPS: Array<{ title: string; props: PropDef[] }> = [
       { key: "colorBorder", label: "Граница", type: "color" },
       { key: "colorText", label: "Текст", type: "color" },
       { key: "colorMuted", label: "Приглушённый", type: "color" },
-      { key: "colorDim", label: "Затемнённый", type: "color" },
+      { key: "colorDim", label: "Затемнённый (заливка)", type: "color" },
+      { key: "colorFaint", label: "Тусклый текст", type: "color" },
       { key: "colorAmber", label: "Основной акцент", type: "color" },
       { key: "colorTeal", label: "Успех / активный", type: "color" },
       { key: "colorRose", label: "Опасность / ошибка", type: "color" },
@@ -193,7 +194,7 @@ export default function ThemeEditor() {
                             : fontDisplayLabel(theme[prop.key])}
                       </div>
                     </div>
-                    <span style={{ color: "var(--color-dim)", fontSize: "12px" }}>{selected === prop.key ? "▾" : "▸"}</span>
+                    <span style={{ color: "var(--color-faint)", fontSize: "12px" }}>{selected === prop.key ? "▾" : "▸"}</span>
                   </div>
                 ))}
               </div>
@@ -423,13 +424,13 @@ export default function ThemeEditor() {
                     {isColor ? (
                       <div className="flex flex-wrap items-center gap-1.5 shrink-0">
                         <div className="w-4 h-4 rounded-sm border" style={{ background: h.from, border: "1px solid var(--color-border)" }} />
-                        <span style={{ color: "var(--color-dim)" }}>→</span>
+                        <span style={{ color: "var(--color-faint)" }}>→</span>
                         <div className="w-4 h-4 rounded-sm border" style={{ background: h.to, border: "1px solid var(--color-border)" }} />
                       </div>
                     ) : (
                       <div className="text-xs flex flex-wrap gap-1.5 items-center shrink-0" style={{ fontFamily: "var(--font-mono)", color: "var(--color-muted)" }}>
                         <span>{h.from}</span>
-                        <span style={{ color: "var(--color-dim)" }}>→</span>
+                        <span style={{ color: "var(--color-faint)" }}>→</span>
                         <span style={{ color: "var(--color-amber)" }}>{h.to}</span>
                       </div>
                     )}

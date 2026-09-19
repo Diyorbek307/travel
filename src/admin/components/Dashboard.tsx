@@ -138,7 +138,7 @@ export default function Dashboard({ onNavigate }: { onNavigate: (id: string) => 
                         title={`${m.label}: ${m.всего}`}
                       />
                     </div>
-                    <span className="truncate text-[9px]" style={{ color: "var(--color-dim)" }}>
+                    <span className="truncate text-[9px]" style={{ color: "var(--color-faint)" }}>
                       {m.label}
                     </span>
                   </div>

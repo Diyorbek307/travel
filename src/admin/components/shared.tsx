@@ -70,7 +70,10 @@ export function Badge({ label, color }: { label: string; color?: "amber" | "teal
     amber: { bg: "color-mix(in srgb, var(--color-amber) 15%, transparent)", text: "var(--color-amber)" },
     teal: { bg: "color-mix(in srgb, var(--color-teal) 15%, transparent)", text: "var(--color-teal)" },
     rose: { bg: "color-mix(in srgb, var(--color-rose) 15%, transparent)", text: "var(--color-rose)" },
-    dim: { bg: "rgba(74,66,55,0.4)", text: "var(--color-muted)" },
+    // Была вписана коричневая полупрозрачность от прежней палитры:
+    // в светлой теме тёмная плашка под приглушённым текстом давала
+    // контраст 2:1. Берём заливку и текст от токенов темы.
+    dim: { bg: "var(--color-dim)", text: "var(--color-text)" },
   };
   const c = colors[color ?? "dim"];
   return (

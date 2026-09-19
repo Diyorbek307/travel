@@ -248,7 +248,7 @@ export default function AdminShell() {
               {!sidebarCollapsed && (
                 <div
                   className="px-2 mb-1 text-xs tracking-widest uppercase font-medium"
-                  style={{ color: "var(--color-dim)", fontFamily: "var(--font-mono)" }}
+                  style={{ color: "var(--color-faint)", fontFamily: "var(--font-mono)" }}
                 >
                   {group.label}
                 </div>

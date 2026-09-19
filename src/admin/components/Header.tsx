@@ -126,8 +126,8 @@ export default function Header({ active, onNavigate, sidebarCollapsed, onToggleS
 
         {/* Breadcrumb */}
         <div className="flex flex-wrap items-center gap-1.5 text-sm min-w-0">
-          <span className="hidden md:inline" style={{ color: "var(--color-dim)" }}>Узбекистан Админ</span>
-          <span style={{ color: "var(--color-dim)" }}>›</span>
+          <span className="hidden md:inline" style={{ color: "var(--color-faint)" }}>Узбекистан Админ</span>
+          <span style={{ color: "var(--color-faint)" }}>›</span>
           <span className="font-medium truncate" style={{ color: "var(--color-text)" }}>
             {activePage?.label ?? active}
           </span>
@@ -228,7 +228,7 @@ export default function Header({ active, onNavigate, sidebarCollapsed, onToggleS
                         {!n.read && <div className="w-2 h-2 rounded-full shrink-0 mt-1" style={{ background: "var(--color-amber)" }} />}
                       </div>
                       <div className="text-xs mt-0.5 leading-relaxed" style={{ color: "var(--color-muted)" }}>{n.body}</div>
-                      <div className="text-xs mt-1" style={{ color: "var(--color-dim)", fontFamily: "var(--font-mono)" }}>{n.time}</div>
+                      <div className="text-xs mt-1" style={{ color: "var(--color-faint)", fontFamily: "var(--font-mono)" }}>{n.time}</div>
                     </div>
                   </div>
                 ))}
@@ -279,7 +279,7 @@ export default function Header({ active, onNavigate, sidebarCollapsed, onToggleS
             <div className="overflow-y-auto" style={{ maxHeight: "400px" }}>
               {Object.entries(grouped).map(([group, items]) => (
                 <div key={group}>
-                  <div className="px-4 py-2 text-xs tracking-widest uppercase" style={{ color: "var(--color-dim)", fontFamily: "var(--font-mono)" }}>
+                  <div className="px-4 py-2 text-xs tracking-widest uppercase" style={{ color: "var(--color-faint)", fontFamily: "var(--font-mono)" }}>
                     {group}
                   </div>
                   {items.map(item => (
@@ -296,7 +296,7 @@ export default function Header({ active, onNavigate, sidebarCollapsed, onToggleS
                       onMouseEnter={e => (e.currentTarget.style.background = "var(--color-surface)")}
                       onMouseLeave={e => (e.currentTarget.style.background = active === item.id ? "color-mix(in srgb, var(--color-amber) 10%, transparent)" : "transparent")}
                     >
-                      <span style={{ color: "var(--color-dim)", fontSize: "12px" }}>→</span>
+                      <span style={{ color: "var(--color-faint)", fontSize: "12px" }}>→</span>
                       {item.label}
                       {active === item.id && <span className="ml-auto text-xs" style={{ color: "var(--color-amber)", fontFamily: "var(--font-mono)" }}>текущая</span>}
                     </button>

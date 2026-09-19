@@ -98,7 +98,7 @@ export default function Integrations() {
                     <span className="font-mono text-xs min-w-0 flex-1 truncate" style={{ color: reveal === k.id ? "var(--color-amber)" : "var(--color-muted)" }}>
                       {reveal === k.id ? k.key.replace("...", "••••••••••••") : k.key}
                     </span>
-                    <span className="text-xs shrink-0" style={{ color: "var(--color-dim)" }}>{reveal === k.id ? "скрыть" : "показать"}</span>
+                    <span className="text-xs shrink-0" style={{ color: "var(--color-faint)" }}>{reveal === k.id ? "скрыть" : "показать"}</span>
                   </div>
 
                   <div className="flex gap-4 text-xs flex-wrap" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
@@ -151,7 +151,7 @@ export default function Integrations() {
                     />
                   </div>
                   <p className="text-xs mb-2" style={{ color: "var(--color-muted)" }}>{intg.desc}</p>
-                  <div className="text-xs" style={{ color: "var(--color-dim)", fontFamily: "var(--font-mono)" }}>{intg.category}</div>
+                  <div className="text-xs" style={{ color: "var(--color-faint)", fontFamily: "var(--font-mono)" }}>{intg.category}</div>
                 </div>
                 <div className="shrink-0">
                   {intg.status === "connected" ? (

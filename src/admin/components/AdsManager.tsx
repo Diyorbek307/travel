@@ -257,7 +257,7 @@ export default function AdsManager() {
           >
             <div>
               <div className="text-sm font-medium" style={{ color: "var(--color-muted)" }}>Добавить бизнес в продвижение</div>
-              <div className="text-xs mt-0.5" style={{ color: "var(--color-dim)" }}>Рестораны, отели, достопримечательности, туры</div>
+              <div className="text-xs mt-0.5" style={{ color: "var(--color-faint)" }}>Рестораны, отели, достопримечательности, туры</div>
             </div>
             <Btn onClick={() => setShowAddPromo(true)}>+ Добавить продвижение</Btn>
           </div>

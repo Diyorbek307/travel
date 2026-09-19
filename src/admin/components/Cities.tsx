@@ -65,7 +65,7 @@ export default function Cities() {
                   <span key={h} className="text-xs px-2 py-0.5 rounded" style={{ background: "var(--color-dim)", color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>{h}</span>
                 ))}
                 {city.highlights.length > 3 && (
-                  <span className="text-xs px-2 py-0.5 rounded" style={{ background: "var(--color-dim)", color: "var(--color-dim)", fontFamily: "var(--font-mono)" }}>+{city.highlights.length - 3}</span>
+                  <span className="text-xs px-2 py-0.5 rounded" style={{ background: "var(--color-dim)", color: "var(--color-faint)", fontFamily: "var(--font-mono)" }}>+{city.highlights.length - 3}</span>
                 )}
               </div>
               <div className="flex flex-wrap gap-2">

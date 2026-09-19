@@ -115,7 +115,7 @@ export default function NotifCenter({ onNavigate }: { onNavigate?: (page: string
               <div className="flex-1 min-w-0">
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <span className="text-sm font-medium" style={{ color: n.read ? "var(--color-muted)" : "var(--color-text)" }}>{n.title}</span>
-                  <span className="text-xs shrink-0" style={{ color: "var(--color-dim)", fontFamily: "var(--font-mono)" }}>{n.time}</span>
+                  <span className="text-xs shrink-0" style={{ color: "var(--color-faint)", fontFamily: "var(--font-mono)" }}>{n.time}</span>
                 </div>
                 <p className="text-xs mt-0.5 truncate" style={{ color: "var(--color-muted)" }}>{n.body}</p>
               </div>
@@ -161,7 +161,7 @@ export default function NotifCenter({ onNavigate }: { onNavigate?: (page: string
           </div>
         ) : (
           <div className="w-full shrink-0 rounded-2xl lg:w-72 flex items-center justify-center text-center p-8" style={{ border: "1px dashed var(--color-border)" }}>
-            <p className="text-sm" style={{ color: "var(--color-dim)" }}>Выберите уведомление для просмотра</p>
+            <p className="text-sm" style={{ color: "var(--color-faint)" }}>Выберите уведомление для просмотра</p>
           </div>
         )}
       </div>

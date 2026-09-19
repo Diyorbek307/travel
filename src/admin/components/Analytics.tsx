@@ -104,7 +104,7 @@ export default function Analytics() {
                     }}
                   />
                 </div>
-                <span className="truncate text-[9px]" style={{ color: "var(--color-dim)" }}>
+                <span className="truncate text-[9px]" style={{ color: "var(--color-faint)" }}>
                   {m.label}
                 </span>
               </div>

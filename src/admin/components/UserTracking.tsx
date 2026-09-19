@@ -313,7 +313,7 @@ export default function UserTracking() {
                     <div className="flex-1 min-w-0">
                       <div className="text-sm font-medium" style={{ color: "var(--color-text)" }}>{h.city}</div>
                       <div className="text-xs" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>{h.time}</div>
-                      <div className="text-xs" style={{ color: "var(--color-dim)", fontFamily: "var(--font-mono)" }}>
+                      <div className="text-xs" style={{ color: "var(--color-faint)", fontFamily: "var(--font-mono)" }}>
                         {h.lat.toFixed(3)}°N {h.lng.toFixed(3)}°E
                       </div>
                     </div>
@@ -345,7 +345,7 @@ export default function UserTracking() {
                         <div className="text-xs flex flex-wrap items-center gap-1.5" style={{ color: "var(--color-muted)" }}>
                           <span style={{ fontFamily: "var(--font-mono)" }}>📍</span>
                           <span>{u.location.city}</span>
-                          <span style={{ fontFamily: "var(--font-mono)", color: "var(--color-dim)" }}>·</span>
+                          <span style={{ fontFamily: "var(--font-mono)", color: "var(--color-faint)" }}>·</span>
                           <span style={{ fontFamily: "var(--font-mono)", fontSize: "10px" }}>{u.lastSeen}</span>
                         </div>
                       </div>

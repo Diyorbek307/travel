@@ -221,7 +221,7 @@ export default function Staff() {
               </div>
               <div className="text-right shrink-0">
                 <div className="text-xs" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>{member.permissions.length} доступов</div>
-                <div className="text-xs mt-0.5" style={{ color: "var(--color-dim)" }}>{member.lastActive}</div>
+                <div className="text-xs mt-0.5" style={{ color: "var(--color-faint)" }}>{member.lastActive}</div>
               </div>
             </div>
           ))}
@@ -269,7 +269,7 @@ export default function Staff() {
               <div className="flex flex-col gap-3 max-h-64 overflow-y-auto pr-1">
                 {permGroups.map(group => (
                   <div key={group}>
-                    <div className="text-xs mb-1.5 uppercase tracking-wider" style={{ color: "var(--color-dim)", fontFamily: "var(--font-mono)" }}>{group}</div>
+                    <div className="text-xs mb-1.5 uppercase tracking-wider" style={{ color: "var(--color-faint)", fontFamily: "var(--font-mono)" }}>{group}</div>
                     <div className="flex flex-wrap gap-1.5">
                       {ALL_PERMS.filter(p => p.group === group).map(p => {
                         const active = editing ? editPerms.includes(p.id) : selected.permissions.includes(p.id);
@@ -307,7 +307,7 @@ export default function Staff() {
           </div>
         ) : (
           <div className="w-full shrink-0 rounded-2xl lg:w-80 flex items-center justify-center text-center p-8" style={{ border: "1px dashed var(--color-border)" }}>
-            <p className="text-sm" style={{ color: "var(--color-dim)" }}>Выберите сотрудника для управления доступами</p>
+            <p className="text-sm" style={{ color: "var(--color-faint)" }}>Выберите сотрудника для управления доступами</p>
           </div>
         )}
       </div>
@@ -355,7 +355,7 @@ export default function Staff() {
               <div className="flex flex-col gap-3">
                 {permGroups.map(group => (
                   <div key={group}>
-                    <div className="text-xs mb-1.5 uppercase tracking-wider" style={{ color: "var(--color-dim)", fontFamily: "var(--font-mono)" }}>{group}</div>
+                    <div className="text-xs mb-1.5 uppercase tracking-wider" style={{ color: "var(--color-faint)", fontFamily: "var(--font-mono)" }}>{group}</div>
                     <div className="flex flex-wrap gap-1.5">
                       {ALL_PERMS.filter(p => p.group === group).map(p => {
                         const on = invite.permissions.includes(p.id);

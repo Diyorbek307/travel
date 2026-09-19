@@ -13,6 +13,9 @@ export type ThemeVars = {
   colorText: string;
   colorMuted: string;
   colorDim: string;
+  /** Тусклый текст. Отдельно от colorDim: тот служит заливкой и потому
+   *  почти сливается с фоном — как текст он нечитаем. */
+  colorFaint: string;
   radiusCard: string;
   radiusBtn: string;
   fontDisplay: string;
@@ -40,6 +43,7 @@ export const DARK_THEME: ThemeVars = {
   colorText: "#e8f1ef",
   colorMuted: "#8a9b96",
   colorDim: "#26332f",
+  colorFaint: "#6f827d",
   radiusCard: "10px",
   radiusBtn: "8px",
   fontDisplay: "'Fraunces', Georgia, serif",
@@ -60,6 +64,7 @@ export const LIGHT_THEME: ThemeVars = {
   colorText: "#0d1715",
   colorMuted: "#5f7873",
   colorDim: "#d5e3e1",
+  colorFaint: "#7c918c",
   radiusCard: "8px",
   radiusBtn: "6px",
   fontDisplay: "'Fraunces', Georgia, serif",
@@ -112,11 +117,14 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     root.style.setProperty("--color-panel", theme.colorPanel);
     root.style.setProperty("--color-border", theme.colorBorder);
     root.style.setProperty("--color-amber", theme.colorAmber);
+    // Акцент светлый в обеих темах, поэтому текст по нему всегда тёмный.
+    root.style.setProperty("--color-on-accent", "#05100f");
     root.style.setProperty("--color-teal", theme.colorTeal);
     root.style.setProperty("--color-rose", theme.colorRose);
     root.style.setProperty("--color-text", theme.colorText);
     root.style.setProperty("--color-muted", theme.colorMuted);
     root.style.setProperty("--color-dim", theme.colorDim);
+    root.style.setProperty("--color-faint", theme.colorFaint);
     root.style.setProperty("--radius-card", theme.radiusCard);
     root.style.setProperty("--radius-btn", theme.radiusBtn);
     root.style.setProperty("--font-display", theme.fontDisplay);
