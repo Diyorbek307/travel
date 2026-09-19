@@ -8,6 +8,9 @@ import type { ManagedCity as City } from "@/lib/types";
 export default function Cities() {
   const [cities, setCities] = useEntity("cities");
   const [selected, setSelected] = useState<City | null>(null);
+  // Черновик правки: карточка города раньше только показывала данные,
+  // изменить их было нельзя. Правим копию, сохраняем по кнопке.
+  const [draft, setDraft] = useState<City | null>(null);
   const [filter, setFilter] = useState("all");
   const [showAdd, setShowAdd] = useState(false);
   const [newCity, setNewCity] = useState({ name: "", region: "", population: "", tourists: "", description: "" });
@@ -72,7 +75,7 @@ export default function Cities() {
                 <Btn variant={city.featured ? "danger" : "ghost"} small onClick={e => { e.stopPropagation(); toggleFeatured(city.id); }}>
                   {city.featured ? "Убрать с главной" : "На главную ★"}
                 </Btn>
-                <Btn variant="ghost" small onClick={e => { e.stopPropagation(); setSelected(city); }}>Изменить</Btn>
+                <Btn variant="ghost" small onClick={e => { e.stopPropagation(); setSelected(city); setDraft(city); }}>Изменить</Btn>
               </div>
             </div>
           </div>
@@ -124,46 +127,78 @@ export default function Cities() {
         </div>
       )}
 
-      {selected && (
-        <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: "rgba(0,0,0,0.7)" }} onClick={() => setSelected(null)}>
-          <div className="rounded-xl w-full max-w-lg overflow-hidden" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }} onClick={e => e.stopPropagation()}>
+      {selected && draft && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 p-4" style={{ background: "rgba(0,0,0,0.7)" }} onClick={() => setSelected(null)}>
+          <div className="rounded-xl w-full max-w-lg overflow-hidden max-h-[90dvh] overflow-y-auto" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }} onClick={e => e.stopPropagation()}>
             <div className="relative h-44" style={{ background: "var(--color-dim)" }}>
-              <img src={selected.img} alt={selected.name} className="w-full h-full object-cover" />
+              <img src={draft.img} alt={draft.name} className="w-full h-full object-cover" />
               <div className="absolute inset-0" style={{ background: "linear-gradient(to top, color-mix(in srgb, var(--color-bg) 85%, transparent) 0%, transparent 60%)" }} />
               <div className="absolute bottom-4 left-5">
-                <h2 className="text-2xl font-semibold text-white" style={{ fontFamily: "var(--font-display)" }}>{selected.name}</h2>
-                <div className="text-sm text-white opacity-60 mt-0.5">{selected.region} Регион</div>
+                <h2 className="text-2xl font-semibold text-white" style={{ fontFamily: "var(--font-display)" }}>{draft.name}</h2>
+                <div className="text-sm text-white opacity-60 mt-0.5">{draft.region} Регион</div>
               </div>
               <button className="absolute top-4 right-4 text-white text-xl opacity-60 hover:opacity-100 cursor-pointer" onClick={() => setSelected(null)}>×</button>
             </div>
             <div className="p-5">
-              <p className="text-sm leading-relaxed mb-4" style={{ color: "var(--color-muted)" }}>{selected.description}</p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
-                {[
-                  { label: "Население", val: selected.population.toLocaleString() },
-                  { label: "Туристов в год", val: selected.tourists.toLocaleString() },
-                  { label: "Регион", val: selected.region },
-                  { label: "Статус", val: selected.status },
-                ].map(s => (
-                  <div key={s.label} className="rounded p-2" style={{ background: "var(--color-surface)" }}>
-                    <div className="text-xs mb-0.5" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>{s.label}</div>
-                    <div className="text-sm" style={{ color: "var(--color-text)" }}>{s.val}</div>
+              {/* Правим копию: каждое поле сразу в черновике, применяем
+                  всё разом по «Сохранить». */}
+              <div className="flex flex-col gap-3 mb-4">
+                {([
+                  ["name", "Название", "text"],
+                  ["region", "Регион", "text"],
+                  ["population", "Население", "number"],
+                  ["tourists", "Туристов в год", "number"],
+                ] as const).map(([k, label, type]) => (
+                  <div key={k}>
+                    <label className="text-xs block mb-1" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>{label.toUpperCase()}</label>
+                    <input
+                      type={type}
+                      value={String(draft[k as keyof City] ?? "")}
+                      onChange={e => setDraft(d => d && { ...d, [k]: type === "number" ? Number(e.target.value) : e.target.value })}
+                      className="w-full rounded px-3 py-2 text-sm outline-none"
+                      style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", color: "var(--color-text)", fontFamily: "var(--font-body)" }}
+                    />
                   </div>
                 ))}
-              </div>
-              <div className="mb-4">
-                <div className="text-xs mb-2" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>ДОСТОПРИМЕЧАТЕЛЬНОСТИ</div>
-                <div className="flex flex-wrap gap-1.5">
-                  {selected.highlights.map(h => (
-                    <span key={h} className="text-xs px-2 py-1 rounded" style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>{h}</span>
-                  ))}
+                <div>
+                  <label className="text-xs block mb-1" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>ОПИСАНИЕ</label>
+                  <textarea
+                    rows={3}
+                    value={draft.description}
+                    onChange={e => setDraft(d => d && { ...d, description: e.target.value })}
+                    className="w-full rounded px-3 py-2 text-sm outline-none resize-none"
+                    style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", color: "var(--color-text)", fontFamily: "var(--font-body)" }}
+                  />
+                </div>
+                <div>
+                  <label className="text-xs block mb-1" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>СТАТУС</label>
+                  <select
+                    value={draft.status}
+                    onChange={e => setDraft(d => d && { ...d, status: e.target.value as City["status"] })}
+                    className="w-full rounded px-3 py-2 text-sm outline-none"
+                    style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", color: "var(--color-text)", fontFamily: "var(--font-body)" }}
+                  >
+                    <option value="active">Активный</option>
+                    <option value="draft">Черновик</option>
+                  </select>
                 </div>
               </div>
+              {draft.highlights.length > 0 && (
+                <div className="mb-4">
+                  <div className="text-xs mb-2" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>ДОСТОПРИМЕЧАТЕЛЬНОСТИ</div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {draft.highlights.map(h => (
+                      <span key={h} className="text-xs px-2 py-1 rounded" style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>{h}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
               <div className="flex flex-wrap gap-2">
-                <Btn variant={selected.featured ? "danger" : "ghost"} onClick={() => { toggleFeatured(selected.id); setSelected(null); }}>
-                  {selected.featured ? "Убрать с главной" : "На главную ★"}
+                <Btn onClick={() => { setCities(prev => prev.map(c => c.id === draft.id ? draft : c)); setSelected(null); }}>Сохранить</Btn>
+                <Btn variant={draft.featured ? "danger" : "ghost"} onClick={() => { toggleFeatured(draft.id); setSelected(null); }}>
+                  {draft.featured ? "Убрать с главной" : "На главную ★"}
                 </Btn>
-                <Btn variant="ghost" onClick={() => setSelected(null)}>Закрыть</Btn>
+                <Btn variant="ghost" onClick={() => setSelected(null)}>Отмена</Btn>
               </div>
             </div>
           </div>
