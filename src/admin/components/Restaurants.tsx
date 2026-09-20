@@ -10,6 +10,9 @@ export default function Restaurants() {
   const [filter, setFilter] = useState("all");
   const [cityFilter, setCityFilter] = useState("all");
   const [selected, setSelected] = useState<Restaurant | null>(null);
+  // Черновик правки: карточка заведения раньше только показывала поля,
+  // изменить их было нельзя. Правим копию, применяем по «Сохранить».
+  const [draft, setDraft] = useState<Restaurant | null>(null);
   const [view, setView] = useState<"cards" | "table">("cards");
   const [showAdd, setShowAdd] = useState(false);
   const [newRest, setNewRest] = useState({ name: "", city: "", cuisine: "", seats: "", phone: "", address: "", open: "", desc: "" });
@@ -85,7 +88,7 @@ export default function Restaurants() {
           {filtered.map(r => (
             <div key={r.id} className="rounded-lg overflow-hidden cursor-pointer transition-all hover:translate-y-[-1px]"
               style={{ background: "var(--color-panel)", border: `1px solid ${r.promoted ? "rgba(212,135,42,0.5)" : "var(--color-border)"}` }}
-              onClick={() => setSelected(r)}
+              onClick={() => { setSelected(r); setDraft(r); }}
             >
               <div className="flex flex-wrap gap-0">
                 <img src={r.img} alt={r.name} className="w-24 h-24 object-cover shrink-0" style={{ background: "var(--color-dim)" }} />
@@ -132,7 +135,7 @@ export default function Restaurants() {
             <Badge label={r.status} color={r.status === "active" ? "teal" : r.status === "pending" ? "amber" : "rose"} />,
             <span style={{ color: r.promoted ? "var(--color-amber)" : "var(--color-dim)" }}>{r.promoted ? "★ Да" : "—"}</span>,
             <div className="flex flex-wrap gap-2">
-              <Btn variant="ghost" small onClick={() => setSelected(r)}>Изменить</Btn>
+              <Btn variant="ghost" small onClick={() => { setSelected(r); setDraft(r); }}>Изменить</Btn>
               <Btn variant={r.promoted ? "danger" : "ghost"} small onClick={() => togglePromote(r.id)}>
                 {r.promoted ? "Убрать" : "Продвинуть"}
               </Btn>
@@ -188,35 +191,52 @@ export default function Restaurants() {
         </div>
       )}
 
-      {selected && (
-        <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: "rgba(0,0,0,0.7)" }} onClick={() => setSelected(null)}>
-          <div className="rounded-xl w-full max-w-md p-6" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }} onClick={e => e.stopPropagation()}>
+      {selected && draft && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 p-4" style={{ background: "rgba(0,0,0,0.7)" }} onClick={() => setSelected(null)}>
+          <div className="rounded-xl w-full max-w-md p-6 max-h-[90dvh] overflow-y-auto" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }} onClick={e => e.stopPropagation()}>
             <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
-              <h3 className="text-lg font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}>{selected.name}</h3>
+              <h3 className="text-lg font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}>{draft.name}</h3>
               <button className="text-xl opacity-50 hover:opacity-100 cursor-pointer" style={{ color: "var(--color-text)" }} onClick={() => setSelected(null)}>×</button>
             </div>
-            <p className="text-sm leading-relaxed mb-4" style={{ color: "var(--color-muted)" }}>{selected.desc}</p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
-              {[
-                { label: "Город", val: selected.city },
-                { label: "Кухня", val: selected.cuisine },
-                { label: "Рейтинг", val: `★ ${selected.rating}` },
-                { label: "Мест", val: String(selected.seats) },
-                { label: "Часы работы", val: selected.open },
-                { label: "Телефон", val: selected.phone },
-              ].map(s => (
-                <div key={s.label} className="rounded p-2" style={{ background: "var(--color-surface)" }}>
-                  <div className="text-xs mb-0.5" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>{s.label}</div>
-                  <div className="text-sm" style={{ color: "var(--color-text)" }}>{s.val}</div>
+            {/* Правим копию, применяем всё разом по «Сохранить». */}
+            <div className="flex flex-col gap-3 mb-4">
+              {([
+                ["name", "Название", "text"],
+                ["cuisine", "Кухня", "text"],
+                ["open", "Часы работы", "text"],
+                ["phone", "Телефон", "text"],
+                ["address", "Адрес", "text"],
+                ["seats", "Мест", "number"],
+              ] as const).map(([k, label, type]) => (
+                <div key={k}>
+                  <label className="text-xs block mb-1" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>{label.toUpperCase()}</label>
+                  <input
+                    type={type}
+                    value={String(draft[k as keyof Restaurant] ?? "")}
+                    onChange={e => setDraft(d => d && { ...d, [k]: type === "number" ? Number(e.target.value) : e.target.value })}
+                    className="w-full rounded px-3 py-2 text-sm outline-none"
+                    style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", color: "var(--color-text)", fontFamily: "var(--font-body)" }}
+                  />
                 </div>
               ))}
+              <div>
+                <label className="text-xs block mb-1" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>ОПИСАНИЕ</label>
+                <textarea
+                  rows={3}
+                  value={draft.desc}
+                  onChange={e => setDraft(d => d && { ...d, desc: e.target.value })}
+                  className="w-full rounded px-3 py-2 text-sm outline-none resize-none"
+                  style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", color: "var(--color-text)", fontFamily: "var(--font-body)" }}
+                />
+              </div>
             </div>
             <div className="flex flex-wrap gap-2">
-              {selected.status === "pending" && <Btn onClick={() => approveRestaurant(selected.id)}>Одобрить</Btn>}
-              <Btn variant={selected.promoted ? "danger" : "ghost"} onClick={() => { togglePromote(selected.id); setSelected(null); }}>
-                {selected.promoted ? "Убрать продвижение" : "Продвигать ★"}
+              <Btn onClick={() => { setItems(prev => prev.map(r => r.id === draft.id ? draft : r)); setSelected(null); }}>Сохранить</Btn>
+              {draft.status === "pending" && <Btn variant="ghost" onClick={() => approveRestaurant(draft.id)}>Одобрить</Btn>}
+              <Btn variant={draft.promoted ? "danger" : "ghost"} onClick={() => { togglePromote(draft.id); setSelected(null); }}>
+                {draft.promoted ? "Убрать продвижение" : "Продвигать ★"}
               </Btn>
-              <Btn variant="ghost" onClick={() => setSelected(null)}>Закрыть</Btn>
+              <Btn variant="ghost" onClick={() => setSelected(null)}>Отмена</Btn>
             </div>
           </div>
         </div>

@@ -7,6 +7,29 @@ export default function Settings({ onNavigate }: { onNavigate?: (page: string) =
   const [saved, setSaved] = useState(false);
   const [pwSaved, setPwSaved] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [exporting, setExporting] = useState(false);
+
+  /**
+   * Экспорт содержимого — настоящий: скачиваем текущий дамп из
+   * /api/content. Раньше кнопка обещала «дамп базы в ZIP» и не делала
+   * ничего.
+   */
+  const exportData = async () => {
+    setExporting(true);
+    try {
+      const data = await fetch("/api/content").then(r => r.json());
+      const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }));
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `uzroam-content-${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
+    } finally {
+      setExporting(false);
+    }
+  };
   const [profile, setProfile] = useState({
     name: "Администратор",
     email: "admin@uztravel.uz",
@@ -33,6 +56,18 @@ export default function Settings({ onNavigate }: { onNavigate?: (page: string) =
         subtitle="Аккаунт, уведомления и системные параметры"
         action={<Btn onClick={save}>{saved ? "✓ Сохранено" : "Сохранить"}</Btn>}
       />
+
+      {/* Честно о том, что аккаунта как такового нет: вход в панель один,
+          по общему паролю. Профиль, 2FA и смена пароля ниже пока
+          оформление — работают только тема и экспорт. */}
+      <div
+        className="mb-6 rounded-lg px-4 py-3 text-sm"
+        style={{ background: "color-mix(in srgb, var(--color-amber) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--color-amber) 30%, transparent)", color: "var(--color-text)" }}
+      >
+        ⚠️ Учётных записей пока нет — вход в панель один, по общему паролю (задаётся
+        <code style={{ fontFamily: "var(--font-mono)" }}> ADMIN_PASSWORD</code>). Профиль, роли,
+        2FA и смена пароля ниже не сохраняются. Реально работают тема оформления и экспорт данных.
+      </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Профиль */}
@@ -213,12 +248,12 @@ export default function Settings({ onNavigate }: { onNavigate?: (page: string) =
               <div className="flex-1 min-w-0 sm:min-w-60">
                 <div className="text-sm font-medium mb-0.5" style={{ color: "var(--color-text)" }}>Очистить кэш</div>
                 <div className="text-xs mb-3" style={{ color: "var(--color-muted)" }}>Принудительное обновление всех кэшированных страниц и CDN</div>
-                <Btn variant="ghost">Очистить кэш</Btn>
+                <Btn variant="ghost" onClick={() => location.reload()}>Очистить кэш</Btn>
               </div>
               <div className="flex-1 min-w-0 sm:min-w-60">
                 <div className="text-sm font-medium mb-0.5" style={{ color: "var(--color-text)" }}>Экспорт данных</div>
                 <div className="text-xs mb-3" style={{ color: "var(--color-muted)" }}>Скачать полный дамп базы данных в ZIP-архиве</div>
-                <Btn variant="ghost">Экспортировать</Btn>
+                <Btn variant="ghost" onClick={exportData}>{exporting ? "Готовим…" : "Экспортировать"}</Btn>
               </div>
               <div className="flex-1 min-w-0 sm:min-w-60">
                 <div className="text-sm font-medium mb-0.5" style={{ color: "var(--color-rose)" }}>Удалить аккаунт</div>

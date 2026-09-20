@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { PageHeader, Badge, Btn, Card, SectionTitle } from "./shared";
+import { PageHeader, Badge, Btn, Card, SectionTitle, ДемоРаздел } from "./shared";
 import { useEntity } from "../context/useEntity";
 import type { ManagedAd as Ad } from "@/lib/types";
 
@@ -198,6 +198,7 @@ export default function AdsManager() {
 
       {tab === "promotions" && (
         <div>
+          <ДемоРаздел что="Платного продвижения листингов пока нет: приложение не поднимает заведения по этим записям, они здесь для примера." />
           <div
             className="rounded-lg px-4 py-3 mb-5 text-sm"
             style={{ background: "color-mix(in srgb, var(--color-amber) 8%, transparent)", border: "1px solid color-mix(in srgb, var(--color-amber) 20%, transparent)", color: "var(--color-amber-light)" }}
@@ -245,7 +246,6 @@ export default function AdsManager() {
                   <Btn variant={p.active ? "danger" : "ghost"} small onClick={() => togglePromo(p.id)}>
                     {p.active ? "Приостановить" : "Активировать"}
                   </Btn>
-                  <Btn variant="ghost" small>Изменить</Btn>
                 </div>
               </div>
             ))}

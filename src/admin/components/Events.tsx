@@ -10,6 +10,8 @@ export default function Events() {
   const [filter, setFilter] = useState("all");
   const [cityFilter, setCityFilter] = useState("all");
   const [showForm, setShowForm] = useState(false);
+  // Черновик правки события: кнопка «Изменить» раньше не делала ничего.
+  const [draft, setDraft] = useState<Event | null>(null);
   const [newEvent, setNewEvent] = useState({ name: "", city: "", category: "Festival", date: "", venue: "", price: "", capacity: "" });
 
   const cities = ["all", ...Array.from(new Set(events.map(e => e.city)))];
@@ -118,7 +120,7 @@ export default function Events() {
                   <Btn variant={e.featured ? "danger" : "ghost"} small onClick={() => toggleFeatured(e.id)}>
                     {e.featured ? "Убрать из рек." : "Рекомендовать ★"}
                   </Btn>
-                  <Btn variant="ghost" small>Изменить</Btn>
+                  <Btn variant="ghost" small onClick={() => setDraft(e)}>Изменить</Btn>
                   {e.status !== "cancelled" && e.status !== "past" && (
                     <Btn variant="danger" small onClick={() => setEvents(prev => prev.map(ev => ev.id === e.id ? { ...ev, status: "cancelled" } : ev))}>
                       Отменить
@@ -132,6 +134,52 @@ export default function Events() {
       </div>
 
       {/* Add Event Modal */}
+      {draft && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 p-4" style={{ background: "rgba(0,0,0,0.7)" }} onClick={() => setDraft(null)}>
+          <div className="rounded-xl w-full max-w-md p-6 max-h-[90dvh] overflow-y-auto" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }} onClick={e => e.stopPropagation()}>
+            <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
+              <h3 className="text-lg font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}>{draft.name}</h3>
+              <button className="text-xl opacity-50 hover:opacity-100 cursor-pointer" style={{ color: "var(--color-text)" }} onClick={() => setDraft(null)}>×</button>
+            </div>
+            <div className="flex flex-col gap-3 mb-4">
+              {([
+                ["name", "Название", "text"],
+                ["city", "Город", "text"],
+                ["venue", "Площадка", "text"],
+                ["date", "Дата", "text"],
+                ["capacity", "Вместимость", "number"],
+                ["price", "Цена билета", "number"],
+              ] as const).map(([k, label, type]) => (
+                <div key={k}>
+                  <label className="text-xs block mb-1" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>{label.toUpperCase()}</label>
+                  <input
+                    type={type}
+                    value={String(draft[k as keyof Event] ?? "")}
+                    onChange={ev => setDraft(d => d && { ...d, [k]: type === "number" ? Number(ev.target.value) : ev.target.value })}
+                    className="w-full rounded px-3 py-2 text-sm outline-none"
+                    style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", color: "var(--color-text)", fontFamily: "var(--font-body)" }}
+                  />
+                </div>
+              ))}
+              <div>
+                <label className="text-xs block mb-1" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>ОПИСАНИЕ</label>
+                <textarea
+                  rows={3}
+                  value={draft.desc}
+                  onChange={ev => setDraft(d => d && { ...d, desc: ev.target.value })}
+                  className="w-full rounded px-3 py-2 text-sm outline-none resize-none"
+                  style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", color: "var(--color-text)", fontFamily: "var(--font-body)" }}
+                />
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Btn onClick={() => { setEvents(prev => prev.map(ev => ev.id === draft.id ? draft : ev)); setDraft(null); }}>Сохранить</Btn>
+              <Btn variant="ghost" onClick={() => setDraft(null)}>Отмена</Btn>
+            </div>
+          </div>
+        </div>
+      )}
+
       {showForm && (
         <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: "rgba(0,0,0,0.7)" }} onClick={() => setShowForm(false)}>
           <div className="rounded-xl w-full max-w-md p-6" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }} onClick={e => e.stopPropagation()}>
