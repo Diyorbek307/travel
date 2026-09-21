@@ -90,9 +90,15 @@ export default function RealMap({
         attributionControl: true,
       });
 
+      // Убираем приписку «Leaflet» с флагом — она мозолит глаза и к делу
+      // не относится. Кредит OpenStreetMap лицензия требует сохранить,
+      // поэтому оставляем его коротким «© OSM» и делаем крошечным,
+      // почти незаметным в globals.css.
+      м.attributionControl.setPrefix(false);
+
       L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 19,
-        attribution: "© OpenStreetMap",
+        attribution: "© OSM",
       }).addTo(м);
 
       м.on("click", (e: { latlng: { lat: number; lng: number } }) => {

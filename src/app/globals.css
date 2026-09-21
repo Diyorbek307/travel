@@ -584,11 +584,17 @@ button[aria-disabled="true"] {
 
 
 /* Неон «вау»-экрана: перебираем оттенки, а не вращаем элемент — под
-   ореолом лежит текст, и поворот увёл бы его вместе с собой. Два набора:
-   у ореола в filter ещё и размытие, и его нужно сохранить по кадрам. */
+   ореолом лежит текст, и поворот увёл бы его вместе с собой. У каждого
+   слоя своё размытие, и его нужно сохранить по кадрам, иначе на старте
+   анимации свечение дёргается. */
 @keyframes wow-glow {
   to {
-    filter: hue-rotate(360deg) blur(58px);
+    filter: hue-rotate(360deg) blur(64px);
+  }
+}
+@keyframes wow-glow-rev {
+  to {
+    filter: hue-rotate(-360deg) blur(34px);
   }
 }
 @keyframes wow-ring {
@@ -598,8 +604,23 @@ button[aria-disabled="true"] {
 }
 @keyframes wow-reflect {
   to {
-    filter: hue-rotate(360deg) blur(34px);
+    filter: hue-rotate(360deg) blur(38px);
   }
+}
+/* Дыхание внешнего ореола — лёгкая пульсация размера. */
+@keyframes wow-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.09); }
+}
+/* Медленный дрейф цветной дымки по сцене. */
+@keyframes wow-aurora {
+  0%, 100% { transform: translate3d(0, 0, 0); opacity: 0.85; }
+  50% { transform: translate3d(0, -3%, 0); opacity: 1; }
+}
+/* Парящие искры: всплывают и мерцают. */
+@keyframes wow-float {
+  0%, 100% { transform: translateY(0) scale(1); opacity: 0.35; }
+  50% { transform: translateY(-16px) scale(1.4); opacity: 0.95; }
 }
 
 /* Живая рамка партнёрского блока: перелив по краю, чтобы блок замечали
@@ -657,4 +678,18 @@ html[data-theme="dark"] .leaflet-bar a {
    их классом: «назад» и «вперёд» — это смысл, а не украшение. */
 [dir="rtl"] .rtl-flip {
   transform: scaleX(-1);
+}
+
+/* Кредит карты — крошечный и полупрозрачный: по лицензии его нельзя
+   убрать совсем, но и мозолить глаза он не должен. */
+.leaflet-control-attribution {
+  font-size: 8px !important;
+  opacity: 0.35;
+  padding: 0 3px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.leaflet-control-attribution a {
+  color: inherit !important;
+  text-decoration: none !important;
 }
