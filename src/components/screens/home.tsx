@@ -16,6 +16,7 @@ import { useПрочитанные } from "@/lib/notifs-read";
 import { NOTIFS } from "@/data/content";
 import CityReel from "@/components/city-reel";
 import { ВИДЕО, кадрыГорода } from "@/data/city-reels";
+import { useДеньги } from "@/lib/money";
 
 import { AdShelf, AdSpotlight } from "@/components/ads";
 import { glass, glassLight } from "@/lib/theme";
@@ -29,6 +30,7 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
   const самарканд = погода.get("Самарканд");
   // Город пользователя для таргетинга рекламы (по геолокации).
   const городРекл = ближайшийГород(useGeo().pos);
+  const дг = useДеньги();
   // Точка на колокольчике раньше горела всегда — даже после «Прочитать все».
   const прочитанные = useПрочитанные();
   const естьНепрочитанные = NOTIFS.some((n) => n.unread && !прочитанные.includes(n.title));
@@ -196,7 +198,7 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
                   <div><p className="text-white font-bold text-[10px]">{h.facilities.length}</p><p className="text-[7px]" style={{color:"rgba(255,255,255,0.4)"}}>{t("home_services")}</p></div>
                 </div>
                 <div className="flex items-center justify-between">
-                  <div><p className="text-[7px]" style={{color:"rgba(255,255,255,0.4)"}}>{t("home_per_night")}</p><p className="text-white font-bold text-sm">{h.price}</p></div>
+                  <div><p className="text-[7px]" style={{color:"rgba(255,255,255,0.4)"}}>{t("home_per_night")}</p><p className="text-white font-bold text-sm">{дг.цена(h.price)}</p></div>
                   <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{background:GOLD}}><svg className="rtl-flip" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={TEXT} strokeWidth="2.5"><polyline points="9 18 15 12 9 6"/></svg></div>
                 </div>
               </div>
@@ -226,7 +228,7 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
                   <div><p className="text-white font-bold text-[10px]">{r.open.split("–")[0]}</p><p className="text-[7px]" style={{color:"rgba(255,255,255,0.4)"}}>{t("home_open_word")}</p></div>
                 </div>
                 <div className="flex items-center justify-between">
-                  <div><p className="text-[7px]" style={{color:"rgba(255,255,255,0.4)"}}>{t("d_price")}</p><p className="text-white font-bold text-xs">{r.price}</p></div>
+                  <div><p className="text-[7px]" style={{color:"rgba(255,255,255,0.4)"}}>{t("d_price")}</p><p className="text-white font-bold text-xs">{дг.цена(r.price)}</p></div>
                   <div className="w-7 h-7 rounded-full flex items-center justify-center" style={{background:"#C1603A"}}><svg className="rtl-flip" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"/></svg></div>
                 </div>
               </div>

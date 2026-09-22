@@ -43,6 +43,9 @@ export async function GET() {
       storage: бэкенд,
       reachable: достучались,
       persists: переживётПерезапуск,
+      // Версия текущей сборки — по ней приложение понимает, что вышло
+      // обновление, и предлагает перезагрузиться.
+      build: process.env.NEXT_PUBLIC_BUILD_ID ?? "dev",
       error: ошибка,
     },
     { headers: { "Cache-Control": "no-store" } },

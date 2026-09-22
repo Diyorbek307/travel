@@ -18,26 +18,116 @@ import { LOCALE_META, LOCALES, type TKey, датаСловами } from "@/lib/i
 import { Badge } from "../ui";
 import { CurrencyConverter } from "@/components/screens/practical";
 import { AdInline } from "@/components/ads";
+import { faqТексты, условияТекст, политикаТекст } from "@/data/legal";
 
 
-export function SettingsView({ isPremium, onUpgrade, onLogout }:{ isPremium:boolean; onUpgrade:()=>void; onLogout:()=>void }) {
+export function SettingsView({ isPremium, user, onUpgrade, onLogout, onSupport }:{ isPremium:boolean; user:PublicUser|null; onUpgrade:()=>void; onLogout:()=>void; onSupport:()=>void }) {
   const { t, lang, setLang } = useT();
+  // Какая подробная панель открыта поверх настроек.
+  type Панель = null | "faq" | "terms" | "privacy" | "edit" | "linked" | "delete" | "rate";
+  const [панель, setПанель] = useState<Панель>(null);
+  const [сообщение, setСообщение] = useState("");
+  const [обновление, setОбновление] = useState<null | "checking" | "current" | "available">(null);
+  const [форма, setФорма] = useState({ firstName: "", lastName: "", country: "", phone: "" });
+  const [оценка, setОценка] = useState(0);
+
+  const тост = (m: string) => { setСообщение(m); setTimeout(() => setСообщение(""), 2400); };
+
+  // Поделиться приложением: системное окно, если есть; иначе — копия ссылки.
+  const поделиться = async () => {
+    const url = typeof location !== "undefined" ? location.origin : "https://uzbekistan-travel.onrender.com";
+    try {
+      if (navigator.share) { await navigator.share({ title: "UzRoam", url }); return; }
+      await navigator.clipboard.writeText(url);
+      тост(t("share_copied"));
+    } catch { /* человек закрыл окно «Поделиться» — это не ошибка */ }
+  };
+
+  // Проверка обновлений: сравниваем сборку в приложении с той, что на
+  // сервере. Разошлись — предлагаем перезагрузиться.
+  const проверитьОбновления = async () => {
+    setОбновление("checking");
+    try {
+      const h = await fetch("/api/health", { cache: "no-store" }).then(r => r.json());
+      const текущая = process.env.NEXT_PUBLIC_BUILD_ID ?? "dev";
+      setОбновление(h?.build && h.build !== текущая ? "available" : "current");
+    } catch {
+      setОбновление("current");
+    }
+  };
+
+  // Скачать свои данные: то, что о человеке знает приложение.
+  const скачатьДанные = () => {
+    const данные = {
+      профиль: user,
+      настройки: (() => { try { return JSON.parse(localStorage.getItem("uzup.settings") || "{}"); } catch { return {}; } })(),
+      избранное: (() => { try { return JSON.parse(localStorage.getItem("uzup.favorites") || "[]"); } catch { return []; } })(),
+      маршрут: (() => { try { return JSON.parse(localStorage.getItem("uzup.trip") || "[]"); } catch { return []; } })(),
+      посещения: (() => { try { return JSON.parse(localStorage.getItem("uzup.visits") || "{}"); } catch { return {}; } })(),
+    };
+    const url = URL.createObjectURL(new Blob([JSON.stringify(данные, null, 2)], { type: "application/json" }));
+    const a = document.createElement("a"); a.href = url; a.download = "uzroam-my-data.json";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+  };
+
+  // Сохранить правку профиля на сервере.
+  const сохранитьПрофиль = async () => {
+    try {
+      await fetch("/api/auth/me", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(форма) });
+      тост(t("prof_saved_ok"));
+      setПанель(null);
+    } catch { тост(t("err_network")); }
+  };
+
+  // Смена пароля: письмо со ссылкой на почту аккаунта.
+  const сброситьПароль = async () => {
+    if (!user?.email) return;
+    try {
+      await fetch("/api/auth/forgot", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: user.email }) });
+      тост(t("sec_reset_sent"));
+    } catch { тост(t("err_network")); }
+  };
+
+  // Удаление аккаунта.
+  const удалитьАккаунт = async () => {
+    try {
+      await fetch("/api/auth/me", { method: "DELETE" });
+    } finally {
+      setПанель(null);
+      onLogout();
+    }
+  };
+
+  const открытьПравку = () => {
+    setФорма({ firstName: user?.firstName ?? "", lastName: user?.lastName ?? "", country: user?.country ?? "", phone: user?.phone ?? "" });
+    setПанель("edit");
+  };
+
+  const отправитьОценку = async (n: number) => {
+    setОценка(n);
+    try { await fetch("/api/support", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text: `★ ${n}/5` }) }); } catch { /* не критично */ }
+    setTimeout(() => { setПанель(null); setОценка(0); тост(t("rate_thanks")); }, 500);
+  };
   // Все настройки — из общего хранилища (сохраняются на устройстве).
   const нст = useSettings();
-  const [currency,   setCurrency]   = useState("USD");
 
   const Toggle=({on,set}:{on:boolean;set:(v:boolean)=>void})=>(
     <button onClick={()=>set(!on)} className="relative w-11 h-6 rounded-full transition-colors flex-shrink-0" style={{background:on?GREEN:BORDER}}>
-      <div className="absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all" style={{left:on?"22px":"2px"}}/>
+      <div className="absolute top-0.5 w-5 h-5 rounded-full shadow transition-all" style={{left:on?"22px":"2px",background:"#fff"}}/>
     </button>
   );
-  const Row=({icon,label,sub,right}:{icon:string;label:string;sub?:string;right:React.ReactNode})=>(
-    <div className="flex items-center gap-3 py-3 border-b last:border-0" style={{borderColor:BORDER}}>
+  const Row=({icon,label,sub,right,onClick}:{icon:string;label:string;sub?:string;right:React.ReactNode;onClick?:()=>void})=>{
+    const внутри=(<>
       <span className="text-lg w-6 text-center flex-shrink-0">{icon}</span>
-      <div className="flex-1 min-w-0"><p className="text-sm font-medium" style={{color:TEXT}}>{label}</p>{sub&&<p className="text-[10px]" style={{color:MUTED}}>{sub}</p>}</div>
+      <div className="flex-1 min-w-0 text-left"><p className="text-sm font-medium" style={{color:TEXT}}>{label}</p>{sub&&<p className="text-[10px]" style={{color:MUTED}}>{sub}</p>}</div>
       {right}
-    </div>
-  );
+    </>);
+    return onClick
+      ? <button onClick={onClick} className="w-full flex items-center gap-3 py-3 border-b last:border-0 active:opacity-60 transition-opacity" style={{borderColor:BORDER}}>{внутри}</button>
+      : <div className="flex items-center gap-3 py-3 border-b last:border-0" style={{borderColor:BORDER}}>{внутри}</div>;
+  };
+  const шеврон=<svg className="rtl-flip" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={MUTED} strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>;
 
   return (
     <div className="flex-1 overflow-y-auto hide-scroll p-4 animate-fade-in space-y-3">
@@ -114,8 +204,8 @@ export function SettingsView({ isPremium, onUpgrade, onLogout }:{ isPremium:bool
         }/>
         <Row icon="🎵" label={t("s_autoplay")} sub={t("s_autoplay_sub")} right={<Toggle on={нст.autoplay} set={v=>задатьНастройку("autoplay",v)}/>}/>
         <Row icon="💱" label={t("s_currency")} right={
-          <select value={currency} onChange={e=>setCurrency(e.target.value)} className="text-xs font-bold px-2 py-1 rounded-lg outline-none border" style={{color:GREEN,borderColor:BORDER,background:CREAM}}>
-            {["USD","EUR","RUB","GBP","KRW","CNY","JPY"].map(c=><option key={c}>{c}</option>)}
+          <select value={нст.currency} onChange={e=>задатьНастройку("currency",e.target.value)} className="text-xs font-bold px-2 py-1 rounded-lg outline-none border" style={{color:GREEN,borderColor:BORDER,background:CREAM}}>
+            {["USD","EUR","RUB","GBP","KRW","CNY","JPY","UZS"].map(c=><option key={c}>{c}</option>)}
           </select>
         }/>
       </div>
@@ -123,31 +213,115 @@ export function SettingsView({ isPremium, onUpgrade, onLogout }:{ isPremium:bool
       {/* Аккаунт */}
       <div className="bg-white rounded-2xl px-4 shadow-sm border" style={{borderColor:BORDER}}>
         <p className="font-bold text-xs pt-3 pb-1 uppercase tracking-widest" style={{color:MUTED}}>{t("prof_account")}</p>
-        {[{e:"👤",l:t("s_edit_profile")},{e:"🔐",l:t("s_security")},{e:"🔗",l:t("s_linked")},{e:"📊",l:t("s_privacy")},{e:"🗑️",l:t("s_delete")}].map((item,i)=>(
-          <Row key={i} icon={item.e} label={item.l} right={<svg className="rtl-flip" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={MUTED} strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>}/>
-        ))}
+        <Row icon="👤" label={t("s_edit_profile")} right={шеврон} onClick={открытьПравку}/>
+        <Row icon="🔐" label={t("s_security")} right={шеврон} onClick={сброситьПароль}/>
+        <Row icon="🔗" label={t("s_linked")} right={шеврон} onClick={()=>setПанель("linked")}/>
+        <Row icon="📊" label={t("s_privacy")} right={шеврон} onClick={скачатьДанные}/>
+        <Row icon="🗑️" label={t("s_delete")} right={шеврон} onClick={()=>setПанель("delete")}/>
       </div>
 
       {/* Поддержка */}
       <div className="bg-white rounded-2xl px-4 shadow-sm border" style={{borderColor:BORDER}}>
         <p className="font-bold text-xs pt-3 pb-1 uppercase tracking-widest" style={{color:MUTED}}>{t("prof_support")}</p>
-        {[{e:"❓",l:t("s_help")},{e:"💬",l:t("s_write_support")},{e:"⭐",l:t("s_rate")},{e:"📢",l:t("s_share")},{e:"📄",l:t("s_terms")},{e:"🔒",l:t("s_privacy_policy")}].map((item,i)=>(
-          <Row key={i} icon={item.e} label={item.l} right={<svg className="rtl-flip" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={MUTED} strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>}/>
-        ))}
+        <Row icon="❓" label={t("s_help")} right={шеврон} onClick={()=>setПанель("faq")}/>
+        <Row icon="💬" label={t("s_write_support")} right={шеврон} onClick={onSupport}/>
+        <Row icon="⭐" label={t("s_rate")} right={шеврон} onClick={()=>setПанель("rate")}/>
+        <Row icon="📢" label={t("s_share")} right={шеврон} onClick={поделиться}/>
+        <Row icon="📄" label={t("s_terms")} right={шеврон} onClick={()=>setПанель("terms")}/>
+        <Row icon="🔒" label={t("s_privacy_policy")} right={шеврон} onClick={()=>setПанель("privacy")}/>
       </div>
 
       {/* О приложении */}
       <div className="bg-white rounded-2xl px-4 shadow-sm border" style={{borderColor:BORDER}}>
         <p className="font-bold text-xs pt-3 pb-1 uppercase tracking-widest" style={{color:MUTED}}>{t("prof_about")}</p>
         <Row icon="📱" label={t("s_version")} right={<span className="text-xs font-mono" style={{color:MUTED}}>2.4.1</span>}/>
-        <Row icon="🔄" label={t("s_check_updates")} right={<span className="text-xs font-bold" style={{color:GREEN}}>{t("prof_updated")}</span>}/>
+        <Row icon="🔄" label={t("s_check_updates")} onClick={обновление==="available"?()=>location.reload():проверитьОбновления} right={
+          <span className="text-xs font-bold" style={{color:обновление==="available"?GOLD:GREEN}}>
+            {обновление==="checking"?t("upd_checking"):обновление==="available"?t("upd_reload"):обновление==="current"?t("upd_current"):t("prof_updated")}
+          </span>
+        }/>
         <Row icon="🌍" label="UzRoam — Made in Uzbekistan" right={<span className="text-base">🇺🇿</span>}/>
       </div>
 
-      <button onClick={onLogout} className="w-full py-3.5 rounded-2xl text-sm font-bold border mb-1 active:scale-[0.98] transition-all" style={{color:"#E74C3C",borderColor:"#FCDADA",background:"#FFF5F5"}}>
+      <button onClick={onLogout} className="w-full py-3.5 rounded-2xl text-sm font-bold border mb-1 active:scale-[0.98] transition-all" style={{color:"#E7574C",borderColor:"color-mix(in srgb,#E7574C 35%,transparent)",background:"color-mix(in srgb,#E7574C 12%,transparent)"}}>
         🚪 {t("prof_logout")}
       </button>
       <div className="pb-6"/>
+
+      {/* Тост подтверждений. */}
+      {сообщение && (
+        <div className="fixed left-1/2 bottom-24 z-[70] -translate-x-1/2 rounded-full px-4 py-2 text-sm font-semibold shadow-lg" style={{background:TEXT,color:CREAM}}>
+          {сообщение}
+        </div>
+      )}
+
+      {/* Панель поверх настроек: справка, условия, политика, правка,
+          привязки, оценка, удаление. Общая обёртка — лист снизу. */}
+      {панель && (
+        <div className="fixed inset-0 z-[65] flex items-end sm:items-center justify-center" style={{background:"rgba(0,0,0,0.55)"}} onClick={()=>setПанель(null)}>
+          <div className="w-full sm:max-w-md max-h-[85dvh] overflow-y-auto rounded-t-3xl sm:rounded-3xl p-5" style={{background:SURFACE,border:`1px solid ${BORDER}`}} onClick={e=>e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold" style={{color:TEXT,fontFamily:"'Fraunces',serif"}}>
+                {панель==="faq"?t("s_help"):панель==="terms"?t("s_terms"):панель==="privacy"?t("s_privacy_policy"):панель==="edit"?t("s_edit_profile"):панель==="linked"?t("s_linked"):панель==="rate"?t("rate_title"):t("del_title")}
+              </h3>
+              <button onClick={()=>setПанель(null)} className="text-xl opacity-50 active:opacity-100" style={{color:TEXT}}>×</button>
+            </div>
+
+            {панель==="faq" && (
+              <div className="space-y-4">
+                {faqТексты(lang).map((б,i)=>(
+                  <div key={i}>
+                    <p className="text-sm font-bold" style={{color:TEXT}}>{б.q}</p>
+                    <p className="text-sm mt-1 leading-relaxed" style={{color:MUTED}}>{б.a}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {(панель==="terms"||панель==="privacy") && (
+              <p className="text-sm leading-relaxed whitespace-pre-line" style={{color:MUTED}}>
+                {панель==="terms"?условияТекст(lang):политикаТекст(lang)}
+              </p>
+            )}
+
+            {панель==="linked" && (
+              <p className="text-sm leading-relaxed" style={{color:MUTED}}>{t("linked_none")}</p>
+            )}
+
+            {панель==="edit" && (
+              <div className="space-y-3">
+                {([["firstName",t("f_field_first")],["lastName",t("f_field_last")],["country",t("f_field_country")],["phone",t("f_field_phone")]] as const).map(([k,label])=>(
+                  <div key={k}>
+                    <label className="text-[10px] uppercase tracking-widest font-bold block mb-1" style={{color:MUTED}}>{label}</label>
+                    <input value={(форма as Record<string,string>)[k]} onChange={e=>setФорма(f=>({...f,[k]:e.target.value}))} className="w-full rounded-xl px-3 py-2.5 text-sm outline-none border" style={{background:CREAM,borderColor:BORDER,color:TEXT}}/>
+                  </div>
+                ))}
+                <button onClick={сохранитьПрофиль} className="w-full py-3 rounded-xl text-sm font-bold text-white active:scale-[0.98] transition-all" style={{background:GREEN}}>{t("prof_save")}</button>
+              </div>
+            )}
+
+            {панель==="rate" && (
+              <div className="text-center">
+                <div className="flex justify-center gap-2 my-4">
+                  {[1,2,3,4,5].map(n=>(
+                    <button key={n} onClick={()=>отправитьОценку(n)} className="text-3xl transition-transform active:scale-125" style={{opacity:n<=оценка?1:0.4}}>⭐</button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {панель==="delete" && (
+              <div>
+                <p className="text-sm leading-relaxed mb-4" style={{color:MUTED}}>{t("del_body")}</p>
+                <div className="flex gap-2">
+                  <button onClick={удалитьАккаунт} className="flex-1 py-3 rounded-xl text-sm font-bold text-white active:scale-[0.98]" style={{background:"#E74C3C"}}>{t("del_yes")}</button>
+                  <button onClick={()=>setПанель(null)} className="flex-1 py-3 rounded-xl text-sm font-bold border active:scale-[0.98]" style={{color:TEXT,borderColor:BORDER}}>{t("common_back")}</button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -328,7 +502,7 @@ ${t("cur_live_hint")}`
       )}
       {view==="bookings"&&<MyBookings/>}
       {view==="support"&&<SupportChat onBack={()=>setView("passport")}/>}
-      {view==="settings"&&<SettingsView isPremium={isPremium} onUpgrade={()=>setShowPremium(true)} onLogout={onLogout}/>}
+      {view==="settings"&&<SettingsView isPremium={isPremium} user={user} onUpgrade={()=>setShowPremium(true)} onLogout={onLogout} onSupport={()=>setView("support")}/>}
     </div>
   );
 }

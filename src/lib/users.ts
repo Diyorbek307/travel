@@ -214,6 +214,32 @@ export async function deleteUser(id: string): Promise<void> {
   await хранилище.update((users) => [users.filter((u) => u.id !== id), undefined]);
 }
 
+/**
+ * Обновить редактируемые поля профиля.
+ *
+ * Меняем только то, что человек и правда меняет о себе: имя, фамилию,
+ * страну, телефон. Почту и пароль трогаем отдельными путями (там своя
+ * проверка), поэтому сюда они не входят.
+ */
+export async function updateUser(
+  id: string,
+  fields: Partial<Pick<User, "firstName" | "lastName" | "country" | "phone">>,
+): Promise<User | null> {
+  return хранилище.update<User | null>((users) => {
+    const i = users.findIndex((u) => u.id === id);
+    if (i === -1) return [users, null];
+    const копия = [...users];
+    const чистые: typeof fields = {};
+    if (typeof fields.firstName === "string") чистые.firstName = fields.firstName.trim().slice(0, 60);
+    if (typeof fields.lastName === "string") чистые.lastName = fields.lastName.trim().slice(0, 60);
+    if (typeof fields.country === "string") чистые.country = fields.country.trim().slice(0, 60);
+    if (typeof fields.phone === "string") чистые.phone = fields.phone.trim().slice(0, 40);
+    копия[i] = { ...копия[i], ...чистые };
+    return [копия, копия[i]];
+  });
+}
+
+
 /* ------------------------------------------------------------------ */
 /* Подтверждение почты                                                */
 /* ------------------------------------------------------------------ */

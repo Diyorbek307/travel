@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ГОРОДА } from "@/data/geo";
+import { useДеньги } from "@/lib/money";
 import { ссылкаНаЗаказ } from "@/lib/taxi";
 import { useT } from "@/components/lang-provider";
 import type { TKey } from "@/lib/i18n";
@@ -55,6 +56,7 @@ export function CityPicker({ value, onChange, label, icon }:{ value:string; onCh
 
 export function TransportScreen({ onBack, isPremium }:{ onBack:()=>void; isPremium:boolean }) {
   const { t, трК } = useT();
+  const дг = useДеньги();
   const [mode, setMode] = useState<"trains"|"flights"|"taxi">("trains");
   /*
    * Билеты продаёт перевозчик. Раньше «Купить» просто переключало
@@ -83,7 +85,7 @@ export function TransportScreen({ onBack, isPremium }:{ onBack:()=>void; isPremi
     <div className="bg-white rounded-2xl overflow-hidden shadow-sm border" style={{borderColor:BORDER}}>
       {children}
       <div className="px-4 pb-4 flex items-center justify-between">
-        <div><p className="text-[9px] uppercase font-bold tracking-widest" style={{color:MUTED}}>{t("tr_price_pp")}</p><p className="font-bold text-lg" style={{color:GREEN,fontFamily:"'Fraunces',serif"}}>{price}</p></div>
+        <div><p className="text-[9px] uppercase font-bold tracking-widest" style={{color:MUTED}}>{t("tr_price_pp")}</p><p className="font-bold text-lg" style={{color:GREEN,fontFamily:"'Fraunces',serif"}}>{дг.цена(price)}</p></div>
         <button onClick={onBook} className="px-4 py-2.5 rounded-xl text-xs font-bold text-white transition-all active:scale-95" style={{background:GREEN}}>{t("tr_buy_ext")} <span className="rtl-flip inline-block">↗</span></button>
       </div>
     </div>
@@ -205,7 +207,7 @@ export function TransportScreen({ onBack, isPremium }:{ onBack:()=>void; isPremi
               </div>
               <div className="mt-3 pt-3 border-t flex items-center justify-between" style={{borderColor:BORDER}}>
                 <div><p className="text-[9px]" style={{color:MUTED}}>{трК(ic.departs)}</p><p className="text-xs font-medium mt-0.5" style={{color:TEXT}}>{трК(ic.note)}</p></div>
-                <div className="text-right"><p className="font-bold text-base" style={{color:GREEN,fontFamily:"'Fraunces',serif"}}>{ic.price}</p><button onClick={()=>заказатьТакси(ic.from, ic.to)} className="mt-1 transition-all active:scale-95 px-3 py-1.5 rounded-lg text-[10px] font-bold text-white" style={{background:GREEN}}>{t("tr_book")}</button></div>
+                <div className="text-right"><p className="font-bold text-base" style={{color:GREEN,fontFamily:"'Fraunces',serif"}}>{дг.цена(ic.price)}</p><button onClick={()=>заказатьТакси(ic.from, ic.to)} className="mt-1 transition-all active:scale-95 px-3 py-1.5 rounded-lg text-[10px] font-bold text-white" style={{background:GREEN}}>{t("tr_book")}</button></div>
               </div>
             </div>
           </div>

@@ -16,6 +16,8 @@ export interface Настройки {
   gps: boolean; // GPS-аудиогид у объектов
   offline: boolean; // офлайн-карты
   units: "metric" | "imperial";
+  /** Валюта отображения цен. По умолчанию доллар. */
+  currency: string;
   mapStyle: "standard" | "sat";
   notifNear: boolean;
   notifEvents: boolean;
@@ -29,6 +31,7 @@ const ПОУМОЛЧАНИЮ: Настройки = {
   gps: true,
   offline: true,
   units: "metric",
+  currency: "USD",
   mapStyle: "standard",
   notifNear: true,
   notifEvents: false,

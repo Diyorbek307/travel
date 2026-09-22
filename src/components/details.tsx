@@ -13,12 +13,14 @@ import { useGeo } from "@/components/geo-provider";
 import { useFavorites, переключитьИзбранное } from "@/lib/favorites";
 import { useTrip, переключитьВМаршруте } from "@/lib/trip";
 import { дистанцияКм, точкаИзвестна } from "@/data/geo";
+import { useДеньги } from "@/lib/money";
 import { glass } from "@/lib/theme";
 
 
 export function PlaceDetail({ place, onBack, onPlay, onToast, onПуть }:{ place:Place; onBack:()=>void; onPlay:(p:Place)=>void; onToast:(m:string)=>void; onПуть:(название:string,город:string)=>void }) {
   const { t, трК, lang } = useT();
   const { pos } = useGeo();
+  const дг = useДеньги();
   const км = дистанцияКм(pos, place.nameRu ?? place.name, place.city); // «от вас»
   const дист = useДистанция();
   const [playing, setPlaying] = useState(false);
@@ -59,7 +61,7 @@ export function PlaceDetail({ place, onBack, onPlay, onToast, onПуть }:{ pla
       </div>
       <div className="flex-1 overflow-y-auto hide-scroll px-4 pt-4">
         <div className="grid grid-cols-4 gap-2 mb-4">
-          {[{e:"📍",v:км!=null?дист.формат(км):дист.изДанных(place.distance),k:"d_distance" as const},{e:"🎫",v:place.entry,k:"d_entry" as const},{e:"🕐",v:place.hours.length>8?t("d_always"):place.hours,k:"d_hours" as const},{e:"⏱",v:"8:42",k:"d_audio" as const}].map(s=>(
+          {[{e:"📍",v:км!=null?дист.формат(км):дист.изДанных(place.distance),k:"d_distance" as const},{e:"🎫",v:дг.цена(place.entry),k:"d_entry" as const},{e:"🕐",v:place.hours.length>8?t("d_always"):place.hours,k:"d_hours" as const},{e:"⏱",v:"8:42",k:"d_audio" as const}].map(s=>(
             <div key={s.k} className="bg-white rounded-2xl p-2.5 text-center shadow-sm border" style={{borderColor:BORDER}}><p className="text-base">{s.e}</p><p className="font-semibold text-[10px] mt-1 leading-tight" style={{color:TEXT}}>{s.v}</p><p className="text-[8px] mt-0.5" style={{color:MUTED}}>{t(s.k)}</p></div>
           ))}
         </div>
@@ -128,7 +130,8 @@ export function HotelDetail({ hotel, onBack, onToast }:{ hotel:Hotel; onBack:()=
   const [nights, setNights] = useState(2);
   const избранное = useFavorites();
   const fav = избранное.some((f) => f.key === `hotel:${hotel.id}`);
-  const total = parseInt(hotel.price.replace("$","")) * nights;
+  const total = parseInt(hotel.price.replace(/[^0-9.]/g,"")) * nights;
+  const дг = useДеньги();
   return (
     <div className="flex flex-col h-full animate-slide-up" style={{background:CREAM}}>
       <div className="relative flex-shrink-0" style={{height:250}}>
@@ -169,7 +172,7 @@ export function HotelDetail({ hotel, onBack, onToast }:{ hotel:Hotel; onBack:()=
                 </div>
               </div>
             ))}
-            <div className="text-right"><p className="text-[10px] font-semibold" style={{color:MUTED}}>{t("d_total")}</p><p className="text-xl font-bold mt-1" style={{color:GREEN,fontFamily:"'Fraunces',serif"}}>${total}</p><p className="text-[9px]" style={{color:MUTED}}>{hotel.price}{t("d_per_night")} × {nights}</p></div>
+            <div className="text-right"><p className="text-[10px] font-semibold" style={{color:MUTED}}>{t("d_total")}</p><p className="text-xl font-bold mt-1" style={{color:GREEN,fontFamily:"'Fraunces',serif"}}>{дг.одна(total)}</p><p className="text-[9px]" style={{color:MUTED}}>{дг.цена(hotel.price)}{t("d_per_night")} × {nights}</p></div>
           </div>
           {/*
             Раньше эта кнопка сама показывала «🎉 Бронь подтверждена»,
@@ -182,7 +185,7 @@ export function HotelDetail({ hotel, onBack, onToast }:{ hotel:Hotel; onBack:()=
             onClick={()=>document.getElementById("заявка")?.scrollIntoView({behavior:"smooth",block:"center"})}
             className="w-full py-4 rounded-2xl text-white font-bold text-sm active:scale-[0.98] transition-all"
             style={{background:GREEN}}
-          >{t("d_book")} — ${total}</button>
+          >{t("d_book")} — {дг.одна(total)}</button>
           <p className="text-center text-[10px] mt-2" style={{color:MUTED}}>{t("d_book_terms")}</p>
         </div>
         <BookingForm kind="hotel" itemId={hotel.id} itemName={hotel.name} />
@@ -197,6 +200,7 @@ export function HotelDetail({ hotel, onBack, onToast }:{ hotel:Hotel; onBack:()=
 
 export function RestaurantDetail({ r, onBack, onToast, onПуть }:{ r:Restaurant; onBack:()=>void; onToast:(m:string)=>void; onПуть:(название:string,город:string)=>void }) {
   const { t, трК } = useT();
+  const дг = useДеньги();
   const избранное = useFavorites();
   const fav = избранное.some((f) => f.key === `restaurant:${r.id}`);
   return (
@@ -214,7 +218,7 @@ export function RestaurantDetail({ r, onBack, onToast, onПуть }:{ r:Restaura
       </div>
       <div className="flex-1 overflow-y-auto hide-scroll px-4 pt-4">
         <div className="grid grid-cols-3 gap-2 mb-4">
-          {[{e:"🕐",v:r.open,k:"d_mode" as const},{e:"💰",v:r.price,k:"d_price" as const},{e:"🍽️",v:r.cuisine,k:"i_cuisine" as const}].map(s=>(
+          {[{e:"🕐",v:r.open,k:"d_mode" as const},{e:"💰",v:дг.цена(r.price),k:"d_price" as const},{e:"🍽️",v:r.cuisine,k:"i_cuisine" as const}].map(s=>(
             <div key={s.k} className="bg-white rounded-2xl p-3 text-center shadow-sm border" style={{borderColor:BORDER}}><p className="text-base">{s.e}</p><p className="font-semibold text-[10px] mt-1 leading-tight" style={{color:TEXT}}>{s.v}</p><p className="text-[8px] mt-0.5" style={{color:MUTED}}>{t(s.k)}</p></div>
           ))}
         </div>
