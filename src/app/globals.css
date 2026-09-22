@@ -622,6 +622,17 @@ button[aria-disabled="true"] {
   0%, 100% { transform: translateY(0) scale(1); opacity: 0.35; }
   50% { transform: translateY(-16px) scale(1.4); opacity: 0.95; }
 }
+/* Боковые огни: после въезда медленно покачиваются и дышат яркостью,
+   чтобы свет с краёв жил, а не стоял пятном. Два набора — соседние
+   углы качаются в противофазе. */
+@keyframes wow-side-a {
+  0%, 100% { transform: translate(0, 0); opacity: 0.75; }
+  50% { transform: translate(4%, 3%); opacity: 1; }
+}
+@keyframes wow-side-b {
+  0%, 100% { transform: translate(0, 0); opacity: 0.75; }
+  50% { transform: translate(-4%, 3%); opacity: 1; }
+}
 
 /* Живая рамка партнёрского блока: перелив по краю, чтобы блок замечали
    боковым зрением, но ничто не мигало под текстом. */

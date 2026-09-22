@@ -47,21 +47,23 @@ export default function WelcomeWow({ name, onDone }: { name?: string; onDone: ()
     setВкл(true);
   };
 
-  // Тумблер переключается сам через секунду с небольшим — успеть увидеть
-  // тёмную «сцену» до того, как она оживёт. Уважаем «уменьшить движение».
+  // Тумблер переключается сам, но не сразу: даём разглядеть тёмную
+  // «сцену», а сам переход делаем небыстрым — это маленькое шоу, а не
+  // мигание. Уважаем «уменьшить движение».
   useEffect(() => {
     if (typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches) {
       включить();
       return;
     }
-    const id = setTimeout(включить, 1200);
+    const id = setTimeout(включить, 2600);
     return () => clearTimeout(id);
   }, []);
 
   // Слайды крутим только после включения — до этого фон намеренно мёртвый.
+  // Держим кадр дольше: спешка ломает ощущение плавности.
   useEffect(() => {
     if (!вкл) return;
-    const id = setInterval(() => setКадр((k) => (k + 1) % КАДРЫ.length), 3200);
+    const id = setInterval(() => setКадр((k) => (k + 1) % КАДРЫ.length), 5000);
     return () => clearInterval(id);
   }, [вкл]);
 
@@ -79,7 +81,7 @@ export default function WelcomeWow({ name, onDone }: { name?: string; onDone: ()
               opacity: вкл ? (i === кадр ? 0.6 : 0) : 0.1,
               filter: вкл ? "saturate(1.2) contrast(1.05)" : "grayscale(1) brightness(0.45)",
               transform: `scale(${вкл && i === кадр ? 1.16 : 1.02})`,
-              transition: "opacity 2s ease, filter 1.6s ease, transform 7s ease-out",
+              transition: "opacity 3s ease, filter 2.4s ease, transform 11s ease-out",
             }}
           />
         ))}
@@ -90,8 +92,8 @@ export default function WelcomeWow({ name, onDone }: { name?: string; onDone: ()
             background:
               "radial-gradient(60% 40% at 30% 25%, rgba(63,224,220,0.22), transparent 60%), radial-gradient(50% 40% at 75% 30%, rgba(212,255,79,0.16), transparent 60%), radial-gradient(60% 50% at 50% 90%, rgba(255,45,155,0.14), transparent 65%)",
             opacity: вкл ? 1 : 0,
-            transition: "opacity 2.4s ease",
-            animation: вкл ? "wow-aurora 16s ease-in-out infinite" : undefined,
+            transition: "opacity 3.4s ease",
+            animation: вкл ? "wow-aurora 22s ease-in-out infinite" : undefined,
           }}
         />
         <div
@@ -99,6 +101,35 @@ export default function WelcomeWow({ name, onDone }: { name?: string; onDone: ()
           style={{ background: "radial-gradient(120% 80% at 50% 40%, transparent 0%, rgba(3,5,9,0.8) 68%, #02040a 100%)" }}
         />
       </div>
+
+      {/*
+       * Свет с четырёх сторон. Каждое пятно «вплывает» из своего края
+       * экрана и потом медленно дышит — свет приходит отовсюду, а не
+       * только из центра. Появляются по очереди, чтобы читалось как волна.
+       */}
+      {([
+        { цвет: "rgba(63,224,220,0.5)", поз: "left top", off: { left: "-30%", top: "-20%" }, from: "translate(-40%,-40%)", d: "0.2s", a: "wow-side-a" },
+        { цвет: "rgba(212,255,79,0.42)", поз: "right top", off: { right: "-30%", top: "-15%" }, from: "translate(40%,-40%)", d: "0.7s", a: "wow-side-b" },
+        { цвет: "rgba(255,45,155,0.4)", поз: "left bottom", off: { left: "-25%", bottom: "-25%" }, from: "translate(-40%,40%)", d: "1.2s", a: "wow-side-a" },
+        { цвет: "rgba(79,139,255,0.42)", поз: "right bottom", off: { right: "-28%", bottom: "-20%" }, from: "translate(40%,40%)", d: "1.7s", a: "wow-side-b" },
+      ] as const).map((л, n) => (
+        <div
+          key={n}
+          className="pointer-events-none absolute"
+          style={{
+            ...л.off,
+            width: 420,
+            height: 420,
+            borderRadius: "50%",
+            background: `radial-gradient(circle at ${л.поз}, ${л.цвет}, transparent 70%)`,
+            filter: "blur(46px)",
+            opacity: вкл ? 1 : 0,
+            transform: вкл ? "translate(0,0)" : л.from,
+            transition: `opacity 2.6s ease ${л.d}, transform 2.8s cubic-bezier(.2,.7,.2,1) ${л.d}`,
+            animation: вкл ? `${л.a} 12s ease-in-out ${л.d} infinite` : undefined,
+          }}
+        />
+      ))}
 
       {/* Внешний ореол — большой, дышащий. */}
       <div
@@ -115,8 +146,8 @@ export default function WelcomeWow({ name, onDone }: { name?: string; onDone: ()
           filter: "blur(64px)",
           opacity: вкл ? 0.55 : 0,
           transform: вкл ? "scale(1)" : "scale(0.3)",
-          transition: "opacity 1.3s ease, transform 1.3s cubic-bezier(.2,.8,.2,1)",
-          animation: вкл ? "wow-glow 10s linear infinite, wow-breathe 5.5s ease-in-out infinite" : undefined,
+          transition: "opacity 2.2s ease, transform 2.4s cubic-bezier(.2,.8,.2,1)",
+          animation: вкл ? "wow-glow 16s linear infinite, wow-breathe 8s ease-in-out infinite" : undefined,
         }}
       />
       {/* Внутреннее ядро — вращается в другую сторону, ярче: даёт глубину. */}
@@ -134,8 +165,8 @@ export default function WelcomeWow({ name, onDone }: { name?: string; onDone: ()
           filter: "blur(34px)",
           opacity: вкл ? 0.75 : 0,
           transform: вкл ? "scale(1)" : "scale(0.4)",
-          transition: "opacity 1.5s ease .1s, transform 1.5s cubic-bezier(.2,.8,.2,1) .1s",
-          animation: вкл ? "wow-glow-rev 7s linear infinite" : undefined,
+          transition: "opacity 2.4s ease .2s, transform 2.6s cubic-bezier(.2,.8,.2,1) .2s",
+          animation: вкл ? "wow-glow-rev 12s linear infinite" : undefined,
         }}
       />
       {/* Отражение «на полу» — как в референсе, под тумблером. */}
@@ -151,8 +182,8 @@ export default function WelcomeWow({ name, onDone }: { name?: string; onDone: ()
           background: "conic-gradient(from 180deg,#3fe0dc,#d4ff4f,#ffb03a,#ff2d9b,#3fe0dc)",
           filter: "blur(38px)",
           opacity: вкл ? 0.32 : 0,
-          transition: "opacity 1.6s ease .3s",
-          animation: вкл ? "wow-reflect 10s linear infinite" : undefined,
+          transition: "opacity 2.6s ease .5s",
+          animation: вкл ? "wow-reflect 16s linear infinite" : undefined,
         }}
       />
 
@@ -169,7 +200,7 @@ export default function WelcomeWow({ name, onDone }: { name?: string; onDone: ()
             background: "rgba(255,255,255,0.9)",
             boxShadow: "0 0 8px 2px rgba(63,224,220,0.7)",
             opacity: вкл ? 0.8 : 0,
-            transition: "opacity 1.8s ease",
+            transition: "opacity 2.6s ease",
             animation: вкл ? `wow-float ${и.s}s ease-in-out ${и.d}s infinite` : undefined,
           }}
         />
@@ -182,7 +213,7 @@ export default function WelcomeWow({ name, onDone }: { name?: string; onDone: ()
         style={{
           background: "radial-gradient(54% 34% at 50% 40%, transparent 0%, rgba(3,5,10,0.5) 60%, rgba(2,4,10,0.9) 100%)",
           opacity: вкл ? 1 : 0,
-          transition: "opacity 1.3s ease",
+          transition: "opacity 2.2s ease",
         }}
       />
 
@@ -202,8 +233,8 @@ export default function WelcomeWow({ name, onDone }: { name?: string; onDone: ()
                 : "rgba(255,255,255,0.06)",
               border: вкл ? "none" : "1.5px solid rgba(255,255,255,0.22)",
               boxShadow: вкл ? "0 0 56px 8px rgba(212,255,79,0.5)" : "none",
-              transition: "background .6s ease, box-shadow .7s ease",
-              animation: вкл ? "wow-ring 4s linear infinite" : undefined,
+              transition: "background 1s ease, box-shadow 1.1s ease",
+              animation: вкл ? "wow-ring 7s linear infinite" : undefined,
             }}
           />
           <span
@@ -219,14 +250,14 @@ export default function WelcomeWow({ name, onDone }: { name?: string; onDone: ()
                 : "0 2px 8px rgba(0,0,0,0.4)",
               // Пружинка: колёсико чуть перелетает и возвращается — живее,
               // чем ровный переезд.
-              transition: "left .7s cubic-bezier(.34,1.56,.4,1), background .5s ease",
+              transition: "left 1.2s cubic-bezier(.34,1.4,.4,1), background .8s ease",
             }}
           />
         </button>
 
         <p
           className="text-[10px] font-bold uppercase"
-          style={{ letterSpacing: "0.34em", color: вкл ? "rgba(255,255,255,0.8)" : "rgba(255,255,255,0.35)", transition: "color .7s ease" }}
+          style={{ letterSpacing: "0.34em", color: вкл ? "rgba(255,255,255,0.8)" : "rgba(255,255,255,0.35)", transition: "color 1.1s ease" }}
         >
           UZROAM MODE
         </p>
@@ -236,7 +267,7 @@ export default function WelcomeWow({ name, onDone }: { name?: string; onDone: ()
           style={{
             opacity: вкл ? 1 : 0,
             transform: вкл ? "translateY(0)" : "translateY(16px)",
-            transition: "opacity 1s ease .5s, transform 1s cubic-bezier(.2,.8,.2,1) .5s",
+            transition: "opacity 1.4s ease 1s, transform 1.4s cubic-bezier(.2,.8,.2,1) 1s",
             pointerEvents: вкл ? "auto" : "none",
           }}
           className="mt-10 w-full max-w-sm"
@@ -260,13 +291,6 @@ export default function WelcomeWow({ name, onDone }: { name?: string; onDone: ()
           </button>
         </div>
 
-        {/* Подсказка до включения — гаснет, как только сцена ожила. */}
-        <p
-          className="absolute bottom-16 text-xs"
-          style={{ color: "rgba(255,255,255,0.42)", opacity: вкл ? 0 : 1, transition: "opacity .6s ease" }}
-        >
-          {t("wow_tap")}
-        </p>
       </div>
     </div>
   );
