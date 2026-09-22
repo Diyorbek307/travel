@@ -1,14 +1,13 @@
 import { NextResponse } from "next/server";
-import { isAuthenticated } from "@/lib/admin-auth";
+import { отказЕсли } from "@/lib/admin-auth";
 import { проверитьПочту, пробноеПисьмо } from "@/lib/mail";
 
 export const dynamic = "force-dynamic";
 
 /** Состояние почты: подключение и вход, без отправки писем. */
 export async function GET() {
-  if (!(await isAuthenticated())) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
+  const нет = await отказЕсли("users");
+  if (нет) return нет;
   return NextResponse.json(await проверитьПочту(), {
     headers: { "Cache-Control": "no-store" },
   });
@@ -16,9 +15,8 @@ export async function GET() {
 
 /** Пробное письмо на указанный адрес. */
 export async function POST(request: Request) {
-  if (!(await isAuthenticated())) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
+  const нет = await отказЕсли("users");
+  if (нет) return нет;
 
   let body: Record<string, unknown>;
   try {

@@ -57,16 +57,24 @@ export default function Settings({ onNavigate }: { onNavigate?: (page: string) =
         action={<Btn onClick={save}>{saved ? "✓ Сохранено" : "Сохранить"}</Btn>}
       />
 
-      {/* Честно о том, что аккаунта как такового нет: вход в панель один,
-          по общему паролю. Профиль, 2FA и смена пароля ниже пока
-          оформление — работают только тема и экспорт. */}
+      {/* Учётные записи и роли теперь настоящие — они в разделе
+          «Сотрудники». А карточка профиля ниже (2FA, отчёты, часовой
+          пояс) пока оформление: честно про это говорим. Работают тема,
+          экспорт и выход. */}
       <div
         className="mb-6 rounded-lg px-4 py-3 text-sm"
         style={{ background: "color-mix(in srgb, var(--color-amber) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--color-amber) 30%, transparent)", color: "var(--color-text)" }}
       >
-        ⚠️ Учётных записей пока нет — вход в панель один, по общему паролю (задаётся
-        <code style={{ fontFamily: "var(--font-mono)" }}> ADMIN_PASSWORD</code>). Профиль, роли,
-        2FA и смена пароля ниже не сохраняются. Реально работают тема оформления и экспорт данных.
+        ⚠️ Именные учётные записи сотрудников и их роли — в разделе{" "}
+        <button
+          onClick={() => onNavigate?.("staff")}
+          className="cursor-pointer underline"
+          style={{ color: "var(--color-amber)" }}
+        >
+          «Сотрудники»
+        </button>
+        . Карточка профиля ниже (2FA, отчёты, часовой пояс) пока оформление и не сохраняется —
+        работают тема, экспорт и выход (значок ⎋ вверху справа).
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">

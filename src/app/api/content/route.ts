@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { isAuthenticated } from "@/lib/admin-auth";
+import { отказЕсли } from "@/lib/admin-auth";
 import { readContent, writeContent } from "@/lib/store";
 import type { Content, ContentKey } from "@/lib/types";
 
@@ -17,9 +17,9 @@ export async function GET() {
 }
 
 export async function PUT(request: Request) {
-  if (!(await isAuthenticated())) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
+  // Правка содержимого — за редактором и владельцем.
+  const нет = await отказЕсли("content");
+  if (нет) return нет;
 
   let body: unknown;
   try {

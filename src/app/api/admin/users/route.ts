@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { isAuthenticated } from "@/lib/admin-auth";
+import { отказЕсли } from "@/lib/admin-auth";
 import { deleteUser, listUsers } from "@/lib/users";
 import { deletePhoto } from "@/lib/photos";
 
@@ -7,9 +7,8 @@ export const dynamic = "force-dynamic";
 
 /** Список туристов для панели. Хешей паролей здесь нет. */
 export async function GET() {
-  if (!(await isAuthenticated())) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
+  const нет = await отказЕсли("users");
+  if (нет) return нет;
   return NextResponse.json(
     { users: await listUsers() },
     { headers: { "Cache-Control": "no-store" } },
@@ -17,9 +16,8 @@ export async function GET() {
 }
 
 export async function DELETE(request: Request) {
-  if (!(await isAuthenticated())) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
+  const нет = await отказЕсли("users");
+  if (нет) return нет;
   const id = new URL(request.url).searchParams.get("id");
   if (!id) return NextResponse.json({ error: "id_required" }, { status: 400 });
 

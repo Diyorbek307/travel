@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { isAuthenticated } from "@/lib/admin-auth";
+import { отказЕсли } from "@/lib/admin-auth";
 import { addSupportMessage, listThreads, markThreadRead } from "@/lib/community";
 import { listUsers } from "@/lib/users";
 
@@ -13,9 +13,8 @@ export const dynamic = "force-dynamic";
  * человек может сменить.
  */
 export async function GET() {
-  if (!(await isAuthenticated())) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
+  const нет = await отказЕсли("operations");
+  if (нет) return нет;
 
   const [ветки, users] = await Promise.all([listThreads(), listUsers()]);
   const поИд = new Map(users.map((u) => [u.id, u]));
@@ -39,9 +38,8 @@ export async function GET() {
 
 /** Ответ оператора либо отметка «прочитано». */
 export async function POST(request: Request) {
-  if (!(await isAuthenticated())) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
+  const нет = await отказЕсли("operations");
+  if (нет) return нет;
 
   let body: Record<string, unknown>;
   try {

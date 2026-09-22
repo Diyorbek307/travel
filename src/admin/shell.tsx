@@ -33,6 +33,21 @@ import PushCampaigns from "./components/PushCampaigns";
 import Integrations from "./components/Integrations";
 import AccessControl from "./components/AccessControl";
 import Staff from "./components/Staff";
+import { можетРаздел, ROLE_META, type AdminRole } from "@/lib/admin-roles";
+
+interface Меня {
+  id: string;
+  role: AdminRole;
+  name: string;
+}
+
+/** Две буквы для кружка-аватара. Пусто — «AD». */
+function инициалы(имя?: string): string {
+  if (!имя) return "AD";
+  const части = имя.trim().split(/\s+/).filter(Boolean);
+  const буквы = части.slice(0, 2).map((w) => w[0]).join("");
+  return (буквы || имя.slice(0, 2)).toUpperCase();
+}
 
 /*
  * В меню только разделы с настоящими данными: они читают и пишут через
@@ -93,6 +108,7 @@ const NAV_GROUPS = [
   {
     label: "Аккаунт",
     items: [
+      { id: "staff", label: "Сотрудники", icon: "◈" },
       { id: "settings", label: "Настройки", icon: "▣" },
     ],
   },
@@ -100,6 +116,33 @@ const NAV_GROUPS = [
 
 export default function AdminShell() {
   const [active, setActive] = useState("dashboard");
+
+  // Кто вошёл: по роли решаем, какие разделы показать. Настоящая проверка
+  // прав живёт на сервере в каждом роуте — это лишь чтобы не рисовать
+  // заведомо закрытое. Пока роль не пришла, меню не строим.
+  const [me, setMe] = useState<Меня | null>(null);
+  useEffect(() => {
+    fetch("/api/admin/whoami")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d: Меня | null) => d && setMe(d))
+      .catch(() => undefined);
+  }, []);
+
+  // Разделы под роль: чужие группы и пункты убираем, пустые группы прячем.
+  const groups = React.useMemo(() => {
+    if (!me) return NAV_GROUPS;
+    return NAV_GROUPS.map((g) => ({
+      ...g,
+      items: g.items.filter((i) => можетРаздел(me.role, i.id)),
+    })).filter((g) => g.items.length > 0);
+  }, [me]);
+
+  // Если активный раздел роли недоступен — возвращаемся на дашборд, он
+  // открыт всем. Иначе поддержка, открывшая ссылку на «Города», застряла
+  // бы на пустом экране.
+  useEffect(() => {
+    if (me && !можетРаздел(me.role, active)) setActive("dashboard");
+  }, [me, active]);
   /*
    * На телефоне боковая панель шириной 224 пикселя оставляла контенту
    * 136 из 360 — работать в такой щели невозможно. Поэтому на узком
@@ -243,7 +286,7 @@ export default function AdminShell() {
 
         {/* Nav */}
         <nav className="flex-1 overflow-y-auto py-3 px-2">
-          {NAV_GROUPS.map((group) => (
+          {groups.map((group) => (
             <div key={group.label} className="mb-3">
               {!sidebarCollapsed && (
                 <div
@@ -308,21 +351,21 @@ export default function AdminShell() {
             >
               <div
                 className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold shrink-0"
-                style={{ background: "var(--color-amber)", color: "var(--color-on-accent)" }}
+                style={{ background: me ? ROLE_META[me.role].color : "var(--color-amber)", color: "var(--color-on-accent)" }}
               >
-                AD
+                {инициалы(me?.name)}
               </div>
               <div className="min-w-0">
-                <div className="text-xs font-medium truncate" style={{ color: "var(--color-text)" }}>Администратор</div>
-                <div className="text-xs truncate" style={{ color: "var(--color-muted)" }}>admin@uztravel.uz</div>
+                <div className="text-xs font-medium truncate" style={{ color: "var(--color-text)" }}>{me?.name ?? "Администратор"}</div>
+                <div className="text-xs truncate" style={{ color: "var(--color-muted)" }}>{me ? ROLE_META[me.role].label : "—"}</div>
               </div>
             </button>
           </div>
         )}
         {sidebarCollapsed && (
           <div className="flex justify-center py-3" style={{ borderTop: "1px solid var(--color-border)" }}>
-            <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold" style={{ background: "var(--color-amber)", color: "var(--color-on-accent)" }}>
-              AD
+            <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold" style={{ background: me ? ROLE_META[me.role].color : "var(--color-amber)", color: "var(--color-on-accent)" }} title={me?.name}>
+              {инициалы(me?.name)}
             </div>
           </div>
         )}

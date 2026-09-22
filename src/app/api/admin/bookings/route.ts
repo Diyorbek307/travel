@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { isAuthenticated } from "@/lib/admin-auth";
+import { отказЕсли } from "@/lib/admin-auth";
 import { listBookings, setBookingStatus, type BookingStatus } from "@/lib/community";
 import { listUsers } from "@/lib/users";
 
@@ -8,9 +8,8 @@ export const dynamic = "force-dynamic";
 const СТАТУСЫ: BookingStatus[] = ["new", "confirmed", "cancelled"];
 
 export async function GET() {
-  if (!(await isAuthenticated())) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
+  const нет = await отказЕсли("operations");
+  if (нет) return нет;
 
   const [брони, users] = await Promise.all([listBookings(), listUsers()]);
   const поИд = new Map(users.map((u) => [u.id, u]));
@@ -32,9 +31,8 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  if (!(await isAuthenticated())) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
+  const нет = await отказЕсли("operations");
+  if (нет) return нет;
 
   let body: Record<string, unknown>;
   try {

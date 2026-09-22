@@ -1,14 +1,13 @@
 import { NextResponse } from "next/server";
-import { isAuthenticated } from "@/lib/admin-auth";
+import { отказЕсли } from "@/lib/admin-auth";
 import { listReviews, setReviewStatus, type ReviewStatus } from "@/lib/community";
 import { listUsers } from "@/lib/users";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  if (!(await isAuthenticated())) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
+  const нет = await отказЕсли("operations");
+  if (нет) return нет;
 
   const [все, users] = await Promise.all([listReviews(), listUsers()]);
   const поИд = new Map(users.map((u) => [u.id, u]));
@@ -30,9 +29,8 @@ export async function GET() {
 
 /** Скрыть или вернуть отзыв. Удаления нет: скрытый можно вернуть. */
 export async function POST(request: Request) {
-  if (!(await isAuthenticated())) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
+  const нет = await отказЕсли("operations");
+  if (нет) return нет;
 
   let body: Record<string, unknown>;
   try {

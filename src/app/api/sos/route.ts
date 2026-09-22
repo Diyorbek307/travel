@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
 import { createSos, listSos } from "@/lib/community";
 import { currentUser } from "@/lib/session";
-import { isAuthenticated } from "@/lib/admin-auth";
+import { отказЕсли } from "@/lib/admin-auth";
 
 export const dynamic = "force-dynamic";
 
-/** Список сигналов — только для админки (по админ-куке). */
+/** Список сигналов — операции (поддержка и владелец). */
 export async function GET() {
-  if (!(await isAuthenticated())) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const нет = await отказЕсли("operations");
+  if (нет) return нет;
   return NextResponse.json({ alerts: await listSos() }, { headers: { "Cache-Control": "no-store" } });
 }
 

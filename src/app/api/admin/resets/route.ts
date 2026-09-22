@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { isAuthenticated } from "@/lib/admin-auth";
+import { отказЕсли } from "@/lib/admin-auth";
 import { listResets, listVerifications } from "@/lib/users";
 import { mailConfigured } from "@/lib/mail";
 
@@ -13,9 +13,8 @@ export const dynamic = "force-dynamic";
  * и заглядывать сюда незачем.
  */
 export async function GET() {
-  if (!(await isAuthenticated())) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
+  const нет = await отказЕсли("users");
+  if (нет) return нет;
   return NextResponse.json(
     {
       resets: await listResets(),

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNotifs } from "../context/NotifContext";
+import { logout } from "@/app/admin/actions";
 
 const ICON: Record<string, string> = {
   booking: "◫", review: "◇", chat: "◈", transport: "◉", system: "⬡", payment: "▣",
@@ -249,6 +250,19 @@ export default function Header({ active, onNavigate, sidebarCollapsed, onToggleS
             AD
           </div>
         </button>
+
+        {/* Выход. Форма, а не onClick: logout — серверное действие, и
+            через action оно отрабатывает без ручного вызова с клиента. */}
+        <form action={logout}>
+          <button
+            type="submit"
+            title="Выйти из панели"
+            className="w-8 h-8 rounded flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity shrink-0"
+            style={{ background: "transparent", color: "var(--color-muted)", fontSize: "15px" }}
+          >
+            ⎋
+          </button>
+        </form>
       </header>
 
       {/* Command palette overlay */}

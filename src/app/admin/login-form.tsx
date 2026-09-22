@@ -39,6 +39,30 @@ export default function LoginForm({ defaultPassword }: { defaultPassword: boolea
         </div>
 
         <label
+          htmlFor="username"
+          className="mb-2 block text-xs uppercase tracking-widest"
+          style={{ color: "var(--color-faint)" }}
+        >
+          Логин
+        </label>
+        <input
+          id="username"
+          name="username"
+          type="text"
+          autoFocus
+          autoCapitalize="none"
+          autoCorrect="off"
+          spellCheck={false}
+          placeholder="admin"
+          className="mb-3 w-full rounded-lg px-3 py-2.5 text-sm outline-none"
+          style={{
+            background: "var(--color-panel)",
+            border: "1px solid var(--color-border)",
+            color: "var(--color-text)",
+          }}
+        />
+
+        <label
           htmlFor="password"
           className="mb-2 block text-xs uppercase tracking-widest"
           style={{ color: "var(--color-faint)" }}
@@ -49,7 +73,6 @@ export default function LoginForm({ defaultPassword }: { defaultPassword: boolea
           id="password"
           name="password"
           type="password"
-          autoFocus
           required
           className="mb-3 w-full rounded-lg px-3 py-2.5 text-sm outline-none"
           style={{
@@ -74,11 +97,16 @@ export default function LoginForm({ defaultPassword }: { defaultPassword: boolea
           </p>
         )}
 
+        <p className="mt-4 text-xs leading-relaxed" style={{ color: "var(--color-faint)" }}>
+          Владелец входит без логина (или логином <code>admin</code>) по паролю из переменной{" "}
+          <code>ADMIN_PASSWORD</code>. Сотрудники — своим логином и паролем; их заводит владелец в
+          разделе «Сотрудники».
+        </p>
+
         {defaultPassword && (
-          <p className="mt-6 text-xs leading-relaxed" style={{ color: "var(--color-muted)" }}>
-            Пароль по умолчанию — <code style={{ color: "var(--color-amber)" }}>admin</code>. Он
-            задаётся переменной <code>ADMIN_PASSWORD</code>. Для продакшена этого мало: нужны
-            отдельные учётные записи редакторов, роли и журнал изменений.
+          <p className="mt-3 text-xs leading-relaxed" style={{ color: "var(--color-muted)" }}>
+            Пароль владельца по умолчанию — <code style={{ color: "var(--color-amber)" }}>admin</code>.
+            Для продакшена задайте свой в переменной <code>ADMIN_PASSWORD</code>.
           </p>
         )}
       </form>
