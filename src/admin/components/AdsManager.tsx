@@ -343,7 +343,7 @@ export default function AdsManager() {
               {[
                 { key: "advertiser", label: "Рекламодатель", ph: "напр. Coca-Cola" },
                 { key: "title", label: "Заголовок", ph: "Освежись в дороге" },
-                { key: "videoUrl", label: "Ссылка на ролик (mp4 или YouTube)", ph: "/videos/ad.mp4 или youtube.com/shorts/…" },
+                { key: "videoUrl", label: "Ссылка на ролик (или загрузите файл ниже)", ph: "заполнится сама при загрузке файла" },
                 { key: "url", label: "Куда ведёт клик", ph: "https://…" },
                 { key: "cta", label: "Текст кнопки", ph: "Подробнее" },
                 { key: "city", label: "Город показа (пусто — везде)", ph: "Самарканд" },

@@ -6,11 +6,11 @@ import { useAppContent } from "./content-provider";
 import { useT } from "@/components/lang-provider";
 import { BORDER, LIME, MUTED, SURFACE, TEXT, WHITE, контрастныйТекст, мягко } from "@/lib/theme";
 import type { AdPolicy } from "@/lib/types";
-import YouTubeBg from "./youtube-bg";
 
 /**
  * id ролика YouTube из любой его ссылки (shorts, watch, youtu.be, embed).
- * Такую ссылку нельзя вставить в <video> — она не mp4; играем плеером.
+ * По нему отсеиваем ссылки YouTube из полноэкранной рекламы: на iPhone
+ * они не играют. Годятся только загруженные mp4-файлы.
  */
 function ютубId(u: string): string | null {
   const m = u.match(/(?:youtube\.com\/(?:shorts\/|watch\?v=|embed\/|live\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
@@ -309,7 +309,10 @@ export function AdInterstitial({
   // не обязательна — ролик может просто играть, без клика по сайту.
   const { ADS: live } = useAppContent();
   const ролики = useMemo(() => {
-    const свидео = (live as Креатив[]).filter((a) => a.videoUrl);
+    // Только настоящие видеофайлы (загруженные mp4). Ссылки YouTube
+    // исключаем: на iPhone они не запускаются сами и грузят тяжёлый
+    // плеер — вместо рекламы человек видит чёрный экран с кнопкой.
+    const свидео = (live as Креатив[]).filter((a) => a.videoUrl && !ютубId(a.videoUrl));
     const поГороду = свидео.filter(
       (a) => !a.city || !cities || cities.length === 0 || cities.includes(a.city),
     );
@@ -389,8 +392,6 @@ export function AdInterstitial({
 
   if (!текущее) return null;
   const ad = текущее;
-  // Ссылка на YouTube (в т.ч. Shorts) — играем плеером, иначе своим mp4.
-  const ytId = ютубId(ad.videoUrl ?? "");
 
   const включитьЗвук = () => {
     const v = видеоRef.current;
@@ -402,29 +403,21 @@ export function AdInterstitial({
 
   return (
     <div className="fixed inset-0 z-[80] flex flex-col" style={{ background: "#000" }}>
-      {ytId ? (
-        // Ролик с YouTube: плеер во весь экран. Клик по кадру ведёт на сайт
-        // рекламодателя (сам плеер клики не пропускает).
-        <div className="absolute inset-0 cursor-pointer" onClick={() => перейти(ad)}>
-          <YouTubeBg id={ytId} className="absolute inset-0 h-full w-full" />
-        </div>
-      ) : (
-        <video
-          ref={видеоRef}
-          src={ad.videoUrl}
-          poster={undefined}
-          loop
-          playsInline
-          autoPlay
-          preload="auto"
-          controls={false}
-          disablePictureInPicture
-          // Тап по видео сперва включает звук (браузер не даёт автозвук),
-          // и только когда он уже есть — ведёт на сайт рекламодателя.
-          onClick={() => { if (!звук) включитьЗвук(); else перейти(ad); }}
-          className="absolute inset-0 h-full w-full object-cover"
-        />
-      )}
+      <video
+        ref={видеоRef}
+        src={ad.videoUrl}
+        poster={undefined}
+        loop
+        playsInline
+        autoPlay
+        preload="auto"
+        controls={false}
+        disablePictureInPicture
+        // Тап по видео сперва включает звук (браузер не даёт автозвук),
+        // и только когда он уже есть — ведёт на сайт рекламодателя.
+        onClick={() => { if (!звук) включитьЗвук(); else перейти(ad); }}
+        className="absolute inset-0 h-full w-full object-cover"
+      />
 
       {/* Затемнение снизу — под подпись и кнопку, чтобы читались на любом кадре. */}
       <div
@@ -460,7 +453,7 @@ export function AdInterstitial({
       </div>
 
       {/* Кнопка звука — только пока играем без него. */}
-      {!звук && !ytId && (
+      {!звук && (
         <button
           onClick={включитьЗвук}
           className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition-all active:scale-95"
