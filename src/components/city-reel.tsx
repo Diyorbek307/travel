@@ -35,6 +35,7 @@ export default function CityReel({
   const [кадр, setКадр] = useState(0);
   const [виден, setВиден] = useState(false);
   const боксRef = useRef<HTMLDivElement | null>(null);
+  const видеоRef = useRef<HTMLVideoElement | null>(null);
 
   useEffect(() => {
     const узел = боксRef.current;
@@ -49,6 +50,21 @@ export default function CityReel({
     наб.observe(узел);
     return () => наб.disconnect();
   }, []);
+
+  // Свой ролик заводим и глушим вручную по видимости. Атрибута autoPlay
+  // мало: при монтировании блок ещё за экраном (виден=false), а когда он
+  // появляется, autoPlay уже не срабатывает — видео так и стоит на первом
+  // кадре. Поэтому play/pause зовём сами.
+  useEffect(() => {
+    const v = видеоRef.current;
+    if (!v) return;
+    if (виден) {
+      const p = v.play();
+      if (p && typeof p.catch === "function") p.catch(() => undefined);
+    } else {
+      v.pause();
+    }
+  }, [виден, видео]);
 
   useEffect(() => {
     if (!виден || кадры.length < 2 || видео) return;
@@ -65,13 +81,14 @@ export default function CityReel({
         <YouTubeBg id={видео} poster={кадры[0]} className="absolute inset-0 overflow-hidden" />
       ) : видео ? (
         <video
+          ref={видеоRef}
           src={видео}
           poster={кадры[0]}
           muted
           loop
           playsInline
-          autoPlay={виден}
-          preload="none"
+          autoPlay
+          preload="auto"
           className="h-full w-full object-cover"
         />
       ) : (

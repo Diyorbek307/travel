@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useT } from "@/components/lang-provider";
 import { GOLD } from "@/lib/theme";
-import YouTubeBg from "./youtube-bg";
 import { ФОН_ВИДЕО } from "@/data/city-reels";
 
 /**
@@ -90,9 +89,17 @@ export default function WelcomeWow({ name, onDone }: { name?: string; onDone: ()
           />
         ))}
         {вкл && (
-          <div className="absolute inset-0" style={{ opacity: 0.5, animation: "wow-fadein 3s ease forwards" }}>
-            <YouTubeBg id={ФОН_ВИДЕО} poster={КАДРЫ[0]} className="absolute inset-0 overflow-hidden" />
-          </div>
+          <video
+            src={ФОН_ВИДЕО}
+            poster={КАДРЫ[0]}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{ opacity: 0.5, animation: "wow-fadein 3s ease forwards" }}
+          />
         )}
         {/* Мягкая аврора: цветная дымка, что медленно плывёт по верху сцены. */}
         <div
