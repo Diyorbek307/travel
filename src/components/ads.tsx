@@ -322,6 +322,10 @@ export function AdInterstitial({
   const [политика, setПолитика] = useState<AdPolicy | null>(null);
   const [текущее, setТекущее] = useState<Креатив | null>(null);
   const [осталось, setОсталось] = useState(0);
+  // Видео реально пошло. Отсчёт «Пропустить» ведём от начала показа
+  // ролика, а не от появления окна: иначе, пока видео грузится, секунды
+  // утекают и кнопка открывается раньше, чем человек что-то увидел.
+  const [началось, setНачалось] = useState(false);
   const [звук, setЗвук] = useState(false);
   const видеоRef = useRef<HTMLVideoElement | null>(null);
 
@@ -357,7 +361,8 @@ export function AdInterstitial({
     const ad = ролики[Math.floor(Math.random() * ролики.length)];
     setТекущее(ad);
     setЗвук(false);
-    setОсталось(Math.max(0, Math.round(ad.skipAfter ?? 5)));
+    setНачалось(false);
+    setОсталось(Math.max(0, Math.round(ad.skipAfter ?? 10)));
     try {
       localStorage.setItem(КЛЮЧ_ПОСЛЕДНИЙ, String(Date.now()));
     } catch {
@@ -367,12 +372,13 @@ export function AdInterstitial({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navCount]);
 
-  // Обратный отсчёт до кнопки «Пропустить».
+  // Обратный отсчёт до кнопки «Пропустить» — только после того, как
+  // видео действительно пошло. Пока грузится — счётчик стоит.
   useEffect(() => {
-    if (!текущее || осталось <= 0) return;
+    if (!текущее || !началось || осталось <= 0) return;
     const id = setTimeout(() => setОсталось((s) => s - 1), 1000);
     return () => clearTimeout(id);
-  }, [текущее, осталось]);
+  }, [текущее, началось, осталось]);
 
   // Заводим ролик: сперва со звуком, при отказе — без и с кнопкой.
   useEffect(() => {
@@ -413,6 +419,14 @@ export function AdInterstitial({
         preload="auto"
         controls={false}
         disablePictureInPicture
+        // Пошло воспроизведение — с этого мига и считаем «Пропустить».
+        onPlaying={() => setНачалось(true)}
+        // Гасим дорожки субтитров, если они есть в файле, — они мешают
+        // рекламному кадру. Вшитые в картинку так не убрать, это ожидаемо.
+        onLoadedMetadata={(e) => {
+          const tt = e.currentTarget.textTracks;
+          for (let i = 0; i < tt.length; i++) tt[i].mode = "disabled";
+        }}
         // Тап по видео сперва включает звук (браузер не даёт автозвук),
         // и только когда он уже есть — ведёт на сайт рекламодателя.
         onClick={() => { if (!звук) включитьЗвук(); else перейти(ad); }}

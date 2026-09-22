@@ -72,7 +72,7 @@ export default function AdsManager() {
 
   // Форма видео-объявления.
   const [newVideo, setNewVideo] = useState({
-    advertiser: "", title: "", cta: "Подробнее", videoUrl: "", url: "", city: "", skipAfter: "5", color: "#1B6B8A",
+    advertiser: "", title: "", cta: "Подробнее", videoUrl: "", url: "", city: "", skipAfter: "10", color: "#1B6B8A",
   });
   // Загрузка mp4-файла прямо в базу: рекламодатель прислал ролик — грузим
   // его и подставляем короткую ссылку в поле, без сторонних сервисов.
@@ -122,10 +122,10 @@ export default function AdsManager() {
       city: newVideo.city.trim() || undefined,
       url: newVideo.url.trim() || undefined,
       videoUrl: newVideo.videoUrl.trim(),
-      skipAfter: Math.max(0, Number(newVideo.skipAfter) || 5),
+      skipAfter: Math.max(0, Number(newVideo.skipAfter) || 10),
     };
     setAds((prev) => [ad, ...prev]);
-    setNewVideo({ advertiser: "", title: "", cta: "Подробнее", videoUrl: "", url: "", city: "", skipAfter: "5", color: "#1B6B8A" });
+    setNewVideo({ advertiser: "", title: "", cta: "Подробнее", videoUrl: "", url: "", city: "", skipAfter: "10", color: "#1B6B8A" });
   };
   const removeAd = (id: string) => setAds((prev) => prev.filter((a) => a.id !== id));
   const [showAddPromo, setShowAddPromo] = useState(false);
@@ -347,7 +347,7 @@ export default function AdsManager() {
                 { key: "url", label: "Куда ведёт клик", ph: "https://…" },
                 { key: "cta", label: "Текст кнопки", ph: "Подробнее" },
                 { key: "city", label: "Город показа (пусто — везде)", ph: "Самарканд" },
-                { key: "skipAfter", label: "Кнопка «Пропустить» через (сек)", ph: "5" },
+                { key: "skipAfter", label: "Кнопка «Пропустить» через (сек)", ph: "10" },
               ].map((f) => (
                 <div key={f.key} className={f.key === "videoUrl" ? "sm:col-span-2" : ""}>
                   <label className="text-xs mb-1.5 block" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>{f.label.toUpperCase()}</label>
