@@ -416,9 +416,12 @@ export function AdInterstitial({
           loop
           playsInline
           autoPlay
+          preload="auto"
           controls={false}
           disablePictureInPicture
-          onClick={() => перейти(ad)}
+          // Тап по видео сперва включает звук (браузер не даёт автозвук),
+          // и только когда он уже есть — ведёт на сайт рекламодателя.
+          onClick={() => { if (!звук) включитьЗвук(); else перейти(ad); }}
           className="absolute inset-0 h-full w-full object-cover"
         />
       )}

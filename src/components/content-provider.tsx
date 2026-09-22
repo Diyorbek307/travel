@@ -7,14 +7,14 @@ import type { Content } from "@/lib/types";
 import { useT } from "@/components/lang-provider";
 
 /**
- * Фото демо-объявлений по их id. На уже работающем стенде записи рекламы
- * могли сохраниться в базу ещё без поля фото; чтобы у них всё равно
- * появилась картинка, подставляем её по id из вшитого набора.
+ * Медиа демо-объявлений по их id. На уже работающем стенде записи рекламы
+ * могли сохраниться в базу ещё без полей фото и ролика; чтобы у них всё
+ * равно появились картинка и видео, подставляем их по id из вшитого
+ * набора.
  */
-const ФОТО_РЕКЛАМЫ = new Map(
-  (ВШИТЫЕ_РЕКЛАМЫ as { id: string; imageUrl?: string }[])
-    .filter((a) => a.imageUrl)
-    .map((a) => [a.id, a.imageUrl as string]),
+const МЕДИА_РЕКЛАМЫ = new Map(
+  (ВШИТЫЕ_РЕКЛАМЫ as { id: string; imageUrl?: string; videoUrl?: string; skipAfter?: number }[])
+    .map((a) => [a.id, { imageUrl: a.imageUrl, videoUrl: a.videoUrl, skipAfter: a.skipAfter }] as const),
 );
 
 /**
@@ -109,6 +109,15 @@ export function useAppContent() {
     // Приостановленная в панели кампания сразу исчезает из приложения.
     ADS: content.ads
       .filter((a) => a.status === "active")
-      .map((a) => ({ ...a, color: мЦвет(a.color), imageUrl: a.imageUrl ?? ФОТО_РЕКЛАМЫ.get(a.id) })),
+      .map((a) => {
+        const м = МЕДИА_РЕКЛАМЫ.get(a.id);
+        return {
+          ...a,
+          color: мЦвет(a.color),
+          imageUrl: a.imageUrl ?? м?.imageUrl,
+          videoUrl: a.videoUrl ?? м?.videoUrl,
+          skipAfter: a.skipAfter ?? м?.skipAfter,
+        };
+      }),
   };
 }
