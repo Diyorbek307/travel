@@ -74,6 +74,34 @@ export default function AdsManager() {
   const [newVideo, setNewVideo] = useState({
     advertiser: "", title: "", cta: "Подробнее", videoUrl: "", url: "", city: "", skipAfter: "5", color: "#1B6B8A",
   });
+  // Загрузка mp4-файла прямо в базу: рекламодатель прислал ролик — грузим
+  // его и подставляем короткую ссылку в поле, без сторонних сервисов.
+  const [загрузка, setЗагрузка] = useState<"idle" | "loading" | "error" | "big">("idle");
+  const загрузитьФайл = (file: File) => {
+    if (file.size > 15 * 1024 * 1024) { setЗагрузка("big"); return; }
+    setЗагрузка("loading");
+    const r = new FileReader();
+    r.onload = async () => {
+      try {
+        const res = await fetch("/api/ad-media", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ dataUrl: r.result }),
+        });
+        const d = await res.json().catch(() => ({}));
+        if (res.ok && d.url) {
+          setNewVideo((p) => ({ ...p, videoUrl: d.url }));
+          setЗагрузка("idle");
+        } else {
+          setЗагрузка(d.error === "too_big" ? "big" : "error");
+        }
+      } catch {
+        setЗагрузка("error");
+      }
+    };
+    r.onerror = () => setЗагрузка("error");
+    r.readAsDataURL(file);
+  };
   const videoAds = ads.filter((a) => a.type === "interstitial" || a.videoUrl);
   const submitVideo = () => {
     if (!newVideo.videoUrl.trim()) return;
@@ -333,6 +361,23 @@ export default function AdsManager() {
                   />
                 </div>
               ))}
+              {/* Загрузка mp4 с компьютера — самый надёжный способ: файл
+                  ложится в базу и играет сразу, со звуком, на любом
+                  телефоне. YouTube/Google Drive для этого не годятся. */}
+              <div className="sm:col-span-2">
+                <label className="text-xs mb-1.5 block" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>ИЛИ ЗАГРУЗИТЕ ФАЙЛ mp4 (до 15 МБ)</label>
+                <input
+                  type="file"
+                  accept="video/mp4,video/*"
+                  onChange={(e) => { const f = e.target.files?.[0]; if (f) загрузитьФайл(f); e.target.value = ""; }}
+                  className="w-full text-sm"
+                  style={{ color: "var(--color-muted)" }}
+                />
+                {загрузка === "loading" && <p className="mt-1.5 text-xs" style={{ color: "var(--color-amber)" }}>Загружаю ролик…</p>}
+                {загрузка === "error" && <p className="mt-1.5 text-xs" style={{ color: "var(--color-rose)" }}>Не удалось загрузить. Попробуйте ещё раз.</p>}
+                {загрузка === "big" && <p className="mt-1.5 text-xs" style={{ color: "var(--color-rose)" }}>Файл больше 15 МБ — сожмите или укоротите ролик.</p>}
+                {загрузка === "idle" && newVideo.videoUrl.startsWith("/api/ad-media/") && <p className="mt-1.5 text-xs" style={{ color: "var(--color-teal)" }}>✓ Ролик загружен и подставлен в ссылку.</p>}
+              </div>
               <div>
                 <label className="text-xs mb-1.5 block" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>ЦВЕТ КНОПКИ</label>
                 <input
