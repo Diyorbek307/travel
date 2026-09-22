@@ -459,7 +459,10 @@ ${t("cur_live_hint")}`
   ];
 
   return (
-    <div className="flex flex-col h-full" style={{background:CREAM}}>
+    // На широком экране профиль — это строки «подпись … переключатель» и
+    // узкие карточки; во всю ширину они разъезжаются пустотой. Держим
+    // читаемой колонкой по центру, на телефоне это по-прежнему вся ширина.
+    <div className="flex flex-col h-full w-full max-w-xl mx-auto" style={{background:CREAM}}>
       {showPremium&&<PremiumModal onClose={()=>setShowPremium(false)} onActivate={()=>{setIsPremium(true);setShowPremium(false);}}/>}
 
       <div className="px-4 pt-14 pb-3 bg-white border-b" style={{borderColor:BORDER}}>
