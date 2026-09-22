@@ -25,6 +25,7 @@ import PracticalScreen from "@/components/screens/practical";
 import FavoritesScreen from "@/components/screens/favorites";
 import RouteView from "@/components/route-view";
 import { MiniPlayer, Toast } from "@/components/widgets";
+import { AdInterstitial } from "@/components/ads";
 import { ContentProvider } from "@/components/content-provider";
 import { LangProvider } from "@/components/lang-provider";
 import { WeatherProvider } from "@/components/weather-provider";
@@ -136,6 +137,9 @@ function App() {
   const [isPremium, setIsPremium] = useState(false);
   const [miniAudio, setMiniAudio] = useState<Place | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  // Счётчик переходов между экранами — по нему решается показ
+  // полноэкранной рекламы. Растёт при открытии карточек.
+  const [navCount, setNavCount] = useState(0);
 
   // Перемонтирует содержимое вкладки, чтобы въезд проигрывался заново.
   const [tabKey, setTabKey] = useState(0);
@@ -170,24 +174,31 @@ function App() {
 
   const showToast = useCallback((msg: string) => setToast(msg), []);
 
+  // Каждое открытие карточки — переход: считаем их для показа рекламы.
+  const переход = () => setNavCount((n) => n + 1);
+
   const openPlace = (value: Place) => {
     отметитьВизит(value.city); // штамп города в «Цифровой паспорт»
     setDetail({ kind: "place", value });
     setTab("explore");
+    переход();
   };
 
   const openRoute = (value: Route) => {
     setDetail({ kind: "route", value });
     setTab("map");
+    переход();
   };
 
   const openHotel = (value: Hotel) => {
     отметитьВизит(value.city);
     setDetail({ kind: "hotel", value });
+    переход();
   };
   const openRestaurant = (value: Restaurant) => {
     отметитьВизит(value.city);
     setDetail({ kind: "restaurant", value });
+    переход();
   };
   const openПуть = (название: string, город: string) => setDetail({ kind: "путь", название, город });
   /*
@@ -455,6 +466,10 @@ function App() {
 
             {miniAudio && <MiniPlayer place={miniAudio} onClose={() => setMiniAudio(null)} />}
             {toast && <Toast msg={toast} onDone={() => setToast(null)} />}
+
+            {/* Полноэкранная видео-реклама: сама решает, показываться ли,
+                по счётчику переходов и настройке частоты из панели. */}
+            <AdInterstitial isPremium={isPremium} navCount={navCount} />
 
             <BottomNav tab={tab} onTab={switchTab} />
           </>

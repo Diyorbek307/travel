@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ADS } from "@/data/content";
 import { useAppContent } from "./content-provider";
 import { useT } from "@/components/lang-provider";
 import { BORDER, LIME, MUTED, SURFACE, TEXT, WHITE, контрастныйТекст, мягко } from "@/lib/theme";
+import type { AdPolicy } from "@/lib/types";
 
 /**
  * Партнёрские блоки.
@@ -30,6 +31,10 @@ export interface Креатив {
   color: string;
   city?: string;
   url?: string;
+  /** Ролик для полноэкранного показа: файл в /videos или ссылка на mp4. */
+  videoUrl?: string;
+  /** Через сколько секунд можно закрыть. По умолчанию 5. */
+  skipAfter?: number;
 }
 
 /** Общий подбор креативов: живые из админки, иначе вшитые. */
@@ -226,6 +231,206 @@ export function AdShelf({ isPremium }: { isPremium: boolean }) {
             </span>
           </button>
         ))}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Полноэкранная видео-реклама (interstitial).
+ *
+ * Выскакивает поверх всего на переходах между экранами — но не сразу и
+ * не на каждом: частоту задаёт владелец в панели (раз в N минут и на
+ * каждый N-й переход), и оба условия должны совпасть. Premium её не
+ * видит вовсе.
+ *
+ * Показываются только объявления, у которых есть ролик: ничего не
+ * выдумываем, нет видео — нет и полного экрана. Кнопка «Пропустить»
+ * появляется через заданные секунды, до этого — честный обратный отсчёт.
+ * Пометка «Реклама» видна с первой секунды.
+ *
+ * Звук: пробуем со звуком (показ идёт сразу за касанием — жест ещё в
+ * силе), а если браузер заглушил — играем без звука и предлагаем
+ * включить кнопкой.
+ */
+const КЛЮЧ_ПОСЛЕДНИЙ = "uz_interstitial_last";
+
+export function AdInterstitial({
+  isPremium,
+  navCount,
+  cities,
+}: {
+  isPremium: boolean;
+  navCount: number;
+  cities?: string[];
+}) {
+  const { t, трК } = useT();
+  // Берём напрямую живые объявления с роликом. Через useКреативы нельзя:
+  // он отбрасывает объявления без ссылки перехода, а видео-рекламе она
+  // не обязательна — ролик может просто играть, без клика по сайту.
+  const { ADS: live } = useAppContent();
+  const ролики = useMemo(() => {
+    const свидео = (live as Креатив[]).filter((a) => a.videoUrl);
+    const поГороду = свидео.filter(
+      (a) => !a.city || !cities || cities.length === 0 || cities.includes(a.city),
+    );
+    // По городу ничего не нашлось — показываем любой ролик, а не пусто.
+    return поГороду.length ? поГороду : свидео;
+  }, [live, cities]);
+  const [политика, setПолитика] = useState<AdPolicy | null>(null);
+  const [текущее, setТекущее] = useState<Креатив | null>(null);
+  const [осталось, setОсталось] = useState(0);
+  const [звук, setЗвук] = useState(false);
+  const видеоRef = useRef<HTMLVideoElement | null>(null);
+
+  // Правило показа берём один раз с сервера. Не пришло — молчим, рекламу
+  // не крутим (лучше не показать, чем показать против настройки).
+  useEffect(() => {
+    let жив = true;
+    fetch("/api/ad-policy")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((p: AdPolicy | null) => жив && p && setПолитика(p))
+      .catch(() => undefined);
+    return () => {
+      жив = false;
+    };
+  }, []);
+
+  const закрыть = useCallback(() => setТекущее(null), []);
+
+  // Решение о показе — на каждый новый переход.
+  useEffect(() => {
+    if (текущее) return; // уже висит — не накладываем второй
+    if (isPremium || !политика || !политика.fullscreen || ролики.length === 0) return;
+    if (navCount <= 0 || navCount % политика.everyNav !== 0) return;
+
+    let последний = 0;
+    try {
+      последний = Number(localStorage.getItem(КЛЮЧ_ПОСЛЕДНИЙ) || 0);
+    } catch {
+      /* приватный режим — считаем, что не показывали */
+    }
+    if (политика.everyMinutes > 0 && Date.now() - последний < политика.everyMinutes * 60_000) return;
+
+    const ad = ролики[Math.floor(Math.random() * ролики.length)];
+    setТекущее(ad);
+    setЗвук(false);
+    setОсталось(Math.max(0, Math.round(ad.skipAfter ?? 5)));
+    try {
+      localStorage.setItem(КЛЮЧ_ПОСЛЕДНИЙ, String(Date.now()));
+    } catch {
+      /* не смогли запомнить — не страшно, покажем в следующий раз по счётчику */
+    }
+    // navCount в зависимостях: показ привязан к переходу.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [navCount]);
+
+  // Обратный отсчёт до кнопки «Пропустить».
+  useEffect(() => {
+    if (!текущее || осталось <= 0) return;
+    const id = setTimeout(() => setОсталось((s) => s - 1), 1000);
+    return () => clearTimeout(id);
+  }, [текущее, осталось]);
+
+  // Заводим ролик: сперва со звуком, при отказе — без и с кнопкой.
+  useEffect(() => {
+    const v = видеоRef.current;
+    if (!текущее || !v) return;
+    v.muted = false;
+    const p = v.play();
+    if (p && typeof p.catch === "function") {
+      p.catch(() => {
+        v.muted = true;
+        setЗвук(false);
+        v.play().catch(() => undefined);
+      });
+    }
+    setЗвук(!v.muted);
+  }, [текущее]);
+
+  if (!текущее) return null;
+  const ad = текущее;
+
+  const включитьЗвук = () => {
+    const v = видеоRef.current;
+    if (!v) return;
+    v.muted = false;
+    v.play().catch(() => undefined);
+    setЗвук(true);
+  };
+
+  return (
+    <div className="fixed inset-0 z-[80] flex flex-col" style={{ background: "#000" }}>
+      <video
+        ref={видеоRef}
+        src={ad.videoUrl}
+        poster={undefined}
+        loop
+        playsInline
+        autoPlay
+        onClick={() => перейти(ad)}
+        className="absolute inset-0 h-full w-full object-cover"
+      />
+
+      {/* Затемнение снизу — под подпись и кнопку, чтобы читались на любом кадре. */}
+      <div
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-2/5"
+        style={{ background: "linear-gradient(to top, rgba(0,0,0,0.85), transparent)" }}
+      />
+
+      {/* Верх: пометка «Реклама» слева, «Пропустить»/отсчёт справа. */}
+      <div className="relative flex items-start justify-between p-4 device-safe-top">
+        <span
+          className="rounded-full px-2.5 py-1 text-[10px] font-bold uppercase"
+          style={{ letterSpacing: "0.14em", background: "rgba(0,0,0,0.5)", color: "rgba(255,255,255,0.92)", backdropFilter: "blur(8px)" }}
+        >
+          {t("ad_label")}
+        </span>
+
+        {осталось > 0 ? (
+          <span
+            className="flex h-9 min-w-9 items-center justify-center rounded-full px-3 text-xs font-bold"
+            style={{ background: "rgba(0,0,0,0.5)", color: "rgba(255,255,255,0.85)", backdropFilter: "blur(8px)" }}
+          >
+            {t("ad_skip_in")} {осталось}
+          </span>
+        ) : (
+          <button
+            onClick={закрыть}
+            className="flex items-center gap-1.5 rounded-full px-3.5 py-2 text-xs font-bold transition-all active:scale-95"
+            style={{ background: "rgba(255,255,255,0.95)", color: "#14201d" }}
+          >
+            {t("ad_skip")} <span className="rtl-flip inline-block">✕</span>
+          </button>
+        )}
+      </div>
+
+      {/* Кнопка звука — только пока играем без него. */}
+      {!звук && (
+        <button
+          onClick={включитьЗвук}
+          className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition-all active:scale-95"
+          style={{ background: "rgba(0,0,0,0.55)", color: "#fff", backdropFilter: "blur(8px)" }}
+        >
+          🔊 {t("ad_sound_on")}
+        </button>
+      )}
+
+      {/* Низ: рекламодатель, текст и кнопка перехода. */}
+      <div className="relative mt-auto p-4 device-safe-bottom">
+        <p className="mb-0.5 text-[11px] font-bold uppercase" style={{ letterSpacing: "0.1em", color: "rgba(255,255,255,0.7)" }}>
+          {трК(ad.label)}
+        </p>
+        <p className="mb-2 text-xl font-bold leading-tight" style={{ color: "#fff", fontFamily: "'Fraunces',serif" }}>
+          {трК(ad.title)}
+        </p>
+        <button
+          onClick={() => перейти(ad)}
+          className="w-full rounded-2xl py-3 text-sm font-bold transition-all active:scale-[0.98]"
+          style={{ background: ad.color, color: контрастныйТекст(ad.color) }}
+        >
+          {трК(ad.cta)} <span className="rtl-flip inline-block">→</span>
+        </button>
       </div>
     </div>
   );

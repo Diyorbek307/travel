@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PageHeader, Badge, Btn, Card, SectionTitle, ДемоРаздел } from "./shared";
 import { useEntity } from "../context/useEntity";
-import type { ManagedAd as Ad } from "@/lib/types";
+import type { AdPolicy, ManagedAd as Ad } from "@/lib/types";
 
 
 type Promotion = {
@@ -31,15 +31,75 @@ const AD_TYPE_LABELS: Record<string, string> = {
   spotlight: "Спотлайт",
   top_listing: "Топ листинг",
   push: "Push-уведомление",
+  interstitial: "Видео на весь экран",
 };
 
 export default function AdsManager() {
   const [ads, setAds] = useEntity("ads");
   const [promos, setPromos] = useState<Promotion[]>(PROMOTIONS);
-  const [tab, setTab] = useState<"ads" | "promotions" | "new">("ads");
+  const [tab, setTab] = useState<"ads" | "promotions" | "new" | "video">("ads");
   const [newAd, setNewAd] = useState({
     advertiser: "", type: "banner", target: "", budget: "", bid: "", startDate: "", endDate: "",
   });
+
+  // Настройка частоты полноэкранной рекламы (отдельно от содержимого).
+  const [policy, setPolicy] = useState<AdPolicy | null>(null);
+  const [policyState, setPolicyState] = useState<"idle" | "saving" | "saved">("idle");
+  useEffect(() => {
+    fetch("/api/ad-policy")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((p: AdPolicy | null) => p && setPolicy(p))
+      .catch(() => undefined);
+  }, []);
+  const savePolicy = async (patch: Partial<AdPolicy>) => {
+    const next = { ...(policy ?? { fullscreen: true, everyMinutes: 4, everyNav: 3 }), ...patch };
+    setPolicy(next);
+    setPolicyState("saving");
+    try {
+      const r = await fetch("/api/ad-policy", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(next),
+      });
+      const d = await r.json().catch(() => null);
+      if (d?.policy) setPolicy(d.policy);
+      setPolicyState("saved");
+      setTimeout(() => setPolicyState("idle"), 1500);
+    } catch {
+      setPolicyState("idle");
+    }
+  };
+
+  // Форма видео-объявления.
+  const [newVideo, setNewVideo] = useState({
+    advertiser: "", title: "", cta: "Подробнее", videoUrl: "", url: "", city: "", skipAfter: "5", color: "#1B6B8A",
+  });
+  const videoAds = ads.filter((a) => a.type === "interstitial" || a.videoUrl);
+  const submitVideo = () => {
+    if (!newVideo.videoUrl.trim()) return;
+    const ad: Ad = {
+      id: `vid-${Date.now()}`,
+      advertiser: newVideo.advertiser || "Рекламодатель",
+      type: "interstitial",
+      target: "Полный экран",
+      budget: 0, spent: 0, clicks: 0, impressions: 0,
+      status: "active",
+      startDate: "", endDate: "", bid: 0,
+      emoji: "🎬",
+      label: newVideo.advertiser || "РЕКЛАМА",
+      title: newVideo.title || newVideo.advertiser || "Реклама",
+      sub: "",
+      cta: newVideo.cta || "Подробнее",
+      color: newVideo.color || "#1B6B8A",
+      city: newVideo.city.trim() || undefined,
+      url: newVideo.url.trim() || undefined,
+      videoUrl: newVideo.videoUrl.trim(),
+      skipAfter: Math.max(0, Number(newVideo.skipAfter) || 5),
+    };
+    setAds((prev) => [ad, ...prev]);
+    setNewVideo({ advertiser: "", title: "", cta: "Подробнее", videoUrl: "", url: "", city: "", skipAfter: "5", color: "#1B6B8A" });
+  };
+  const removeAd = (id: string) => setAds((prev) => prev.filter((a) => a.id !== id));
   const [showAddPromo, setShowAddPromo] = useState(false);
   const [newPromo, setNewPromo] = useState({ business: "", city: "", category: "restaurant", monthlyFee: "" });
 
@@ -108,7 +168,7 @@ export default function AdsManager() {
 
       {/* Tabs */}
       <div className="flex flex-wrap gap-1 mb-6">
-        {([["ads", "Кампании"], ["promotions", "Продвижение листинга"], ["new", "+ Новая кампания"]] as const).map(([id, label]) => (
+        {([["ads", "Кампании"], ["video", "Видео на весь экран"], ["promotions", "Продвижение листинга"], ["new", "+ Новая кампания"]] as const).map(([id, label]) => (
           <button
             key={id}
             onClick={() => setTab(id)}
@@ -193,6 +253,132 @@ export default function AdsManager() {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {tab === "video" && (
+        <div className="flex flex-col gap-6">
+          {/* Частота показа — настоящая настройка, читается приложением. */}
+          <Card className="p-5">
+            <div className="flex items-center justify-between mb-4">
+              <SectionTitle>Как часто показывать</SectionTitle>
+              {policyState !== "idle" && (
+                <span className="text-xs" style={{ color: policyState === "saved" ? "var(--color-teal)" : "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
+                  {policyState === "saving" ? "Сохраняю…" : "✓ Сохранено"}
+                </span>
+              )}
+            </div>
+
+            <label className="flex items-center justify-between gap-3 mb-4 cursor-pointer">
+              <span className="text-sm" style={{ color: "var(--color-text)" }}>Показывать полноэкранную видео-рекламу</span>
+              <button
+                onClick={() => savePolicy({ fullscreen: !(policy?.fullscreen ?? true) })}
+                className="w-11 h-6 rounded-full transition-all shrink-0 relative cursor-pointer"
+                style={{ background: (policy?.fullscreen ?? true) ? "var(--color-teal)" : "var(--color-dim)" }}
+              >
+                <span className="absolute top-0.5 w-5 h-5 rounded-full transition-all" style={{ background: "#fff", left: (policy?.fullscreen ?? true) ? "22px" : "2px" }} />
+              </button>
+            </label>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs mb-1.5 block" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>НЕ ЧАЩЕ РАЗА В (МИНУТ)</label>
+                <input
+                  type="number" min={0} value={policy?.everyMinutes ?? 4}
+                  onChange={(e) => setPolicy((p) => ({ ...(p ?? { fullscreen: true, everyMinutes: 4, everyNav: 3 }), everyMinutes: Number(e.target.value) }))}
+                  onBlur={(e) => savePolicy({ everyMinutes: Number(e.target.value) })}
+                  className="w-full rounded px-3 py-2 text-sm outline-none"
+                  style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", color: "var(--color-text)", fontFamily: "var(--font-body)" }}
+                />
+              </div>
+              <div>
+                <label className="text-xs mb-1.5 block" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>ПОКАЗ НА КАЖДЫЙ N-Й ПЕРЕХОД</label>
+                <input
+                  type="number" min={1} value={policy?.everyNav ?? 3}
+                  onChange={(e) => setPolicy((p) => ({ ...(p ?? { fullscreen: true, everyMinutes: 4, everyNav: 3 }), everyNav: Number(e.target.value) }))}
+                  onBlur={(e) => savePolicy({ everyNav: Number(e.target.value) })}
+                  className="w-full rounded px-3 py-2 text-sm outline-none"
+                  style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", color: "var(--color-text)", fontFamily: "var(--font-body)" }}
+                />
+              </div>
+            </div>
+            <p className="text-xs mt-3" style={{ color: "var(--color-faint)" }}>
+              Оба условия должны совпасть: реклама выскочит на каждый N-й переход, но не чаще раза в заданные минуты. Premium-подписчики её не видят.
+            </p>
+          </Card>
+
+          {/* Форма нового видео-объявления. */}
+          <Card className="p-5">
+            <SectionTitle>Добавить видео-рекламу</SectionTitle>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-1">
+              {[
+                { key: "advertiser", label: "Рекламодатель", ph: "напр. Coca-Cola" },
+                { key: "title", label: "Заголовок", ph: "Освежись в дороге" },
+                { key: "videoUrl", label: "Ссылка на ролик (mp4)", ph: "/videos/ad.mp4 или https://…" },
+                { key: "url", label: "Куда ведёт клик", ph: "https://…" },
+                { key: "cta", label: "Текст кнопки", ph: "Подробнее" },
+                { key: "city", label: "Город показа (пусто — везде)", ph: "Самарканд" },
+                { key: "skipAfter", label: "Кнопка «Пропустить» через (сек)", ph: "5" },
+              ].map((f) => (
+                <div key={f.key} className={f.key === "videoUrl" ? "sm:col-span-2" : ""}>
+                  <label className="text-xs mb-1.5 block" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>{f.label.toUpperCase()}</label>
+                  <input
+                    type={f.key === "skipAfter" ? "number" : "text"}
+                    placeholder={f.ph}
+                    value={(newVideo as Record<string, string>)[f.key]}
+                    onChange={(e) => setNewVideo((p) => ({ ...p, [f.key]: e.target.value }))}
+                    className="w-full rounded px-3 py-2 text-sm outline-none"
+                    style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", color: "var(--color-text)", fontFamily: "var(--font-body)" }}
+                  />
+                </div>
+              ))}
+              <div>
+                <label className="text-xs mb-1.5 block" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>ЦВЕТ КНОПКИ</label>
+                <input
+                  type="color" value={newVideo.color}
+                  onChange={(e) => setNewVideo((p) => ({ ...p, color: e.target.value }))}
+                  className="w-full h-9 rounded cursor-pointer"
+                  style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }}
+                />
+              </div>
+            </div>
+            <div className="mt-4">
+              <Btn onClick={submitVideo}>Добавить ролик</Btn>
+            </div>
+          </Card>
+
+          {/* Список видео-объявлений. */}
+          <div>
+            <SectionTitle>Ролики ({videoAds.length})</SectionTitle>
+            {videoAds.length === 0 ? (
+              <div className="rounded-lg p-6 text-center text-sm" style={{ border: "1px dashed var(--color-border)", color: "var(--color-faint)" }}>
+                Пока нет ни одного ролика. Добавьте выше — и он начнёт показываться туристам на весь экран.
+              </div>
+            ) : (
+              <div className="flex flex-col gap-3">
+                {videoAds.map((ad) => (
+                  <div key={ad.id} className="rounded-lg p-4 flex flex-wrap items-center gap-3" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }}>
+                    <span className="w-10 h-10 rounded-lg flex items-center justify-center text-lg shrink-0" style={{ background: "var(--color-dim)" }}>🎬</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap mb-0.5">
+                        <span className="font-medium text-sm" style={{ color: "var(--color-text)" }}>{ad.advertiser}</span>
+                        <Badge label={ad.status === "active" ? "показывается" : "пауза"} color={ad.status === "active" ? "teal" : "rose"} />
+                        <Badge label={`пропуск через ${ad.skipAfter ?? 5}с`} color="dim" />
+                        {ad.city && <span className="text-xs" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>📍 {ad.city}</span>}
+                      </div>
+                      <div className="text-xs truncate" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>{ad.videoUrl}</div>
+                    </div>
+                    <div className="flex flex-wrap gap-2 shrink-0">
+                      <Btn variant={ad.status === "active" ? "danger" : "ghost"} small onClick={() => toggleAd(ad.id)}>
+                        {ad.status === "active" ? "Пауза" : "Включить"}
+                      </Btn>
+                      <Btn variant="ghost" small onClick={() => removeAd(ad.id)}>Удалить</Btn>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       )}
 

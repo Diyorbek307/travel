@@ -220,7 +220,7 @@ export interface ManagedEvent {
 export interface ManagedAd {
   id: string;
   advertiser: string;
-  type: "banner" | "spotlight" | "top_listing" | "push";
+  type: "banner" | "spotlight" | "top_listing" | "push" | "interstitial";
   target: string;
   budget: number;
   spent: number;
@@ -242,6 +242,28 @@ export interface ManagedAd {
   city?: string;
   /** Куда ведёт клик — сайт рекламодателя. */
   url?: string;
+  /**
+   * Ролик рекламодателя для полноэкранного показа. Путь к файлу в
+   * public/videos или внешняя ссылка на mp4. Есть ссылка — объявление
+   * может показываться на весь экран (interstitial); нет — обычный блок.
+   */
+  videoUrl?: string;
+  /** Через сколько секунд появляется кнопка «Пропустить». По умолчанию 5. */
+  skipAfter?: number;
+}
+
+/**
+ * Как часто показывать полноэкранную видео-рекламу. Настраивается в
+ * панели (раздел «Реклама»), приложение читает и решает по этим числам.
+ * Хранится отдельно от содержимого: это правило показа, а не запись.
+ */
+export interface AdPolicy {
+  /** Показывать ли полноэкранную рекламу вообще. */
+  fullscreen: boolean;
+  /** Не чаще одного показа в это число минут. 0 — без паузы по времени. */
+  everyMinutes: number;
+  /** Показ на каждый N-й переход между экранами. */
+  everyNav: number;
 }
 
 /** Всё содержимое платформы одним объектом — его отдаёт и принимает API. */
