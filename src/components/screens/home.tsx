@@ -15,7 +15,7 @@ import { напомнитьОСобытии } from "@/lib/calendar";
 import { useПрочитанные } from "@/lib/notifs-read";
 import { NOTIFS } from "@/data/content";
 import CityReel from "@/components/city-reel";
-import { ВИДЕО, кадрыГорода } from "@/data/city-reels";
+import { ВИДЕО, ФОН_ВИДЕО, кадрыГорода } from "@/data/city-reels";
 import { useДеньги } from "@/lib/money";
 
 import { AdShelf, AdSpotlight } from "@/components/ads";
@@ -43,7 +43,7 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
             поэтому главная не выглядит застывшей открыткой. */}
         <CityReel
           кадры={кадрыГорода("Самарканд", "https://images.unsplash.com/photo-1664602078796-68ee76b3fc59?w=900&h=900&fit=crop&auto=format", { PLACES })}
-          видео={ВИДЕО["Самарканд"]}
+          видео={ВИДЕО["Самарканд"] ?? ФОН_ВИДЕО}
           alt="Самарканд"
         />
         <div className="absolute inset-0" style={{background:"linear-gradient(to bottom,rgba(0,0,0,0.32) 0%,rgba(0,0,0,0.04) 38%,rgba(0,0,0,0.75) 100%)"}}/>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import YouTubeBg from "./youtube-bg";
 
 /**
  * Короткий «ролик» о городе: 3–4 кадра с медленным наездом и плавным
@@ -59,7 +60,10 @@ export default function CityReel({
 
   return (
     <div ref={боксRef} className={className ?? "absolute inset-0 overflow-hidden"}>
-      {видео ? (
+      {видео && /^[A-Za-z0-9_-]{11}$/.test(видео) ? (
+        // Короткий id (11 символов) — ролик на YouTube: играем плеером.
+        <YouTubeBg id={видео} poster={кадры[0]} className="absolute inset-0 overflow-hidden" />
+      ) : видео ? (
         <video
           src={видео}
           poster={кадры[0]}

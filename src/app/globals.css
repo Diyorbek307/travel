@@ -62,7 +62,6 @@
     --accent-light: #7ff3ef;
     --glass: rgba(16, 24, 22, 0.82);
     --glass-border: rgba(255, 255, 255, 0.14);
-  --accent-light: #7ff3ef;
     --cream: #0a0f0e;
     --surface: #131a18;
     --text: #e8f1ef;
@@ -625,6 +624,10 @@ button[aria-disabled="true"] {
 /* Боковые огни: после въезда медленно покачиваются и дышат яркостью,
    чтобы свет с краёв жил, а не стоял пятном. Два набора — соседние
    углы качаются в противофазе. */
+@keyframes wow-fadein {
+  from { opacity: 0; }
+  to { opacity: 0.5; }
+}
 @keyframes wow-side-a {
   0%, 100% { transform: translate(0, 0); opacity: 0.75; }
   50% { transform: translate(4%, 3%); opacity: 1; }

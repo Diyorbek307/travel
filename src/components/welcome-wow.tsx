@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useT } from "@/components/lang-provider";
 import { GOLD } from "@/lib/theme";
+import YouTubeBg from "./youtube-bg";
+import { ФОН_ВИДЕО } from "@/data/city-reels";
 
 /**
  * Экран после регистрации. Тумблер «включает» приложение: из темноты
@@ -69,7 +71,9 @@ export default function WelcomeWow({ name, onDone }: { name?: string; onDone: ()
 
   return (
     <div className="relative h-full w-full overflow-hidden" style={{ background: "#04060a" }}>
-      {/* Фон: до включения обесцвечен и придавлен, после — оживает с наездом. */}
+      {/* Фон: до включения обесцвечен и придавлен, после — оживает.
+          Когда сцена включилась, поверх кадров разгорается живое видео
+          об Узбекистане; до включения его нет — фон намеренно мёртвый. */}
       <div className="absolute inset-0">
         {КАДРЫ.map((src, i) => (
           <img
@@ -85,6 +89,11 @@ export default function WelcomeWow({ name, onDone }: { name?: string; onDone: ()
             }}
           />
         ))}
+        {вкл && (
+          <div className="absolute inset-0" style={{ opacity: 0.5, animation: "wow-fadein 3s ease forwards" }}>
+            <YouTubeBg id={ФОН_ВИДЕО} poster={КАДРЫ[0]} className="absolute inset-0 overflow-hidden" />
+          </div>
+        )}
         {/* Мягкая аврора: цветная дымка, что медленно плывёт по верху сцены. */}
         <div
           className="pointer-events-none absolute inset-0"
