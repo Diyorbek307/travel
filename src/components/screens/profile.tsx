@@ -30,6 +30,32 @@ export function SettingsView({ isPremium, user, onUpgrade, onLogout, onSupport }
   const [обновление, setОбновление] = useState<null | "checking" | "current" | "available">(null);
   const [форма, setФорма] = useState({ firstName: "", lastName: "", country: "", phone: "" });
   const [оценка, setОценка] = useState(0);
+  // Новое фото профиля (data-URL) или null — значит не меняли.
+  const [новоеФото, setНовоеФото] = useState<string | null>(null);
+  const файлФото = useRef<HTMLInputElement>(null);
+
+  // Сжимаем снимок в квадрат 320px — как при регистрации, чтобы не
+  // грузить в базу мегабайты.
+  const выбратьФото = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const сторона = 320;
+        const c = document.createElement("canvas");
+        c.width = c.height = сторона;
+        const ctx = c.getContext("2d");
+        if (!ctx) return;
+        const min = Math.min(img.width, img.height);
+        ctx.drawImage(img, (img.width - min) / 2, (img.height - min) / 2, min, min, 0, 0, сторона, сторона);
+        setНовоеФото(c.toDataURL("image/jpeg", 0.82));
+      };
+      img.src = String(reader.result);
+    };
+    reader.readAsDataURL(f);
+  };
 
   const тост = (m: string) => { setСообщение(m); setTimeout(() => setСообщение(""), 2400); };
 
@@ -74,9 +100,12 @@ export function SettingsView({ isPremium, user, onUpgrade, onLogout, onSupport }
   // Сохранить правку профиля на сервере.
   const сохранитьПрофиль = async () => {
     try {
-      await fetch("/api/auth/me", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(форма) });
+      await fetch("/api/auth/me", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(новоеФото ? { ...форма, photo: новоеФото } : форма) });
       тост(t("prof_saved_ok"));
       setПанель(null);
+      setНовоеФото(null);
+      // Перечитываем профиль, чтобы имя и фото сразу обновились.
+      setTimeout(() => location.reload(), 600);
     } catch { тост(t("err_network")); }
   };
 
@@ -101,6 +130,7 @@ export function SettingsView({ isPremium, user, onUpgrade, onLogout, onSupport }
 
   const открытьПравку = () => {
     setФорма({ firstName: user?.firstName ?? "", lastName: user?.lastName ?? "", country: user?.country ?? "", phone: user?.phone ?? "" });
+    setНовоеФото(null);
     setПанель("edit");
   };
 
@@ -290,6 +320,18 @@ export function SettingsView({ isPremium, user, onUpgrade, onLogout, onSupport }
 
             {панель==="edit" && (
               <div className="space-y-3">
+                {/* Аватар: показываем новый выбранный, иначе текущий с сервера. */}
+                <div className="flex flex-col items-center gap-2 pb-1">
+                  <button onClick={()=>файлФото.current?.click()} className="h-20 w-20 overflow-hidden rounded-full flex items-center justify-center active:scale-95 transition-transform" style={{background:ACCENT_SOFT,border:`1px dashed ${GREEN}`}}>
+                    {новоеФото
+                      ? <img src={новоеФото} alt="" className="h-full w-full object-cover"/>
+                      : user?.hasPhoto
+                        ? <img src={`/api/photo/${user.id}`} alt="" className="h-full w-full object-cover"/>
+                        : <span className="text-2xl">📷</span>}
+                  </button>
+                  <button onClick={()=>файлФото.current?.click()} className="text-xs font-semibold" style={{color:GREEN}}>{t("reg_photo")}</button>
+                  <input ref={файлФото} type="file" accept="image/*" hidden onChange={выбратьФото}/>
+                </div>
                 {([["firstName",t("f_field_first")],["lastName",t("f_field_last")],["country",t("f_field_country")],["phone",t("f_field_phone")]] as const).map(([k,label])=>(
                   <div key={k}>
                     <label className="text-[10px] uppercase tracking-widest font-bold block mb-1" style={{color:MUTED}}>{label}</label>

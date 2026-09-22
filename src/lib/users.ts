@@ -223,7 +223,7 @@ export async function deleteUser(id: string): Promise<void> {
  */
 export async function updateUser(
   id: string,
-  fields: Partial<Pick<User, "firstName" | "lastName" | "country" | "phone">>,
+  fields: Partial<Pick<User, "firstName" | "lastName" | "country" | "phone" | "hasPhoto">>,
 ): Promise<User | null> {
   return хранилище.update<User | null>((users) => {
     const i = users.findIndex((u) => u.id === id);
@@ -234,6 +234,7 @@ export async function updateUser(
     if (typeof fields.lastName === "string") чистые.lastName = fields.lastName.trim().slice(0, 60);
     if (typeof fields.country === "string") чистые.country = fields.country.trim().slice(0, 60);
     if (typeof fields.phone === "string") чистые.phone = fields.phone.trim().slice(0, 40);
+    if (typeof fields.hasPhoto === "boolean") чистые.hasPhoto = fields.hasPhoto;
     копия[i] = { ...копия[i], ...чистые };
     return [копия, копия[i]];
   });

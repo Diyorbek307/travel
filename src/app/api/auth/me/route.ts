@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { savePhoto, deletePhoto } from "@/lib/photos";
 import {
   deleteUser,
   findById,
@@ -56,11 +57,22 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: "bad_json" }, { status: 400 });
   }
 
+  // Фото — отдельным хранилищем: пустая строка/ null убирает снимок.
+  let hasPhoto: boolean | undefined;
+  if (typeof body.photo === "string" && body.photo.startsWith("data:")) {
+    await savePhoto(userId, body.photo);
+    hasPhoto = true;
+  } else if (body.photo === null || body.photo === "") {
+    await deletePhoto(userId);
+    hasPhoto = false;
+  }
+
   const обновлён = await updateUser(userId, {
     firstName: typeof body.firstName === "string" ? body.firstName : undefined,
     lastName: typeof body.lastName === "string" ? body.lastName : undefined,
     country: typeof body.country === "string" ? body.country : undefined,
     phone: typeof body.phone === "string" ? body.phone : undefined,
+    hasPhoto,
   });
   if (!обновлён) return NextResponse.json({ error: "not_found" }, { status: 404 });
   return NextResponse.json({ user: publicUser(обновлён) }, { headers: { "Cache-Control": "no-store" } });
