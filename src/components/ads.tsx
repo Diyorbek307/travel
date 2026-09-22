@@ -6,6 +6,16 @@ import { useAppContent } from "./content-provider";
 import { useT } from "@/components/lang-provider";
 import { BORDER, LIME, MUTED, SURFACE, TEXT, WHITE, контрастныйТекст, мягко } from "@/lib/theme";
 import type { AdPolicy } from "@/lib/types";
+import YouTubeBg from "./youtube-bg";
+
+/**
+ * id ролика YouTube из любой его ссылки (shorts, watch, youtu.be, embed).
+ * Такую ссылку нельзя вставить в <video> — она не mp4; играем плеером.
+ */
+function ютубId(u: string): string | null {
+  const m = u.match(/(?:youtube\.com\/(?:shorts\/|watch\?v=|embed\/|live\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+  return m ? m[1] : null;
+}
 
 /**
  * Партнёрские блоки.
@@ -379,6 +389,8 @@ export function AdInterstitial({
 
   if (!текущее) return null;
   const ad = текущее;
+  // Ссылка на YouTube (в т.ч. Shorts) — играем плеером, иначе своим mp4.
+  const ytId = ютубId(ad.videoUrl ?? "");
 
   const включитьЗвук = () => {
     const v = видеоRef.current;
@@ -390,16 +402,26 @@ export function AdInterstitial({
 
   return (
     <div className="fixed inset-0 z-[80] flex flex-col" style={{ background: "#000" }}>
-      <video
-        ref={видеоRef}
-        src={ad.videoUrl}
-        poster={undefined}
-        loop
-        playsInline
-        autoPlay
-        onClick={() => перейти(ad)}
-        className="absolute inset-0 h-full w-full object-cover"
-      />
+      {ytId ? (
+        // Ролик с YouTube: плеер во весь экран. Клик по кадру ведёт на сайт
+        // рекламодателя (сам плеер клики не пропускает).
+        <div className="absolute inset-0 cursor-pointer" onClick={() => перейти(ad)}>
+          <YouTubeBg id={ytId} className="absolute inset-0 h-full w-full" />
+        </div>
+      ) : (
+        <video
+          ref={видеоRef}
+          src={ad.videoUrl}
+          poster={undefined}
+          loop
+          playsInline
+          autoPlay
+          controls={false}
+          disablePictureInPicture
+          onClick={() => перейти(ad)}
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+      )}
 
       {/* Затемнение снизу — под подпись и кнопку, чтобы читались на любом кадре. */}
       <div
@@ -435,7 +457,7 @@ export function AdInterstitial({
       </div>
 
       {/* Кнопка звука — только пока играем без него. */}
-      {!звук && (
+      {!звук && !ytId && (
         <button
           onClick={включитьЗвук}
           className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition-all active:scale-95"

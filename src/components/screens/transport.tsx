@@ -116,9 +116,9 @@ export function TransportScreen({ onBack, isPremium }:{ onBack:()=>void; isPremi
           onLoadStart={()=>setВидеоOk(false)}
           onPlaying={()=>setВидеоOk(true)}
           className="absolute inset-0 h-full w-full object-cover"
-          style={{opacity: видеоOk?0.55:0, transition:"opacity 1s ease"}}
+          style={{opacity: видеоOk?0.9:0, transition:"opacity 1s ease"}}
         />
-        <div className="absolute inset-0 pointer-events-none" style={{background:"linear-gradient(180deg, rgba(11,90,82,0.4) 0%, rgba(11,90,82,0.8) 100%)"}}/>
+        <div className="absolute inset-0 pointer-events-none" style={{background:"linear-gradient(180deg, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.5) 100%)"}}/>
         <div className="absolute inset-0 opacity-20 pointer-events-none"><AnimatedBg/></div>
         <div className="relative z-10">
           <button onClick={onBack} className="mb-3 w-9 h-9 rounded-xl flex items-center justify-center" style={{background:"rgba(255,255,255,0.2)"}}>

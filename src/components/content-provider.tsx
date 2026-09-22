@@ -2,8 +2,20 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { SEED } from "@/data/seed";
+import { ADS as ВШИТЫЕ_РЕКЛАМЫ } from "@/data/content";
 import type { Content } from "@/lib/types";
 import { useT } from "@/components/lang-provider";
+
+/**
+ * Фото демо-объявлений по их id. На уже работающем стенде записи рекламы
+ * могли сохраниться в базу ещё без поля фото; чтобы у них всё равно
+ * появилась картинка, подставляем её по id из вшитого набора.
+ */
+const ФОТО_РЕКЛАМЫ = new Map(
+  (ВШИТЫЕ_РЕКЛАМЫ as { id: string; imageUrl?: string }[])
+    .filter((a) => a.imageUrl)
+    .map((a) => [a.id, a.imageUrl as string]),
+);
 
 /**
  * Содержимое приложения.
@@ -95,6 +107,8 @@ export function useAppContent() {
     // Скрытый в панели аудиогид сразу пропадает у туристов.
     AUDIO: (content.audio ?? []).filter((a) => a.active),
     // Приостановленная в панели кампания сразу исчезает из приложения.
-    ADS: content.ads.filter((a) => a.status === "active").map((a) => ({ ...a, color: мЦвет(a.color) })),
+    ADS: content.ads
+      .filter((a) => a.status === "active")
+      .map((a) => ({ ...a, color: мЦвет(a.color), imageUrl: a.imageUrl ?? ФОТО_РЕКЛАМЫ.get(a.id) })),
   };
 }

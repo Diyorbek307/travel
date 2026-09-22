@@ -70,7 +70,7 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
               boxShadow: "0 4px 18px rgba(0,0,0,0.3)",
             }}
           >
-            <LogoMark size={22}/>
+            <LogoMark size={22} tone="#ffffff"/>
             <span className="text-white text-sm font-bold" style={{fontFamily:"'Fraunces',serif",textShadow:"0 1px 6px rgba(0,0,0,0.5)"}}>UzRoam</span>
           </div>
           <button onClick={onNotifs} className="w-9 h-9 rounded-xl flex items-center justify-center relative" style={{...glass}}>
