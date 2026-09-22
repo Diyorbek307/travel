@@ -20,9 +20,13 @@ type User = {
   country: string;
   phone: string;
   photoUrl: string | null;
+  emailVerified?: boolean;
   createdAt: string;
   lastSeenAt: string;
 };
+
+/** Сигнал SOS: единственный источник координат туриста — по своей воле. */
+type Sos = { id: string; userId: string | null; lat: number; lon: number; createdAt: string };
 
 /** Три месяца без входа — по этому же сроку истекает сессия. */
 const НЕАКТИВЕН_МС = 90 * 24 * 60 * 60 * 1000;
@@ -30,6 +34,11 @@ const НЕАКТИВЕН_МС = 90 * 24 * 60 * 60 * 1000;
 function дата(iso: string): string {
   if (!iso) return "—";
   return new Date(iso).toLocaleDateString("ru", { day: "numeric", month: "short", year: "numeric" });
+}
+
+function датаВремя(iso: string): string {
+  if (!iso) return "—";
+  return new Date(iso).toLocaleString("ru", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
 }
 
 type Reset = { token: string; email: string; expiresAt: string };
@@ -58,6 +67,7 @@ export default function Users() {
   const [проверяю, setПроверяю] = useState(false);
   const [кудаПробное, setКудаПробное] = useState("");
   const [пробноеИтог, setПробноеИтог] = useState<string | null>(null);
+  const [сигналы, setСигналы] = useState<Sos[]>([]);
 
   useEffect(() => {
     fetch("/api/admin/users")
@@ -76,7 +86,19 @@ export default function Users() {
         setПочтаНастроена(d.mailConfigured);
       })
       .catch(() => setЗаявки([]));
+
+    // Сигналы SOS — единственные координаты туристов: приложение не следит
+    // за ними в фоне, позицию присылает только сам человек.
+    fetch("/api/sos")
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error())))
+      .then((d: { alerts: Sos[] }) => setСигналы(d.alerts ?? []))
+      .catch(() => setСигналы([]));
   }, []);
+
+  /** Последний известный сигнал этого туриста — по нему его местоположение. */
+  function последнееМесто(u: User): Sos | null {
+    return сигналы.find((s) => s.userId === u.id) ?? null;
+  }
 
   async function проверитьПочту() {
     setПроверяю(true);
@@ -391,6 +413,9 @@ export default function Users() {
 
             <dl className="mb-5 grid gap-2 text-sm">
               {[
+                ["Имя", `${открыт.firstName} ${открыт.lastName}`.trim() || "—"],
+                ["Почта", открыт.email],
+                ["Подтверждение", открыт.emailVerified ? "почта подтверждена ✓" : "не подтверждена"],
                 ["Страна", открыт.country || "не указана"],
                 ["Телефон", открыт.phone || "не указан"],
                 ["Регистрация", дата(открыт.createdAt)],
@@ -398,10 +423,59 @@ export default function Users() {
               ].map(([k, v]) => (
                 <div key={k} className="flex flex-wrap justify-between gap-2">
                   <dt style={{ color: "var(--color-muted)" }}>{k}</dt>
-                  <dd style={{ color: "var(--color-text)" }}>{v}</dd>
+                  <dd className="min-w-0 text-right" style={{ color: "var(--color-text)" }}>{v}</dd>
                 </div>
               ))}
             </dl>
+
+            {/* Местоположение. Честно: приложение не следит за туристами в
+                фоне, координаты приходят только из сигнала SOS. */}
+            {(() => {
+              const м = последнееМесто(открыт);
+              return (
+                <div className="mb-4">
+                  <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
+                    Местоположение
+                  </p>
+                  {м ? (
+                    <>
+                      <p className="mb-2 text-xs" style={{ color: "var(--color-text)" }}>
+                        Последний сигнал SOS · {датаВремя(м.createdAt)}
+                        <br />
+                        <span style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
+                          {м.lat.toFixed(5)}, {м.lon.toFixed(5)}
+                        </span>
+                      </p>
+                      <div className="overflow-hidden rounded-lg" style={{ border: "1px solid var(--color-border)" }}>
+                        <iframe
+                          title="Местоположение"
+                          width="100%"
+                          height="180"
+                          style={{ border: 0, display: "block" }}
+                          loading="lazy"
+                          referrerPolicy="no-referrer"
+                          src={`https://www.openstreetmap.org/export/embed.html?bbox=${м.lon - 0.02}%2C${м.lat - 0.015}%2C${м.lon + 0.02}%2C${м.lat + 0.015}&layer=mapnik&marker=${м.lat}%2C${м.lon}`}
+                        />
+                      </div>
+                      <a
+                        href={`https://www.openstreetmap.org/?mlat=${м.lat}&mlon=${м.lon}#map=15/${м.lat}/${м.lon}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-1.5 inline-block text-xs"
+                        style={{ color: "var(--color-amber)" }}
+                      >
+                        Открыть на карте →
+                      </a>
+                    </>
+                  ) : (
+                    <p className="text-xs leading-relaxed" style={{ color: "var(--color-faint)" }}>
+                      Турист не передавал координаты. Приложение не отслеживает людей в фоне —
+                      местоположение приходит только когда человек сам отправляет сигнал SOS.
+                    </p>
+                  )}
+                </div>
+              );
+            })()}
 
             <p className="mb-4 text-xs" style={{ color: "var(--color-faint)" }}>
               Паспортные данные не собираются.

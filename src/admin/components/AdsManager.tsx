@@ -39,7 +39,7 @@ export default function AdsManager() {
   const [promos, setPromos] = useState<Promotion[]>(PROMOTIONS);
   const [tab, setTab] = useState<"ads" | "promotions" | "new" | "video">("ads");
   const [newAd, setNewAd] = useState({
-    advertiser: "", type: "banner", target: "", budget: "", bid: "", startDate: "", endDate: "",
+    advertiser: "", type: "banner", target: "", budget: "", bid: "", startDate: "", endDate: "", imageUrl: "",
   });
 
   // Настройка частоты полноэкранной рекламы (отдельно от содержимого).
@@ -137,10 +137,11 @@ export default function AdsManager() {
       sub: newAd.target || "",
       cta: "Подробнее",
       color: "#1B6B8A",
+      imageUrl: newAd.imageUrl.trim() || undefined,
     };
     setAds(prev => [ad, ...prev]);
     setTab("ads");
-    setNewAd({ advertiser: "", type: "banner", target: "", budget: "", bid: "", startDate: "", endDate: "" });
+    setNewAd({ advertiser: "", type: "banner", target: "", budget: "", bid: "", startDate: "", endDate: "", imageUrl: "" });
   };
 
   return (
@@ -456,6 +457,7 @@ export default function AdsManager() {
           <div className="flex flex-col gap-4">
             {[
               { label: "Имя рекламодателя", key: "advertiser", placeholder: "напр. Samarkand Hotel Group" },
+              { label: "Фото товара (ссылка)", key: "imageUrl", placeholder: "https://…/photo.jpg" },
               { label: "Место размещения", key: "target", placeholder: "напр. Страница отелей, Главный баннер" },
               { label: "Бюджет ($)", key: "budget", placeholder: "500" },
               { label: "Макс. ставка CPC ($)", key: "bid", placeholder: "0.50" },

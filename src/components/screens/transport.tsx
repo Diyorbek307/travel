@@ -12,6 +12,7 @@ import { FLIGHTS, INTERCITY, TRAINS, UZ_CITIES } from "@/data/content";
 import { EmptyRoute } from "../ui";
 import { AnimatedBg } from "@/components/animated-bg";
 import { AdInline } from "@/components/ads";
+import { ВИДЕО, ФОН_ВИДЕО } from "@/data/city-reels";
 
 
 export function CityPicker({ value, onChange, label, icon }:{ value:string; onChange:(c:string)=>void; label:string; icon:string }) {
@@ -79,6 +80,11 @@ export function TransportScreen({ onBack, isPremium }:{ onBack:()=>void; isPremi
   const купить = (куда: keyof typeof САЙТЫ) => window.open(САЙТЫ[куда], "_blank", "noopener,noreferrer");
   const [fromCity, setFromCity] = useState("");
   const [toCity,   setToCity]   = useState("");
+  // Ролик города для шапки: свой у города «откуда», иначе общий об
+  // Узбекистане. Пока не заиграл (или автозапуск закрыт) — держим чистый
+  // бирюзовый фон, без чужой кнопки «play».
+  const видеоШапки = ВИДЕО[fromCity] ?? ФОН_ВИДЕО;
+  const [видеоOk, setВидеоOk] = useState(false);
   const TABS:[typeof mode,string,TKey][] = [["trains","🚄","tr_trains"],["flights","✈️","tr_flights"],["taxi","🚌","tr_taxi"]];
 
   const TicketCard = ({ children, price, onBook }:{ children:React.ReactNode; price:string; onBook:()=>void }) => (
@@ -99,6 +105,20 @@ export function TransportScreen({ onBack, isPremium }:{ onBack:()=>void; isPremi
   return (
     <div className="flex flex-col h-full animate-slide-up" style={{background:CREAM}}>
       <div className="relative overflow-hidden px-4 pt-14 pb-4" style={{background:GREEN}}>
+        {/* Живой фон города. Зелёная плёнка поверх держит фирменный цвет и
+            читаемость белого текста в любой теме. */}
+        <video
+          key={видеоШапки}
+          src={видеоШапки}
+          autoPlay muted loop playsInline preload="auto"
+          controls={false}
+          disablePictureInPicture
+          onLoadStart={()=>setВидеоOk(false)}
+          onPlaying={()=>setВидеоOk(true)}
+          className="absolute inset-0 h-full w-full object-cover"
+          style={{opacity: видеоOk?0.55:0, transition:"opacity 1s ease"}}
+        />
+        <div className="absolute inset-0 pointer-events-none" style={{background:"linear-gradient(180deg, rgba(11,90,82,0.4) 0%, rgba(11,90,82,0.8) 100%)"}}/>
         <div className="absolute inset-0 opacity-20 pointer-events-none"><AnimatedBg/></div>
         <div className="relative z-10">
           <button onClick={onBack} className="mb-3 w-9 h-9 rounded-xl flex items-center justify-center" style={{background:"rgba(255,255,255,0.2)"}}>

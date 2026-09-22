@@ -67,6 +67,7 @@ export function MapScreen({ onRoute, onAudio }:{ onRoute:(r:Route)=>void; onAudi
               <RealMap
                 высота="clamp(300px, 46vh, 560px)"
                 откуда={где}
+                фокус={где}
                 приблизить={false}
                 точки={Object.entries(ГОРОДА).map(([название,geo])=>({
                   geo,

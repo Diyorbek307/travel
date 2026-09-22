@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BORDER, CREAM, GREEN, MUTED, TEXT, WHITE, SURFACE, ACCENT_SOFT } from "@/lib/theme";
 import { LOCALE_META, LOCALES, type Locale, type TKey } from "@/lib/i18n";
 import { GeomPattern, LogoMark } from "./ui";
@@ -8,11 +8,22 @@ import { useT } from "@/components/lang-provider";
 
 export function SplashScreen({ onStart, onLogin }:{ onStart:()=>void; onLogin:()=>void }) {
   const { t } = useT();
+  // Цифры витрины редактируются в панели. Пока ответ не пришёл (или сети
+  // нет) — показываем разумные значения по умолчанию, экран не пустует.
+  const [цифры, setЦифры] = useState({ statPlaces:"500+", statLangs:"10", statRating:"4.9" });
+  useEffect(() => {
+    let живо = true;
+    fetch("/api/site-config")
+      .then(r => r.ok ? r.json() : null)
+      .then(c => { if (живо && c) setЦифры(c); })
+      .catch(() => {});
+    return () => { живо = false; };
+  }, []);
   return (
     <div className="flex flex-col h-full relative overflow-hidden">
       <img src="https://images.unsplash.com/photo-1664602078796-68ee76b3fc59?w=800&h=1000&fit=crop&auto=format" alt="Регистан" className="absolute inset-0 w-full h-full object-cover"/>
       <div className="absolute inset-0" style={{background:"linear-gradient(180deg,rgba(7,120,111,0.5) 0%,rgba(0,0,0,0.1) 40%,rgba(0,0,0,0.82) 100%)"}}/>
-      <div className="relative z-10 flex items-center gap-3 px-6 pt-16"><LogoMark size={44} intro/><div><p className="text-white text-2xl font-bold leading-none" style={{fontFamily:"'Fraunces',serif"}}>UzRoam</p><p className="text-white/70 text-xs mt-0.5">{t("splash_tagline")}</p></div></div>
+      <div className="relative z-10 flex items-center gap-3 px-6 pt-16"><LogoMark size={44} intro/><div><p className="text-white text-2xl font-bold leading-none" style={{fontFamily:"'Fraunces',serif",textShadow:"0 2px 12px rgba(0,0,0,0.55)"}}>UzRoam</p><p className="text-white text-xs mt-1 font-medium" style={{textShadow:"0 1px 8px rgba(0,0,0,0.6)"}}>{t("splash_tagline")}</p></div></div>
       <div className="relative z-10 flex justify-end px-4 mt-2"><GeomPattern opacity={0.22}/></div>
       <div className="relative z-10 mt-auto px-6 pb-12">
         <h1 className="text-white font-bold leading-tight mb-3" style={{fontSize:36,fontFamily:"'Fraunces',serif"}}>{t("splash_tagline")}</h1>
@@ -22,7 +33,7 @@ export function SplashScreen({ onStart, onLogin }:{ onStart:()=>void; onLogin:()
           <svg className="rtl-flip" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
         <button onClick={onLogin} className="w-full py-3 rounded-2xl text-sm font-semibold border" style={{color:"white",borderColor:"rgba(255,255,255,0.3)"}}>{t("splash_login")}</button>
-        <div className="flex justify-center gap-8 mt-8">{[["500+",t("splash_places")],["10",t("splash_langs")],["4.9",t("splash_rating")]].map(([v,l])=><div key={l} className="text-center"><p className="text-white font-bold text-lg leading-none" style={{fontFamily:"'Fraunces',serif"}}>{v}</p><p className="text-white/60 text-[10px] mt-0.5">{l}</p></div>)}</div>
+        <div className="flex justify-center gap-8 mt-8">{[[цифры.statPlaces,t("splash_places")],[цифры.statLangs,t("splash_langs")],[цифры.statRating,t("splash_rating")]].map(([v,l])=><div key={l} className="text-center"><p className="text-white font-bold text-lg leading-none" style={{fontFamily:"'Fraunces',serif"}}>{v}</p><p className="text-white/60 text-[10px] mt-0.5">{l}</p></div>)}</div>
         {/* Знак национального туристического бренда — на белой плашке,
             как того требует любое фирменное руководство: поверх фотографии
             тёмно-синие буквы знака иначе тонут. */}

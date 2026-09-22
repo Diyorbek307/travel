@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PageHeader, Btn, Card, SectionTitle } from "./shared";
 import { useTheme } from "../context/ThemeContext";
 
@@ -8,6 +8,21 @@ export default function Settings({ onNavigate }: { onNavigate?: (page: string) =
   const [pwSaved, setPwSaved] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [exporting, setExporting] = useState(false);
+
+  // Цифры стартового экрана — настоящие, читаются приложением.
+  const [цифры, setЦифры] = useState({ statPlaces: "", statLangs: "", statRating: "" });
+  const [цифрыState, setЦифрыState] = useState<"idle" | "saving" | "saved">("idle");
+  useEffect(() => {
+    fetch("/api/site-config").then(r => r.ok ? r.json() : null).then(c => c && setЦифры(c)).catch(() => {});
+  }, []);
+  const сохранитьЦифры = async () => {
+    setЦифрыState("saving");
+    try {
+      await fetch("/api/site-config", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(цифры) });
+      setЦифрыState("saved");
+      setTimeout(() => setЦифрыState("idle"), 1500);
+    } catch { setЦифрыState("idle"); }
+  };
 
   /**
    * Экспорт содержимого — настоящий: скачиваем текущий дамп из
@@ -76,6 +91,34 @@ export default function Settings({ onNavigate }: { onNavigate?: (page: string) =
         . Карточка профиля ниже (2FA, отчёты, часовой пояс) пока оформление и не сохраняется —
         работают тема, экспорт и выход (значок ⎋ вверху справа).
       </div>
+
+      {/* Цифры стартового экрана — настоящие, их видит гость до входа. */}
+      <Card className="p-5 mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <SectionTitle>Цифры на стартовом экране</SectionTitle>
+          {цифрыState !== "idle" && (
+            <span className="text-xs" style={{ color: цифрыState === "saved" ? "var(--color-teal)" : "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
+              {цифрыState === "saving" ? "Сохраняю…" : "✓ Сохранено"}
+            </span>
+          )}
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {([["statPlaces", "МЕСТ", "500+"], ["statLangs", "ЯЗЫКОВ", "10"], ["statRating", "РЕЙТИНГ", "4.9"]] as const).map(([key, label, ph]) => (
+            <div key={key}>
+              <label className="text-xs mb-1.5 block" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>{label}</label>
+              <input
+                type="text"
+                value={цифры[key]}
+                placeholder={ph}
+                onChange={(e) => setЦифры((p) => ({ ...p, [key]: e.target.value }))}
+                className="w-full rounded px-3 py-2 text-sm outline-none"
+                style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", color: "var(--color-text)", fontFamily: "var(--font-body)" }}
+              />
+            </div>
+          ))}
+        </div>
+        <div className="mt-4"><Btn onClick={сохранитьЦифры}>Сохранить цифры</Btn></div>
+      </Card>
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Профиль */}

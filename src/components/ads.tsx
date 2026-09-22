@@ -31,6 +31,8 @@ export interface Креатив {
   color: string;
   city?: string;
   url?: string;
+  /** Фото товара — показываем вместо эмодзи, если задано. */
+  imageUrl?: string;
   /** Ролик для полноэкранного показа: файл в /videos или ссылка на mp4. */
   videoUrl?: string;
   /** Через сколько секунд можно закрыть. По умолчанию 5. */
@@ -73,6 +75,33 @@ function Пометка({ тёмный = true }: { тёмный?: boolean }) {
       {t("ad_partner")}
     </span>
   );
+}
+
+/**
+ * Значок объявления: фото товара, короткое видео или, если ничего нет,
+ * эмодзи. Ставится внутрь контейнера с `relative overflow-hidden` — фото
+ * и видео заполняют его целиком, эмодзи ложится по центру.
+ */
+function МедиаРекламы({ ad }: { ad: Креатив }) {
+  if (ad.imageUrl) {
+    return <img src={ad.imageUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />;
+  }
+  if (ad.videoUrl) {
+    return (
+      <video
+        src={ad.videoUrl}
+        muted
+        loop
+        playsInline
+        autoPlay
+        preload="metadata"
+        controls={false}
+        disablePictureInPicture
+        className="absolute inset-0 h-full w-full object-cover"
+      />
+    );
+  }
+  return <>{ad.emoji}</>;
 }
 
 /**
@@ -137,10 +166,10 @@ export function AdSpotlight({ isPremium, cities }: { isPremium: boolean; cities?
 
           <div className="relative flex items-start gap-3 p-4">
             <span
-              className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl text-2xl"
+              className="relative flex h-14 w-14 flex-shrink-0 items-center justify-center overflow-hidden rounded-2xl text-2xl"
               style={{ background: "rgba(255,255,255,0.2)", backdropFilter: "blur(6px)" }}
             >
-              {ad.emoji}
+              <МедиаРекламы ad={ad} />
             </span>
 
             <div className="min-w-0 flex-1">
@@ -212,10 +241,10 @@ export function AdShelf({ isPremium }: { isPremium: boolean }) {
             style={{ background: SURFACE, borderColor: BORDER }}
           >
             <span
-              className="mb-2 flex h-11 w-11 items-center justify-center rounded-xl text-xl"
+              className="relative mb-2 flex h-11 w-11 items-center justify-center overflow-hidden rounded-xl text-xl"
               style={{ background: мягко(ad.color, 12) }}
             >
-              {ad.emoji}
+              <МедиаРекламы ad={ad} />
             </span>
             <p className="truncate text-xs font-bold" style={{ color: TEXT }}>
               {трК(ad.title)}
@@ -459,10 +488,10 @@ export function AdInline({ isPremium, cities }: { isPremium: boolean; cities?: s
       >
         <button
           onClick={() => перейти(ad)}
-          className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl text-xl transition-all active:scale-90"
+          className="relative flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-xl text-xl transition-all active:scale-90"
           style={{ background: мягко(ad.color, 12) }}
         >
-          {ad.emoji}
+          <МедиаРекламы ad={ad} />
         </button>
         <button onClick={() => перейти(ad)} className="min-w-0 flex-1 text-left">
           <div className="mb-0.5 flex items-center gap-1.5">

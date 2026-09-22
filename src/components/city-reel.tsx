@@ -34,6 +34,11 @@ export default function CityReel({
 }) {
   const [кадр, setКадр] = useState(0);
   const [виден, setВиден] = useState(false);
+  // Реально ли ролик играет. Если автозапуск заблокирован (энергосбережение
+  // на iPhone, к примеру), браузер рисует поверх видео свою кнопку «play»,
+  // и она застревает уродливым пятном. Тогда прячем видео и показываем
+  // кадр — красиво и без чужих контролов.
+  const [играет, setИграет] = useState(false);
   const боксRef = useRef<HTMLDivElement | null>(null);
   const видеоRef = useRef<HTMLVideoElement | null>(null);
 
@@ -60,7 +65,7 @@ export default function CityReel({
     if (!v) return;
     if (виден) {
       const p = v.play();
-      if (p && typeof p.catch === "function") p.catch(() => undefined);
+      if (p && typeof p.catch === "function") p.catch(() => setИграет(false));
     } else {
       v.pause();
     }
@@ -80,17 +85,36 @@ export default function CityReel({
         // Короткий id (11 символов) — ролик на YouTube: играем плеером.
         <YouTubeBg id={видео} poster={кадры[0]} className="absolute inset-0 overflow-hidden" />
       ) : видео ? (
-        <video
-          ref={видеоRef}
-          src={видео}
-          poster={кадры[0]}
-          muted
-          loop
-          playsInline
-          autoPlay
-          preload="auto"
-          className="h-full w-full object-cover"
-        />
+        <>
+          <video
+            ref={видеоRef}
+            src={видео}
+            muted
+            loop
+            playsInline
+            autoPlay
+            preload="auto"
+            controls={false}
+            disablePictureInPicture
+            onPlaying={() => setИграет(true)}
+            onPause={() => setИграет(false)}
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+          {/* Кадр поверх видео, пока оно не заиграло: заодно закрывает
+              нативную кнопку «play», которую iOS рисует на паузе. */}
+          <img
+            src={кадры[0]}
+            alt={alt}
+            aria-hidden={играет}
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{
+              opacity: играет ? 0 : 1,
+              transform: `scale(${играет ? 1 : 1.05})`,
+              transition: "opacity 0.8s ease",
+              pointerEvents: "none",
+            }}
+          />
+        </>
       ) : (
         кадры.map((src, i) => (
           <img

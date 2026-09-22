@@ -85,6 +85,7 @@ export default function WelcomeWow({ name, onDone }: { name?: string; onDone: ()
               filter: вкл ? "saturate(1.2) contrast(1.05)" : "grayscale(1) brightness(0.45)",
               transform: `scale(${вкл && i === кадр ? 1.16 : 1.02})`,
               transition: "opacity 3s ease, filter 2.4s ease, transform 11s ease-out",
+              willChange: i === кадр ? "transform, opacity" : undefined,
             }}
           />
         ))}
@@ -97,6 +98,8 @@ export default function WelcomeWow({ name, onDone }: { name?: string; onDone: ()
             loop
             playsInline
             preload="auto"
+            controls={false}
+            disablePictureInPicture
             className="absolute inset-0 h-full w-full object-cover"
             style={{ opacity: 0.5, animation: "wow-fadein 3s ease forwards" }}
           />
@@ -143,6 +146,9 @@ export default function WelcomeWow({ name, onDone }: { name?: string; onDone: ()
             transform: вкл ? "translate(0,0)" : л.from,
             transition: `opacity 2.6s ease ${л.d}, transform 2.8s cubic-bezier(.2,.7,.2,1) ${л.d}`,
             animation: вкл ? `${л.a} 12s ease-in-out ${л.d} infinite` : undefined,
+            // Свой слой: размытие растрируется один раз, покачивание идёт
+            // трансформом на GPU, а не пересчётом blur каждый кадр.
+            willChange: "transform, opacity",
           }}
         />
       ))}
@@ -163,7 +169,11 @@ export default function WelcomeWow({ name, onDone }: { name?: string; onDone: ()
           opacity: вкл ? 0.55 : 0,
           transform: вкл ? "scale(1)" : "scale(0.3)",
           transition: "opacity 2.2s ease, transform 2.4s cubic-bezier(.2,.8,.2,1)",
-          animation: вкл ? "wow-glow 16s linear infinite, wow-breathe 8s ease-in-out infinite" : undefined,
+          // Только «дыхание» размером — дёшево. Прежний перелив цвета шёл
+          // через filter: hue-rotate поверх blur(64px) и пересчитывал
+          // огромное размытие каждый кадр — это и был главный тормоз.
+          animation: вкл ? "wow-breathe 8s ease-in-out infinite" : undefined,
+          willChange: "transform, opacity",
         }}
       />
       {/* Внутреннее ядро — вращается в другую сторону, ярче: даёт глубину. */}
@@ -182,7 +192,10 @@ export default function WelcomeWow({ name, onDone }: { name?: string; onDone: ()
           opacity: вкл ? 0.75 : 0,
           transform: вкл ? "scale(1)" : "scale(0.4)",
           transition: "opacity 2.4s ease .2s, transform 2.6s cubic-bezier(.2,.8,.2,1) .2s",
-          animation: вкл ? "wow-glow-rev 12s linear infinite" : undefined,
+          // Дышит в противофазе с внешним ореолом — глубина без дорогого
+          // вращения filter.
+          animation: вкл ? "wow-breathe 6.5s ease-in-out .3s infinite reverse" : undefined,
+          willChange: "transform, opacity",
         }}
       />
       {/* Отражение «на полу» — как в референсе, под тумблером. */}
@@ -199,7 +212,8 @@ export default function WelcomeWow({ name, onDone }: { name?: string; onDone: ()
           filter: "blur(38px)",
           opacity: вкл ? 0.32 : 0,
           transition: "opacity 2.6s ease .5s",
-          animation: вкл ? "wow-reflect 16s linear infinite" : undefined,
+          // Статичное отражение: прежняя анимация тоже крутила blur через
+          // filter. Под тумблером его перелив всё равно почти не виден.
         }}
       />
 
@@ -218,6 +232,7 @@ export default function WelcomeWow({ name, onDone }: { name?: string; onDone: ()
             opacity: вкл ? 0.8 : 0,
             transition: "opacity 2.6s ease",
             animation: вкл ? `wow-float ${и.s}s ease-in-out ${и.d}s infinite` : undefined,
+            willChange: "transform, opacity",
           }}
         />
       ))}

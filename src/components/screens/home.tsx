@@ -57,9 +57,21 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
           <button onClick={onMenu} className="w-9 h-9 rounded-xl flex items-center justify-center" style={{...glass}}>
             <svg width="18" height="14" viewBox="0 0 18 14" fill="none"><rect width="18" height="2" rx="1" fill="white"/><rect y="6" width="12" height="2" rx="1" fill="white"/><rect y="12" width="8" height="2" rx="1" fill="white"/></svg>
           </button>
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full" style={{...glass}}>
+          {/* Плотнее обычного стекла и с тенью: кадр под шапкой бывает и
+              светлым (закатное небо), и тёмным — на прозрачно-белом стекле
+              белый логотип тонул. Тёмно-бирюзовая пилюля держит контраст в
+              любой теме и на любом кадре. */}
+          <div
+            className="flex items-center gap-2 px-3.5 py-1.5 rounded-full"
+            style={{
+              background: "rgba(11,38,36,0.44)",
+              backdropFilter: "blur(20px)",
+              border: "1px solid rgba(255,255,255,0.28)",
+              boxShadow: "0 4px 18px rgba(0,0,0,0.3)",
+            }}
+          >
             <LogoMark size={22}/>
-            <span className="text-white text-sm font-bold" style={{fontFamily:"'Fraunces',serif"}}>UzRoam</span>
+            <span className="text-white text-sm font-bold" style={{fontFamily:"'Fraunces',serif",textShadow:"0 1px 6px rgba(0,0,0,0.5)"}}>UzRoam</span>
           </div>
           <button onClick={onNotifs} className="w-9 h-9 rounded-xl flex items-center justify-center relative" style={{...glass}}>
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
