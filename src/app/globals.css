@@ -664,113 +664,6 @@ button[aria-disabled="true"] {
   }
 }
 
-/* ── Кинематографичная 3D-заставка (intro-cinematic.tsx) ──────────────
-   Всё на transform/opacity — работа на композиторе, 60 к/с на телефоне.
-   Единая сцена: знак собирается → оживает → из него в глубину вылетают
-   города и карта → всё схлопывается обратно в знак → камера сквозь него. */
-
-/* Фон гаснет из бирюзовой мглы в чистый чёрный — под неоновый знак. */
-@keyframes intro-bg {
-  0%, 50% { opacity: 1; }
-  78% { opacity: 0.15; }
-  100% { opacity: 0; }
-}
-
-/* Лёгкое движение камеры для глубины. */
-@keyframes intro-camera {
-  0% { transform: translateZ(0) rotateX(0deg); }
-  50% { transform: translateZ(-24px) rotateX(1.4deg); }
-  100% { transform: translateZ(0) rotateX(0deg); }
-}
-
-/* Контур карты «рисуется» линией. pathLength=1 → dasharray в долях. */
-@keyframes intro-draw {
-  to { stroke-dashoffset: 0; }
-}
-
-@keyframes intro-fill {
-  0% { opacity: 0; transform: scale(0.9); }
-  100% { opacity: 1; transform: scale(1); }
-}
-
-/* Тоннель городов целиком гаснет до финала — чтобы в кадре со знаком
-   не осталось ни одной подсвеченной панели. */
-@keyframes intro-tunnel {
-  0%, 60% { opacity: 1; }
-  68%, 100% { opacity: 0; }
-}
-
-/* Пролёт сквозь город: налетает из глубины, растёт и проносится мимо
-   камеры. Перспектива сама даёт масштаб — двигаем только по Z. */
-@keyframes intro-fly {
-  0% { opacity: 0; transform: translate3d(var(--fx), var(--fy), -1400px) rotateZ(var(--fr)); }
-  20% { opacity: 1; }
-  68% { opacity: 1; transform: translate3d(var(--fx), var(--fy), 160px) rotateZ(0deg); }
-  100% { opacity: 0; transform: translate3d(var(--fx), var(--fy), 820px) rotateZ(calc(var(--fr) * -1)); }
-}
-
-/* Карта-линия: проступает и уходит вместе со схлопыванием. */
-@keyframes intro-map {
-  0% { opacity: 0; }
-  30% { opacity: 0.9; }
-  70% { opacity: 0.9; }
-  100% { opacity: 0; }
-}
-
-@keyframes intro-dot {
-  0% { opacity: 0; transform: scale(0.2); }
-  60% { opacity: 1; transform: scale(1.5); }
-  100% { opacity: 0.9; transform: scale(1); }
-}
-
-/* Лучи схождения — спицы света стягиваются к центру. */
-@keyframes intro-rays {
-  0% { opacity: 0; transform: scale(1.5) rotate(0deg); }
-  45% { opacity: 0.85; transform: scale(1) rotate(34deg); }
-  100% { opacity: 0; transform: scale(0.2) rotate(72deg); }
-}
-
-/* Вспышка-узел, из которого рождается знак. */
-@keyframes intro-flash {
-  0% { opacity: 0; transform: scale(0.2); }
-  40% { opacity: 1; transform: scale(1); }
-  100% { opacity: 0; transform: scale(1.7); }
-}
-
-/* Знак рождается из узла и неоново разгорается. translate — часть кадра,
-   иначе центрирование класса перебило бы масштаб. */
-@keyframes intro-logo {
-  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.2); }
-  45% { opacity: 1; transform: translate(-50%, -50%) scale(1.14); }
-  66% { transform: translate(-50%, -50%) scale(0.98); }
-  100% { opacity: 1; transform: translate(-50%, -50%) scale(1.02); }
-}
-
-@keyframes intro-logo-short {
-  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.3); }
-  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
-  70% { transform: translate(-50%, -50%) scale(1); }
-  100% { opacity: 1; transform: translate(-50%, -50%) scale(1.02); }
-}
-
-/* Тихий белый пульс за знаком — низкий, мягкий свет. */
-@keyframes intro-neon {
-  0%, 100% { opacity: 0.4; transform: translate(-50%, -50%) scale(1); }
-  50% { opacity: 0.68; transform: translate(-50%, -50%) scale(1.12); }
-}
-
-@keyframes intro-tagline {
-  0% { opacity: 0; transform: translateY(8px); }
-  35% { opacity: 1; transform: translateY(0); }
-  75% { opacity: 1; transform: translateY(0); }
-  100% { opacity: 0; transform: translateY(-4px); }
-}
-
-/* Финал: камера пролетает сквозь знак в приложение. */
-@keyframes intro-portal {
-  0% { transform: translateZ(0) scale(1); }
-  100% { transform: translateZ(560px) scale(3.8); }
-}
 
 /* Знак UZBEKISTAN. На тёмном фоне его тёмно-синие буквы не читаются,
    поэтому там показываем одноцветную белую версию — это штатный
@@ -833,4 +726,86 @@ html[data-theme="dark"] .leaflet-bar a {
 .leaflet-control-attribution a {
   color: inherit !important;
   text-decoration: none !important;
+}
+
+/* ── Кинематографичная заставка запуска (intro-cinematic.tsx) ──────────
+   Всё на transform/opacity + пара видео. Камера летит над городами →
+   вспышка → знак-окно с кадрами внутри → белый знак → посадка в шапку. */
+
+/* Первый дрон-ролик: играет, к финалу гаснет. */
+@keyframes intro-vidA {
+  0%, 72% { opacity: 1; }
+  100% { opacity: 0; }
+}
+/* Второй дрон-ролик: вплывает поверх первого, потом гаснет. */
+@keyframes intro-vidB {
+  0%, 42% { opacity: 0; }
+  56%, 82% { opacity: 1; }
+  100% { opacity: 0; }
+}
+/* Медленный наезд поверх дрон-движения — живее. */
+@keyframes intro-kenburns {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.12); }
+}
+
+/* Контур знака «рисуется». pathLength=1 → dasharray в долях. */
+@keyframes intro-draw { to { stroke-dashoffset: 0; } }
+
+@keyframes intro-fill {
+  0% { opacity: 0; transform: scale(0.9); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* Вспышка неонового света — переход от пролёта к финалу. */
+@keyframes intro-flash {
+  0% { opacity: 0; transform: scale(0.3); }
+  40% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.7); }
+}
+
+/* Финальная группа знака: появляется, держится, к концу уменьшается по
+   центру (перед посадкой в шапку). translate — часть кадра. */
+@keyframes intro-final {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.7); }
+  18% { opacity: 1; transform: translate(-50%, -50%) scale(1.04); }
+  32% { transform: translate(-50%, -50%) scale(1); }
+  80% { transform: translate(-50%, -50%) scale(1); }
+  100% { transform: translate(-50%, -50%) scale(0.78); }
+}
+
+/* Знак-окно с кадрами городов: проступает и гаснет, уступая белому знаку. */
+@keyframes intro-window {
+  0% { opacity: 0; }
+  18% { opacity: 1; }
+  74% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* Кадры-флешбеки внутри знака: наплывают друг на друга. */
+@keyframes intro-flash-img {
+  0% { opacity: 0; transform: scale(1.12); }
+  10% { opacity: 1; transform: scale(1.06); }
+  26% { opacity: 1; transform: scale(1.02); }
+  36% { opacity: 0; transform: scale(1); }
+  100% { opacity: 0; }
+}
+
+/* Сплошной белый знак проступает, когда кадры гаснут. */
+@keyframes intro-white {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+/* Тихий белый пульс за знаком + короткий «дых» неона перед посадкой. */
+@keyframes intro-neon {
+  0%, 100% { opacity: 0.4; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 0.72; transform: translate(-50%, -50%) scale(1.14); }
+}
+
+@keyframes intro-tagline {
+  0% { opacity: 0; transform: translateY(8px); }
+  35% { opacity: 1; transform: translateY(0); }
+  78% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-4px); }
 }
