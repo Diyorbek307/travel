@@ -730,17 +730,22 @@ html[data-theme="dark"] .leaflet-bar a {
 
 /* ── Кинематографичная заставка запуска (intro-cinematic.tsx) ──────────
    Всё на transform/opacity + пара видео. Камера летит над городами →
-   вспышка → знак-окно с кадрами внутри → белый знак → посадка в шапку. */
+   видео «вырезается» в знак во весь экран → знак уменьшается к центру,
+   внутри флешбеки → белый знак, блик неона → посадка в шапку. */
 
-/* Первый дрон-ролик: играет, к финалу гаснет. */
+/* Логотип шапки прячем, пока на него садится знак заставки. */
+html.intro-landing [data-brand-logo] { opacity: 0; }
+
+/* Первый дрон-ролик: играет, уступает второму. */
 @keyframes intro-vidA {
-  0%, 72% { opacity: 1; }
-  100% { opacity: 0; }
+  0%, 60% { opacity: 1; }
+  86%, 100% { opacity: 0; }
 }
-/* Второй дрон-ролик: вплывает поверх первого, потом гаснет. */
+/* Второй дрон-ролик: вплывает, а к моменту «вырезания» фон уходит в
+   чёрное — город остаётся только внутри знака. */
 @keyframes intro-vidB {
   0%, 42% { opacity: 0; }
-  56%, 82% { opacity: 1; }
+  60%, 86% { opacity: 1; }
   100% { opacity: 0; }
 }
 /* Медленный наезд поверх дрон-движения — живее. */
@@ -757,37 +762,31 @@ html[data-theme="dark"] .leaflet-bar a {
   100% { opacity: 1; transform: scale(1); }
 }
 
-/* Вспышка неонового света — переход от пролёта к финалу. */
-@keyframes intro-flash {
-  0% { opacity: 0; transform: scale(0.3); }
-  40% { opacity: 1; transform: scale(1); }
-  100% { opacity: 0; transform: scale(1.7); }
-}
-
-/* Финальная группа знака: появляется, держится, к концу уменьшается по
-   центру (перед посадкой в шапку). translate — часть кадра. */
+/* Знак: стартует во весь экран (--k0) и плавно уменьшается строго по
+   центру; перед посадкой — ещё немного. Только scale, без translate:
+   центр задан margin'ами. */
 @keyframes intro-final {
-  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.7); }
-  18% { opacity: 1; transform: translate(-50%, -50%) scale(1.04); }
-  32% { transform: translate(-50%, -50%) scale(1); }
-  80% { transform: translate(-50%, -50%) scale(1); }
-  100% { transform: translate(-50%, -50%) scale(0.78); }
+  0% { transform: scale(var(--k0)); }
+  15% { transform: scale(var(--k0)); animation-timing-function: cubic-bezier(.45, 0, .25, 1); }
+  62% { transform: scale(1); }
+  84% { transform: scale(1); animation-timing-function: ease-in-out; }
+  100% { transform: scale(0.86); }
 }
 
-/* Знак-окно с кадрами городов: проступает и гаснет, уступая белому знаку. */
+/* Город внутри знака: проступает поверх фона и гаснет, уступая белому. */
 @keyframes intro-window {
   0% { opacity: 0; }
-  18% { opacity: 1; }
-  74% { opacity: 1; }
+  16% { opacity: 1; }
+  80% { opacity: 1; }
   100% { opacity: 0; }
 }
 
 /* Кадры-флешбеки внутри знака: наплывают друг на друга. */
 @keyframes intro-flash-img {
   0% { opacity: 0; transform: scale(1.12); }
-  10% { opacity: 1; transform: scale(1.06); }
-  26% { opacity: 1; transform: scale(1.02); }
-  36% { opacity: 0; transform: scale(1); }
+  14% { opacity: 1; transform: scale(1.06); }
+  40% { opacity: 1; transform: scale(1.02); }
+  56% { opacity: 0; transform: scale(1); }
   100% { opacity: 0; }
 }
 
@@ -797,10 +796,18 @@ html[data-theme="dark"] .leaflet-bar a {
   100% { opacity: 1; }
 }
 
-/* Тихий белый пульс за знаком + короткий «дых» неона перед посадкой. */
+/* Тихий белый пульс света за знаком — неон слегка «дышит» и смещается. */
 @keyframes intro-neon {
-  0%, 100% { opacity: 0.4; transform: translate(-50%, -50%) scale(1); }
-  50% { opacity: 0.72; transform: translate(-50%, -50%) scale(1.14); }
+  0%, 100% { opacity: 0.45; transform: translate(0, 0) scale(1); }
+  50% { opacity: 0.75; transform: translate(3%, -2%) scale(1.12); }
+}
+
+/* Блик неона: полоса света пробегает по белому знаку. */
+@keyframes intro-shimmer {
+  0% { opacity: 0; background-position: 100% 0; }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0; background-position: 0% 0; }
 }
 
 @keyframes intro-tagline {
