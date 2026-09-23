@@ -8,30 +8,33 @@ import { LOGO_D } from "./ui";
  *
  * Хореография (одна цельная сцена, не слайд-шоу):
  *   1. Тёмный экран, знака ещё НЕТ.
- *   2. В 3D-глубине проявляются и парят города Узбекистана + линия-карта.
- *   3. В финале всё стягивается лучами в одну точку в центре — города
- *      сжимаются, как свет, в единый узел.
- *   4. Из этого узла рождается знак приложения и неоново разгорается на
- *      чёрном фоне.
- *   5. Камера пролетает сквозь знак — открывается приложение.
+ *   2. Камера летит СКВОЗЬ города Узбекистана: каждый вылетает из
+ *      глубины, налетает и проносится мимо — Самарканд → Бухара → Хива →
+ *      Ташкент → горы → Шёлковый путь. Настоящий пролёт (translateZ +
+ *      perspective), а не карусель картинок.
+ *   3. Мелькает линия-карта страны.
+ *   4. В финале всё стягивается лучами в одну точку — сжимается в узел.
+ *   5. Из узла рождается знак приложения и неоново горит на чёрном.
+ *   6. Камера пролетает сквозь знак — открывается приложение.
  *
  * 3D — на CSS (perspective + translateZ + preserve-3d), только transform
  * и opacity: 60 к/с на телефоне, без тяжёлого WebGL. Свой логотип
  * (LOGO_D) и фирменные цвета (бирюза/лайм/золото) — как есть; фото
  * городов — те, что уже грузятся в приложении.
  *
- * Первый запуск — полная версия (~6.2 с), дальше короткая (~1.9 с, только
- * неоновый знак). Касание досматривает мгновенно; уважает reduced-motion.
+ * Первый запуск — полная (~6 с), дальше короткая (~1.9 с, только знак).
+ * Касание досматривает мгновенно; уважает reduced-motion.
  */
 
-const И = (id: string) => `https://images.unsplash.com/photo-${id}?w=560&q=70&auto=format&fit=crop`;
+const И = (id: string) => `https://images.unsplash.com/photo-${id}?w=680&q=72&auto=format&fit=crop`;
+/** Города по ходу пролёта: fx/fy — снос от центра, fr — наклон, d — задержка. */
 const ГОРОДА = [
-  { src: И("1664602078796-68ee76b3fc59"), city: "Самарканд", x: -132, y: -158, z: 240, r: -10, d: 0.5 },
-  { src: И("1728029062560-4b0e2b958885"), city: "Бухара", x: 152, y: -128, z: 340, r: 9, d: 0.72 },
-  { src: И("1653023102302-247f5f0fbdd1"), city: "Хива", x: -172, y: 126, z: 190, r: 8, d: 0.94 },
-  { src: И("1654861857666-1e8c438cbe4a"), city: "Ташкент", x: 160, y: 156, z: 320, r: -9, d: 1.16 },
-  { src: И("1719995153986-63e529a32585"), city: "Горы", x: 4, y: -224, z: 140, r: 3, d: 1.38 },
-  { src: И("1622030797403-fa221ce5d208"), city: "Шёлковый путь", x: 10, y: 214, z: 260, r: -4, d: 1.6 },
+  { src: И("1664602078796-68ee76b3fc59"), city: "Самарканд", fx: -30, fy: -18, fr: -6, d: 0.35 },
+  { src: И("1728029062560-4b0e2b958885"), city: "Бухара", fx: 42, fy: 28, fr: 5, d: 0.77 },
+  { src: И("1653023102302-247f5f0fbdd1"), city: "Хива", fx: -46, fy: 26, fr: 6, d: 1.19 },
+  { src: И("1654861857666-1e8c438cbe4a"), city: "Ташкент", fx: 36, fy: -30, fr: -5, d: 1.61 },
+  { src: И("1719995153986-63e529a32585"), city: "Горы", fx: 0, fy: -12, fr: 2, d: 2.03 },
+  { src: И("1622030797403-fa221ce5d208"), city: "Шёлковый путь", fx: 12, fy: 22, fr: -3, d: 2.45 },
 ];
 
 const БИРЮЗА = "#3fe0dc";
@@ -46,11 +49,10 @@ const ТОЧКИ = [[60, 58], [120, 40], [150, 30], [184, 40], [212, 34], [176, 
 
 const T = "translate(50 50) scale(0.66) translate(-85.5 -99)";
 
-/** Реперы времени полной сцены, мс. Знак рождается только в КОЛЛАПС. */
-const ГОРОДА_START = 400;
-const КОЛЛАПС = 3600; // города начинают стягиваться в центр
-const ЗНАК = 4300; // знак разгорается
-const ДЛИНА_ПОЛН = 6200;
+/** Реперы времени полной сцены, мс. */
+const РЕЙ = 3400; // лучи схождения
+const ЗНАК = 4200; // знак разгорается
+const ДЛИНА_ПОЛН = 6000;
 const УХОД = 700;
 
 export default function IntroCinematic({
@@ -85,21 +87,20 @@ export default function IntroCinematic({
       className="fixed inset-0 z-[100] overflow-hidden"
       style={{
         background: "#000",
-        perspective: "1150px",
+        perspective: "1000px",
         opacity: уходит ? 0 : 1,
         transition: `opacity ${УХОД}ms ease`,
         cursor: "pointer",
       }}
       aria-label="Заставка"
     >
-      {/* Фон: чуть тёплая бирюзовая мгла на время городов, к финалу гаснет
-          в чистый чёрный — чтобы неоновый знак горел на пустоте. */}
+      {/* Фон: тёплая бирюзовая мгла на время пролёта, к финалу — чистый чёрный. */}
       {full && (
         <div
           className="pointer-events-none absolute inset-0"
           style={{
             background: "radial-gradient(120% 90% at 50% 46%, #0a1a1b 0%, #05100f 55%, #000 100%)",
-            animation: "intro-bg 6.2s ease forwards",
+            animation: "intro-bg 6s ease forwards",
           }}
         />
       )}
@@ -109,93 +110,79 @@ export default function IntroCinematic({
         className="absolute inset-0"
         style={{
           transformStyle: "preserve-3d",
-          animation: уходит
-            ? `intro-portal ${УХОД}ms cubic-bezier(.5,0,.9,.6) forwards`
-            : full
-              ? "intro-camera 6.2s ease-in-out both"
-              : "none",
+          animation: уходит ? "none" : full ? "intro-camera 6s ease-in-out both" : "none",
           willChange: "transform",
         }}
       >
-        {/* «Космос» городов: проявляются, парят, затем стягиваются лучами
-            в центр — сжимаются в точку, где родится знак. */}
+        {/* Тоннель пролёта: города налетают из глубины и проносятся мимо. */}
         {full && (
-          <div
-            className="absolute left-1/2 top-[46%]"
-            style={{
-              transformStyle: "preserve-3d",
-              animation: "intro-collapse 6.2s cubic-bezier(.6,0,.35,1) both",
-              willChange: "transform, opacity",
-            }}
-          >
+          <div className="absolute left-1/2 top-[46%]" style={{ transformStyle: "preserve-3d" }}>
             {ГОРОДА.map((г) => (
               <div
                 key={г.city}
-                className="absolute overflow-hidden rounded-2xl"
+                className="absolute overflow-hidden rounded-3xl"
                 style={{
-                  width: 150,
-                  height: 194,
-                  left: -75,
-                  top: -97,
+                  width: 288,
+                  height: 372,
+                  left: -144,
+                  top: -186,
                   transformStyle: "preserve-3d",
-                  transform: `translate3d(0,0,0) rotateY(0deg) scale(0)`,
+                  transform: "translate3d(0,0,-1400px)",
                   opacity: 0,
-                  boxShadow: `0 20px 60px rgba(0,0,0,.6), 0 0 0 1px ${БИРЮЗА}55, 0 0 36px ${БИРЮЗА}33`,
-                  animation: `intro-city 3.4s cubic-bezier(.2,.8,.2,1) ${ГОРОДА_START / 1000 + г.d}s both`,
+                  boxShadow: `0 30px 80px rgba(0,0,0,.7), 0 0 0 1px ${БИРЮЗА}44, 0 0 44px ${БИРЮЗА}2e`,
+                  animation: `intro-fly 1.6s cubic-bezier(.35,0,.65,1) ${г.d}s both`,
                   willChange: "transform, opacity",
-                  ["--cx" as string]: `${г.x}px`,
-                  ["--cy" as string]: `${г.y}px`,
-                  ["--cz" as string]: `${г.z}px`,
-                  ["--cr" as string]: `${г.r}deg`,
+                  ["--fx" as string]: `${г.fx}px`,
+                  ["--fy" as string]: `${г.fy}px`,
+                  ["--fr" as string]: `${г.fr}deg`,
                 }}
               >
                 <img src={г.src} alt="" className="h-full w-full object-cover" draggable={false} />
                 <div
                   className="absolute inset-0"
-                  style={{ background: "linear-gradient(to top, rgba(0,0,0,.72), transparent 58%)" }}
+                  style={{ background: "linear-gradient(to top, rgba(0,0,0,.72), transparent 55%)" }}
                 />
                 <span
-                  className="absolute bottom-2 left-3 text-[11px] font-bold tracking-wide text-white"
-                  style={{ fontFamily: "'Fraunces',serif", textShadow: "0 1px 6px rgba(0,0,0,.6)" }}
+                  className="absolute bottom-3 left-4 text-sm font-bold tracking-wide text-white"
+                  style={{ fontFamily: "'Fraunces',serif", textShadow: "0 1px 8px rgba(0,0,0,.7)" }}
                 >
                   {г.city}
                 </span>
               </div>
             ))}
-
-            {/* Линия-карта Узбекистана: контур рисуется, точки-города
-                соединяются маршрутами. */}
-            <svg
-              width={264}
-              height={152}
-              viewBox="0 0 264 152"
-              className="absolute"
-              style={{
-                left: -132,
-                top: -76,
-                transform: "translateZ(70px)",
-                animation: "intro-map 2.4s ease-in-out 1.9s both",
-                willChange: "opacity",
-              }}
-            >
-              <path
-                d={КАРТА_D}
-                fill="none"
-                stroke={ЛАЙМ}
-                strokeWidth={1.6}
-                pathLength={1}
-                style={{ strokeDasharray: 1, strokeDashoffset: 1, animation: "intro-draw 1.3s ease 2.0s forwards" }}
-              />
-              {ТОЧКИ.map(([x, y], i) => (
-                <circle key={i} cx={x} cy={y} r={2.6} fill={ЗОЛОТО}
-                  style={{ opacity: 0, animation: `intro-dot 0.5s ease ${2.4 + i * 0.08}s both` }} />
-              ))}
-            </svg>
           </div>
         )}
 
-        {/* Лучи схождения: в момент коллапса из краёв к центру бьют
-            световые спицы — «всё сходится в одну точку». */}
+        {/* Линия-карта Узбекистана — короткий росчерк перед схождением. */}
+        {full && (
+          <svg
+            width={264}
+            height={152}
+            viewBox="0 0 264 152"
+            className="absolute left-1/2 top-[46%]"
+            style={{
+              marginLeft: -132,
+              marginTop: -76,
+              animation: "intro-map 1.7s ease-in-out 2.7s both",
+              willChange: "opacity",
+            }}
+          >
+            <path
+              d={КАРТА_D}
+              fill="none"
+              stroke={ЛАЙМ}
+              strokeWidth={1.8}
+              pathLength={1}
+              style={{ strokeDasharray: 1, strokeDashoffset: 1, filter: `drop-shadow(0 0 4px ${ЛАЙМ})`, animation: "intro-draw 1.1s ease 2.8s forwards" }}
+            />
+            {ТОЧКИ.map(([x, y], i) => (
+              <circle key={i} cx={x} cy={y} r={2.8} fill={ЗОЛОТО}
+                style={{ opacity: 0, animation: `intro-dot 0.45s ease ${3.0 + i * 0.06}s both` }} />
+            ))}
+          </svg>
+        )}
+
+        {/* Лучи схождения — спицы света стягиваются к центру. */}
         {full && (
           <div
             className="pointer-events-none absolute left-1/2 top-[46%]"
@@ -205,18 +192,17 @@ export default function IntroCinematic({
               marginLeft: -310,
               marginTop: -310,
               borderRadius: "50%",
-              background:
-                `repeating-conic-gradient(from 0deg, transparent 0deg, ${БИРЮЗА}00 6deg, ${БИРЮЗА}66 8deg, ${ЛАЙМ}00 10deg)`,
+              background: `repeating-conic-gradient(from 0deg, transparent 0deg, ${БИРЮЗА}00 6deg, ${БИРЮЗА}66 8deg, ${ЛАЙМ}00 10deg)`,
               WebkitMaskImage: "radial-gradient(circle, transparent 8%, #000 30%, transparent 70%)",
               maskImage: "radial-gradient(circle, transparent 8%, #000 30%, transparent 70%)",
               opacity: 0,
-              animation: `intro-rays 1.6s ease-in ${КОЛЛАПС / 1000}s both`,
+              animation: `intro-rays 1.5s ease-in ${РЕЙ / 1000}s both`,
               willChange: "transform, opacity",
             }}
           />
         )}
 
-        {/* Центральная вспышка — узел, из которого рождается знак. */}
+        {/* Вспышка-узел, из которого рождается знак. */}
         {full && (
           <div
             className="pointer-events-none absolute left-1/2 top-[46%]"
@@ -235,7 +221,20 @@ export default function IntroCinematic({
           />
         )}
 
-        {/* ЗНАК — рождается только в финале и неоново горит на чёрном. */}
+        {/* Обёртка «посадки»: в финале знак уменьшается и уезжает в угол —
+            туда, где стоит логотип шапки приложения. Начало кадра — без
+            трансформа (identity), поэтому переход без рывка. */}
+        <div
+          className="absolute inset-0"
+          style={{
+            transformStyle: "preserve-3d",
+            transformOrigin: "50% 46%",
+            transform: уходит ? "translate(calc(48px - 50vw), calc(76px - 46vh)) scale(0.2)" : "none",
+            transition: `transform ${УХОД}ms cubic-bezier(.5,.1,.25,1)`,
+            willChange: "transform",
+          }}
+        >
+        {/* ЗНАК — рождается в финале и неоново горит на чёрном. */}
         <div
           className="absolute left-1/2 top-[46%] -translate-x-1/2 -translate-y-1/2"
           style={{
@@ -246,15 +245,14 @@ export default function IntroCinematic({
             willChange: "transform, opacity",
           }}
         >
-          {/* Неоновое свечение за знаком — пульс живёт своим слоем (дёшево). */}
           <div
             className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
             style={{
-              width: 260,
-              height: 260,
+              width: 280,
+              height: 280,
               borderRadius: "50%",
-              background: `radial-gradient(circle, ${БИРЮЗА}88, ${ЛАЙМ}22 45%, transparent 68%)`,
-              filter: "blur(30px)",
+              background: `radial-gradient(circle, #ffffff 0%, #ffffffcc 12%, ${БИРЮЗА} 34%, ${ЛАЙМ}33 56%, transparent 72%)`,
+              filter: "blur(26px)",
               animation: full
                 ? `intro-neon 2.4s ease-in-out ${(ЗНАК + 300) / 1000}s infinite`
                 : "intro-neon 2.4s ease-in-out .8s infinite",
@@ -269,18 +267,16 @@ export default function IntroCinematic({
                 <stop offset="100%" stopColor={БИРЮЗА} />
               </linearGradient>
             </defs>
-            {/* Неоновая заливка знака с многослойным свечением. */}
             <path
               d={LOGO_D}
               transform={T}
               fill="url(#intro-neon-grad)"
               fillRule="evenodd"
-              style={{ filter: `drop-shadow(0 0 5px ${БИРЮЗА}) drop-shadow(0 0 16px ${БИРЮЗА}) drop-shadow(0 0 30px ${ЛАЙМ}aa)` }}
+              style={{ filter: `drop-shadow(0 0 3px #ffffff) drop-shadow(0 0 10px #ffffffcc) drop-shadow(0 0 20px ${БИРЮЗА}) drop-shadow(0 0 40px ${ЛАЙМ}aa)` }}
             />
-            {/* Золотая звезда-искра в нише. */}
-            <circle cx={50} cy={44} r={4.6} fill={ЗОЛОТО}
-              style={{ filter: `drop-shadow(0 0 6px ${ЗОЛОТО})` }} />
+            <circle cx={50} cy={44} r={4.6} fill="#ffffff" style={{ filter: `drop-shadow(0 0 6px ${ЗОЛОТО}) drop-shadow(0 0 3px #fff)` }} />
           </svg>
+        </div>
         </div>
       </div>
 

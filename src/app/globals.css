@@ -693,18 +693,13 @@ button[aria-disabled="true"] {
   100% { opacity: 1; transform: scale(1); }
 }
 
-/* Город вылетает из центра на свою глубину и держится там до схлопывания. */
-@keyframes intro-city {
-  0% { opacity: 0; transform: translate3d(0, 0, 0) rotateY(0deg) scale(0); }
-  32% { opacity: 1; transform: translate3d(var(--cx), var(--cy), var(--cz)) rotateY(var(--cr)) scale(1); }
-  100% { opacity: 1; transform: translate3d(var(--cx), var(--cy), var(--cz)) rotateY(var(--cr)) scale(1); }
-}
-
-/* «Космос»: держится, затем стягивается лучами в центр — сжимается в знак. */
-@keyframes intro-collapse {
-  0%, 58% { opacity: 1; transform: scale(1) rotateZ(0deg); }
-  72% { opacity: 0.3; transform: scale(0.05) rotateZ(40deg); }
-  100% { opacity: 0; transform: scale(0.02) rotateZ(52deg); }
+/* Пролёт сквозь город: налетает из глубины, растёт и проносится мимо
+   камеры. Перспектива сама даёт масштаб — двигаем только по Z. */
+@keyframes intro-fly {
+  0% { opacity: 0; transform: translate3d(var(--fx), var(--fy), -1400px) rotateZ(var(--fr)); }
+  20% { opacity: 1; }
+  68% { opacity: 1; transform: translate3d(var(--fx), var(--fy), 160px) rotateZ(0deg); }
+  100% { opacity: 0; transform: translate3d(var(--fx), var(--fy), 820px) rotateZ(calc(var(--fr) * -1)); }
 }
 
 /* Карта-линия: проступает и уходит вместе со схлопыванием. */
