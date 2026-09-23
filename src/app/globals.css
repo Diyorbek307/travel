@@ -693,6 +693,13 @@ button[aria-disabled="true"] {
   100% { opacity: 1; transform: scale(1); }
 }
 
+/* Тоннель городов целиком гаснет до финала — чтобы в кадре со знаком
+   не осталось ни одной подсвеченной панели. */
+@keyframes intro-tunnel {
+  0%, 60% { opacity: 1; }
+  68%, 100% { opacity: 0; }
+}
+
 /* Пролёт сквозь город: налетает из глубины, растёт и проносится мимо
    камеры. Перспектива сама даёт масштаб — двигаем только по Z. */
 @keyframes intro-fly {
@@ -746,10 +753,10 @@ button[aria-disabled="true"] {
   100% { opacity: 1; transform: translate(-50%, -50%) scale(1.02); }
 }
 
-/* Неоновый пульс за знаком (свой слой — дёшево). */
+/* Тихий белый пульс за знаком — низкий, мягкий свет. */
 @keyframes intro-neon {
-  0%, 100% { opacity: 0.72; transform: translate(-50%, -50%) scale(1); }
-  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+  0%, 100% { opacity: 0.4; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 0.68; transform: translate(-50%, -50%) scale(1.12); }
 }
 
 @keyframes intro-tagline {

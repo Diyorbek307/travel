@@ -94,13 +94,15 @@ export default function IntroCinematic({
       }}
       aria-label="Заставка"
     >
-      {/* Фон: тёплая бирюзовая мгла на время пролёта, к финалу — чистый чёрный. */}
+      {/* Тёмная подложка на всю заставку. Держится сплошной до самого
+          перехода — иначе экран приложения проступал бы сквозь неё и
+          подсвечивал угол, пока знак ещё горит. Приложение открывает уже
+          сам уход (контейнер гаснет по opacity). */}
       {full && (
         <div
           className="pointer-events-none absolute inset-0"
           style={{
             background: "radial-gradient(120% 90% at 50% 46%, #0a1a1b 0%, #05100f 55%, #000 100%)",
-            animation: "intro-bg 6s ease forwards",
           }}
         />
       )}
@@ -114,9 +116,11 @@ export default function IntroCinematic({
           willChange: "transform",
         }}
       >
-        {/* Тоннель пролёта: города налетают из глубины и проносятся мимо. */}
+        {/* Тоннель пролёта: города налетают из глубины и проносятся мимо.
+            Гарантированно гаснет до появления знака, чтобы ни один кадр не
+            подсвечивал угол в финале. */}
         {full && (
-          <div className="absolute left-1/2 top-[46%]" style={{ transformStyle: "preserve-3d" }}>
+          <div className="absolute left-1/2 top-[46%]" style={{ transformStyle: "preserve-3d", animation: "intro-tunnel 6s linear both", willChange: "opacity" }}>
             {ГОРОДА.map((г) => (
               <div
                 key={г.city}
@@ -248,14 +252,15 @@ export default function IntroCinematic({
           <div
             className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
             style={{
-              width: 280,
-              height: 280,
+              width: 250,
+              height: 250,
               borderRadius: "50%",
-              background: `radial-gradient(circle, #ffffff 0%, #ffffffcc 12%, ${БИРЮЗА} 34%, ${ЛАЙМ}33 56%, transparent 72%)`,
-              filter: "blur(26px)",
+              // Только белый и мягкий — тихий неон, без цветного ореола.
+              background: "radial-gradient(circle, #ffffffb0 0%, #ffffff40 34%, transparent 64%)",
+              filter: "blur(30px)",
               animation: full
-                ? `intro-neon 2.4s ease-in-out ${(ЗНАК + 300) / 1000}s infinite`
-                : "intro-neon 2.4s ease-in-out .8s infinite",
+                ? `intro-neon 2.8s ease-in-out ${(ЗНАК + 300) / 1000}s infinite`
+                : "intro-neon 2.8s ease-in-out .8s infinite",
               willChange: "transform, opacity",
             }}
           />
@@ -272,9 +277,9 @@ export default function IntroCinematic({
               transform={T}
               fill="url(#intro-neon-grad)"
               fillRule="evenodd"
-              style={{ filter: `drop-shadow(0 0 3px #ffffff) drop-shadow(0 0 10px #ffffffcc) drop-shadow(0 0 20px ${БИРЮЗА}) drop-shadow(0 0 40px ${ЛАЙМ}aa)` }}
+              style={{ filter: "drop-shadow(0 0 3px #ffffffcc) drop-shadow(0 0 12px #ffffff88)" }}
             />
-            <circle cx={50} cy={44} r={4.6} fill="#ffffff" style={{ filter: `drop-shadow(0 0 6px ${ЗОЛОТО}) drop-shadow(0 0 3px #fff)` }} />
+            <circle cx={50} cy={44} r={4.4} fill="#ffffff" style={{ filter: "drop-shadow(0 0 5px #ffffffcc)" }} />
           </svg>
         </div>
         </div>
