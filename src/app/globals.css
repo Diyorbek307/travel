@@ -669,64 +669,42 @@ button[aria-disabled="true"] {
    Единая сцена: знак собирается → оживает → из него в глубину вылетают
    города и карта → всё схлопывается обратно в знак → камера сквозь него. */
 
-/* Дышащее свечение бренда за сценой. */
-@keyframes intro-breathe {
-  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.85; }
-  50% { transform: translate(-50%, -50%) scale(1.14); opacity: 1; }
+/* Фон гаснет из бирюзовой мглы в чистый чёрный — под неоновый знак. */
+@keyframes intro-bg {
+  0%, 50% { opacity: 1; }
+  78% { opacity: 0.15; }
+  100% { opacity: 0; }
 }
 
-/* Лёгкое движение камеры для глубины (сама сцена). */
+/* Лёгкое движение камеры для глубины. */
 @keyframes intro-camera {
   0% { transform: translateZ(0) rotateX(0deg); }
-  50% { transform: translateZ(-26px) rotateX(1.5deg); }
+  50% { transform: translateZ(-24px) rotateX(1.4deg); }
   100% { transform: translateZ(0) rotateX(0deg); }
 }
 
-/* Контур знака/карты «рисуется» линией. pathLength=1 → dasharray в долях. */
+/* Контур карты «рисуется» линией. pathLength=1 → dasharray в долях. */
 @keyframes intro-draw {
   to { stroke-dashoffset: 0; }
 }
 
-/* Заливка/искра проступает следом. */
 @keyframes intro-fill {
   0% { opacity: 0; transform: scale(0.9); }
   100% { opacity: 1; transform: scale(1); }
 }
 
-/* Логотип: собрался → пульс жизни → отступил (города — герои) →
-   принял энергию схлопывания и разгорелся → готов стать порталом. */
-@keyframes intro-logo {
-  0% { opacity: 0; transform: translate(-50%, -50%) translateZ(0) scale(0.6); }
-  15% { opacity: 1; transform: translate(-50%, -50%) translateZ(0) scale(1); }
-  24% { transform: translate(-50%, -50%) translateZ(0) scale(1.08); }
-  30% { transform: translate(-50%, -50%) translateZ(0) scale(1); }
-  36% { opacity: 0.8; transform: translate(-50%, -50%) translateZ(-40px) scale(0.82); }
-  58% { opacity: 0.78; transform: translate(-50%, -50%) translateZ(-40px) scale(0.82); }
-  80% { opacity: 1; transform: translate(-50%, -50%) translateZ(0) scale(1.16); }
-  88% { transform: translate(-50%, -50%) translateZ(0) scale(1.02); }
-  100% { opacity: 1; transform: translate(-50%, -50%) translateZ(0) scale(1.06); }
-}
-
-/* Короткая версия для повторных запусков. */
-@keyframes intro-logo-short {
-  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
-  45% { opacity: 1; transform: translate(-50%, -50%) scale(1.06); }
-  65% { transform: translate(-50%, -50%) scale(1); }
-  100% { opacity: 1; transform: translate(-50%, -50%) scale(1.04); }
-}
-
-/* Город вылетает из центра на свою глубину и держится. */
+/* Город вылетает из центра на свою глубину и держится там до схлопывания. */
 @keyframes intro-city {
   0% { opacity: 0; transform: translate3d(0, 0, 0) rotateY(0deg) scale(0); }
-  26% { opacity: 1; transform: translate3d(var(--cx), var(--cy), var(--cz)) rotateY(var(--cr)) scale(1); }
+  32% { opacity: 1; transform: translate3d(var(--cx), var(--cy), var(--cz)) rotateY(var(--cr)) scale(1); }
   100% { opacity: 1; transform: translate3d(var(--cx), var(--cy), var(--cz)) rotateY(var(--cr)) scale(1); }
 }
 
-/* «Космос» городов и карты: держится, затем схлопывается в центр — в знак. */
+/* «Космос»: держится, затем стягивается лучами в центр — сжимается в знак. */
 @keyframes intro-collapse {
   0%, 58% { opacity: 1; transform: scale(1) rotateZ(0deg); }
-  80% { opacity: 0.25; transform: scale(0.03) rotateZ(24deg); }
-  100% { opacity: 0; transform: scale(0.02) rotateZ(30deg); }
+  72% { opacity: 0.3; transform: scale(0.05) rotateZ(40deg); }
+  100% { opacity: 0; transform: scale(0.02) rotateZ(52deg); }
 }
 
 /* Карта-линия: проступает и уходит вместе со схлопыванием. */
@@ -737,22 +715,48 @@ button[aria-disabled="true"] {
   100% { opacity: 0; }
 }
 
-/* Точки городов на карте — короткий «пинг». */
 @keyframes intro-dot {
   0% { opacity: 0; transform: scale(0.2); }
   60% { opacity: 1; transform: scale(1.5); }
   100% { opacity: 0.9; transform: scale(1); }
 }
 
-/* Искры: из центра наружу, мерцают, дрейфуют обратно к знаку. */
-@keyframes intro-spark {
-  0% { opacity: 0; transform: translate(0, 0) scale(0.2); }
-  24% { opacity: 0.95; transform: translate(var(--sx), var(--sy)) scale(1); }
-  62% { opacity: 0.8; transform: translate(var(--sx), var(--sy)) scale(0.9); }
-  100% { opacity: 0; transform: translate(calc(var(--sx) * 0.35), calc(var(--sy) * 0.35)) scale(0.3); }
+/* Лучи схождения — спицы света стягиваются к центру. */
+@keyframes intro-rays {
+  0% { opacity: 0; transform: scale(1.5) rotate(0deg); }
+  45% { opacity: 0.85; transform: scale(1) rotate(34deg); }
+  100% { opacity: 0; transform: scale(0.2) rotate(72deg); }
 }
 
-/* Подпись «Discover Uzbekistan» — тонко появляется и уходит. */
+/* Вспышка-узел, из которого рождается знак. */
+@keyframes intro-flash {
+  0% { opacity: 0; transform: scale(0.2); }
+  40% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.7); }
+}
+
+/* Знак рождается из узла и неоново разгорается. translate — часть кадра,
+   иначе центрирование класса перебило бы масштаб. */
+@keyframes intro-logo {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.2); }
+  45% { opacity: 1; transform: translate(-50%, -50%) scale(1.14); }
+  66% { transform: translate(-50%, -50%) scale(0.98); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1.02); }
+}
+
+@keyframes intro-logo-short {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.3); }
+  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+  70% { transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1.02); }
+}
+
+/* Неоновый пульс за знаком (свой слой — дёшево). */
+@keyframes intro-neon {
+  0%, 100% { opacity: 0.72; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+}
+
 @keyframes intro-tagline {
   0% { opacity: 0; transform: translateY(8px); }
   35% { opacity: 1; transform: translateY(0); }
@@ -760,10 +764,10 @@ button[aria-disabled="true"] {
   100% { opacity: 0; transform: translateY(-4px); }
 }
 
-/* Финал: камера пролетает сквозь логотип в приложение. */
+/* Финал: камера пролетает сквозь знак в приложение. */
 @keyframes intro-portal {
   0% { transform: translateZ(0) scale(1); }
-  100% { transform: translateZ(520px) scale(3.6); }
+  100% { transform: translateZ(560px) scale(3.8); }
 }
 
 /* Знак UZBEKISTAN. На тёмном фоне его тёмно-синие буквы не читаются,
