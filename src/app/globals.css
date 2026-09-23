@@ -738,15 +738,15 @@ html.intro-landing [data-brand-logo] { opacity: 0; }
 
 /* Первый дрон-ролик: играет, уступает второму. */
 @keyframes intro-vidA {
-  0%, 60% { opacity: 1; }
-  86%, 100% { opacity: 0; }
+  0%, 55% { opacity: 1; }
+  71%, 100% { opacity: 0; }
 }
 /* Второй дрон-ролик: вплывает, а к моменту «вырезания» фон уходит в
    чёрное — город остаётся только внутри знака. */
 @keyframes intro-vidB {
-  0%, 42% { opacity: 0; }
-  60%, 86% { opacity: 1; }
-  100% { opacity: 0; }
+  0%, 40% { opacity: 0; }
+  55%, 71% { opacity: 1; }
+  86%, 100% { opacity: 0; }
 }
 /* Медленный наезд поверх дрон-движения — живее. */
 @keyframes intro-kenburns {
@@ -767,17 +767,17 @@ html.intro-landing [data-brand-logo] { opacity: 0; }
    центр задан margin'ами. */
 @keyframes intro-final {
   0% { transform: scale(var(--k0)); }
-  15% { transform: scale(var(--k0)); animation-timing-function: cubic-bezier(.45, 0, .25, 1); }
-  62% { transform: scale(1); }
-  84% { transform: scale(1); animation-timing-function: ease-in-out; }
+  20% { transform: scale(var(--k0)); animation-timing-function: cubic-bezier(.4, 0, .3, 1); }
+  72% { transform: scale(1); }
+  87% { transform: scale(1); animation-timing-function: ease-in-out; }
   100% { transform: scale(0.86); }
 }
 
 /* Город внутри знака: проступает поверх фона и гаснет, уступая белому. */
 @keyframes intro-window {
-  0% { opacity: 0; }
-  16% { opacity: 1; }
-  80% { opacity: 1; }
+  0% { opacity: 0; animation-timing-function: ease-in-out; }
+  12% { opacity: 1; }
+  92% { opacity: 1; }
   100% { opacity: 0; }
 }
 

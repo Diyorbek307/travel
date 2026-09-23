@@ -46,11 +46,11 @@ const маска = {
 } as const;
 
 /** Реперы времени, мс. */
-const ОКНО = 3300; // видео «вырезается» в большой знак
-const ФЛЕШ_СТАРТ = 4000; // флешбеки внутри знака
-const БЕЛЫЙ = 5500; // знак становится белым
-const БЛИК = 6000; // блик неона перед посадкой
-const ДЛИНА = 6700;
+const ОКНО = 3000; // знак появляется (до этого — только пролёт над городами)
+const ФЛЕШ_СТАРТ = 4600; // флешбеки внутри знака
+const БЕЛЫЙ = 7500; // знак становится белым
+const БЛИК = 8200; // блик неона перед посадкой
+const ДЛИНА = 9000;
 const УХОД = 820;
 
 /** Доля знака внутри квадрата viewBox 100×100 (из bbox пути × 0.66). */
@@ -119,7 +119,7 @@ export default function IntroCinematic({ onDone }: { onDone: () => void }) {
     const пауза = window.setTimeout(() => {
       видеоARef.current?.pause();
       видеоBRef.current?.pause();
-    }, ОКНО + 700);
+    }, ОКНО + 1400);
     return () => {
       window.clearTimeout(t);
       window.clearTimeout(пауза);
@@ -139,17 +139,17 @@ export default function IntroCinematic({ onDone }: { onDone: () => void }) {
           src="/videos/city1.mp4"
           autoPlay muted loop playsInline preload="auto" controls={false} disablePictureInPicture
           className="absolute inset-0 h-full w-full object-cover"
-          style={{ animation: "intro-vidA 3.8s ease forwards, intro-kenburns 3.8s ease-out forwards", willChange: "opacity, transform" }}
+          style={{ animation: "intro-vidA 4.2s ease forwards, intro-kenburns 4.2s ease-out forwards", willChange: "opacity, transform" }}
         />
         <video
           ref={видеоBRef}
           src="/videos/city2.mp4"
           autoPlay muted loop playsInline preload="auto" controls={false} disablePictureInPicture
           className="absolute inset-0 h-full w-full object-cover"
-          style={{ opacity: 0, animation: "intro-vidB 3.8s ease forwards, intro-kenburns 3.8s ease-out forwards", willChange: "opacity, transform" }}
+          style={{ opacity: 0, animation: "intro-vidB 4.2s ease forwards, intro-kenburns 4.2s ease-out forwards", willChange: "opacity, transform" }}
         />
         <div className="pointer-events-none absolute inset-0"
-          style={{ background: "radial-gradient(120% 100% at 50% 50%, transparent 42%, rgba(0,0,0,.55) 100%)", animation: "intro-vidA 3.8s ease forwards" }} />
+          style={{ background: "radial-gradient(120% 100% at 50% 50%, transparent 42%, rgba(0,0,0,.55) 100%)", animation: "intro-vidA 4.2s ease forwards" }} />
 
         <div className="pointer-events-none absolute inset-x-0 bottom-[12%] text-center"
           style={{ animation: `intro-tagline 1.5s ease ${(БЕЛЫЙ + 100) / 1000}s both` }}>
@@ -188,7 +188,7 @@ export default function IntroCinematic({ onDone }: { onDone: () => void }) {
             marginLeft: -S / 2,
             marginTop: -S / 2,
             ["--k0" as string]: k0,
-            animation: `intro-final ${(ДЛИНА - ОКНО) / 1000}s linear ${ОКНО / 1000}s both`,
+            animation: `intro-final ${(ДЛИНА - ОКНО) / 1000}s linear ${ОКНО / 1000}s both, intro-white .9s ease ${ОКНО / 1000}s both`,
             willChange: "transform, opacity",
           }}
         >
@@ -216,7 +216,7 @@ export default function IntroCinematic({ onDone }: { onDone: () => void }) {
             {ФЛЕШ.map((src, i) => (
               <img key={src} src={src} alt="" draggable={false}
                 className="absolute inset-0 h-full w-full object-cover"
-                style={{ opacity: 0, animation: `intro-flash-img 1.4s ease ${ФЛЕШ_СТАРТ / 1000 + i * 0.36}s both`, willChange: "opacity, transform" }} />
+                style={{ opacity: 0, animation: `intro-flash-img 1.4s ease ${ФЛЕШ_СТАРТ / 1000 + i * 0.5}s both`, willChange: "opacity, transform" }} />
             ))}
           </div>
 
