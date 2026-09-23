@@ -38,6 +38,7 @@ import { инитТему } from "@/lib/settings";
 import type { Hotel, Place, PublicUser, Restaurant, Route, Tab } from "@/lib/types";
 import WelcomeWow from "@/components/welcome-wow";
 import TripScreen from "@/components/screens/trip";
+import IntroCinematic from "@/components/intro-cinematic";
 
 /**
  * Оболочка приложения.
@@ -137,6 +138,21 @@ function App() {
   const [isPremium, setIsPremium] = useState(false);
   const [miniAudio, setMiniAudio] = useState<Place | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+
+  // Кинематографичная заставка при запуске. Полная — на первом открытии,
+  // короткая — дальше. Оверлей поверх всего; навигация и сессия под ней
+  // работают как обычно, поэтому к моменту перехода приложение готово.
+  const [introDone, setIntroDone] = useState(false);
+  const [introFull, setIntroFull] = useState(true);
+  useEffect(() => {
+    try {
+      const виделРаньше = localStorage.getItem("uz_intro_seen");
+      setIntroFull(!виделРаньше);
+      localStorage.setItem("uz_intro_seen", "1");
+    } catch {
+      /* приватный режим — покажем полную, это не ошибка */
+    }
+  }, []);
   // Счётчик переходов между экранами — по нему решается показ
   // полноэкранной рекламы. Растёт при открытии карточек.
   const [navCount, setNavCount] = useState(0);
@@ -288,6 +304,9 @@ function App() {
 
   return (
     <div className="device-shell">
+      {!introDone && (
+        <IntroCinematic full={introFull} onDone={() => setIntroDone(true)} />
+      )}
       <NativeBack onBack={назадНаШаг} />
       <div className="device">
 
