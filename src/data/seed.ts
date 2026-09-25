@@ -11,6 +11,7 @@ import {
 import { GREEN } from "@/lib/theme";
 import type {
   Content,
+  ContentKey,
   ManagedCity,
   ManagedAd,
   ManagedEvent,
@@ -184,3 +185,34 @@ const ads: ManagedAd[] = ADS.map((a) => ({
 const audio: ManagedAudio[] = [];
 
 export const SEED: Content = { cities, places, hotels, restaurants, routes, events, ads, audio };
+
+/**
+ * Записи, добавленные в семена после запуска сайта.
+ *
+ * Сохранённый в панели раздел целиком заменяет семена: иначе удалённый
+ * редактором отель возвращался бы после каждого перезапуска. Но тогда и
+ * новые записи из семян на сайт не попадают — раздел «Гостиницы» из базы
+ * о хостелах ничего не знает. Эти записи хранилище досыпает к
+ * сохранённым один раз (см. lib/store.ts), а дальше ими распоряжается
+ * редактор, как любыми другими.
+ *
+ * Идентификатор семени — «номер-исходный id», поэтому сверяем хвост.
+ */
+const ПОЗДНИЕ_ИСХОДНЫЕ = new Set([
+  // Музеи
+  "histm", "timur", "applm", "savit", "afros", "meros", "bukhm",
+  // Хостелы и мотели
+  "hs1", "hs2", "hs3", "hs4", "mt1", "mt2", "mt3",
+  // Бары и клубы
+  "br1", "br2", "br3", "br4", "br5", "br6",
+  // Экскурсии по городам
+  "r7", "r8", "r9", "r10",
+]);
+const позднее = (x: { id: string }) => ПОЗДНИЕ_ИСХОДНЫЕ.has(x.id.replace(/^\d+-/, ""));
+
+export const ПОЗДНИЕ_СЕМЕНА: Partial<Record<ContentKey, string[]>> = {
+  places: places.filter(позднее).map((x) => x.id),
+  hotels: hotels.filter(позднее).map((x) => x.id),
+  restaurants: restaurants.filter(позднее).map((x) => x.id),
+  routes: routes.filter(позднее).map((x) => x.id),
+};

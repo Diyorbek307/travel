@@ -1,7 +1,7 @@
 import path from "node:path";
-import { SEED } from "@/data/seed";
+import { SEED, ПОЗДНИЕ_СЕМЕНА } from "@/data/seed";
 import { создатьХранилище } from "./storage";
-import type { Content } from "@/lib/types";
+import type { Content, ContentKey } from "@/lib/types";
 
 /**
  * Хранилище содержимого платформы.
@@ -21,12 +21,38 @@ import type { Content } from "@/lib/types";
 const DATA_DIR = process.env.DATA_DIR ?? path.join(process.cwd(), "data");
 const FILE = path.join(DATA_DIR, "content.json");
 
-const хранилище = создатьХранилище<Partial<Content>>(FILE, () => ({}));
+/**
+ * Что лежит в хранилище: сохранённые разделы и список поздних семян,
+ * которые редактор уже видел в панели (см. ПОЗДНИЕ_СЕМЕНА в семенах).
+ */
+type Сохранённое = Partial<Content> & { учтённыеСемена?: string[] };
+
+const хранилище = создатьХранилище<Сохранённое>(FILE, () => ({}));
+
+type Записи = { id: string }[];
 
 export async function readContent(): Promise<Content> {
+  const { учтённыеСемена = [], ...сохранено } = await хранилище.read();
   // Семена подкладываются снизу: если в сохранённом файле не хватает
   // раздела, добавленного позже, он не окажется пустым.
-  return { ...SEED, ...(await хранилище.read()) };
+  const итог: Content = { ...SEED, ...сохранено };
+
+  /*
+   * Поздние семена досыпаем к сохранённому разделу, пока редактор их не
+   * видел. Увидел и сохранил раздел — они уже лежат в нём сами, а
+   * удалённые им больше не возвращаются: их id записан в учтённых.
+   */
+  const учтены = new Set(учтённыеСемена);
+  for (const [ключ, ids] of Object.entries(ПОЗДНИЕ_СЕМЕНА) as [ContentKey, string[]][]) {
+    const список = сохранено[ключ] as Записи | undefined;
+    if (!список) continue;
+    const есть = new Set(список.map((x) => x.id));
+    const добавить = (SEED[ключ] as Записи).filter(
+      (x) => ids.includes(x.id) && !есть.has(x.id) && !учтены.has(x.id),
+    );
+    if (добавить.length) (итог as Record<ContentKey, Записи>)[ключ] = [...список, ...добавить];
+  }
+  return итог;
 }
 
 /**
@@ -39,5 +65,16 @@ export async function readContent(): Promise<Content> {
  * нетронутые разделы продолжают браться из семян.
  */
 export async function patchContent(разделы: Partial<Content>): Promise<void> {
-  await хранилище.update((сохранено) => [{ ...сохранено, ...разделы }, undefined]);
+  // Сохраняемый раздел панель брала из readContent — с досыпанными
+  // поздними семенами. Отмечаем их учтёнными: дальше раздел в базе полон,
+  // и удалённое редактором не вернётся.
+  const новые = (Object.keys(разделы) as ContentKey[]).flatMap((k) => ПОЗДНИЕ_СЕМЕНА[k] ?? []);
+  await хранилище.update((сохранено) => [
+    {
+      ...сохранено,
+      ...разделы,
+      учтённыеСемена: [...new Set([...(сохранено.учтённыеСемена ?? []), ...новые])],
+    },
+    undefined,
+  ]);
 }
