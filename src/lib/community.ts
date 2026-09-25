@@ -40,10 +40,7 @@ export interface SupportThread {
   unreadForStaff: number;
 }
 
-const поддержка = создатьХранилище<SupportThread[]>(
-  path.join(DATA_DIR, "support.json"),
-  () => [],
-);
+const поддержка = создатьХранилище<SupportThread[]>(path.join(DATA_DIR, "support.json"), () => []);
 
 export async function listThreads(): Promise<SupportThread[]> {
   return [...(await поддержка.read())].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
@@ -68,9 +65,7 @@ export async function addSupportMessage(
   return поддержка.update<SupportMessage>((все) => {
     const i = все.findIndex((t) => t.userId === userId);
     const ветка: SupportThread =
-      i === -1
-        ? { userId, messages: [], updatedAt: сообщение.createdAt, unreadForStaff: 0 }
-        : все[i];
+      i === -1 ? { userId, messages: [], updatedAt: сообщение.createdAt, unreadForStaff: 0 } : все[i];
 
     const обновлённая: SupportThread = {
       ...ветка,

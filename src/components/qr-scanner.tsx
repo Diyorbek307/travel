@@ -74,7 +74,10 @@ export default function QrScanner({
 
     return () => {
       живо = false;
-      сканер?.stop().then(() => сканер?.clear()).catch(() => undefined);
+      сканер
+        ?.stop()
+        .then(() => сканер?.clear())
+        .catch(() => undefined);
     };
   }, [onКод]);
 
@@ -102,13 +105,19 @@ export default function QrScanner({
           )}
 
           {состояние === "нет-камеры" && (
-            <p className="mt-4 text-center text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.75)" }}>
+            <p
+              className="mt-4 text-center text-sm leading-relaxed"
+              style={{ color: "rgba(255,255,255,0.75)" }}
+            >
               {t("qr_no_camera")}
             </p>
           )}
 
           {состояние === "отказ" && (
-            <p className="mt-4 text-center text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.75)" }}>
+            <p
+              className="mt-4 text-center text-sm leading-relaxed"
+              style={{ color: "rgba(255,255,255,0.75)" }}
+            >
               {t("qr_denied")}
             </p>
           )}

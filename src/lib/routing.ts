@@ -114,9 +114,9 @@ async function черезOsrm(адрес: string, откуда: Geo, куда: G
   const пары = `${откуда.lon},${откуда.lat};${куда.lon},${куда.lat}`;
   const url = `${адрес}/route/v1/${профиль}/${пары}?overview=full&geometries=geojson`;
 
-  const ответ = (await запрос(url, { method: "GET" })) as
-    | { routes?: { distance?: number; duration?: number; geometry?: { coordinates?: unknown } }[] }
-    | null;
+  const ответ = (await запрос(url, { method: "GET" })) as {
+    routes?: { distance?: number; duration?: number; geometry?: { coordinates?: unknown } }[];
+  } | null;
 
   const первый = ответ?.routes?.[0];
   if (!первый) return null;
@@ -145,14 +145,12 @@ async function черезOrs(ключ: string, откуда: Geo, куда: Geo,
         [куда.lon, куда.lat],
       ],
     }),
-  })) as
-    | {
-        features?: {
-          geometry?: { coordinates?: unknown };
-          properties?: { summary?: { distance?: number; duration?: number } };
-        }[];
-      }
-    | null;
+  })) as {
+    features?: {
+      geometry?: { coordinates?: unknown };
+      properties?: { summary?: { distance?: number; duration?: number } };
+    }[];
+  } | null;
 
   const первый = ответ?.features?.[0];
   if (!первый) return null;
@@ -182,9 +180,7 @@ export async function построитьМаршрут(
   if (было && было.до > Date.now()) return было.маршрут;
 
   const маршрут =
-    н.вид === "osrm"
-      ? await черезOsrm(н.адрес, откуда, куда)
-      : await черезOrs(н.ключ, откуда, куда, способ);
+    н.вид === "osrm" ? await черезOsrm(н.адрес, откуда, куда) : await черезOrs(н.ключ, откуда, куда, способ);
 
   // Неудачу тоже помним, но недолго: иначе при лежащем сервере каждый
   // повторный заход снова упирается в восьмисекундное ожидание.

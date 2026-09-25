@@ -52,31 +52,48 @@ export default function Analytics() {
   const ряд = s.помесячно.map((m) => m[метрика]);
   const пик = Math.max(1, ...ряд);
   const доляПодтверждённых =
-    s.пользователи.всего > 0
-      ? Math.round((s.пользователи.подтверждённые / s.пользователи.всего) * 100)
-      : 0;
-  const доляОтменённых =
-    s.брони.всего > 0 ? Math.round((s.брони.отменённые / s.брони.всего) * 100) : 0;
+    s.пользователи.всего > 0 ? Math.round((s.пользователи.подтверждённые / s.пользователи.всего) * 100) : 0;
+  const доляОтменённых = s.брони.всего > 0 ? Math.round((s.брони.отменённые / s.брони.всего) * 100) : 0;
 
   return (
     <div className="p-4 sm:p-7">
       <PageHeader title="Аналитика" subtitle="Только то, что платформа действительно знает" />
 
       <div className="mb-7 grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard label="ПОЛЬЗОВАТЕЛЕЙ" value={String(s.пользователи.всего)} sub={`${s.пользователи.активные} активных`} />
+        <StatCard
+          label="ПОЛЬЗОВАТЕЛЕЙ"
+          value={String(s.пользователи.всего)}
+          sub={`${s.пользователи.активные} активных`}
+        />
         <StatCard label="ПОЧТА ПОДТВЕРЖДЕНА" value={`${доляПодтверждённых}%`} />
-        <StatCard label="ЗАЯВОК" value={String(s.брони.всего)} sub={доляОтменённых ? `${доляОтменённых}% отменено` : undefined} />
-        <StatCard label="СРЕДНЯЯ ОЦЕНКА" value={s.отзывы.всего ? String(s.отзывы.средняяОценка) : "—"} sub={`${s.отзывы.всего} отзывов`} />
+        <StatCard
+          label="ЗАЯВОК"
+          value={String(s.брони.всего)}
+          sub={доляОтменённых ? `${доляОтменённых}% отменено` : undefined}
+        />
+        <StatCard
+          label="СРЕДНЯЯ ОЦЕНКА"
+          value={s.отзывы.всего ? String(s.отзывы.средняяОценка) : "—"}
+          sub={`${s.отзывы.всего} отзывов`}
+        />
       </div>
 
       <Card className="mb-6 p-5">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
           <SectionTitle>Регистрации по месяцам</SectionTitle>
           <div className="flex flex-wrap gap-1.5">
-            <Btn variant={метрика === "всего" ? "primary" : "ghost"} small onClick={() => setМетрика("всего")}>
+            <Btn
+              variant={метрика === "всего" ? "primary" : "ghost"}
+              small
+              onClick={() => setМетрика("всего")}
+            >
               Накопительно
             </Btn>
-            <Btn variant={метрика === "новых" ? "primary" : "ghost"} small onClick={() => setМетрика("новых")}>
+            <Btn
+              variant={метрика === "новых" ? "primary" : "ghost"}
+              small
+              onClick={() => setМетрика("новых")}
+            >
               За месяц
             </Btn>
           </div>
@@ -113,7 +130,10 @@ export default function Analytics() {
         )}
       </Card>
 
-      <div className="mb-6 grid gap-6" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(min(280px, 100%), 1fr))" }}>
+      <div
+        className="mb-6 grid gap-6"
+        style={{ gridTemplateColumns: "repeat(auto-fill, minmax(min(280px, 100%), 1fr))" }}
+      >
         <Card className="p-5">
           <SectionTitle>Страны туристов</SectionTitle>
           {s.страны.length === 0 ? (
@@ -127,7 +147,10 @@ export default function Analytics() {
                   <span className="min-w-0 flex-1 truncate text-sm" style={{ color: "var(--color-muted)" }}>
                     {c.name}
                   </span>
-                  <span className="h-1.5 w-14 shrink-0 overflow-hidden rounded-full sm:w-28" style={{ background: "var(--color-dim)" }}>
+                  <span
+                    className="h-1.5 w-14 shrink-0 overflow-hidden rounded-full sm:w-28"
+                    style={{ background: "var(--color-dim)" }}
+                  >
                     <span
                       className="block h-full rounded-full"
                       style={{
@@ -162,7 +185,10 @@ export default function Analytics() {
                   <span className="min-w-0 flex-1 text-sm" style={{ color: "var(--color-muted)" }}>
                     {label}
                   </span>
-                  <span className="h-1.5 w-14 shrink-0 overflow-hidden rounded-full sm:w-28" style={{ background: "var(--color-dim)" }}>
+                  <span
+                    className="h-1.5 w-14 shrink-0 overflow-hidden rounded-full sm:w-28"
+                    style={{ background: "var(--color-dim)" }}
+                  >
                     <span
                       className="block h-full rounded-full"
                       style={{ width: `${(Number(n) / s.брони.всего) * 100}%`, background: String(color) }}
@@ -181,9 +207,8 @@ export default function Analytics() {
       <Card className="p-5">
         <SectionTitle>Чего здесь пока нет</SectionTitle>
         <p className="text-sm leading-relaxed" style={{ color: "var(--color-muted)" }}>
-          Посещаемости, глубины просмотра и воронки конверсии в этом разделе нет: счётчик событий
-          на платформе не ведётся, и такие графики пришлось бы выдумать. Появится сбор событий —
-          появятся и они.
+          Посещаемости, глубины просмотра и воронки конверсии в этом разделе нет: счётчик событий на платформе
+          не ведётся, и такие графики пришлось бы выдумать. Появится сбор событий — появятся и они.
         </p>
       </Card>
     </div>

@@ -95,14 +95,14 @@ export default function LoginForm({ defaultPassword }: { defaultPassword: boolea
 
         <p className="mt-4 text-xs leading-relaxed" style={{ color: "var(--color-faint)" }}>
           Владелец входит без логина (или логином <code>admin</code>) по паролю из переменной{" "}
-          <code>ADMIN_PASSWORD</code>. Сотрудники — своим логином и паролем; их заводит владелец в
-          разделе «Сотрудники».
+          <code>ADMIN_PASSWORD</code>. Сотрудники — своим логином и паролем; их заводит владелец в разделе
+          «Сотрудники».
         </p>
 
         {defaultPassword && (
           <p className="mt-3 text-xs leading-relaxed" style={{ color: "var(--color-muted)" }}>
-            Пароль владельца по умолчанию — <code style={{ color: "var(--color-amber)" }}>admin</code>.
-            Для продакшена задайте свой в переменной <code>ADMIN_PASSWORD</code>.
+            Пароль владельца по умолчанию — <code style={{ color: "var(--color-amber)" }}>admin</code>. Для
+            продакшена задайте свой в переменной <code>ADMIN_PASSWORD</code>.
           </p>
         )}
       </form>

@@ -41,7 +41,12 @@ function дата(iso: string): string {
 
 function датаВремя(iso: string): string {
   if (!iso) return "—";
-  return new Date(iso).toLocaleString("ru", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+  return new Date(iso).toLocaleString("ru", {
+    day: "numeric",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 type Reset = { token: string; email: string; expiresAt: string };
@@ -134,9 +139,7 @@ export default function Users() {
       body: JSON.stringify({ to: кудаПробное }),
     });
     const d = await res.json();
-    setПробноеИтог(
-      d.ok ? "Письмо отправлено — проверьте ящик и папку «Спам»" : "Отправить не удалось",
-    );
+    setПробноеИтог(d.ok ? "Письмо отправлено — проверьте ящик и папку «Спам»" : "Отправить не удалось");
   }
 
   function открыть(u: User | null) {
@@ -175,9 +178,7 @@ export default function Users() {
   if (поиск) {
     const q = поиск.toLowerCase();
     список = список.filter(
-      (u) =>
-        `${u.firstName} ${u.lastName}`.toLowerCase().includes(q) ||
-        u.email.toLowerCase().includes(q),
+      (u) => `${u.firstName} ${u.lastName}`.toLowerCase().includes(q) || u.email.toLowerCase().includes(q),
     );
   }
 
@@ -279,8 +280,8 @@ export default function Users() {
             Почтовый сервис не подключён
           </p>
           <p className="mt-1 text-xs leading-relaxed" style={{ color: "var(--color-muted)" }}>
-            Письма не уходят. Задайте SMTP_HOST, SMTP_USER и SMTP_PASSWORD — и коды со ссылками
-            начнут приходить сами. Пока их передаёт оператор.
+            Письма не уходят. Задайте SMTP_HOST, SMTP_USER и SMTP_PASSWORD — и коды со ссылками начнут
+            приходить сами. Пока их передаёт оператор.
           </p>
         </div>
       )}
@@ -320,8 +321,8 @@ export default function Users() {
             Заявки на смену пароля · {заявки.length}
           </p>
           <p className="mb-3 text-xs" style={{ color: "var(--color-muted)" }}>
-            Почтовый сервис не подключён — передайте ссылку человеку сами. Она действует час и
-            гаснет после первого применения.
+            Почтовый сервис не подключён — передайте ссылку человеку сами. Она действует час и гаснет после
+            первого применения.
           </p>
           <ul className="grid gap-2">
             {заявки.map((r) => {
@@ -378,8 +379,8 @@ export default function Users() {
           className="rounded-lg p-8 text-center text-sm"
           style={{ background: "var(--color-panel)", color: "var(--color-muted)" }}
         >
-          Пока никто не зарегистрировался. Записи появятся здесь, как только турист создаст аккаунт
-          в приложении.
+          Пока никто не зарегистрировался. Записи появятся здесь, как только турист создаст аккаунт в
+          приложении.
         </div>
       )}
 
@@ -421,7 +422,10 @@ export default function Users() {
       )}
 
       {открыт && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.6)" }}>
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: "rgba(0,0,0,0.6)" }}
+        >
           <div
             className="w-full max-w-md rounded-2xl p-5"
             style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }}
@@ -460,7 +464,9 @@ export default function Users() {
               ].map(([k, v]) => (
                 <div key={k} className="flex flex-wrap justify-between gap-2">
                   <dt style={{ color: "var(--color-muted)" }}>{k}</dt>
-                  <dd className="min-w-0 text-right" style={{ color: "var(--color-text)" }}>{v}</dd>
+                  <dd className="min-w-0 text-right" style={{ color: "var(--color-text)" }}>
+                    {v}
+                  </dd>
                 </div>
               ))}
             </dl>
@@ -471,7 +477,10 @@ export default function Users() {
               const м = последнееМесто(открыт);
               return (
                 <div className="mb-4">
-                  <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
+                  <p
+                    className="mb-1.5 text-xs font-semibold uppercase tracking-wide"
+                    style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+                  >
                     Местоположение
                   </p>
                   {м ? (
@@ -483,7 +492,10 @@ export default function Users() {
                           {м.lat.toFixed(5)}, {м.lon.toFixed(5)}
                         </span>
                       </p>
-                      <div className="overflow-hidden rounded-lg" style={{ border: "1px solid var(--color-border)" }}>
+                      <div
+                        className="overflow-hidden rounded-lg"
+                        style={{ border: "1px solid var(--color-border)" }}
+                      >
                         <iframe
                           title="Местоположение"
                           width="100%"
@@ -491,7 +503,9 @@ export default function Users() {
                           style={{ border: 0, display: "block" }}
                           loading="lazy"
                           referrerPolicy="no-referrer"
-                          src={`https://www.openstreetmap.org/export/embed.html?bbox=${м.lon - 0.02}%2C${м.lat - 0.015}%2C${м.lon + 0.02}%2C${м.lat + 0.015}&layer=mapnik&marker=${м.lat}%2C${м.lon}`}
+                          src={`https://www.openstreetmap.org/export/embed.html?bbox=${м.lon - 0.02}%2C${
+                            м.lat - 0.015
+                          }%2C${м.lon + 0.02}%2C${м.lat + 0.015}&layer=mapnik&marker=${м.lat}%2C${м.lon}`}
                         />
                       </div>
                       <a
@@ -506,8 +520,8 @@ export default function Users() {
                     </>
                   ) : (
                     <p className="text-xs leading-relaxed" style={{ color: "var(--color-faint)" }}>
-                      Турист не передавал координаты. Приложение не отслеживает людей в фоне —
-                      местоположение приходит только когда человек сам отправляет сигнал SOS.
+                      Турист не передавал координаты. Приложение не отслеживает людей в фоне — местоположение
+                      приходит только когда человек сам отправляет сигнал SOS.
                     </p>
                   )}
                 </div>
@@ -517,10 +531,16 @@ export default function Users() {
             {/* Premium. Оплата проверяется глазами: владелец видит поступление
                 в кабинете Payme/Click и продлевает срок здесь. */}
             <div className="mb-4">
-              <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
+              <p
+                className="mb-1.5 text-xs font-semibold uppercase tracking-wide"
+                style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+              >
                 Premium
               </p>
-              <p className="mb-2 text-sm" style={{ color: premium(открыт) ? "var(--color-amber)" : "var(--color-muted)" }}>
+              <p
+                className="mb-2 text-sm"
+                style={{ color: premium(открыт) ? "var(--color-amber)" : "var(--color-muted)" }}
+              >
                 {premium(открыт) ? `Оплачен до ${дата(открыт.premiumUntil ?? "")}` : "Не оплачен"}
               </p>
               {можноДеньги ? (

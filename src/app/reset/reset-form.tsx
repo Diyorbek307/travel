@@ -61,7 +61,7 @@ export default function ResetForm({ token }: { token: string }) {
       style={{ background: `linear-gradient(160deg, ${ACCENT_FILL} 0%, #04302c 100%)` }}
     >
       <div className="w-full max-w-sm">
-        <h1 className="mb-1 text-2xl font-bold text-white" style={{ fontFamily:"var(--font-heading)" }}>
+        <h1 className="mb-1 text-2xl font-bold text-white" style={{ fontFamily: "var(--font-heading)" }}>
           Новый пароль
         </h1>
 

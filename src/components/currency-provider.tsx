@@ -69,9 +69,7 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  return (
-    <CurrencyContext.Provider value={{ rates, loading, updated }}>{children}</CurrencyContext.Provider>
-  );
+  return <CurrencyContext.Provider value={{ rates, loading, updated }}>{children}</CurrencyContext.Provider>;
 }
 
 export function useCurrency() {
@@ -80,9 +78,25 @@ export function useCurrency() {
 
 /** Знаки самых частых валют; для остальных показываем код. */
 export const СИМВОЛЫ: Record<string, string> = {
-  USD: "$", EUR: "€", RUB: "₽", GBP: "£", KRW: "₩", CNY: "¥", JPY: "¥",
-  UZS: "so'm", TRY: "₺", AED: "د.إ", SAR: "﷼", INR: "₹", KZT: "₸",
-  KGS: "с", TJS: "SM", CHF: "Fr", CAD: "$", AUD: "$", PLN: "zł",
+  USD: "$",
+  EUR: "€",
+  RUB: "₽",
+  GBP: "£",
+  KRW: "₩",
+  CNY: "¥",
+  JPY: "¥",
+  UZS: "so'm",
+  TRY: "₺",
+  AED: "د.إ",
+  SAR: "﷼",
+  INR: "₹",
+  KZT: "₸",
+  KGS: "с",
+  TJS: "SM",
+  CHF: "Fr",
+  CAD: "$",
+  AUD: "$",
+  PLN: "zł",
 };
 
 /**
@@ -90,4 +104,19 @@ export const СИМВОЛЫ: Record<string, string> = {
  * стран, откуда чаще всего едут гости, плюс сам сум. Остальные — следом,
  * по алфавиту, чтобы «все валюты» действительно были все.
  */
-export const ГЛАВНЫЕ = ["USD", "EUR", "UZS", "RUB", "KZT", "KGS", "CNY", "KRW", "TRY", "AED", "GBP", "JPY", "INR", "SAR"];
+export const ГЛАВНЫЕ = [
+  "USD",
+  "EUR",
+  "UZS",
+  "RUB",
+  "KZT",
+  "KGS",
+  "CNY",
+  "KRW",
+  "TRY",
+  "AED",
+  "GBP",
+  "JPY",
+  "INR",
+  "SAR",
+];

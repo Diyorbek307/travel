@@ -18,7 +18,10 @@ import { отметитьПрослушанное } from "@/lib/visits";
  * пауза в любом месте ставит на паузу именно его.
  */
 
-export type Запись = Pick<ManagedAudio, "id" | "title" | "url" | "placeId" | "placeName" | "lang" | "seconds">;
+export type Запись = Pick<
+  ManagedAudio,
+  "id" | "title" | "url" | "placeId" | "placeName" | "lang" | "seconds"
+>;
 
 /**
  * «tap» — браузер не дал включить звук без касания (так бывает, когда

@@ -1,12 +1,6 @@
 import { NextResponse } from "next/server";
 import { отказЕсли } from "@/lib/admin-auth";
-import {
-  createAdmin,
-  deleteAdmin,
-  listAdmins,
-  setAdminPassword,
-  updateAdmin,
-} from "@/lib/admins";
+import { createAdmin, deleteAdmin, listAdmins, setAdminPassword, updateAdmin } from "@/lib/admins";
 import { рольСуществует } from "@/lib/admin-roles";
 
 export const dynamic = "force-dynamic";
@@ -18,10 +12,7 @@ const МИН_ПАРОЛЬ = 8;
 export async function GET() {
   const нет = await отказЕсли("staff");
   if (нет) return нет;
-  return NextResponse.json(
-    { admins: await listAdmins() },
-    { headers: { "Cache-Control": "no-store" } },
-  );
+  return NextResponse.json({ admins: await listAdmins() }, { headers: { "Cache-Control": "no-store" } });
 }
 
 /**

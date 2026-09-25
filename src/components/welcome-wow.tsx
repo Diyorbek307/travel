@@ -117,7 +117,10 @@ export default function WelcomeWow({ name, onDone }: { name?: string; onDone: ()
         />
         <div
           className="absolute inset-0"
-          style={{ background: "radial-gradient(120% 80% at 50% 40%, transparent 0%, rgba(3,5,9,0.8) 68%, #02040a 100%)" }}
+          style={{
+            background:
+              "radial-gradient(120% 80% at 50% 40%, transparent 0%, rgba(3,5,9,0.8) 68%, #02040a 100%)",
+          }}
         />
       </div>
 
@@ -126,12 +129,42 @@ export default function WelcomeWow({ name, onDone }: { name?: string; onDone: ()
        * экрана и потом медленно дышит — свет приходит отовсюду, а не
        * только из центра. Появляются по очереди, чтобы читалось как волна.
        */}
-      {([
-        { цвет: "rgba(52,220,207,0.5)", поз: "left top", off: { left: "-30%", top: "-20%" }, from: "translate(-40%,-40%)", d: "0.2s", a: "wow-side-a" },
-        { цвет: "rgba(242,206,110,0.4)", поз: "right top", off: { right: "-30%", top: "-15%" }, from: "translate(40%,-40%)", d: "0.7s", a: "wow-side-b" },
-        { цвет: "rgba(15,179,172,0.42)", поз: "left bottom", off: { left: "-25%", bottom: "-25%" }, from: "translate(-40%,40%)", d: "1.2s", a: "wow-side-a" },
-        { цвет: "rgba(233,196,106,0.34)", поз: "right bottom", off: { right: "-28%", bottom: "-20%" }, from: "translate(40%,40%)", d: "1.7s", a: "wow-side-b" },
-      ] as const).map((л, n) => (
+      {(
+        [
+          {
+            цвет: "rgba(52,220,207,0.5)",
+            поз: "left top",
+            off: { left: "-30%", top: "-20%" },
+            from: "translate(-40%,-40%)",
+            d: "0.2s",
+            a: "wow-side-a",
+          },
+          {
+            цвет: "rgba(242,206,110,0.4)",
+            поз: "right top",
+            off: { right: "-30%", top: "-15%" },
+            from: "translate(40%,-40%)",
+            d: "0.7s",
+            a: "wow-side-b",
+          },
+          {
+            цвет: "rgba(15,179,172,0.42)",
+            поз: "left bottom",
+            off: { left: "-25%", bottom: "-25%" },
+            from: "translate(-40%,40%)",
+            d: "1.2s",
+            a: "wow-side-a",
+          },
+          {
+            цвет: "rgba(233,196,106,0.34)",
+            поз: "right bottom",
+            off: { right: "-28%", bottom: "-20%" },
+            from: "translate(40%,40%)",
+            d: "1.7s",
+            a: "wow-side-b",
+          },
+        ] as const
+      ).map((л, n) => (
         <div
           key={n}
           className="pointer-events-none absolute"
@@ -242,7 +275,8 @@ export default function WelcomeWow({ name, onDone }: { name?: string; onDone: ()
       <div
         className="pointer-events-none absolute inset-0"
         style={{
-          background: "radial-gradient(54% 34% at 50% 40%, transparent 0%, rgba(3,5,10,0.5) 60%, rgba(2,4,10,0.9) 100%)",
+          background:
+            "radial-gradient(54% 34% at 50% 40%, transparent 0%, rgba(3,5,10,0.5) 60%, rgba(2,4,10,0.9) 100%)",
           opacity: вкл ? 1 : 0,
           transition: "opacity 2.2s ease",
         }}
@@ -279,9 +313,7 @@ export default function WelcomeWow({ name, onDone }: { name?: string; onDone: ()
               marginTop: -23,
               left: вкл ? 78 : 8,
               background: вкл ? "#06080c" : "#ffffff",
-              boxShadow: вкл
-                ? "inset 0 0 0 1px rgba(255,255,255,0.1)"
-                : "0 2px 8px rgba(0,0,0,0.4)",
+              boxShadow: вкл ? "inset 0 0 0 1px rgba(255,255,255,0.1)" : "0 2px 8px rgba(0,0,0,0.4)",
               // Пружинка: колёсико чуть перелетает и возвращается — живее,
               // чем ровный переезд.
               transition: "left 1.2s cubic-bezier(.34,1.4,.4,1), background .8s ease",
@@ -291,7 +323,11 @@ export default function WelcomeWow({ name, onDone }: { name?: string; onDone: ()
 
         <p
           className="text-[10px] font-bold uppercase"
-          style={{ letterSpacing: "0.34em", color: вкл ? "rgba(255,255,255,0.8)" : "rgba(255,255,255,0.35)", transition: "color 1.1s ease" }}
+          style={{
+            letterSpacing: "0.34em",
+            color: вкл ? "rgba(255,255,255,0.8)" : "rgba(255,255,255,0.35)",
+            transition: "color 1.1s ease",
+          }}
         >
           HELLOUZ MODE
         </p>
@@ -306,12 +342,22 @@ export default function WelcomeWow({ name, onDone }: { name?: string; onDone: ()
           }}
           className="mt-10 w-full max-w-sm"
         >
-          <h1 className="text-white" style={{ fontFamily:"var(--font-heading)", fontSize: 32, lineHeight: 1.15 }}>
+          <h1
+            className="text-white"
+            style={{ fontFamily: "var(--font-heading)", fontSize: 32, lineHeight: 1.15 }}
+          >
             {t("wow_welcome")}
             {name ? "," : ""}
-            {name ? <><br /><span style={{ color: GOLD }}>{name}</span></> : null}
+            {name ? (
+              <>
+                <br />
+                <span style={{ color: GOLD }}>{name}</span>
+              </>
+            ) : null}
           </h1>
-          <p className="mt-2 text-sm" style={{ color: "rgba(255,255,255,0.6)" }}>{t("wow_sub")}</p>
+          <p className="mt-2 text-sm" style={{ color: "rgba(255,255,255,0.6)" }}>
+            {t("wow_sub")}
+          </p>
           <button
             onClick={onDone}
             className="mt-8 w-full rounded-2xl py-4 text-sm font-bold transition-all active:scale-[0.97]"
@@ -324,7 +370,6 @@ export default function WelcomeWow({ name, onDone }: { name?: string; onDone: ()
             {t("wow_go")} <span className="rtl-flip inline-block">→</span>
           </button>
         </div>
-
       </div>
     </div>
   );

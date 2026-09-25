@@ -48,7 +48,9 @@ export function переключитьВМаршруте(т: Omit<ТочкаМа
   if (typeof localStorage === "undefined") return false;
   const текущий = прочитать();
   const есть = текущий.some((x) => x.id === т.id);
-  записать(есть ? текущий.filter((x) => x.id !== т.id) : [...текущий, { ...т, addedAt: new Date().toISOString() }]);
+  записать(
+    есть ? текущий.filter((x) => x.id !== т.id) : [...текущий, { ...т, addedAt: new Date().toISOString() }],
+  );
   return !есть;
 }
 

@@ -65,7 +65,14 @@ function CardFace({ it }: { it: DeckItem }) {
 
       <div className="absolute bottom-0 left-0 right-0 p-3.5">
         <div className="mb-1 flex items-center gap-1">
-          <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="2.5">
+          <svg
+            width="8"
+            height="8"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="rgba(255,255,255,0.5)"
+            strokeWidth="2.5"
+          >
             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
             <circle cx="12" cy="10" r="3" />
           </svg>
@@ -76,7 +83,7 @@ function CardFace({ it }: { it: DeckItem }) {
 
         <p
           className="mb-1 font-bold leading-tight text-white"
-          style={{ fontSize: 15, fontFamily:"var(--font-heading)" }}
+          style={{ fontSize: 15, fontFamily: "var(--font-heading)" }}
         >
           {it.title}
         </p>
@@ -95,10 +102,7 @@ function CardFace({ it }: { it: DeckItem }) {
             // уродливым дефисом («Рейтин-Г») и не распирают колонку.
             <div key={si} className="min-w-0 flex-1 text-center">
               <p className="truncate whitespace-nowrap text-[11px] font-bold text-white">{v}</p>
-              <p
-                className="truncate whitespace-nowrap text-[8px]"
-                style={{ color: "rgba(255,255,255,0.4)" }}
-              >
+              <p className="truncate whitespace-nowrap text-[8px]" style={{ color: "rgba(255,255,255,0.4)" }}>
                 {l}
               </p>
             </div>
@@ -113,7 +117,15 @@ function CardFace({ it }: { it: DeckItem }) {
             <p className="text-sm font-bold text-white">{it.price}</p>
           </div>
           <div className="flex h-9 w-9 items-center justify-center rounded-full" style={{ background: GOLD }}>
-            <svg className="rtl-flip" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={ON_GOLD} strokeWidth="2.5">
+            <svg
+              className="rtl-flip"
+              width="13"
+              height="13"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke={ON_GOLD}
+              strokeWidth="2.5"
+            >
               <polyline points="9 18 15 12 9 6" />
             </svg>
           </div>
@@ -135,7 +147,7 @@ export function CardDeckBase({
   return (
     <div className="pt-5">
       <div className="mb-3 flex items-center justify-between px-4">
-        <p className="text-base font-bold" style={{ color: TEXT, fontFamily:"var(--font-heading)" }}>
+        <p className="text-base font-bold" style={{ color: TEXT, fontFamily: "var(--font-heading)" }}>
           {title}
         </p>
       </div>
@@ -193,9 +205,7 @@ export function CardDeck({ places, onPlace }: { places: Place[]; onPlace: (p: Pl
       pricel: t("card_entry"),
     };
   });
-  return (
-    <CardDeckBase items={items} title={t("deck_top_sights")} onSelect={(i) => onPlace(places[i])} />
-  );
+  return <CardDeckBase items={items} title={t("deck_top_sights")} onSelect={(i) => onPlace(places[i])} />;
 }
 
 export function CityDeck({ onSearch }: { onSearch: (city?: string) => void }) {

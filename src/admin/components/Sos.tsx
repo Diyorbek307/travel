@@ -54,7 +54,9 @@ export default function Sos() {
       {загрузка ? (
         <p style={{ color: "var(--color-muted)" }}>Загрузка…</p>
       ) : сигналы.length === 0 ? (
-        <Card><p style={{ color: "var(--color-muted)" }}>Сигналов нет.</p></Card>
+        <Card>
+          <p style={{ color: "var(--color-muted)" }}>Сигналов нет.</p>
+        </Card>
       ) : (
         <div className="grid gap-3">
           {сигналы.map((s) => (
@@ -63,10 +65,17 @@ export default function Sos() {
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
                     <span className="text-lg">🆘</span>
-                    <p className="font-semibold" style={{ color: "var(--color-text)" }}>{s.userName}</p>
-                    <Badge label={s.status === "new" ? "новый" : "просмотрен"} color={s.status === "new" ? "rose" : "dim"} />
+                    <p className="font-semibold" style={{ color: "var(--color-text)" }}>
+                      {s.userName}
+                    </p>
+                    <Badge
+                      label={s.status === "new" ? "новый" : "просмотрен"}
+                      color={s.status === "new" ? "rose" : "dim"}
+                    />
                   </div>
-                  <p className="text-sm mt-1" style={{ color: "var(--color-muted)" }}>{s.userInfo}</p>
+                  <p className="text-sm mt-1" style={{ color: "var(--color-muted)" }}>
+                    {s.userInfo}
+                  </p>
                   <p className="text-xs mt-1" style={{ color: "var(--color-muted)" }}>
                     {new Date(s.createdAt).toLocaleString("ru")} · {s.lat.toFixed(5)}, {s.lon.toFixed(5)}
                   </p>
@@ -76,7 +85,11 @@ export default function Sos() {
                     <button
                       onClick={() => просмотрено(s.id)}
                       className="rounded-lg px-3 py-2 text-sm font-semibold"
-                      style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)", color: "var(--color-text)" }}
+                      style={{
+                        background: "var(--color-panel)",
+                        border: "1px solid var(--color-border)",
+                        color: "var(--color-text)",
+                      }}
                     >
                       ✓ Просмотрено
                     </button>

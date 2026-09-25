@@ -319,9 +319,7 @@ body {
     box-shadow: 0 0 20px rgb(233 196 106 / 0.3);
   }
   50% {
-    box-shadow:
-      0 0 40px rgb(233 196 106 / 0.6),
-      0 0 60px rgb(15 179 172 / 0.3);
+    box-shadow: 0 0 40px rgb(233 196 106 / 0.6), 0 0 60px rgb(15 179 172 / 0.3);
   }
 }
 
@@ -399,12 +397,7 @@ body {
 }
 
 .shimmer-bg {
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgb(255 255 255 / 0.06) 50%,
-    transparent 100%
-  );
+  background: linear-gradient(90deg, transparent 0%, rgb(255 255 255 / 0.06) 50%, transparent 100%);
   background-size: 200% 100%;
   animation: shimmer 2s linear infinite;
 }
@@ -424,14 +417,8 @@ body {
 button,
 a,
 [role="button"] {
-  transition:
-    transform 0.14s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 0.14s ease,
-    box-shadow 0.2s ease,
-    background-color 0.15s ease,
-    border-color 0.15s ease,
-    color 0.15s ease,
-    filter 0.15s ease;
+  transition: transform 0.14s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.14s ease, box-shadow 0.2s ease,
+    background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, filter 0.15s ease;
 }
 button:active,
 [role="button"]:active {
@@ -599,36 +586,72 @@ button[aria-disabled="true"] {
   }
 }
 
-
 /* Дыхание внешнего ореола — лёгкая пульсация размера. */
 @keyframes wow-breathe {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.09); }
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.09);
+  }
 }
 /* Медленный дрейф цветной дымки по сцене. */
 @keyframes wow-aurora {
-  0%, 100% { transform: translate3d(0, 0, 0); opacity: 0.85; }
-  50% { transform: translate3d(0, -3%, 0); opacity: 1; }
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+    opacity: 0.85;
+  }
+  50% {
+    transform: translate3d(0, -3%, 0);
+    opacity: 1;
+  }
 }
 /* Парящие искры: всплывают и мерцают. */
 @keyframes wow-float {
-  0%, 100% { transform: translateY(0) scale(1); opacity: 0.35; }
-  50% { transform: translateY(-16px) scale(1.4); opacity: 0.95; }
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 0.35;
+  }
+  50% {
+    transform: translateY(-16px) scale(1.4);
+    opacity: 0.95;
+  }
 }
 /* Боковые огни: после въезда медленно покачиваются и дышат яркостью,
    чтобы свет с краёв жил, а не стоял пятном. Два набора — соседние
    углы качаются в противофазе. */
 @keyframes wow-fadein {
-  from { opacity: 0; }
-  to { opacity: 0.5; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.5;
+  }
 }
 @keyframes wow-side-a {
-  0%, 100% { transform: translate(0, 0); opacity: 0.75; }
-  50% { transform: translate(4%, 3%); opacity: 1; }
+  0%,
+  100% {
+    transform: translate(0, 0);
+    opacity: 0.75;
+  }
+  50% {
+    transform: translate(4%, 3%);
+    opacity: 1;
+  }
 }
 @keyframes wow-side-b {
-  0%, 100% { transform: translate(0, 0); opacity: 0.75; }
-  50% { transform: translate(-4%, 3%); opacity: 1; }
+  0%,
+  100% {
+    transform: translate(0, 0);
+    opacity: 0.75;
+  }
+  50% {
+    transform: translate(-4%, 3%);
+    opacity: 1;
+  }
 }
 
 /* Живая рамка партнёрского блока: перелив по краю, чтобы блок замечали
@@ -638,7 +661,6 @@ button[aria-disabled="true"] {
     background-position: 200% 0;
   }
 }
-
 
 /* Знак UZBEKISTAN. На тёмном фоне его тёмно-синие буквы не читаются,
    поэтому там показываем одноцветную белую версию — это штатный
@@ -709,85 +731,184 @@ html[data-theme="dark"] .leaflet-bar a {
    внутри флешбеки → белый знак, блик неона → посадка в шапку. */
 
 /* Логотип шапки прячем, пока на него садится знак заставки. */
-html.intro-landing [data-brand-logo] { opacity: 0; }
+html.intro-landing [data-brand-logo] {
+  opacity: 0;
+}
 
 /* Первый дрон-ролик: играет, уступает второму. */
 @keyframes intro-vidA {
-  0%, 55% { opacity: 1; }
-  71%, 100% { opacity: 0; }
+  0%,
+  55% {
+    opacity: 1;
+  }
+  71%,
+  100% {
+    opacity: 0;
+  }
 }
 /* Второй дрон-ролик: вплывает, а к моменту «вырезания» фон уходит в
    чёрное — город остаётся только внутри знака. */
 @keyframes intro-vidB {
-  0%, 40% { opacity: 0; }
-  55%, 71% { opacity: 1; }
-  86%, 100% { opacity: 0; }
+  0%,
+  40% {
+    opacity: 0;
+  }
+  55%,
+  71% {
+    opacity: 1;
+  }
+  86%,
+  100% {
+    opacity: 0;
+  }
 }
 /* Медленный наезд поверх дрон-движения — живее. */
 @keyframes intro-kenburns {
-  0% { transform: scale(1); }
-  100% { transform: scale(1.12); }
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.12);
+  }
 }
 
 /* Контур знака «рисуется». pathLength=1 → dasharray в долях. */
-@keyframes intro-draw { to { stroke-dashoffset: 0; } }
+@keyframes intro-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
 
 @keyframes intro-fill {
-  0% { opacity: 0; transform: scale(0.9); }
-  100% { opacity: 1; transform: scale(1); }
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 /* Знак: стартует во весь экран (--k0) и плавно уменьшается строго по
    центру; перед посадкой — ещё немного. Только scale, без translate:
    центр задан margin'ами. */
 @keyframes intro-final {
-  0% { transform: scale(var(--k0)); }
-  20% { transform: scale(var(--k0)); animation-timing-function: cubic-bezier(.4, 0, .3, 1); }
-  72% { transform: scale(1); }
-  87% { transform: scale(1); animation-timing-function: ease-in-out; }
-  100% { transform: scale(0.86); }
+  0% {
+    transform: scale(var(--k0));
+  }
+  20% {
+    transform: scale(var(--k0));
+    animation-timing-function: cubic-bezier(0.4, 0, 0.3, 1);
+  }
+  72% {
+    transform: scale(1);
+  }
+  87% {
+    transform: scale(1);
+    animation-timing-function: ease-in-out;
+  }
+  100% {
+    transform: scale(0.86);
+  }
 }
 
 /* Город внутри знака: проступает поверх фона и гаснет, уступая белому. */
 @keyframes intro-window {
-  0% { opacity: 0; animation-timing-function: ease-in-out; }
-  12% { opacity: 1; }
-  92% { opacity: 1; }
-  100% { opacity: 0; }
+  0% {
+    opacity: 0;
+    animation-timing-function: ease-in-out;
+  }
+  12% {
+    opacity: 1;
+  }
+  92% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 
 /* Кадры-флешбеки внутри знака: наплывают друг на друга. */
 @keyframes intro-flash-img {
-  0% { opacity: 0; transform: scale(1.12); }
-  14% { opacity: 1; transform: scale(1.06); }
-  40% { opacity: 1; transform: scale(1.02); }
-  56% { opacity: 0; transform: scale(1); }
-  100% { opacity: 0; }
+  0% {
+    opacity: 0;
+    transform: scale(1.12);
+  }
+  14% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+  56% {
+    opacity: 0;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+  }
 }
 
 /* Сплошной белый знак проступает, когда кадры гаснут. */
 @keyframes intro-white {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 /* Тихий белый пульс света за знаком — неон слегка «дышит» и смещается. */
 @keyframes intro-neon {
-  0%, 100% { opacity: 0.45; transform: translate(0, 0) scale(1); }
-  50% { opacity: 0.75; transform: translate(3%, -2%) scale(1.12); }
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    opacity: 0.75;
+    transform: translate(3%, -2%) scale(1.12);
+  }
 }
 
 /* Блик неона: полоса света пробегает по белому знаку. */
 @keyframes intro-shimmer {
-  0% { opacity: 0; background-position: 100% 0; }
-  20% { opacity: 1; }
-  80% { opacity: 1; }
-  100% { opacity: 0; background-position: 0% 0; }
+  0% {
+    opacity: 0;
+    background-position: 100% 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    background-position: 0% 0;
+  }
 }
 
 @keyframes intro-tagline {
-  0% { opacity: 0; transform: translateY(8px); }
-  35% { opacity: 1; transform: translateY(0); }
-  78% { opacity: 1; transform: translateY(0); }
-  100% { opacity: 0; transform: translateY(-4px); }
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  35% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  78% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
 }

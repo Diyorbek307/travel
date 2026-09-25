@@ -51,7 +51,9 @@ export default function GoogleMap({
 
   // С двумя точками — маршрут, с одной — просто место на карте.
   const адрес = откуда
-    ? `https://www.google.com/maps/embed/v1/directions?key=${ключ}&origin=${т(откуда)}&destination=${т(куда)}&mode=${пешком ? "walking" : "driving"}`
+    ? `https://www.google.com/maps/embed/v1/directions?key=${ключ}&origin=${т(откуда)}&destination=${т(
+        куда,
+      )}&mode=${пешком ? "walking" : "driving"}`
     : `https://www.google.com/maps/embed/v1/place?key=${ключ}&q=${т(куда)}&zoom=15`;
 
   return (

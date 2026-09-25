@@ -3,7 +3,6 @@ import { PageHeader, Badge, Btn, Card, SectionTitle, ДемоРаздел } from
 import { useEntity } from "../context/useEntity";
 import type { AdPolicy, ManagedAd as Ad } from "@/lib/types";
 
-
 type Promotion = {
   id: string;
   business: string;
@@ -16,14 +15,73 @@ type Promotion = {
   city: string;
 };
 
-
 const PROMOTIONS: Promotion[] = [
-  { id: "1", business: "Плов Центр Тошкент", category: "restaurant", currentRank: 1, boostedRank: 1, monthlyFee: 250, active: true, since: "Jan 2026", city: "Tashkent" },
-  { id: "2", business: "Samarkand Coffe House", category: "restaurant", currentRank: 8, boostedRank: 2, monthlyFee: 180, active: true, since: "Mar 2026", city: "Samarkand" },
-  { id: "3", business: "Bukhara Pilaf Club", category: "restaurant", currentRank: 15, boostedRank: 3, monthlyFee: 120, active: true, since: "Jun 2026", city: "Bukhara" },
-  { id: "4", business: "Khiva Bazaar Kitchen", category: "restaurant", currentRank: 22, boostedRank: 4, monthlyFee: 90, active: false, since: "Aug 2026", city: "Khiva" },
-  { id: "5", business: "Fergana Valley Grill", category: "restaurant", currentRank: 31, boostedRank: 5, monthlyFee: 75, active: true, since: "Jul 2026", city: "Fergana" },
-  { id: "6", business: "Tashkent Night Market", category: "attraction", currentRank: 12, boostedRank: 2, monthlyFee: 200, active: true, since: "Apr 2026", city: "Tashkent" },
+  {
+    id: "1",
+    business: "Плов Центр Тошкент",
+    category: "restaurant",
+    currentRank: 1,
+    boostedRank: 1,
+    monthlyFee: 250,
+    active: true,
+    since: "Jan 2026",
+    city: "Tashkent",
+  },
+  {
+    id: "2",
+    business: "Samarkand Coffe House",
+    category: "restaurant",
+    currentRank: 8,
+    boostedRank: 2,
+    monthlyFee: 180,
+    active: true,
+    since: "Mar 2026",
+    city: "Samarkand",
+  },
+  {
+    id: "3",
+    business: "Bukhara Pilaf Club",
+    category: "restaurant",
+    currentRank: 15,
+    boostedRank: 3,
+    monthlyFee: 120,
+    active: true,
+    since: "Jun 2026",
+    city: "Bukhara",
+  },
+  {
+    id: "4",
+    business: "Khiva Bazaar Kitchen",
+    category: "restaurant",
+    currentRank: 22,
+    boostedRank: 4,
+    monthlyFee: 90,
+    active: false,
+    since: "Aug 2026",
+    city: "Khiva",
+  },
+  {
+    id: "5",
+    business: "Fergana Valley Grill",
+    category: "restaurant",
+    currentRank: 31,
+    boostedRank: 5,
+    monthlyFee: 75,
+    active: true,
+    since: "Jul 2026",
+    city: "Fergana",
+  },
+  {
+    id: "6",
+    business: "Tashkent Night Market",
+    category: "attraction",
+    currentRank: 12,
+    boostedRank: 2,
+    monthlyFee: 200,
+    active: true,
+    since: "Apr 2026",
+    city: "Tashkent",
+  },
 ];
 
 const AD_TYPE_LABELS: Record<string, string> = {
@@ -39,7 +97,14 @@ export default function AdsManager() {
   const [promos, setPromos] = useState<Promotion[]>(PROMOTIONS);
   const [tab, setTab] = useState<"ads" | "promotions" | "new" | "video">("ads");
   const [newAd, setNewAd] = useState({
-    advertiser: "", type: "banner", target: "", budget: "", bid: "", startDate: "", endDate: "", imageUrl: "",
+    advertiser: "",
+    type: "banner",
+    target: "",
+    budget: "",
+    bid: "",
+    startDate: "",
+    endDate: "",
+    imageUrl: "",
   });
 
   // Настройка частоты полноэкранной рекламы (отдельно от содержимого).
@@ -72,13 +137,23 @@ export default function AdsManager() {
 
   // Форма видео-объявления.
   const [newVideo, setNewVideo] = useState({
-    advertiser: "", title: "", cta: "Подробнее", videoUrl: "", url: "", city: "", skipAfter: "10", color: "#1B6B8A",
+    advertiser: "",
+    title: "",
+    cta: "Подробнее",
+    videoUrl: "",
+    url: "",
+    city: "",
+    skipAfter: "10",
+    color: "#1B6B8A",
   });
   // Загрузка mp4-файла прямо в базу: рекламодатель прислал ролик — грузим
   // его и подставляем короткую ссылку в поле, без сторонних сервисов.
   const [загрузка, setЗагрузка] = useState<"idle" | "loading" | "error" | "big">("idle");
   const загрузитьФайл = (file: File) => {
-    if (file.size > 15 * 1024 * 1024) { setЗагрузка("big"); return; }
+    if (file.size > 15 * 1024 * 1024) {
+      setЗагрузка("big");
+      return;
+    }
     setЗагрузка("loading");
     const r = new FileReader();
     r.onload = async () => {
@@ -110,9 +185,14 @@ export default function AdsManager() {
       advertiser: newVideo.advertiser || "Рекламодатель",
       type: "interstitial",
       target: "Полный экран",
-      budget: 0, spent: 0, clicks: 0, impressions: 0,
+      budget: 0,
+      spent: 0,
+      clicks: 0,
+      impressions: 0,
       status: "active",
-      startDate: "", endDate: "", bid: 0,
+      startDate: "",
+      endDate: "",
+      bid: 0,
       emoji: "🎬",
       label: newVideo.advertiser || "РЕКЛАМА",
       title: newVideo.title || newVideo.advertiser || "Реклама",
@@ -125,22 +205,38 @@ export default function AdsManager() {
       skipAfter: Math.max(0, Number(newVideo.skipAfter) || 10),
     };
     setAds((prev) => [ad, ...prev]);
-    setNewVideo({ advertiser: "", title: "", cta: "Подробнее", videoUrl: "", url: "", city: "", skipAfter: "10", color: "#1B6B8A" });
+    setNewVideo({
+      advertiser: "",
+      title: "",
+      cta: "Подробнее",
+      videoUrl: "",
+      url: "",
+      city: "",
+      skipAfter: "10",
+      color: "#1B6B8A",
+    });
   };
   const removeAd = (id: string) => setAds((prev) => prev.filter((a) => a.id !== id));
   const [showAddPromo, setShowAddPromo] = useState(false);
-  const [newPromo, setNewPromo] = useState({ business: "", city: "", category: "restaurant", monthlyFee: "" });
+  const [newPromo, setNewPromo] = useState({
+    business: "",
+    city: "",
+    category: "restaurant",
+    monthlyFee: "",
+  });
 
-  const totalRevenue = promos.filter(p => p.active).reduce((s, p) => s + p.monthlyFee, 0);
-  const activeAds = ads.filter(a => a.status === "active").length;
+  const totalRevenue = promos.filter((p) => p.active).reduce((s, p) => s + p.monthlyFee, 0);
+  const activeAds = ads.filter((a) => a.status === "active").length;
   const totalAdSpend = ads.reduce((s, a) => s + a.spent, 0);
 
   const togglePromo = (id: string) => {
-    setPromos(prev => prev.map(p => p.id === id ? { ...p, active: !p.active } : p));
+    setPromos((prev) => prev.map((p) => (p.id === id ? { ...p, active: !p.active } : p)));
   };
 
   const toggleAd = (id: string) => {
-    setAds(prev => prev.map(a => a.id === id ? { ...a, status: a.status === "active" ? "paused" : "active" } : a));
+    setAds((prev) =>
+      prev.map((a) => (a.id === id ? { ...a, status: a.status === "active" ? "paused" : "active" } : a)),
+    );
   };
 
   const submitAd = () => {
@@ -167,9 +263,18 @@ export default function AdsManager() {
       color: "#1B6B8A",
       imageUrl: newAd.imageUrl.trim() || undefined,
     };
-    setAds(prev => [ad, ...prev]);
+    setAds((prev) => [ad, ...prev]);
     setTab("ads");
-    setNewAd({ advertiser: "", type: "banner", target: "", budget: "", bid: "", startDate: "", endDate: "", imageUrl: "" });
+    setNewAd({
+      advertiser: "",
+      type: "banner",
+      target: "",
+      budget: "",
+      bid: "",
+      startDate: "",
+      endDate: "",
+      imageUrl: "",
+    });
   };
 
   return (
@@ -180,24 +285,51 @@ export default function AdsManager() {
         action={<Btn onClick={() => setTab("new")}>+ Новая кампания</Btn>}
       />
 
-      {/* Summary stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-7">
         {[
           { label: "ДОХОД ОТ ПРОДВИЖЕНИЙ", val: `$${totalRevenue}`, color: "var(--color-teal)" },
           { label: "АКТИВНЫХ КАМПАНИЙ", val: String(activeAds), color: "var(--color-amber)" },
-          { label: "ПОТРАЧЕНО НА РЕКЛАМУ", val: `$${totalAdSpend.toLocaleString()}`, color: "var(--color-text)" },
-          { label: "ВСЕГО ПОКАЗОВ", val: ads.reduce((s, a) => s + a.impressions, 0).toLocaleString(), color: "var(--color-text)" },
+          {
+            label: "ПОТРАЧЕНО НА РЕКЛАМУ",
+            val: `$${totalAdSpend.toLocaleString()}`,
+            color: "var(--color-text)",
+          },
+          {
+            label: "ВСЕГО ПОКАЗОВ",
+            val: ads.reduce((s, a) => s + a.impressions, 0).toLocaleString(),
+            color: "var(--color-text)",
+          },
         ].map((s) => (
-          <div key={s.label} className="rounded-lg px-4 py-3" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }}>
-            <div className="text-xs mb-1.5" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>{s.label}</div>
-            <div className="text-2xl font-semibold" style={{ fontFamily: "var(--font-display)", color: s.color }}>{s.val}</div>
+          <div
+            key={s.label}
+            className="rounded-lg px-4 py-3"
+            style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }}
+          >
+            <div
+              className="text-xs mb-1.5"
+              style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+            >
+              {s.label}
+            </div>
+            <div
+              className="text-2xl font-semibold"
+              style={{ fontFamily: "var(--font-display)", color: s.color }}
+            >
+              {s.val}
+            </div>
           </div>
         ))}
       </div>
 
-      {/* Tabs */}
       <div className="flex flex-wrap gap-1 mb-6">
-        {([["ads", "Кампании"], ["video", "Видео на весь экран"], ["promotions", "Продвижение листинга"], ["new", "+ Новая кампания"]] as const).map(([id, label]) => (
+        {(
+          [
+            ["ads", "Кампании"],
+            ["video", "Видео на весь экран"],
+            ["promotions", "Продвижение листинга"],
+            ["new", "+ Новая кампания"],
+          ] as const
+        ).map(([id, label]) => (
           <button
             key={id}
             onClick={() => setTab(id)}
@@ -227,14 +359,24 @@ export default function AdsManager() {
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2.5 flex-wrap">
-                      <span className="font-medium text-sm" style={{ color: "var(--color-text)" }}>{ad.advertiser}</span>
+                      <span className="font-medium text-sm" style={{ color: "var(--color-text)" }}>
+                        {ad.advertiser}
+                      </span>
                       <Badge
                         label={AD_TYPE_LABELS[ad.type]}
                         color={ad.type === "spotlight" ? "amber" : ad.type === "push" ? "rose" : "dim"}
                       />
                       <Badge
                         label={ad.status}
-                        color={ad.status === "active" ? "teal" : ad.status === "ended" ? "dim" : ad.status === "pending" ? "amber" : "rose"}
+                        color={
+                          ad.status === "active"
+                            ? "teal"
+                            : ad.status === "ended"
+                            ? "dim"
+                            : ad.status === "pending"
+                            ? "amber"
+                            : "rose"
+                        }
                       />
                     </div>
                     <div className="text-xs mt-1" style={{ color: "var(--color-muted)" }}>
@@ -243,7 +385,11 @@ export default function AdsManager() {
                   </div>
                   <div className="flex flex-wrap gap-2 shrink-0">
                     {ad.status !== "ended" && (
-                      <Btn variant={ad.status === "active" ? "danger" : "ghost"} small onClick={() => toggleAd(ad.id)}>
+                      <Btn
+                        variant={ad.status === "active" ? "danger" : "ghost"}
+                        small
+                        onClick={() => toggleAd(ad.id)}
+                      >
                         {ad.status === "active" ? "Приостановить" : "Активировать"}
                       </Btn>
                     )}
@@ -258,23 +404,44 @@ export default function AdsManager() {
                     { label: "ПОКАЗЫ", val: ad.impressions.toLocaleString() },
                   ].map((s) => (
                     <div key={s.label}>
-                      <div className="text-xs mb-0.5" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>{s.label}</div>
-                      <div className="text-sm font-medium" style={{ color: "var(--color-text)", fontFamily: "var(--font-mono)" }}>{s.val}</div>
+                      <div
+                        className="text-xs mb-0.5"
+                        style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+                      >
+                        {s.label}
+                      </div>
+                      <div
+                        className="text-sm font-medium"
+                        style={{ color: "var(--color-text)", fontFamily: "var(--font-mono)" }}
+                      >
+                        {s.val}
+                      </div>
                     </div>
                   ))}
                 </div>
 
                 <div className="mt-3">
-                  <div className="flex flex-wrap justify-between gap-2 text-xs mb-1" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
+                  <div
+                    className="flex flex-wrap justify-between gap-2 text-xs mb-1"
+                    style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+                  >
                     <span>Использовано бюджета</span>
                     <span>{pct}%</span>
                   </div>
-                  <div className="h-1 rounded-full overflow-hidden" style={{ background: "var(--color-dim)" }}>
+                  <div
+                    className="h-1 rounded-full overflow-hidden"
+                    style={{ background: "var(--color-dim)" }}
+                  >
                     <div
                       className="h-full rounded-full"
                       style={{
                         width: `${Math.min(pct, 100)}%`,
-                        background: pct > 90 ? "var(--color-rose)" : pct > 60 ? "var(--color-amber)" : "var(--color-teal)",
+                        background:
+                          pct > 90
+                            ? "var(--color-rose)"
+                            : pct > 60
+                            ? "var(--color-amber)"
+                            : "var(--color-teal)",
                       }}
                     />
                   </div>
@@ -292,47 +459,93 @@ export default function AdsManager() {
             <div className="flex items-center justify-between mb-4">
               <SectionTitle>Как часто показывать</SectionTitle>
               {policyState !== "idle" && (
-                <span className="text-xs" style={{ color: policyState === "saved" ? "var(--color-teal)" : "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
+                <span
+                  className="text-xs"
+                  style={{
+                    color: policyState === "saved" ? "var(--color-teal)" : "var(--color-muted)",
+                    fontFamily: "var(--font-mono)",
+                  }}
+                >
                   {policyState === "saving" ? "Сохраняю…" : "✓ Сохранено"}
                 </span>
               )}
             </div>
 
             <label className="flex items-center justify-between gap-3 mb-4 cursor-pointer">
-              <span className="text-sm" style={{ color: "var(--color-text)" }}>Показывать полноэкранную видео-рекламу</span>
+              <span className="text-sm" style={{ color: "var(--color-text)" }}>
+                Показывать полноэкранную видео-рекламу
+              </span>
               <button
                 onClick={() => savePolicy({ fullscreen: !(policy?.fullscreen ?? true) })}
                 className="w-11 h-6 rounded-full transition-all shrink-0 relative cursor-pointer"
-                style={{ background: (policy?.fullscreen ?? true) ? "var(--color-teal)" : "var(--color-dim)" }}
+                style={{ background: policy?.fullscreen ?? true ? "var(--color-teal)" : "var(--color-dim)" }}
               >
-                <span className="absolute top-0.5 w-5 h-5 rounded-full transition-all" style={{ background: "#fff", left: (policy?.fullscreen ?? true) ? "22px" : "2px" }} />
+                <span
+                  className="absolute top-0.5 w-5 h-5 rounded-full transition-all"
+                  style={{ background: "#fff", left: policy?.fullscreen ?? true ? "22px" : "2px" }}
+                />
               </button>
             </label>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="text-xs mb-1.5 block" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>НЕ ЧАЩЕ РАЗА В (МИНУТ)</label>
+                <label
+                  className="text-xs mb-1.5 block"
+                  style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+                >
+                  НЕ ЧАЩЕ РАЗА В (МИНУТ)
+                </label>
                 <input
-                  type="number" min={0} value={policy?.everyMinutes ?? 4}
-                  onChange={(e) => setPolicy((p) => ({ ...(p ?? { fullscreen: true, everyMinutes: 4, everyNav: 3 }), everyMinutes: Number(e.target.value) }))}
+                  type="number"
+                  min={0}
+                  value={policy?.everyMinutes ?? 4}
+                  onChange={(e) =>
+                    setPolicy((p) => ({
+                      ...(p ?? { fullscreen: true, everyMinutes: 4, everyNav: 3 }),
+                      everyMinutes: Number(e.target.value),
+                    }))
+                  }
                   onBlur={(e) => savePolicy({ everyMinutes: Number(e.target.value) })}
                   className="w-full rounded px-3 py-2 text-sm outline-none"
-                  style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", color: "var(--color-text)", fontFamily: "var(--font-body)" }}
+                  style={{
+                    background: "var(--color-surface)",
+                    border: "1px solid var(--color-border)",
+                    color: "var(--color-text)",
+                    fontFamily: "var(--font-body)",
+                  }}
                 />
               </div>
               <div>
-                <label className="text-xs mb-1.5 block" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>ПОКАЗ НА КАЖДЫЙ N-Й ПЕРЕХОД</label>
+                <label
+                  className="text-xs mb-1.5 block"
+                  style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+                >
+                  ПОКАЗ НА КАЖДЫЙ N-Й ПЕРЕХОД
+                </label>
                 <input
-                  type="number" min={1} value={policy?.everyNav ?? 3}
-                  onChange={(e) => setPolicy((p) => ({ ...(p ?? { fullscreen: true, everyMinutes: 4, everyNav: 3 }), everyNav: Number(e.target.value) }))}
+                  type="number"
+                  min={1}
+                  value={policy?.everyNav ?? 3}
+                  onChange={(e) =>
+                    setPolicy((p) => ({
+                      ...(p ?? { fullscreen: true, everyMinutes: 4, everyNav: 3 }),
+                      everyNav: Number(e.target.value),
+                    }))
+                  }
                   onBlur={(e) => savePolicy({ everyNav: Number(e.target.value) })}
                   className="w-full rounded px-3 py-2 text-sm outline-none"
-                  style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", color: "var(--color-text)", fontFamily: "var(--font-body)" }}
+                  style={{
+                    background: "var(--color-surface)",
+                    border: "1px solid var(--color-border)",
+                    color: "var(--color-text)",
+                    fontFamily: "var(--font-body)",
+                  }}
                 />
               </div>
             </div>
             <p className="text-xs mt-3" style={{ color: "var(--color-faint)" }}>
-              Оба условия должны совпасть: реклама выскочит на каждый N-й переход, но не чаще раза в заданные минуты. Premium-подписчики её не видят.
+              Оба условия должны совпасть: реклама выскочит на каждый N-й переход, но не чаще раза в заданные
+              минуты. Premium-подписчики её не видят.
             </p>
           </Card>
 
@@ -343,21 +556,35 @@ export default function AdsManager() {
               {[
                 { key: "advertiser", label: "Рекламодатель", ph: "напр. Coca-Cola" },
                 { key: "title", label: "Заголовок", ph: "Освежись в дороге" },
-                { key: "videoUrl", label: "Ссылка на ролик (или загрузите файл ниже)", ph: "заполнится сама при загрузке файла" },
+                {
+                  key: "videoUrl",
+                  label: "Ссылка на ролик (или загрузите файл ниже)",
+                  ph: "заполнится сама при загрузке файла",
+                },
                 { key: "url", label: "Куда ведёт клик", ph: "https://…" },
                 { key: "cta", label: "Текст кнопки", ph: "Подробнее" },
                 { key: "city", label: "Город показа (пусто — везде)", ph: "Самарканд" },
                 { key: "skipAfter", label: "Кнопка «Пропустить» через (сек)", ph: "10" },
               ].map((f) => (
                 <div key={f.key} className={f.key === "videoUrl" ? "sm:col-span-2" : ""}>
-                  <label className="text-xs mb-1.5 block" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>{f.label.toUpperCase()}</label>
+                  <label
+                    className="text-xs mb-1.5 block"
+                    style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+                  >
+                    {f.label.toUpperCase()}
+                  </label>
                   <input
                     type={f.key === "skipAfter" ? "number" : "text"}
                     placeholder={f.ph}
                     value={(newVideo as Record<string, string>)[f.key]}
                     onChange={(e) => setNewVideo((p) => ({ ...p, [f.key]: e.target.value }))}
                     className="w-full rounded px-3 py-2 text-sm outline-none"
-                    style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", color: "var(--color-text)", fontFamily: "var(--font-body)" }}
+                    style={{
+                      background: "var(--color-surface)",
+                      border: "1px solid var(--color-border)",
+                      color: "var(--color-text)",
+                      fontFamily: "var(--font-body)",
+                    }}
                   />
                 </div>
               ))}
@@ -365,23 +592,54 @@ export default function AdsManager() {
                   ложится в базу и играет сразу, со звуком, на любом
                   телефоне. YouTube/Google Drive для этого не годятся. */}
               <div className="sm:col-span-2">
-                <label className="text-xs mb-1.5 block" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>ИЛИ ЗАГРУЗИТЕ ФАЙЛ mp4 (до 15 МБ)</label>
+                <label
+                  className="text-xs mb-1.5 block"
+                  style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+                >
+                  ИЛИ ЗАГРУЗИТЕ ФАЙЛ mp4 (до 15 МБ)
+                </label>
                 <input
                   type="file"
                   accept="video/mp4,video/*"
-                  onChange={(e) => { const f = e.target.files?.[0]; if (f) загрузитьФайл(f); e.target.value = ""; }}
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) загрузитьФайл(f);
+                    e.target.value = "";
+                  }}
                   className="w-full text-sm"
                   style={{ color: "var(--color-muted)" }}
                 />
-                {загрузка === "loading" && <p className="mt-1.5 text-xs" style={{ color: "var(--color-amber)" }}>Загружаю ролик…</p>}
-                {загрузка === "error" && <p className="mt-1.5 text-xs" style={{ color: "var(--color-rose)" }}>Не удалось загрузить. Попробуйте ещё раз.</p>}
-                {загрузка === "big" && <p className="mt-1.5 text-xs" style={{ color: "var(--color-rose)" }}>Файл больше 15 МБ — сожмите или укоротите ролик.</p>}
-                {загрузка === "idle" && newVideo.videoUrl.startsWith("/api/ad-media/") && <p className="mt-1.5 text-xs" style={{ color: "var(--color-teal)" }}>✓ Ролик загружен и подставлен в ссылку.</p>}
+                {загрузка === "loading" && (
+                  <p className="mt-1.5 text-xs" style={{ color: "var(--color-amber)" }}>
+                    Загружаю ролик…
+                  </p>
+                )}
+                {загрузка === "error" && (
+                  <p className="mt-1.5 text-xs" style={{ color: "var(--color-rose)" }}>
+                    Не удалось загрузить. Попробуйте ещё раз.
+                  </p>
+                )}
+                {загрузка === "big" && (
+                  <p className="mt-1.5 text-xs" style={{ color: "var(--color-rose)" }}>
+                    Файл больше 15 МБ — сожмите или укоротите ролик.
+                  </p>
+                )}
+                {загрузка === "idle" && newVideo.videoUrl.startsWith("/api/ad-media/") && (
+                  <p className="mt-1.5 text-xs" style={{ color: "var(--color-teal)" }}>
+                    ✓ Ролик загружен и подставлен в ссылку.
+                  </p>
+                )}
               </div>
               <div>
-                <label className="text-xs mb-1.5 block" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>ЦВЕТ КНОПКИ</label>
+                <label
+                  className="text-xs mb-1.5 block"
+                  style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+                >
+                  ЦВЕТ КНОПКИ
+                </label>
                 <input
-                  type="color" value={newVideo.color}
+                  type="color"
+                  value={newVideo.color}
                   onChange={(e) => setNewVideo((p) => ({ ...p, color: e.target.value }))}
                   className="w-full h-9 rounded cursor-pointer"
                   style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }}
@@ -397,28 +655,63 @@ export default function AdsManager() {
           <div>
             <SectionTitle>Ролики ({videoAds.length})</SectionTitle>
             {videoAds.length === 0 ? (
-              <div className="rounded-lg p-6 text-center text-sm" style={{ border: "1px dashed var(--color-border)", color: "var(--color-faint)" }}>
+              <div
+                className="rounded-lg p-6 text-center text-sm"
+                style={{ border: "1px dashed var(--color-border)", color: "var(--color-faint)" }}
+              >
                 Пока нет ни одного ролика. Добавьте выше — и он начнёт показываться туристам на весь экран.
               </div>
             ) : (
               <div className="flex flex-col gap-3">
                 {videoAds.map((ad) => (
-                  <div key={ad.id} className="rounded-lg p-4 flex flex-wrap items-center gap-3" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }}>
-                    <span className="w-10 h-10 rounded-lg flex items-center justify-center text-lg shrink-0" style={{ background: "var(--color-dim)" }}>🎬</span>
+                  <div
+                    key={ad.id}
+                    className="rounded-lg p-4 flex flex-wrap items-center gap-3"
+                    style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }}
+                  >
+                    <span
+                      className="w-10 h-10 rounded-lg flex items-center justify-center text-lg shrink-0"
+                      style={{ background: "var(--color-dim)" }}
+                    >
+                      🎬
+                    </span>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap mb-0.5">
-                        <span className="font-medium text-sm" style={{ color: "var(--color-text)" }}>{ad.advertiser}</span>
-                        <Badge label={ad.status === "active" ? "показывается" : "пауза"} color={ad.status === "active" ? "teal" : "rose"} />
+                        <span className="font-medium text-sm" style={{ color: "var(--color-text)" }}>
+                          {ad.advertiser}
+                        </span>
+                        <Badge
+                          label={ad.status === "active" ? "показывается" : "пауза"}
+                          color={ad.status === "active" ? "teal" : "rose"}
+                        />
                         <Badge label={`пропуск через ${ad.skipAfter ?? 5}с`} color="dim" />
-                        {ad.city && <span className="text-xs" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>📍 {ad.city}</span>}
+                        {ad.city && (
+                          <span
+                            className="text-xs"
+                            style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+                          >
+                            📍 {ad.city}
+                          </span>
+                        )}
                       </div>
-                      <div className="text-xs truncate" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>{ad.videoUrl}</div>
+                      <div
+                        className="text-xs truncate"
+                        style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+                      >
+                        {ad.videoUrl}
+                      </div>
                     </div>
                     <div className="flex flex-wrap gap-2 shrink-0">
-                      <Btn variant={ad.status === "active" ? "danger" : "ghost"} small onClick={() => toggleAd(ad.id)}>
+                      <Btn
+                        variant={ad.status === "active" ? "danger" : "ghost"}
+                        small
+                        onClick={() => toggleAd(ad.id)}
+                      >
                         {ad.status === "active" ? "Пауза" : "Включить"}
                       </Btn>
-                      <Btn variant="ghost" small onClick={() => removeAd(ad.id)}>Удалить</Btn>
+                      <Btn variant="ghost" small onClick={() => removeAd(ad.id)}>
+                        Удалить
+                      </Btn>
                     </div>
                   </div>
                 ))}
@@ -433,9 +726,14 @@ export default function AdsManager() {
           <ДемоРаздел что="Платного продвижения листингов пока нет: приложение не поднимает заведения по этим записям, они здесь для примера." />
           <div
             className="rounded-lg px-4 py-3 mb-5 text-sm"
-            style={{ background: "color-mix(in srgb, var(--color-amber) 8%, transparent)", border: "1px solid color-mix(in srgb, var(--color-amber) 20%, transparent)", color: "var(--color-amber-light)" }}
+            style={{
+              background: "color-mix(in srgb, var(--color-amber) 8%, transparent)",
+              border: "1px solid color-mix(in srgb, var(--color-amber) 20%, transparent)",
+              color: "var(--color-amber-light)",
+            }}
           >
-            💰 Бизнесы платят ежемесячную плату для повышения позиции в результатах поиска. Рейтинг ниже показывает продвинутую позицию по сравнению с органической.
+            💰 Бизнесы платят ежемесячную плату для повышения позиции в результатах поиска. Рейтинг ниже
+            показывает продвинутую позицию по сравнению с органической.
           </div>
 
           <div className="grid gap-3">
@@ -445,32 +743,55 @@ export default function AdsManager() {
                 className="rounded-lg p-4 flex flex-wrap items-center gap-4"
                 style={{
                   background: "var(--color-panel)",
-                  border: `1px solid ${p.active ? "color-mix(in srgb, var(--color-amber) 30%, transparent)" : "var(--color-border)"}`,
+                  border: `1px solid ${
+                    p.active
+                      ? "color-mix(in srgb, var(--color-amber) 30%, transparent)"
+                      : "var(--color-border)"
+                  }`,
                 }}
               >
                 <div
                   className="w-8 h-8 rounded flex items-center justify-center text-sm font-bold shrink-0"
-                  style={{ background: p.active ? "var(--color-amber)" : "var(--color-dim)", color: p.active ? "var(--color-on-accent)" : "var(--color-muted)" }}
+                  style={{
+                    background: p.active ? "var(--color-amber)" : "var(--color-dim)",
+                    color: p.active ? "var(--color-on-accent)" : "var(--color-muted)",
+                  }}
                 >
                   #{idx + 1}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-medium text-sm" style={{ color: "var(--color-text)" }}>{p.business}</span>
+                    <span className="font-medium text-sm" style={{ color: "var(--color-text)" }}>
+                      {p.business}
+                    </span>
                     <Badge label={p.category} color="dim" />
-                    <span className="text-xs" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>📍 {p.city}</span>
+                    <span
+                      className="text-xs"
+                      style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+                    >
+                      📍 {p.city}
+                    </span>
                   </div>
-                  <div className="text-xs mt-0.5 flex flex-wrap gap-3" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
+                  <div
+                    className="text-xs mt-0.5 flex flex-wrap gap-3"
+                    style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+                  >
                     <span>Органическая позиция: #{p.currentRank}</span>
                     <span style={{ color: "var(--color-amber)" }}>→ Продвинутая: #{p.boostedRank}</span>
                     <span>С {p.since}</span>
                   </div>
                 </div>
                 <div className="text-right shrink-0">
-                  <div className="text-base font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--color-teal)" }}>
+                  <div
+                    className="text-base font-semibold"
+                    style={{ fontFamily: "var(--font-display)", color: "var(--color-teal)" }}
+                  >
                     ${p.monthlyFee}/mo
                   </div>
-                  <div className="text-xs mt-0.5" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
+                  <div
+                    className="text-xs mt-0.5"
+                    style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+                  >
                     {p.active ? "Активна" : "Приостановлена"}
                   </div>
                 </div>
@@ -488,8 +809,12 @@ export default function AdsManager() {
             style={{ background: "var(--color-surface)", border: "1px dashed var(--color-border)" }}
           >
             <div>
-              <div className="text-sm font-medium" style={{ color: "var(--color-muted)" }}>Добавить бизнес в продвижение</div>
-              <div className="text-xs mt-0.5" style={{ color: "var(--color-faint)" }}>Рестораны, отели, достопримечательности, туры</div>
+              <div className="text-sm font-medium" style={{ color: "var(--color-muted)" }}>
+                Добавить бизнес в продвижение
+              </div>
+              <div className="text-xs mt-0.5" style={{ color: "var(--color-faint)" }}>
+                Рестораны, отели, достопримечательности, туры
+              </div>
             </div>
             <Btn onClick={() => setShowAddPromo(true)}>+ Добавить продвижение</Btn>
           </div>
@@ -503,20 +828,27 @@ export default function AdsManager() {
             {[
               { label: "Имя рекламодателя", key: "advertiser", placeholder: "напр. Samarkand Hotel Group" },
               { label: "Фото товара (ссылка)", key: "imageUrl", placeholder: "https://…/photo.jpg" },
-              { label: "Место размещения", key: "target", placeholder: "напр. Страница отелей, Главный баннер" },
+              {
+                label: "Место размещения",
+                key: "target",
+                placeholder: "напр. Страница отелей, Главный баннер",
+              },
               { label: "Бюджет ($)", key: "budget", placeholder: "500" },
               { label: "Макс. ставка CPC ($)", key: "bid", placeholder: "0.50" },
               { label: "Дата начала", key: "startDate", placeholder: "Sep 5, 2026" },
               { label: "Дата окончания", key: "endDate", placeholder: "Oct 5, 2026" },
             ].map((f) => (
               <div key={f.key}>
-                <label className="text-xs mb-1.5 block" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
+                <label
+                  className="text-xs mb-1.5 block"
+                  style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+                >
                   {f.label.toUpperCase()}
                 </label>
                 <input
                   type="text"
                   placeholder={f.placeholder}
-                  value={(newAd as any)[f.key]}
+                  value={newAd[f.key as keyof typeof newAd]}
                   onChange={(e) => setNewAd((p) => ({ ...p, [f.key]: e.target.value }))}
                   className="w-full rounded px-3 py-2 text-sm outline-none"
                   style={{
@@ -529,12 +861,17 @@ export default function AdsManager() {
               </div>
             ))}
             <div>
-              <label className="text-xs mb-1.5 block" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>ТИП РЕКЛАМЫ</label>
+              <label
+                className="text-xs mb-1.5 block"
+                style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+              >
+                ТИП РЕКЛАМЫ
+              </label>
               <div className="flex gap-2 flex-wrap">
                 {(["banner", "spotlight", "top_listing", "push"] as const).map((t) => (
                   <button
                     key={t}
-                    onClick={() => setNewAd(p => ({ ...p, type: t }))}
+                    onClick={() => setNewAd((p) => ({ ...p, type: t }))}
                     className="px-3 py-1.5 rounded text-xs cursor-pointer transition-all"
                     style={{
                       background: newAd.type === t ? "var(--color-amber)" : "var(--color-surface)",
@@ -548,7 +885,9 @@ export default function AdsManager() {
               </div>
             </div>
             <div className="flex flex-wrap gap-3 pt-2">
-              <Btn variant="ghost" onClick={() => setTab("ads")}>Отмена</Btn>
+              <Btn variant="ghost" onClick={() => setTab("ads")}>
+                Отмена
+              </Btn>
               <Btn onClick={submitAd}>Запустить кампанию</Btn>
             </div>
           </div>
@@ -556,66 +895,157 @@ export default function AdsManager() {
       )}
 
       {showAddPromo && (
-        <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: "rgba(0,0,0,0.7)" }} onClick={() => setShowAddPromo(false)}>
-          <div className="rounded-2xl w-full max-w-md p-6" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }} onClick={e => e.stopPropagation()}>
+        <div
+          className="fixed inset-0 flex items-center justify-center z-50"
+          style={{ background: "rgba(0,0,0,0.7)" }}
+          onClick={() => setShowAddPromo(false)}
+        >
+          <div
+            className="rounded-2xl w-full max-w-md p-6"
+            style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }}
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex flex-wrap items-center justify-between gap-2 mb-5">
-              <h3 className="text-lg font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}>Добавить продвижение</h3>
-              <button onClick={() => setShowAddPromo(false)} className="opacity-50 hover:opacity-100 cursor-pointer text-xl" style={{ color: "var(--color-text)" }}>×</button>
+              <h3
+                className="text-lg font-semibold"
+                style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}
+              >
+                Добавить продвижение
+              </h3>
+              <button
+                onClick={() => setShowAddPromo(false)}
+                className="opacity-50 hover:opacity-100 cursor-pointer text-xl"
+                style={{ color: "var(--color-text)" }}
+              >
+                ×
+              </button>
             </div>
             <div className="flex flex-col gap-3 mb-4">
               <div>
-                <label className="text-xs block mb-1" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>НАЗВАНИЕ БИЗНЕСА</label>
-                <input type="text" placeholder="напр. Плов Центр Тошкент" value={newPromo.business}
-                  onChange={e => setNewPromo(p => ({ ...p, business: e.target.value }))}
+                <label
+                  className="text-xs block mb-1"
+                  style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+                >
+                  НАЗВАНИЕ БИЗНЕСА
+                </label>
+                <input
+                  type="text"
+                  placeholder="напр. Плов Центр Тошкент"
+                  value={newPromo.business}
+                  onChange={(e) => setNewPromo((p) => ({ ...p, business: e.target.value }))}
                   className="w-full rounded px-3 py-2 text-sm outline-none"
-                  style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", color: "var(--color-text)", fontFamily: "var(--font-body)" }}
+                  style={{
+                    background: "var(--color-surface)",
+                    border: "1px solid var(--color-border)",
+                    color: "var(--color-text)",
+                    fontFamily: "var(--font-body)",
+                  }}
                 />
               </div>
               <div>
-                <label className="text-xs block mb-1" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>ГОРОД</label>
-                <input type="text" placeholder="Tashkent" value={newPromo.city}
-                  onChange={e => setNewPromo(p => ({ ...p, city: e.target.value }))}
+                <label
+                  className="text-xs block mb-1"
+                  style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+                >
+                  ГОРОД
+                </label>
+                <input
+                  type="text"
+                  placeholder="Tashkent"
+                  value={newPromo.city}
+                  onChange={(e) => setNewPromo((p) => ({ ...p, city: e.target.value }))}
                   className="w-full rounded px-3 py-2 text-sm outline-none"
-                  style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", color: "var(--color-text)", fontFamily: "var(--font-body)" }}
+                  style={{
+                    background: "var(--color-surface)",
+                    border: "1px solid var(--color-border)",
+                    color: "var(--color-text)",
+                    fontFamily: "var(--font-body)",
+                  }}
                 />
               </div>
               <div>
-                <label className="text-xs block mb-2" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>КАТЕГОРИЯ</label>
+                <label
+                  className="text-xs block mb-2"
+                  style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+                >
+                  КАТЕГОРИЯ
+                </label>
                 <div className="flex gap-2 flex-wrap">
-                  {(["restaurant","hotel","tour","attraction"] as const).map(c => (
-                    <button key={c} onClick={() => setNewPromo(p => ({ ...p, category: c }))}
+                  {(["restaurant", "hotel", "tour", "attraction"] as const).map((c) => (
+                    <button
+                      key={c}
+                      onClick={() => setNewPromo((p) => ({ ...p, category: c }))}
                       className="px-3 py-1.5 rounded text-xs cursor-pointer capitalize"
-                      style={{ background: newPromo.category === c ? "var(--color-amber)" : "var(--color-surface)", color: newPromo.category === c ? "var(--color-on-accent)" : "var(--color-muted)", border: "1px solid var(--color-border)", fontFamily: "var(--font-mono)" }}
-                    >{{ restaurant: "Ресторан", hotel: "Отель", tour: "Тур", attraction: "Достопримечательность" }[c]}</button>
+                      style={{
+                        background: newPromo.category === c ? "var(--color-amber)" : "var(--color-surface)",
+                        color: newPromo.category === c ? "var(--color-on-accent)" : "var(--color-muted)",
+                        border: "1px solid var(--color-border)",
+                        fontFamily: "var(--font-mono)",
+                      }}
+                    >
+                      {
+                        {
+                          restaurant: "Ресторан",
+                          hotel: "Отель",
+                          tour: "Тур",
+                          attraction: "Достопримечательность",
+                        }[c]
+                      }
+                    </button>
                   ))}
                 </div>
               </div>
               <div>
-                <label className="text-xs block mb-1" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>ЕЖЕМЕСЯЧНАЯ ПЛАТА ($)</label>
-                <input type="number" placeholder="150" value={newPromo.monthlyFee}
-                  onChange={e => setNewPromo(p => ({ ...p, monthlyFee: e.target.value }))}
+                <label
+                  className="text-xs block mb-1"
+                  style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+                >
+                  ЕЖЕМЕСЯЧНАЯ ПЛАТА ($)
+                </label>
+                <input
+                  type="number"
+                  placeholder="150"
+                  value={newPromo.monthlyFee}
+                  onChange={(e) => setNewPromo((p) => ({ ...p, monthlyFee: e.target.value }))}
                   className="w-full rounded px-3 py-2 text-sm outline-none"
-                  style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", color: "var(--color-text)", fontFamily: "var(--font-body)" }}
+                  style={{
+                    background: "var(--color-surface)",
+                    border: "1px solid var(--color-border)",
+                    color: "var(--color-text)",
+                    fontFamily: "var(--font-body)",
+                  }}
                 />
               </div>
             </div>
             <div className="flex flex-wrap gap-3">
-              <Btn variant="ghost" onClick={() => setShowAddPromo(false)}>Отмена</Btn>
-              <Btn onClick={() => {
-                if (!newPromo.business) return;
-                const maxRank = Math.max(...promos.map(p => p.boostedRank), 0);
-                setPromos(prev => [...prev, {
-                  id: `new-${Date.now()}`, business: newPromo.business,
-                  category: newPromo.category as Promotion["category"],
-                  currentRank: 99, boostedRank: maxRank + 1,
-                  monthlyFee: Number(newPromo.monthlyFee) || 100,
-                  active: true, since: new Date().toLocaleDateString("ru", { month: "short", year: "numeric" }),
-                  city: newPromo.city || "Tashkent",
-                }]);
-                setShowAddPromo(false);
-                setNewPromo({ business: "", city: "", category: "restaurant", monthlyFee: "" });
-                setTab("promotions");
-              }}>Добавить</Btn>
+              <Btn variant="ghost" onClick={() => setShowAddPromo(false)}>
+                Отмена
+              </Btn>
+              <Btn
+                onClick={() => {
+                  if (!newPromo.business) return;
+                  const maxRank = Math.max(...promos.map((p) => p.boostedRank), 0);
+                  setPromos((prev) => [
+                    ...prev,
+                    {
+                      id: `new-${Date.now()}`,
+                      business: newPromo.business,
+                      category: newPromo.category as Promotion["category"],
+                      currentRank: 99,
+                      boostedRank: maxRank + 1,
+                      monthlyFee: Number(newPromo.monthlyFee) || 100,
+                      active: true,
+                      since: new Date().toLocaleDateString("ru", { month: "short", year: "numeric" }),
+                      city: newPromo.city || "Tashkent",
+                    },
+                  ]);
+                  setShowAddPromo(false);
+                  setNewPromo({ business: "", city: "", category: "restaurant", monthlyFee: "" });
+                  setTab("promotions");
+                }}
+              >
+                Добавить
+              </Btn>
             </div>
           </div>
         </div>

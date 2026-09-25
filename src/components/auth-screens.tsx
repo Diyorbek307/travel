@@ -116,7 +116,9 @@ export function RegisterScreen({
   onDone: (user: PublicUser) => void;
 }) {
   const { t } = useT();
-  const [ждётКод, setЖдётКод] = useState<{ email: string; почтаНастроена: boolean; пауза: number } | null>(null);
+  const [ждётКод, setЖдётКод] = useState<{ email: string; почтаНастроена: boolean; пауза: number } | null>(
+    null,
+  );
   const [форма, setФорма] = useState({
     firstName: "",
     lastName: "",
@@ -382,11 +384,7 @@ export function VerifyScreen({
   }
 
   return (
-    <Обёртка
-      заголовок={t("verify_title")}
-      подпись={`${t("verify_sent_to")} ${email}`}
-      onBack={onBack}
-    >
+    <Обёртка заголовок={t("verify_title")} подпись={`${t("verify_sent_to")} ${email}`} onBack={onBack}>
       <form onSubmit={отправить} className="flex flex-col gap-3">
         <input
           required
@@ -429,9 +427,7 @@ export function VerifyScreen({
           className="py-2 text-sm disabled:opacity-50"
           style={{ color: "rgba(255,255,255,0.7)" }}
         >
-          {осталось > 0
-            ? t("verify_resend_in").replace("{n}", String(осталось))
-            : t("verify_resend")}
+          {осталось > 0 ? t("verify_resend_in").replace("{n}", String(осталось)) : t("verify_resend")}
         </button>
       </form>
     </Обёртка>
@@ -608,11 +604,7 @@ function ForgotScreen({ onBack, email: начальный }: { onBack: () => voi
   }
 
   return (
-    <Обёртка
-      заголовок={t("forgot_title")}
-      подпись={t("forgot_sub")}
-      onBack={onBack}
-    >
+    <Обёртка заголовок={t("forgot_title")} подпись={t("forgot_sub")} onBack={onBack}>
       <form onSubmit={отправить} className="flex flex-col gap-3">
         <input
           required
@@ -641,4 +633,3 @@ function ForgotScreen({ onBack, email: начальный }: { onBack: () => voi
 export function AuthSplash() {
   return <div className="h-full w-full" style={{ background: CREAM }} aria-hidden />;
 }
-

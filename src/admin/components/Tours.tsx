@@ -3,33 +3,32 @@ import { PageHeader, Badge, Btn, Table } from "./shared";
 import { useEntity } from "../context/useEntity";
 import type { ManagedRoute as Tour } from "@/lib/types";
 
-
-
 export default function Tours() {
   const [tours, setTours] = useEntity("routes");
   const [filter, setFilter] = useState("all");
   const [catFilter, setCatFilter] = useState("all");
   const [editing, setEditing] = useState<Tour | null>(null);
   const [showAdd, setShowAdd] = useState(false);
-  const [newTour, setNewTour] = useState({ title: "", duration: "", price: "", category: "Культура", guide: "", maxGroup: "" });
+  const [newTour, setNewTour] = useState({
+    title: "",
+    duration: "",
+    price: "",
+    category: "Культура",
+    guide: "",
+    maxGroup: "",
+  });
 
   const categories = ["all", ...Array.from(new Set(tours.map((t) => t.category)))];
   const statusFilter = filter === "all" ? tours : tours.filter((t) => t.status === filter);
   const filtered = catFilter === "all" ? statusFilter : statusFilter.filter((t) => t.category === catFilter);
 
-  const diffColor = (d: string) =>
-    d === "Лёгкий" ? "teal" : d === "Средний" ? "amber" : "rose";
+  const diffColor = (d: string) => (d === "Лёгкий" ? "teal" : d === "Средний" ? "amber" : "rose");
 
-  const statusColor = (s: string) =>
-    s === "active" ? "teal" : s === "draft" ? "dim" : "rose";
+  const statusColor = (s: string) => (s === "active" ? "teal" : s === "draft" ? "dim" : "rose");
 
   const toggleStatus = (id: string) => {
     setTours((prev) =>
-      prev.map((t) =>
-        t.id === id
-          ? { ...t, status: t.status === "active" ? "paused" : "active" }
-          : t
-      )
+      prev.map((t) => (t.id === id ? { ...t, status: t.status === "active" ? "paused" : "active" } : t)),
     );
   };
 
@@ -46,7 +45,12 @@ export default function Tours() {
       <div className="flex flex-wrap items-center gap-3 mb-6">
         <div className="flex gap-1.5 flex-wrap">
           {["all", "active", "paused", "draft"].map((f) => {
-            const statusLabel: Record<string, string> = { all: "Все", active: "Активные", paused: "Приостановлены", draft: "Черновик" };
+            const statusLabel: Record<string, string> = {
+              all: "Все",
+              active: "Активные",
+              paused: "Приостановлены",
+              draft: "Черновик",
+            };
             return (
               <button
                 key={f}
@@ -64,10 +68,7 @@ export default function Tours() {
             );
           })}
         </div>
-        <div
-          className="w-px h-5 shrink-0"
-          style={{ background: "var(--color-border)" }}
-        />
+        <div className="w-px h-5 shrink-0" style={{ background: "var(--color-border)" }} />
         <div className="flex gap-1.5 flex-wrap">
           {categories.map((c) => (
             <button
@@ -75,9 +76,14 @@ export default function Tours() {
               onClick={() => setCatFilter(c)}
               className="px-3 py-1.5 rounded text-xs transition-all cursor-pointer capitalize"
               style={{
-                background: catFilter === c ? "color-mix(in srgb, var(--color-amber) 15%, transparent)" : "transparent",
+                background:
+                  catFilter === c ? "color-mix(in srgb, var(--color-amber) 15%, transparent)" : "transparent",
                 color: catFilter === c ? "var(--color-amber)" : "var(--color-muted)",
-                border: `1px solid ${catFilter === c ? "color-mix(in srgb, var(--color-amber) 40%, transparent)" : "var(--color-border)"}`,
+                border: `1px solid ${
+                  catFilter === c
+                    ? "color-mix(in srgb, var(--color-amber) 40%, transparent)"
+                    : "var(--color-border)"
+                }`,
                 fontFamily: "var(--font-mono)",
               }}
             >
@@ -91,80 +97,174 @@ export default function Tours() {
         cols={["НАЗВАНИЕ", "ДЛИТЕЛЬНОСТЬ", "ЦЕНА", "СЛОЖНОСТЬ", "ОТПРАВЛЕНИЕ", "ГИД", "БРОНИ", "СТАТУС", ""]}
         rows={filtered.map((t) => [
           <div>
-            <div className="font-medium text-sm" style={{ color: "var(--color-text)" }}>{t.title}</div>
-            <div className="text-xs mt-0.5" style={{ color: "var(--color-muted)" }}>{t.category}</div>
+            <div className="font-medium text-sm" style={{ color: "var(--color-text)" }}>
+              {t.title}
+            </div>
+            <div className="text-xs mt-0.5" style={{ color: "var(--color-muted)" }}>
+              {t.category}
+            </div>
           </div>,
-          <span style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)", fontSize: "12px" }}>{t.duration}</span>,
-          <span style={{ color: "var(--color-text)", fontFamily: "var(--font-mono)" }}>${t.price.toLocaleString()}</span>,
-          <Badge label={t.difficulty} color={diffColor(t.difficulty) as any} />,
-          <span style={{ color: "var(--color-muted)", fontSize: "12px", fontFamily: "var(--font-mono)" }}>{t.nextDep}</span>,
+          <span style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)", fontSize: "12px" }}>
+            {t.duration}
+          </span>,
+          <span style={{ color: "var(--color-text)", fontFamily: "var(--font-mono)" }}>
+            ${t.price.toLocaleString()}
+          </span>,
+          <Badge label={t.difficulty} color={diffColor(t.difficulty)} />,
+          <span style={{ color: "var(--color-muted)", fontSize: "12px", fontFamily: "var(--font-mono)" }}>
+            {t.nextDep}
+          </span>,
           <span style={{ color: "var(--color-muted)", fontSize: "12px" }}>{t.guide}</span>,
           <div>
             <span style={{ color: "var(--color-text)", fontFamily: "var(--font-mono)" }}>{t.bookings}</span>
             <span style={{ color: "var(--color-muted)", fontSize: "11px" }}>/{t.maxGroup} max</span>
           </div>,
-          <Badge label={t.status} color={statusColor(t.status) as any} />,
+          <Badge label={t.status} color={statusColor(t.status)} />,
           <div className="flex flex-wrap gap-2">
-            <Btn variant="ghost" small onClick={() => setEditing(t)}>Изменить</Btn>
-            <Btn variant={t.status === "active" ? "danger" : "ghost"} small onClick={() => toggleStatus(t.id)}>
+            <Btn variant="ghost" small onClick={() => setEditing(t)}>
+              Изменить
+            </Btn>
+            <Btn
+              variant={t.status === "active" ? "danger" : "ghost"}
+              small
+              onClick={() => toggleStatus(t.id)}
+            >
               {t.status === "active" ? "Приостановить" : "Активировать"}
             </Btn>
           </div>,
         ])}
       />
 
-      {/* Add tour modal */}
       {showAdd && (
-        <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: "rgba(0,0,0,0.7)" }} onClick={() => setShowAdd(false)}>
-          <div className="rounded-2xl w-full max-w-md p-6" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }} onClick={e => e.stopPropagation()}>
+        <div
+          className="fixed inset-0 flex items-center justify-center z-50"
+          style={{ background: "rgba(0,0,0,0.7)" }}
+          onClick={() => setShowAdd(false)}
+        >
+          <div
+            className="rounded-2xl w-full max-w-md p-6"
+            style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }}
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex flex-wrap items-center justify-between gap-2 mb-5">
-              <h3 className="text-lg font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}>Новый тур</h3>
-              <button onClick={() => setShowAdd(false)} className="opacity-50 hover:opacity-100 cursor-pointer text-xl" style={{ color: "var(--color-text)" }}>×</button>
+              <h3
+                className="text-lg font-semibold"
+                style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}
+              >
+                Новый тур
+              </h3>
+              <button
+                onClick={() => setShowAdd(false)}
+                className="opacity-50 hover:opacity-100 cursor-pointer text-xl"
+                style={{ color: "var(--color-text)" }}
+              >
+                ×
+              </button>
             </div>
             <div className="flex flex-col gap-3 mb-4">
-              {([["name","Название тура","text"],["duration","Длительность","text"],["price","Цена ($)","number"],["guide","Гид","text"],["maxGroup","Макс. группа","number"]] as [string,string,string][]).map(([k,label,type]) => (
+              {(
+                [
+                  ["name", "Название тура", "text"],
+                  ["duration", "Длительность", "text"],
+                  ["price", "Цена ($)", "number"],
+                  ["guide", "Гид", "text"],
+                  ["maxGroup", "Макс. группа", "number"],
+                ] as [string, string, string][]
+              ).map(([k, label, type]) => (
                 <div key={k}>
-                  <label className="text-xs block mb-1" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>{label.toUpperCase()}</label>
-                  <input type={type} value={(newTour as any)[k]} onChange={e => setNewTour(p => ({ ...p, [k]: e.target.value }))}
+                  <label
+                    className="text-xs block mb-1"
+                    style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+                  >
+                    {label.toUpperCase()}
+                  </label>
+                  <input
+                    type={type}
+                    value={newTour[k as keyof typeof newTour]}
+                    onChange={(e) => setNewTour((p) => ({ ...p, [k]: e.target.value }))}
                     className="w-full rounded px-3 py-2 text-sm outline-none"
-                    style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", color: "var(--color-text)", fontFamily: "var(--font-body)" }}
+                    style={{
+                      background: "var(--color-surface)",
+                      border: "1px solid var(--color-border)",
+                      color: "var(--color-text)",
+                      fontFamily: "var(--font-body)",
+                    }}
                   />
                 </div>
               ))}
               <div>
-                <label className="text-xs block mb-1.5" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>КАТЕГОРИЯ</label>
+                <label
+                  className="text-xs block mb-1.5"
+                  style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+                >
+                  КАТЕГОРИЯ
+                </label>
                 <div className="flex gap-1.5 flex-wrap">
-                  {["Культура","Приключения","Ремёсла","Экспедиция","Еда","Город"].map(c => (
-                    <button key={c} onClick={() => setNewTour(p => ({ ...p, category: c }))}
+                  {["Культура", "Приключения", "Ремёсла", "Экспедиция", "Еда", "Город"].map((c) => (
+                    <button
+                      key={c}
+                      onClick={() => setNewTour((p) => ({ ...p, category: c }))}
                       className="px-2.5 py-1 rounded text-xs cursor-pointer"
-                      style={{ background: newTour.category === c ? "var(--color-amber)" : "var(--color-surface)", color: newTour.category === c ? "var(--color-on-accent)" : "var(--color-muted)", border: "1px solid var(--color-border)" }}
-                    >{c}</button>
+                      style={{
+                        background: newTour.category === c ? "var(--color-amber)" : "var(--color-surface)",
+                        color: newTour.category === c ? "var(--color-on-accent)" : "var(--color-muted)",
+                        border: "1px solid var(--color-border)",
+                      }}
+                    >
+                      {c}
+                    </button>
                   ))}
                 </div>
               </div>
             </div>
             <div className="flex flex-wrap gap-3">
-              <Btn variant="ghost" onClick={() => setShowAdd(false)}>Отмена</Btn>
-              <Btn onClick={() => {
-                if (!newTour.title) return;
-                setTours(prev => [...prev, {
-                  id: `new-${Date.now()}`, title: newTour.title, duration: newTour.duration || "1 день",
-                  price: Number(newTour.price) || 100, difficulty: "Лёгкий", category: newTour.category,
-                  bookings: 0, maxGroup: Number(newTour.maxGroup) || 12, status: "draft" as const,
-                  nextDep: "", guide: newTour.guide || "Не назначен", rating: 0,
-                  // Цвет — настоящий hex: переменные панели приложение не знает.
-                  sub: newTour.category, icon: "🗺️", color: "#0E6F66",
-                  badge: newTour.category, stops: [],
-                }]);
-                setShowAdd(false);
-                setNewTour({ title: "", duration: "", price: "", category: "Культура", guide: "", maxGroup: "" });
-              }}>Создать</Btn>
+              <Btn variant="ghost" onClick={() => setShowAdd(false)}>
+                Отмена
+              </Btn>
+              <Btn
+                onClick={() => {
+                  if (!newTour.title) return;
+                  setTours((prev) => [
+                    ...prev,
+                    {
+                      id: `new-${Date.now()}`,
+                      title: newTour.title,
+                      duration: newTour.duration || "1 день",
+                      price: Number(newTour.price) || 100,
+                      difficulty: "Лёгкий",
+                      category: newTour.category,
+                      bookings: 0,
+                      maxGroup: Number(newTour.maxGroup) || 12,
+                      status: "draft" as const,
+                      nextDep: "",
+                      guide: newTour.guide || "Не назначен",
+                      rating: 0,
+                      // Цвет — настоящий hex: переменные панели приложение не знает.
+                      sub: newTour.category,
+                      icon: "🗺️",
+                      color: "#0E6F66",
+                      badge: newTour.category,
+                      stops: [],
+                    },
+                  ]);
+                  setShowAdd(false);
+                  setNewTour({
+                    title: "",
+                    duration: "",
+                    price: "",
+                    category: "Культура",
+                    guide: "",
+                    maxGroup: "",
+                  });
+                }}
+              >
+                Создать
+              </Btn>
             </div>
           </div>
         </div>
       )}
 
-      {/* Edit modal */}
       {editing && (
         <div
           className="fixed inset-0 flex items-center justify-center z-50"
@@ -207,19 +307,35 @@ export default function Tours() {
                 { label: "Рейтинг", val: editing.rating > 0 ? `★ ${editing.rating}` : "Н/Д" },
               ].map((s) => (
                 <div key={s.label} className="rounded p-3" style={{ background: "var(--color-surface)" }}>
-                  <div className="text-xs mb-1" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>{s.label}</div>
-                  <div className="text-sm font-medium" style={{ color: "var(--color-text)" }}>{s.val}</div>
+                  <div
+                    className="text-xs mb-1"
+                    style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+                  >
+                    {s.label}
+                  </div>
+                  <div className="text-sm font-medium" style={{ color: "var(--color-text)" }}>
+                    {s.val}
+                  </div>
                 </div>
               ))}
             </div>
 
             <div className="mb-5 rounded p-3" style={{ background: "var(--color-surface)" }}>
-              <div className="text-xs mb-1" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>Гид</div>
-              <div className="text-sm" style={{ color: "var(--color-text)" }}>{editing.guide}</div>
+              <div
+                className="text-xs mb-1"
+                style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+              >
+                Гид
+              </div>
+              <div className="text-sm" style={{ color: "var(--color-text)" }}>
+                {editing.guide}
+              </div>
             </div>
 
             <div className="flex flex-wrap gap-3 justify-end">
-              <Btn variant="ghost" onClick={() => setEditing(null)}>Отмена</Btn>
+              <Btn variant="ghost" onClick={() => setEditing(null)}>
+                Отмена
+              </Btn>
               <Btn onClick={() => setEditing(null)}>Сохранить</Btn>
             </div>
           </div>

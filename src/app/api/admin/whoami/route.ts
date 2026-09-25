@@ -16,10 +16,7 @@ export async function GET() {
   }
 
   // Мастер-вход по переменной окружения именной записи не имеет.
-  const name =
-    admin.id === ROOT_ID
-      ? "Владелец"
-      : (await findAdminById(admin.id))?.name ?? "Сотрудник";
+  const name = admin.id === ROOT_ID ? "Владелец" : (await findAdminById(admin.id))?.name ?? "Сотрудник";
 
   return NextResponse.json(
     { id: admin.id, role: admin.role, name },

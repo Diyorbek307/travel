@@ -41,8 +41,7 @@ export default function BookingForm({
   const изКарточки = гостей !== undefined;
   const сколькоГостей = гостей ?? guests;
 
-  const подпись =
-    kind === "hotel" ? t("bk_hotel") : kind === "restaurant" ? t("bk_rest") : t("bk_tour");
+  const подпись = kind === "hotel" ? t("bk_hotel") : kind === "restaurant" ? t("bk_rest") : t("bk_tour");
 
   /** Дата выезда по дате заезда и числу ночей — чтобы человек видел, на что просит. */
   function выезд(): string | null {
@@ -76,7 +75,11 @@ export default function BookingForm({
 
   if (итог === "ок") {
     return (
-      <div id="заявка" className="mb-3 rounded-2xl p-4" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
+      <div
+        id="заявка"
+        className="mb-3 rounded-2xl p-4"
+        style={{ background: SURFACE, border: `1px solid ${BORDER}` }}
+      >
         <p className="text-sm font-semibold" style={{ color: GREEN }}>
           {t("bk_sent_title")}
         </p>

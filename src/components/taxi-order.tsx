@@ -1,7 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ACCENT_FILL, BORDER, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE, ACCENT_SOFT, ON_GOLD } from "@/lib/theme";
+import {
+  ACCENT_FILL,
+  BORDER,
+  GOLD,
+  GREEN,
+  MUTED,
+  TEXT,
+  WHITE,
+  SURFACE,
+  ACCENT_SOFT,
+  ON_GOLD,
+} from "@/lib/theme";
 import { ГОРОДА, МЕСТА, расстояниеКм } from "@/data/geo";
 import type { Geo } from "@/lib/types";
 import RealMap from "@/components/real-map";
@@ -44,10 +55,12 @@ export default function TaxiOrder({
   const [город, setГород] = useState(городСразу);
   const [откуда, setОткуда] = useState<Geo | null>(null);
   const [геоОшибка, setГеоОшибка] = useState<string | null>(null);
-  const [куда, setКуда] = useState<{ название: string; geo: Geo; своя?: boolean; текст?: boolean } | null>(() => {
-    if (сразуКуда?.geo) return { название: сразуКуда.название, geo: сразуКуда.geo };
-    return null;
-  });
+  const [куда, setКуда] = useState<{ название: string; geo: Geo; своя?: boolean; текст?: boolean } | null>(
+    () => {
+      if (сразуКуда?.geo) return { название: сразуКуда.название, geo: сразуКуда.geo };
+      return null;
+    },
+  );
   const [оценки, setОценки] = useState<Оценка[] | null>(null);
   const [карта, setКарта] = useState(false);
 
@@ -71,9 +84,7 @@ export default function TaxiOrder({
 
   // На карте показываем те же места плюс сам центр города — иначе при
   // приближении не за что зацепиться глазом.
-  const местаГорода = ГОРОДА[город]
-    ? [...направления, { название: город, geo: ГОРОДА[город] }]
-    : направления;
+  const местаГорода = ГОРОДА[город] ? [...направления, { название: город, geo: ГОРОДА[город] }] : направления;
 
   function определитьГде() {
     if (!navigator.geolocation) {
@@ -166,7 +177,7 @@ export default function TaxiOrder({
 
   return (
     <section className="px-4 pt-5">
-      <p className="mb-3 text-base font-bold" style={{ color: TEXT, fontFamily:"var(--font-heading)" }}>
+      <p className="mb-3 text-base font-bold" style={{ color: TEXT, fontFamily: "var(--font-heading)" }}>
         🚖 {t("taxi_title")}
       </p>
 
@@ -190,7 +201,10 @@ export default function TaxiOrder({
         </div>
 
         {/* Откуда */}
-        <div className="mb-2 flex flex-wrap items-center gap-3 rounded-xl px-3 py-2.5" style={{ background: ACCENT_SOFT }}>
+        <div
+          className="mb-2 flex flex-wrap items-center gap-3 rounded-xl px-3 py-2.5"
+          style={{ background: ACCENT_SOFT }}
+        >
           <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: ACCENT_FILL }} />
           <span className="min-w-0 flex-1 truncate text-sm" style={{ color: TEXT }}>
             {откуда ? t("taxi_my_location") : `${t("taxi_from_city")} · ${трК(город)}`}
@@ -205,7 +219,10 @@ export default function TaxiOrder({
         </div>
 
         {/* Куда */}
-        <div className="mb-3 flex flex-wrap items-center gap-3 rounded-xl border px-3 py-2.5" style={{ borderColor: BORDER }}>
+        <div
+          className="mb-3 flex flex-wrap items-center gap-3 rounded-xl border px-3 py-2.5"
+          style={{ borderColor: BORDER }}
+        >
           <span className="h-2 w-2 shrink-0 rounded-sm" style={{ background: GOLD }} />
           {/* Свободный ввод: можно напечатать любой адрес — Яндекс Go найдёт
               его по названию. Готовые места/карта тоже заполняют это поле. */}

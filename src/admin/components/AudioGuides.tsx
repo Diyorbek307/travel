@@ -86,14 +86,21 @@ export default function AudioGuides() {
       {форма && (
         <Card className="mb-6 p-5">
           <SectionTitle>Новая запись</SectionTitle>
-          <div className="grid gap-3" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(min(220px, 100%), 1fr))" }}>
+          <div
+            className="grid gap-3"
+            style={{ gridTemplateColumns: "repeat(auto-fill, minmax(min(220px, 100%), 1fr))" }}
+          >
             <label className="flex flex-col gap-1 text-xs" style={{ color: "var(--color-muted)" }}>
               Место
               <select
                 value={новый.placeId}
                 onChange={(e) => setНовый((п) => ({ ...п, placeId: e.target.value }))}
                 className="rounded-lg px-3 py-2 text-sm"
-                style={{ background: "var(--color-bg)", color: "var(--color-text)", border: "1px solid var(--color-dim)" }}
+                style={{
+                  background: "var(--color-bg)",
+                  color: "var(--color-text)",
+                  border: "1px solid var(--color-dim)",
+                }}
               >
                 <option value="">— выберите —</option>
                 {места.map((м) => (
@@ -110,7 +117,11 @@ export default function AudioGuides() {
                 value={новый.lang}
                 onChange={(e) => setНовый((п) => ({ ...п, lang: e.target.value }))}
                 className="rounded-lg px-3 py-2 text-sm"
-                style={{ background: "var(--color-bg)", color: "var(--color-text)", border: "1px solid var(--color-dim)" }}
+                style={{
+                  background: "var(--color-bg)",
+                  color: "var(--color-text)",
+                  border: "1px solid var(--color-dim)",
+                }}
               >
                 {ЯЗЫКИ.map((я) => (
                   <option key={я}>{я}</option>
@@ -125,7 +136,11 @@ export default function AudioGuides() {
                 onChange={(e) => setНовый((п) => ({ ...п, title: e.target.value }))}
                 placeholder="Регистан: три медресе"
                 className="rounded-lg px-3 py-2 text-sm"
-                style={{ background: "var(--color-bg)", color: "var(--color-text)", border: "1px solid var(--color-dim)" }}
+                style={{
+                  background: "var(--color-bg)",
+                  color: "var(--color-text)",
+                  border: "1px solid var(--color-dim)",
+                }}
               />
             </label>
 
@@ -137,25 +152,36 @@ export default function AudioGuides() {
                 placeholder="522"
                 inputMode="numeric"
                 className="rounded-lg px-3 py-2 text-sm"
-                style={{ background: "var(--color-bg)", color: "var(--color-text)", border: "1px solid var(--color-dim)" }}
+                style={{
+                  background: "var(--color-bg)",
+                  color: "var(--color-text)",
+                  border: "1px solid var(--color-dim)",
+                }}
               />
             </label>
 
-            <label className="flex flex-col gap-1 text-xs sm:col-span-2" style={{ color: "var(--color-muted)" }}>
+            <label
+              className="flex flex-col gap-1 text-xs sm:col-span-2"
+              style={{ color: "var(--color-muted)" }}
+            >
               Ссылка на файл (mp3 или m4a)
               <input
                 value={новый.url}
                 onChange={(e) => setНовый((п) => ({ ...п, url: e.target.value }))}
                 placeholder="https://…/registan-ru.mp3"
                 className="rounded-lg px-3 py-2 text-sm"
-                style={{ background: "var(--color-bg)", color: "var(--color-text)", border: "1px solid var(--color-dim)" }}
+                style={{
+                  background: "var(--color-bg)",
+                  color: "var(--color-text)",
+                  border: "1px solid var(--color-dim)",
+                }}
               />
             </label>
           </div>
 
           <p className="mt-3 text-xs leading-relaxed" style={{ color: "var(--color-muted)" }}>
-            Файл должен лежать на сервере, отдающем его по https и разрешающем
-            воспроизведение со стороннего сайта. Без места и ссылки запись не сохранится.
+            Файл должен лежать на сервере, отдающем его по https и разрешающем воспроизведение со стороннего
+            сайта. Без места и ссылки запись не сохранится.
           </p>
 
           <div className="mt-4 flex flex-wrap gap-2">
@@ -169,7 +195,12 @@ export default function AudioGuides() {
 
       <div className="mb-4 flex flex-wrap gap-1.5">
         {["all", ...ЯЗЫКИ].map((я) => (
-          <Btn key={я} small variant={языкФильтр === я ? "primary" : "ghost"} onClick={() => setЯзыкФильтр(я)}>
+          <Btn
+            key={я}
+            small
+            variant={языкФильтр === я ? "primary" : "ghost"}
+            onClick={() => setЯзыкФильтр(я)}
+          >
             {я === "all" ? "Все языки" : я}
           </Btn>
         ))}
@@ -178,9 +209,8 @@ export default function AudioGuides() {
       {гиды.length === 0 ? (
         <Card className="p-5">
           <p className="text-sm" style={{ color: "var(--color-muted)" }}>
-            Записей пока нет. Пока раздел пуст, экран «Аудио» в приложении так и
-            пишет туристу, что аудиогидов ещё нет — вместо трёх выдуманных
-            экскурсий, которые там были раньше.
+            Записей пока нет. Пока раздел пуст, экран «Аудио» в приложении так и пишет туристу, что аудиогидов
+            ещё нет — вместо трёх выдуманных экскурсий, которые там были раньше.
           </p>
         </Card>
       ) : (

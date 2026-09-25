@@ -90,7 +90,7 @@ export default function ReviewForm({ placeId, placeName }: { placeId: string; pl
   return (
     <section className="mb-4 rounded-2xl p-4" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <p className="text-sm font-bold" style={{ color: TEXT, fontFamily:"var(--font-heading)" }}>
+        <p className="text-sm font-bold" style={{ color: TEXT, fontFamily: "var(--font-heading)" }}>
           {t("rev_title")}
         </p>
         {среднее && (

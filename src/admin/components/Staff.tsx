@@ -35,13 +35,21 @@ const ОШИБКИ: Record<string, string> = {
 function когда(iso: string | null): string {
   if (!iso) return "ещё не входил";
   const d = new Date(iso);
-  return d.toLocaleDateString("ru-RU", { day: "numeric", month: "short" }) +
-    ", " + d.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" });
+  return (
+    d.toLocaleDateString("ru-RU", { day: "numeric", month: "short" }) +
+    ", " +
+    d.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" })
+  );
 }
 
 function инициалы(имя: string): string {
   const части = имя.trim().split(/\s+/).filter(Boolean);
-  return (части.slice(0, 2).map((w) => w[0]).join("") || имя.slice(0, 2)).toUpperCase();
+  return (
+    части
+      .slice(0, 2)
+      .map((w) => w[0])
+      .join("") || имя.slice(0, 2)
+  ).toUpperCase();
 }
 
 const РОЛЬ_ЦВЕТ: Record<AdminRole, "amber" | "teal" | "dim"> = {
@@ -153,7 +161,11 @@ export default function Staff() {
     <div className="p-4 sm:p-7">
       <PageHeader
         title="Сотрудники"
-        subtitle={загрузка ? "Загрузка…" : `${список.length} ${список.length === 1 ? "запись" : "записей"} · вход по логину и паролю`}
+        subtitle={
+          загрузка
+            ? "Загрузка…"
+            : `${список.length} ${список.length === 1 ? "запись" : "записей"} · вход по логину и паролю`
+        }
       />
 
       {/* Пояснение про владельца */}
@@ -167,9 +179,9 @@ export default function Staff() {
       >
         <span className="text-base leading-none">◈</span>
         <span>
-          <b>Владелец</b> входит без логина по общему паролю из переменной <code>ADMIN_PASSWORD</code> —
-          это аварийный ключ, отдельной записи у него здесь нет. Ниже — именные учётные записи
-          редакторов и поддержки: их роль решает, какие разделы им доступны.
+          <b>Владелец</b> входит без логина по общему паролю из переменной <code>ADMIN_PASSWORD</code> — это
+          аварийный ключ, отдельной записи у него здесь нет. Ниже — именные учётные записи редакторов и
+          поддержки: их роль решает, какие разделы им доступны.
         </span>
       </div>
 
@@ -200,7 +212,11 @@ export default function Staff() {
           {список.map((a) => (
             <div
               key={a.id}
-              onClick={() => { setВыбран(a.id); setНовыйПароль(""); setОшибка(""); }}
+              onClick={() => {
+                setВыбран(a.id);
+                setНовыйПароль("");
+                setОшибка("");
+              }}
               className="rounded-xl p-4 flex flex-wrap items-center gap-3 cursor-pointer transition-all"
               style={{
                 background: выбран === a.id ? "var(--color-panel)" : "transparent",
@@ -216,14 +232,23 @@ export default function Staff() {
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap mb-0.5">
-                  <span className="font-medium text-sm" style={{ color: "var(--color-text)" }}>{a.name}</span>
+                  <span className="font-medium text-sm" style={{ color: "var(--color-text)" }}>
+                    {a.name}
+                  </span>
                   <Badge label={ROLE_META[a.role].label} color={РОЛЬ_ЦВЕТ[a.role]} />
                   {a.disabled && <Badge label="заблокирован" color="rose" />}
                 </div>
-                <div className="text-xs" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>@{a.username}</div>
+                <div
+                  className="text-xs"
+                  style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+                >
+                  @{a.username}
+                </div>
               </div>
               <div className="text-right shrink-0">
-                <div className="text-xs" style={{ color: "var(--color-faint)" }}>{когда(a.lastSeenAt)}</div>
+                <div className="text-xs" style={{ color: "var(--color-faint)" }}>
+                  {когда(a.lastSeenAt)}
+                </div>
               </div>
             </div>
           ))}
@@ -232,17 +257,30 @@ export default function Staff() {
         {/* Правая колонка: создание или карточка выбранного */}
         <div className="w-full shrink-0 lg:w-80">
           {выбранный ? (
-            <div className="rounded-2xl p-5" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }}>
+            <div
+              className="rounded-2xl p-5"
+              style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }}
+            >
               <div className="flex items-center gap-3 mb-4">
                 <div
                   className="w-12 h-12 rounded-full flex items-center justify-center text-base font-bold shrink-0"
-                  style={{ background: мягко(ROLE_META[выбранный.role].color, 20), color: ROLE_META[выбранный.role].color }}
+                  style={{
+                    background: мягко(ROLE_META[выбранный.role].color, 20),
+                    color: ROLE_META[выбранный.role].color,
+                  }}
                 >
                   {инициалы(выбранный.name)}
                 </div>
                 <div className="min-w-0">
-                  <div className="font-semibold text-sm" style={{ color: "var(--color-text)" }}>{выбранный.name}</div>
-                  <div className="text-xs" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>@{выбранный.username}</div>
+                  <div className="font-semibold text-sm" style={{ color: "var(--color-text)" }}>
+                    {выбранный.name}
+                  </div>
+                  <div
+                    className="text-xs"
+                    style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+                  >
+                    @{выбранный.username}
+                  </div>
                 </div>
               </div>
 
@@ -256,12 +294,21 @@ export default function Staff() {
                       onClick={() => !on && сменитьРоль(выбранный.id, r)}
                       className="text-left rounded-lg px-3 py-2 text-sm transition-all cursor-pointer"
                       style={{
-                        background: on ? "color-mix(in srgb, " + ROLE_META[r].color + " 15%, transparent)" : "var(--color-surface)",
+                        background: on
+                          ? "color-mix(in srgb, " + ROLE_META[r].color + " 15%, transparent)"
+                          : "var(--color-surface)",
                         border: `1px solid ${on ? ROLE_META[r].color : "var(--color-border)"}`,
                       }}
                     >
-                      <div className="font-medium" style={{ color: on ? ROLE_META[r].color : "var(--color-text)" }}>{ROLE_META[r].label}</div>
-                      <div className="text-xs mt-0.5" style={{ color: "var(--color-muted)" }}>{ROLE_META[r].desc}</div>
+                      <div
+                        className="font-medium"
+                        style={{ color: on ? ROLE_META[r].color : "var(--color-text)" }}
+                      >
+                        {ROLE_META[r].label}
+                      </div>
+                      <div className="text-xs mt-0.5" style={{ color: "var(--color-muted)" }}>
+                        {ROLE_META[r].desc}
+                      </div>
                     </button>
                   );
                 })}
@@ -277,52 +324,119 @@ export default function Staff() {
                   className="flex-1 rounded-lg px-3 py-2 text-sm outline-none"
                   style={поле}
                 />
-                <Btn small onClick={() => задатьПароль(выбранный.id)}>Задать</Btn>
+                <Btn small onClick={() => задатьПароль(выбранный.id)}>
+                  Задать
+                </Btn>
               </div>
 
-              <div className="flex flex-wrap gap-2 pt-4" style={{ borderTop: "1px solid var(--color-border)" }}>
-                <Btn variant={выбранный.disabled ? "primary" : "ghost"} small onClick={() => переключитьБлок(выбранный)}>
+              <div
+                className="flex flex-wrap gap-2 pt-4"
+                style={{ borderTop: "1px solid var(--color-border)" }}
+              >
+                <Btn
+                  variant={выбранный.disabled ? "primary" : "ghost"}
+                  small
+                  onClick={() => переключитьБлок(выбранный)}
+                >
                   {выбранный.disabled ? "Разблокировать" : "Заблокировать"}
                 </Btn>
-                <Btn variant="danger" small onClick={() => удалить(выбранный.id)}>Удалить</Btn>
-                <Btn variant="ghost" small onClick={() => setВыбран(null)}>Закрыть</Btn>
+                <Btn variant="danger" small onClick={() => удалить(выбранный.id)}>
+                  Удалить
+                </Btn>
+                <Btn variant="ghost" small onClick={() => setВыбран(null)}>
+                  Закрыть
+                </Btn>
               </div>
             </div>
           ) : (
-            <div className="rounded-2xl p-5" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }}>
+            <div
+              className="rounded-2xl p-5"
+              style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }}
+            >
               <SectionTitle>Новый сотрудник</SectionTitle>
               <div className="flex flex-col gap-3">
                 <div>
-                  <label className="text-xs block mb-1" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>ИМЯ</label>
-                  <input type="text" value={нов.name} onChange={(e) => setНов((p) => ({ ...p, name: e.target.value }))}
-                    placeholder="Камола Ташкентова" className="w-full rounded-lg px-3 py-2 text-sm outline-none" style={поле} />
+                  <label
+                    className="text-xs block mb-1"
+                    style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+                  >
+                    ИМЯ
+                  </label>
+                  <input
+                    type="text"
+                    value={нов.name}
+                    onChange={(e) => setНов((p) => ({ ...p, name: e.target.value }))}
+                    placeholder="Камола Ташкентова"
+                    className="w-full rounded-lg px-3 py-2 text-sm outline-none"
+                    style={поле}
+                  />
                 </div>
                 <div>
-                  <label className="text-xs block mb-1" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>ЛОГИН</label>
-                  <input type="text" value={нов.username} autoCapitalize="none" autoCorrect="off" spellCheck={false}
+                  <label
+                    className="text-xs block mb-1"
+                    style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+                  >
+                    ЛОГИН
+                  </label>
+                  <input
+                    type="text"
+                    value={нов.username}
+                    autoCapitalize="none"
+                    autoCorrect="off"
+                    spellCheck={false}
                     onChange={(e) => setНов((p) => ({ ...p, username: e.target.value }))}
-                    placeholder="kamola" className="w-full rounded-lg px-3 py-2 text-sm outline-none" style={поле} />
+                    placeholder="kamola"
+                    className="w-full rounded-lg px-3 py-2 text-sm outline-none"
+                    style={поле}
+                  />
                 </div>
                 <div>
-                  <label className="text-xs block mb-1" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>ПАРОЛЬ</label>
-                  <input type="text" value={нов.password} onChange={(e) => setНов((p) => ({ ...p, password: e.target.value }))}
-                    placeholder="от 8 знаков" className="w-full rounded-lg px-3 py-2 text-sm outline-none" style={поле} />
+                  <label
+                    className="text-xs block mb-1"
+                    style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+                  >
+                    ПАРОЛЬ
+                  </label>
+                  <input
+                    type="text"
+                    value={нов.password}
+                    onChange={(e) => setНов((p) => ({ ...p, password: e.target.value }))}
+                    placeholder="от 8 знаков"
+                    className="w-full rounded-lg px-3 py-2 text-sm outline-none"
+                    style={поле}
+                  />
                 </div>
                 <div>
-                  <label className="text-xs block mb-2" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>РОЛЬ</label>
+                  <label
+                    className="text-xs block mb-2"
+                    style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+                  >
+                    РОЛЬ
+                  </label>
                   <div className="flex flex-col gap-1.5">
                     {ВСЕ_РОЛИ.map((r) => {
                       const on = нов.role === r;
                       return (
-                        <button key={r} onClick={() => setНов((p) => ({ ...p, role: r }))}
+                        <button
+                          key={r}
+                          onClick={() => setНов((p) => ({ ...p, role: r }))}
                           className="text-left rounded-lg px-3 py-2 text-sm transition-all cursor-pointer"
                           style={{
-                            background: on ? "color-mix(in srgb, " + ROLE_META[r].color + " 15%, transparent)" : "var(--color-surface)",
+                            background: on
+                              ? "color-mix(in srgb, " + ROLE_META[r].color + " 15%, transparent)"
+                              : "var(--color-surface)",
                             border: `1px solid ${on ? ROLE_META[r].color : "var(--color-border)"}`,
                           }}
                         >
-                          <div className="font-medium" style={{ color: on ? ROLE_META[r].color : "var(--color-text)" }}>{ROLE_META[r].label}</div>
-                          <div className="text-xs mt-0.5" style={{ color: "var(--color-muted)" }}>{ROLE_META[r].desc}</div>
+                          <div
+                            className="font-medium"
+                            style={{ color: on ? ROLE_META[r].color : "var(--color-text)" }}
+                          >
+                            {ROLE_META[r].label}
+                          </div>
+                          <div className="text-xs mt-0.5" style={{ color: "var(--color-muted)" }}>
+                            {ROLE_META[r].desc}
+                          </div>
                         </button>
                       );
                     })}

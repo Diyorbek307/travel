@@ -54,10 +54,10 @@ export function AudioScreen({
   const ошибка = плохойКод
     ? t("audio_bad_code")
     : плеер.ошибка === "blocked"
-      ? t("audio_blocked")
-      : плеер.ошибка === "failed"
-        ? t("audio_failed")
-        : null;
+    ? t("audio_blocked")
+    : плеер.ошибка === "failed"
+    ? t("audio_failed")
+    : null;
 
   // Языки только те, на которых записи действительно есть.
   const языки = useMemo(() => Array.from(new Set(AUDIO.map((а) => а.lang))), [AUDIO]);
@@ -66,10 +66,7 @@ export function AudioScreen({
     if (язык && !языки.includes(язык)) setЯзык(null);
   }, [языки, язык]);
 
-  const видимые = useMemo(
-    () => (язык ? AUDIO.filter((а) => а.lang === язык) : AUDIO),
-    [AUDIO, язык],
-  );
+  const видимые = useMemo(() => (язык ? AUDIO.filter((а) => а.lang === язык) : AUDIO), [AUDIO, язык]);
 
   /**
    * Код с таблички ведёт на адрес приложения с номером записи. Разбираем
@@ -115,7 +112,7 @@ export function AudioScreen({
         <p className="mb-0.5 text-xs font-medium" style={{ color: GREEN, letterSpacing: "0.1em" }}>
           {t("audio_kicker")}
         </p>
-        <h1 className="mb-3 text-xl font-bold" style={{ color: TEXT, fontFamily:"var(--font-heading)" }}>
+        <h1 className="mb-3 text-xl font-bold" style={{ color: TEXT, fontFamily: "var(--font-heading)" }}>
           {t("audio_listen")}
         </h1>
 
@@ -128,7 +125,11 @@ export function AudioScreen({
               <button
                 onClick={() => setЯзык(null)}
                 className="flex-shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold"
-                style={язык === null ? { background: ACCENT_FILL, color: WHITE } : { background: CREAM, color: MUTED }}
+                style={
+                  язык === null
+                    ? { background: ACCENT_FILL, color: WHITE }
+                    : { background: CREAM, color: MUTED }
+                }
               >
                 {t("audio_all")}
               </button>
@@ -137,7 +138,11 @@ export function AudioScreen({
                   key={я}
                   onClick={() => setЯзык(я)}
                   className="flex-shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold"
-                  style={язык === я ? { background: ACCENT_FILL, color: WHITE } : { background: CREAM, color: MUTED }}
+                  style={
+                    язык === я
+                      ? { background: ACCENT_FILL, color: WHITE }
+                      : { background: CREAM, color: MUTED }
+                  }
                 >
                   {трК(я)}
                 </button>
@@ -159,7 +164,10 @@ export function AudioScreen({
         )}
 
         {нужноНажать && (
-          <p className="rounded-xl px-3 py-2 text-xs leading-relaxed" style={{ background: ACCENT_SOFT, color: GREEN }}>
+          <p
+            className="rounded-xl px-3 py-2 text-xs leading-relaxed"
+            style={{ background: ACCENT_SOFT, color: GREEN }}
+          >
             {t("audio_ready")}
           </p>
         )}
@@ -175,9 +183,7 @@ export function AudioScreen({
           {видимые.length === 0 ? (
             <div className="rounded-2xl border bg-white p-4" style={{ borderColor: BORDER }}>
               <p className="text-sm leading-relaxed" style={{ color: MUTED }}>
-                {AUDIO.length === 0
-                  ? t("audio_empty_none")
-                  : t("audio_empty_lang")}
+                {AUDIO.length === 0 ? t("audio_empty_none") : t("audio_empty_lang")}
               </p>
             </div>
           ) : (
@@ -209,11 +215,7 @@ export function AudioScreen({
                       style={{ background: это ? ACCENT_FILL : ACCENT_SOFT }}
                     >
                       <svg width="13" height="13" viewBox="0 0 24 24" fill={это ? WHITE : GREEN}>
-                        {это ? (
-                          <path d="M6 4h4v16H6zM14 4h4v16h-4z" />
-                        ) : (
-                          <path d="M8 5v14l11-7z" />
-                        )}
+                        {это ? <path d="M6 4h4v16H6zM14 4h4v16h-4z" /> : <path d="M8 5v14l11-7z" />}
                       </svg>
                     </button>
                   </div>
@@ -238,7 +240,9 @@ export function AudioScreen({
                       разошёлся с живым курсом в конвертере. Показываем живой,
                       а к вписанному не возвращаемся. */}
                   {п.title === "Валюта" && курсUZS
-                    ? `$1 ≈ ${курсUZS.toLocaleString(lang, { maximumFractionDigits: 0 })} UZS. ${t("cur_live_hint")}`
+                    ? `$1 ≈ ${курсUZS.toLocaleString(lang, { maximumFractionDigits: 0 })} UZS. ${t(
+                        "cur_live_hint",
+                      )}`
                     : трК(п.body)}
                 </p>
               </div>

@@ -111,8 +111,7 @@ export default function IntroCinematic({ onDone }: { onDone: () => void }) {
     // подменит его на том же месте — без «двойника».
     document.documentElement.classList.add("intro-landing");
 
-    const мало =
-      typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const мало = typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches;
     const t = window.setTimeout(() => финиш.current(), мало ? 1000 : ДЛИНА);
     // Фоновые ролики после «вырезания» не нужны — останавливаем, бережём батарею.
     const пауза = window.setTimeout(() => {
@@ -130,36 +129,81 @@ export default function IntroCinematic({ onDone }: { onDone: () => void }) {
   const плавно = `${УХОД}ms cubic-bezier(.5,.1,.25,1)`;
 
   return (
-    <div onClick={() => финиш.current()} className="fixed inset-0 z-[100] overflow-hidden" style={{ cursor: "pointer" }} aria-label="HelloUZ">
+    <div
+      onClick={() => финиш.current()}
+      className="fixed inset-0 z-[100] overflow-hidden"
+      style={{ cursor: "pointer" }}
+      aria-label="HelloUZ"
+    >
       {/* ── Подложка: чёрный фон, пролёт, подпись. Гаснет при посадке. ── */}
-      <div className="absolute inset-0" style={{ background: "#000", opacity: уходит ? 0 : 1, transition: `opacity ${плавно}` }}>
+      <div
+        className="absolute inset-0"
+        style={{ background: "#000", opacity: уходит ? 0 : 1, transition: `opacity ${плавно}` }}
+      >
         <video
           ref={видеоARef}
           src="/videos/city1.mp4"
-          autoPlay muted loop playsInline preload="auto" controls={false} disablePictureInPicture
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          controls={false}
+          disablePictureInPicture
           className="absolute inset-0 h-full w-full object-cover"
-          style={{ animation: "intro-vidA 4.2s ease forwards, intro-kenburns 4.2s ease-out forwards", willChange: "opacity, transform" }}
+          style={{
+            animation: "intro-vidA 4.2s ease forwards, intro-kenburns 4.2s ease-out forwards",
+            willChange: "opacity, transform",
+          }}
         />
         <video
           ref={видеоBRef}
           src="/videos/city2.mp4"
-          autoPlay muted loop playsInline preload="auto" controls={false} disablePictureInPicture
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          controls={false}
+          disablePictureInPicture
           className="absolute inset-0 h-full w-full object-cover"
-          style={{ opacity: 0, animation: "intro-vidB 4.2s ease forwards, intro-kenburns 4.2s ease-out forwards", willChange: "opacity, transform" }}
+          style={{
+            opacity: 0,
+            animation: "intro-vidB 4.2s ease forwards, intro-kenburns 4.2s ease-out forwards",
+            willChange: "opacity, transform",
+          }}
         />
-        <div className="pointer-events-none absolute inset-0"
-          style={{ background: "radial-gradient(120% 100% at 50% 50%, transparent 42%, rgba(0,0,0,.55) 100%)", animation: "intro-vidA 4.2s ease forwards" }} />
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background: "radial-gradient(120% 100% at 50% 50%, transparent 42%, rgba(0,0,0,.55) 100%)",
+            animation: "intro-vidA 4.2s ease forwards",
+          }}
+        />
 
-        <div className="pointer-events-none absolute inset-x-0 bottom-[12%] text-center"
-          style={{ animation: `intro-tagline 1.5s ease ${(БЕЛЫЙ + 100) / 1000}s both` }}>
-          <p className="text-[12px] font-bold uppercase" style={{ letterSpacing: "0.42em", color: "rgba(255,255,255,0.95)", textShadow: "0 0 16px #ffffff88" }}>
+        <div
+          className="pointer-events-none absolute inset-x-0 bottom-[12%] text-center"
+          style={{ animation: `intro-tagline 1.5s ease ${(БЕЛЫЙ + 100) / 1000}s both` }}
+        >
+          <p
+            className="text-[12px] font-bold uppercase"
+            style={{
+              letterSpacing: "0.42em",
+              color: "rgba(255,255,255,0.95)",
+              textShadow: "0 0 16px #ffffff88",
+            }}
+          >
             Discover Uzbekistan
           </p>
-          <p className="mt-1.5 text-[11px]" style={{ color: "rgba(255,255,255,0.55)" }}>{t("splash_tagline")}</p>
+          <p className="mt-1.5 text-[11px]" style={{ color: "rgba(255,255,255,0.55)" }}>
+            {t("splash_tagline")}
+          </p>
         </div>
 
-        <span className="pointer-events-none absolute right-4 top-4 text-[10px] font-semibold uppercase tracking-widest"
-          style={{ color: "rgba(255,255,255,0.5)", animation: "intro-fill .6s ease .8s both" }}>
+        <span
+          className="pointer-events-none absolute right-4 top-4 text-[10px] font-semibold uppercase tracking-widest"
+          style={{ color: "rgba(255,255,255,0.5)", animation: "intro-fill .6s ease .8s both" }}
+        >
           Пропустить ›
         </span>
       </div>
@@ -187,63 +231,129 @@ export default function IntroCinematic({ onDone }: { onDone: () => void }) {
             marginLeft: -S / 2,
             marginTop: -S / 2,
             ["--k0" as string]: k0,
-            animation: `intro-final ${(ДЛИНА - ОКНО) / 1000}s linear ${ОКНО / 1000}s both, intro-white .9s ease ${ОКНО / 1000}s both`,
+            animation: `intro-final ${(ДЛИНА - ОКНО) / 1000}s linear ${
+              ОКНО / 1000
+            }s both, intro-white .9s ease ${ОКНО / 1000}s both`,
             willChange: "transform, opacity",
           }}
         >
           {/* Мягкое белое свечение позади белого знака. */}
-          <div className="absolute" style={{
-            left: "50%", top: "50%", width: S * 1.15, height: S * 1.15, marginLeft: -S * 0.575, marginTop: -S * 0.575,
-            opacity: уходит ? 0 : undefined, transition: `opacity ${плавно}`,
-            animation: `intro-white .7s ease ${БЕЛЫЙ / 1000}s both`,
-          }}>
-            <div className="h-full w-full rounded-full" style={{
-              background: "radial-gradient(circle, #ffffffa8 0%, #ffffff38 36%, transparent 66%)",
-              filter: "blur(28px)",
-              animation: `intro-neon 2.4s ease-in-out ${БЕЛЫЙ / 1000}s infinite`,
-              willChange: "transform, opacity",
-            }} />
+          <div
+            className="absolute"
+            style={{
+              left: "50%",
+              top: "50%",
+              width: S * 1.15,
+              height: S * 1.15,
+              marginLeft: -S * 0.575,
+              marginTop: -S * 0.575,
+              opacity: уходит ? 0 : undefined,
+              transition: `opacity ${плавно}`,
+              animation: `intro-white .7s ease ${БЕЛЫЙ / 1000}s both`,
+            }}
+          >
+            <div
+              className="h-full w-full rounded-full"
+              style={{
+                background: "radial-gradient(circle, #ffffffa8 0%, #ffffff38 36%, transparent 66%)",
+                filter: "blur(28px)",
+                animation: `intro-neon 2.4s ease-in-out ${БЕЛЫЙ / 1000}s infinite`,
+                willChange: "transform, opacity",
+              }}
+            />
           </div>
 
           {/* Город ВНУТРИ границ знака: продолжение пролёта + флешбеки. */}
-          <div className="absolute inset-0" style={{ ...маска, animation: `intro-window ${(БЕЛЫЙ + 400 - ОКНО) / 1000}s ease ${ОКНО / 1000}s both` }}>
+          <div
+            className="absolute inset-0"
+            style={{
+              ...маска,
+              animation: `intro-window ${(БЕЛЫЙ + 400 - ОКНО) / 1000}s ease ${ОКНО / 1000}s both`,
+            }}
+          >
             <video
               src="/videos/city2.mp4"
-              autoPlay muted loop playsInline preload="auto" controls={false} disablePictureInPicture
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="auto"
+              controls={false}
+              disablePictureInPicture
               className="absolute inset-0 h-full w-full object-cover"
             />
             {ФЛЕШ.map((src, i) => (
-              <img key={src} src={src} alt="" draggable={false}
+              <img
+                key={src}
+                src={src}
+                alt=""
+                draggable={false}
                 className="absolute inset-0 h-full w-full object-cover"
-                style={{ opacity: 0, animation: `intro-flash-img 1.4s ease ${ФЛЕШ_СТАРТ / 1000 + i * 0.5}s both`, willChange: "opacity, transform" }} />
+                style={{
+                  opacity: 0,
+                  animation: `intro-flash-img 1.4s ease ${ФЛЕШ_СТАРТ / 1000 + i * 0.5}s both`,
+                  willChange: "opacity, transform",
+                }}
+              />
             ))}
           </div>
 
           {/* Сплошной белый знак — ровно такой, как в шапке. */}
-          <svg ref={логоRef} viewBox="0 0 100 100" className="absolute inset-0 h-full w-full"
-            style={{ overflow: "visible", opacity: 0, animation: `intro-white .6s ease ${БЕЛЫЙ / 1000}s both` }}>
-            <path d={LOGO_D} fill="#ffffff"
+          <svg
+            ref={логоRef}
+            viewBox="0 0 100 100"
+            className="absolute inset-0 h-full w-full"
+            style={{
+              overflow: "visible",
+              opacity: 0,
+              animation: `intro-white .6s ease ${БЕЛЫЙ / 1000}s both`,
+            }}
+          >
+            <path
+              d={LOGO_D}
+              fill="#ffffff"
               style={{
-                filter: уходит ? "drop-shadow(0 1px 2px rgba(0,0,0,0.3))" : "drop-shadow(0 0 4px #ffffffcc) drop-shadow(0 0 14px #ffffff88)",
+                filter: уходит
+                  ? "drop-shadow(0 1px 2px rgba(0,0,0,0.3))"
+                  : "drop-shadow(0 0 4px #ffffffcc) drop-shadow(0 0 14px #ffffff88)",
                 transition: `filter ${плавно}`,
-              }} />
+              }}
+            />
           </svg>
 
           {/* Блик неона — полоса света пробегает по знаку перед посадкой. */}
-          <div className="absolute inset-0" style={{
-            ...маска,
-            background: "linear-gradient(110deg, transparent 38%, rgba(255,255,255,.95) 50%, transparent 62%)",
-            backgroundSize: "260% 100%",
-            opacity: 0,
-            animation: `intro-shimmer .75s ease-in-out ${БЛИК / 1000}s both`,
-          }} />
+          <div
+            className="absolute inset-0"
+            style={{
+              ...маска,
+              background:
+                "linear-gradient(110deg, transparent 38%, rgba(255,255,255,.95) 50%, transparent 62%)",
+              backgroundSize: "260% 100%",
+              opacity: 0,
+              animation: `intro-shimmer .75s ease-in-out ${БЛИК / 1000}s both`,
+            }}
+          />
 
           {/* Белый светящийся контур — рамка знака-окна. */}
-          <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full"
-            style={{ overflow: "visible", opacity: уходит ? 0 : 1, transition: `opacity ${плавно}` }}>
-            <path d={LOGO_D} fill="none" stroke="#ffffff" strokeWidth={0.9} pathLength={1}
+          <svg
+            viewBox="0 0 100 100"
+            className="absolute inset-0 h-full w-full"
+            style={{ overflow: "visible", opacity: уходит ? 0 : 1, transition: `opacity ${плавно}` }}
+          >
+            <path
+              d={LOGO_D}
+              fill="none"
+              stroke="#ffffff"
+              strokeWidth={0.9}
+              pathLength={1}
               vectorEffect="non-scaling-stroke"
-              style={{ strokeDasharray: 1, strokeDashoffset: 1, filter: "drop-shadow(0 0 5px #ffffffcc)", animation: `intro-draw 1.2s ease ${ОКНО / 1000}s forwards` }} />
+              style={{
+                strokeDasharray: 1,
+                strokeDashoffset: 1,
+                filter: "drop-shadow(0 0 5px #ffffffcc)",
+                animation: `intro-draw 1.2s ease ${ОКНО / 1000}s forwards`,
+              }}
+            />
           </svg>
         </div>
       </div>

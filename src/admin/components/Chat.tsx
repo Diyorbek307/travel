@@ -144,8 +144,8 @@ export default function Chat() {
           className="rounded-lg p-8 text-center text-sm leading-relaxed"
           style={{ background: "var(--color-panel)", color: "var(--color-muted)" }}
         >
-          Обращений пока нет. Они появятся здесь, когда турист напишет из приложения — вкладка
-          «Поддержка» в профиле.
+          Обращений пока нет. Они появятся здесь, когда турист напишет из приложения — вкладка «Поддержка» в
+          профиле.
         </div>
       )}
 
@@ -173,7 +173,10 @@ export default function Chat() {
                   }}
                 >
                   <div className="mb-1 flex flex-wrap items-center gap-2">
-                    <span className="min-w-0 flex-1 truncate text-sm font-medium" style={{ color: "var(--color-text)" }}>
+                    <span
+                      className="min-w-0 flex-1 truncate text-sm font-medium"
+                      style={{ color: "var(--color-text)" }}
+                    >
                       {t.name}
                     </span>
                     {t.unreadForStaff > 0 && <Badge label={String(t.unreadForStaff)} color="rose" />}
@@ -206,7 +209,10 @@ export default function Chat() {
                   style={{ borderColor: "var(--color-border)" }}
                 >
                   {narrow && (
-                    <button onClick={() => setПоказатьПереписку(false)} style={{ color: "var(--color-muted)" }}>
+                    <button
+                      onClick={() => setПоказатьПереписку(false)}
+                      style={{ color: "var(--color-muted)" }}
+                    >
                       ‹
                     </button>
                   )}
@@ -259,7 +265,9 @@ export default function Chat() {
                       color: "var(--color-text)",
                     }}
                   />
-                  <Btn small type="submit">Отправить</Btn>
+                  <Btn small type="submit">
+                    Отправить
+                  </Btn>
                 </form>
               </>
             )}

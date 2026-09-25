@@ -13,17 +13,29 @@ export default function Settings({ onNavigate }: { onNavigate?: (page: string) =
   const [цифры, setЦифры] = useState({ statPlaces: "", statLangs: "", statRating: "" });
   const [цифрыState, setЦифрыState] = useState<"idle" | "saving" | "saved" | "error">("idle");
   useEffect(() => {
-    fetch("/api/site-config").then(r => r.ok ? r.json() : null).then(c => c && setЦифры(c)).catch(() => {});
+    fetch("/api/site-config")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((c) => c && setЦифры(c))
+      .catch(() => {});
   }, []);
   const сохранитьЦифры = async () => {
     setЦифрыState("saving");
     try {
-      const r = await fetch("/api/site-config", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(цифры) });
+      const r = await fetch("/api/site-config", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(цифры),
+      });
       // «Сохранено» — только если сервер принял: у поддержки прав на это нет.
-      if (!r.ok) { setЦифрыState("error"); return; }
+      if (!r.ok) {
+        setЦифрыState("error");
+        return;
+      }
       setЦифрыState("saved");
       setTimeout(() => setЦифрыState("idle"), 1500);
-    } catch { setЦифрыState("error"); }
+    } catch {
+      setЦифрыState("error");
+    }
   };
 
   /**
@@ -34,8 +46,10 @@ export default function Settings({ onNavigate }: { onNavigate?: (page: string) =
   const exportData = async () => {
     setExporting(true);
     try {
-      const data = await fetch("/api/content").then(r => r.json());
-      const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }));
+      const data = await fetch("/api/content").then((r) => r.json());
+      const url = URL.createObjectURL(
+        new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }),
+      );
       const a = document.createElement("a");
       a.href = url;
       a.download = `hellouz-content-${new Date().toISOString().slice(0, 10)}.json`;
@@ -49,7 +63,7 @@ export default function Settings({ onNavigate }: { onNavigate?: (page: string) =
   };
   const [profile, setProfile] = useState({
     name: "Администратор",
-    email: "admin@uztravel.uz",
+    email: "admin@hellouz.uz",
     phone: "+998 71 000-00-00",
     role: "Суперадмин",
     timezone: "Asia/Tashkent (UTC+5)",
@@ -80,7 +94,11 @@ export default function Settings({ onNavigate }: { onNavigate?: (page: string) =
           экспорт и выход. */}
       <div
         className="mb-6 rounded-lg px-4 py-3 text-sm"
-        style={{ background: "color-mix(in srgb, var(--color-amber) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--color-amber) 30%, transparent)", color: "var(--color-text)" }}
+        style={{
+          background: "color-mix(in srgb, var(--color-amber) 10%, transparent)",
+          border: "1px solid color-mix(in srgb, var(--color-amber) 30%, transparent)",
+          color: "var(--color-text)",
+        }}
       >
         ⚠️ Именные учётные записи сотрудников и их роли — в разделе{" "}
         <button
@@ -90,8 +108,8 @@ export default function Settings({ onNavigate }: { onNavigate?: (page: string) =
         >
           «Сотрудники»
         </button>
-        . Карточка профиля ниже (2FA, отчёты, часовой пояс) пока оформление и не сохраняется —
-        работают тема, экспорт и выход (значок ⎋ вверху справа).
+        . Карточка профиля ниже (2FA, отчёты, часовой пояс) пока оформление и не сохраняется — работают тема,
+        экспорт и выход (значок ⎋ вверху справа).
       </div>
 
       {/* Цифры стартового экрана — настоящие, их видит гость до входа. */}
@@ -99,27 +117,60 @@ export default function Settings({ onNavigate }: { onNavigate?: (page: string) =
         <div className="flex items-center justify-between mb-4">
           <SectionTitle>Цифры на стартовом экране</SectionTitle>
           {цифрыState !== "idle" && (
-            <span className="text-xs" style={{ color: цифрыState === "saved" ? "var(--color-teal)" : цифрыState === "error" ? "var(--color-rose)" : "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
-              {цифрыState === "saving" ? "Сохраняю…" : цифрыState === "error" ? "Не сохранено — нет прав или связи" : "✓ Сохранено"}
+            <span
+              className="text-xs"
+              style={{
+                color:
+                  цифрыState === "saved"
+                    ? "var(--color-teal)"
+                    : цифрыState === "error"
+                    ? "var(--color-rose)"
+                    : "var(--color-muted)",
+                fontFamily: "var(--font-mono)",
+              }}
+            >
+              {цифрыState === "saving"
+                ? "Сохраняю…"
+                : цифрыState === "error"
+                ? "Не сохранено — нет прав или связи"
+                : "✓ Сохранено"}
             </span>
           )}
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {([["statPlaces", "МЕСТ", "500+"], ["statLangs", "ЯЗЫКОВ", "10"], ["statRating", "РЕЙТИНГ", "4.9"]] as const).map(([key, label, ph]) => (
+          {(
+            [
+              ["statPlaces", "МЕСТ", "500+"],
+              ["statLangs", "ЯЗЫКОВ", "10"],
+              ["statRating", "РЕЙТИНГ", "4.9"],
+            ] as const
+          ).map(([key, label, ph]) => (
             <div key={key}>
-              <label className="text-xs mb-1.5 block" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>{label}</label>
+              <label
+                className="text-xs mb-1.5 block"
+                style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+              >
+                {label}
+              </label>
               <input
                 type="text"
                 value={цифры[key]}
                 placeholder={ph}
                 onChange={(e) => setЦифры((p) => ({ ...p, [key]: e.target.value }))}
                 className="w-full rounded px-3 py-2 text-sm outline-none"
-                style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", color: "var(--color-text)", fontFamily: "var(--font-body)" }}
+                style={{
+                  background: "var(--color-surface)",
+                  border: "1px solid var(--color-border)",
+                  color: "var(--color-text)",
+                  fontFamily: "var(--font-body)",
+                }}
               />
             </div>
           ))}
         </div>
-        <div className="mt-4"><Btn onClick={сохранитьЦифры}>Сохранить цифры</Btn></div>
+        <div className="mt-4">
+          <Btn onClick={сохранитьЦифры}>Сохранить цифры</Btn>
+        </div>
       </Card>
 
       <div className="grid gap-6 lg:grid-cols-2">
@@ -127,37 +178,74 @@ export default function Settings({ onNavigate }: { onNavigate?: (page: string) =
         <Card className="p-5">
           <SectionTitle>Профиль</SectionTitle>
           <div className="flex flex-wrap items-center gap-4 mb-5">
-            <div className="w-14 h-14 rounded-full flex items-center justify-center text-xl font-bold" style={{ background: "var(--color-amber)", color: "var(--color-on-accent)" }}>
+            <div
+              className="w-14 h-14 rounded-full flex items-center justify-center text-xl font-bold"
+              style={{ background: "var(--color-amber)", color: "var(--color-on-accent)" }}
+            >
               АД
             </div>
             <div>
-              <div className="font-semibold text-base" style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}>{profile.name}</div>
-              <div className="text-xs mt-0.5" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>{profile.role}</div>
+              <div
+                className="font-semibold text-base"
+                style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}
+              >
+                {profile.name}
+              </div>
+              <div
+                className="text-xs mt-0.5"
+                style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+              >
+                {profile.role}
+              </div>
             </div>
           </div>
 
-          {[
-            { label: "Полное имя", key: "name" },
-            { label: "Email", key: "email" },
-            { label: "Телефон", key: "phone" },
-          ].map(f => (
+          {(
+            [
+              { label: "Полное имя", key: "name" },
+              { label: "Email", key: "email" },
+              { label: "Телефон", key: "phone" },
+            ] as const
+          ).map((f) => (
             <div key={f.key} className="mb-3">
-              <label className="text-xs block mb-1" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
+              <label
+                className="text-xs block mb-1"
+                style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+              >
                 {f.label.toUpperCase()}
               </label>
-              <input type="text" value={(profile as any)[f.key]}
-                onChange={e => setProfile(p => ({ ...p, [f.key]: e.target.value }))}
+              <input
+                type="text"
+                value={profile[f.key]}
+                onChange={(e) => setProfile((p) => ({ ...p, [f.key]: e.target.value }))}
                 className="w-full rounded px-3 py-2 text-sm outline-none"
-                style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", color: "var(--color-text)", fontFamily: "var(--font-body)" }}
+                style={{
+                  background: "var(--color-surface)",
+                  border: "1px solid var(--color-border)",
+                  color: "var(--color-text)",
+                  fontFamily: "var(--font-body)",
+                }}
               />
             </div>
           ))}
 
           <div className="mb-3">
-            <label className="text-xs block mb-1" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>ЧАСОВОЙ ПОЯС</label>
-            <select value={profile.timezone} onChange={e => setProfile(p => ({ ...p, timezone: e.target.value }))}
+            <label
+              className="text-xs block mb-1"
+              style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+            >
+              ЧАСОВОЙ ПОЯС
+            </label>
+            <select
+              value={profile.timezone}
+              onChange={(e) => setProfile((p) => ({ ...p, timezone: e.target.value }))}
               className="w-full rounded px-3 py-2 text-sm outline-none"
-              style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", color: "var(--color-text)", fontFamily: "var(--font-body)" }}
+              style={{
+                background: "var(--color-surface)",
+                border: "1px solid var(--color-border)",
+                color: "var(--color-text)",
+                fontFamily: "var(--font-body)",
+              }}
             >
               <option>Asia/Tashkent (UTC+5)</option>
               <option>Europe/Moscow (UTC+3)</option>
@@ -177,18 +265,32 @@ export default function Settings({ onNavigate }: { onNavigate?: (page: string) =
               { key: "pushNotifs", label: "Push-уведомления", desc: "Уведомления в браузере" },
               { key: "chatAlerts", label: "Оповещения из чата", desc: "Сигнал при новом сообщении" },
               { key: "weeklyReport", label: "Еженедельный отчёт", desc: "Сводка каждый понедельник" },
-            ].map(item => (
+            ].map((item) => (
               <div key={item.key} className="flex flex-wrap items-center justify-between gap-4">
                 <div className="min-w-0">
-                  <div className="text-sm font-medium" style={{ color: "var(--color-text)" }}>{item.label}</div>
-                  <div className="text-xs" style={{ color: "var(--color-muted)" }}>{item.desc}</div>
+                  <div className="text-sm font-medium" style={{ color: "var(--color-text)" }}>
+                    {item.label}
+                  </div>
+                  <div className="text-xs" style={{ color: "var(--color-muted)" }}>
+                    {item.desc}
+                  </div>
                 </div>
-                <button onClick={() => setProfile(p => ({ ...p, [item.key]: !(p as any)[item.key] }))}
+                <button
+                  onClick={() => setProfile((p) => ({ ...p, [item.key]: !p[item.key as keyof typeof p] }))}
                   className="w-11 h-6 rounded-full relative transition-all cursor-pointer shrink-0"
-                  style={{ background: (profile as any)[item.key] ? "var(--color-amber)" : "var(--color-dim)" }}
+                  style={{
+                    background: profile[item.key as keyof typeof profile]
+                      ? "var(--color-amber)"
+                      : "var(--color-dim)",
+                  }}
                 >
-                  <div className="absolute top-0.5 w-5 h-5 rounded-full transition-all"
-                    style={{ background: "#fff", left: (profile as any)[item.key] ? "calc(100% - 22px)" : "2px", boxShadow: "0 1px 3px rgba(0,0,0,0.3)" }}
+                  <div
+                    className="absolute top-0.5 w-5 h-5 rounded-full transition-all"
+                    style={{
+                      background: "#fff",
+                      left: profile[item.key as keyof typeof profile] ? "calc(100% - 22px)" : "2px",
+                      boxShadow: "0 1px 3px rgba(0,0,0,0.3)",
+                    }}
                   />
                 </button>
               </div>
@@ -196,14 +298,33 @@ export default function Settings({ onNavigate }: { onNavigate?: (page: string) =
           </div>
 
           <div style={{ borderTop: "1px solid var(--color-border)", paddingTop: "16px" }}>
-            <div className="text-xs mb-3" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>СМЕНА ПАРОЛЯ</div>
-            {["Текущий пароль", "Новый пароль", "Подтвердите пароль"].map(ph => (
-              <input key={ph} type="password" placeholder={ph}
+            <div
+              className="text-xs mb-3"
+              style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+            >
+              СМЕНА ПАРОЛЯ
+            </div>
+            {["Текущий пароль", "Новый пароль", "Подтвердите пароль"].map((ph) => (
+              <input
+                key={ph}
+                type="password"
+                placeholder={ph}
                 className="w-full rounded px-3 py-2 text-sm outline-none mb-2"
-                style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", color: "var(--color-text)", fontFamily: "var(--font-body)" }}
+                style={{
+                  background: "var(--color-surface)",
+                  border: "1px solid var(--color-border)",
+                  color: "var(--color-text)",
+                  fontFamily: "var(--font-body)",
+                }}
               />
             ))}
-            <Btn variant="ghost" onClick={() => { setPwSaved(true); setTimeout(() => setPwSaved(false), 2500); }}>
+            <Btn
+              variant="ghost"
+              onClick={() => {
+                setPwSaved(true);
+                setTimeout(() => setPwSaved(false), 2500);
+              }}
+            >
               {pwSaved ? "✓ Пароль обновлён" : "Обновить пароль"}
             </Btn>
           </div>
@@ -213,26 +334,39 @@ export default function Settings({ onNavigate }: { onNavigate?: (page: string) =
         <Card className="p-5">
           <SectionTitle>Тема оформления</SectionTitle>
 
-          {/* Dark/Light toggle */}
-          <div className="flex flex-wrap items-center justify-between gap-2 mb-4 p-3 rounded-xl" style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }}>
+          <div
+            className="flex flex-wrap items-center justify-between gap-2 mb-4 p-3 rounded-xl"
+            style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }}
+          >
             <div>
               <div className="text-sm font-medium" style={{ color: "var(--color-text)" }}>
                 {isDark ? "Тёмная тема" : "Светлая тема"}
               </div>
               <div className="text-xs" style={{ color: "var(--color-muted)" }}>
-                {isDark ? "Текущая: тёмная — тёплые янтарные тона" : "Текущая: светлая — тёплая слоновая кость"}
+                {isDark
+                  ? "Текущая: тёмная — тёплые янтарные тона"
+                  : "Текущая: светлая — тёплая слоновая кость"}
               </div>
             </div>
-            <button onClick={toggleMode}
+            <button
+              onClick={toggleMode}
               className="flex flex-wrap items-center gap-2 px-4 py-2 rounded-lg cursor-pointer transition-all font-medium text-sm"
-              style={{ background: "var(--color-amber)", color: "var(--color-on-accent)", fontFamily: "var(--font-body)" }}
+              style={{
+                background: "var(--color-amber)",
+                color: "var(--color-on-accent)",
+                fontFamily: "var(--font-body)",
+              }}
             >
               {isDark ? "☀ Светлая" : "☾ Тёмная"}
             </button>
           </div>
 
-          {/* Palette presets */}
-          <div className="text-xs mb-2" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>ЦВЕТОВЫЕ ПАЛИТРЫ</div>
+          <div
+            className="text-xs mb-2"
+            style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+          >
+            ЦВЕТОВЫЕ ПАЛИТРЫ
+          </div>
           <div className="flex gap-2 flex-wrap mb-4">
             {[
               { name: "Янтарь", bg: theme.colorBg, accent: "var(--color-amber)" },
@@ -240,15 +374,25 @@ export default function Settings({ onNavigate }: { onNavigate?: (page: string) =
               { name: "Малина", bg: theme.colorBg, accent: "var(--color-rose)" },
               { name: "Синий", bg: theme.colorBg, accent: "#7a8fff" },
               { name: "Аметист", bg: theme.colorBg, accent: "#c47ae8" },
-            ].map(p => (
+            ].map((p) => (
               <div key={p.name} className="flex flex-col items-center gap-1.5 cursor-pointer group">
-                <div className="w-10 h-10 rounded-lg border-2 transition-all" style={{ background: p.accent, borderColor: theme.colorAmber === p.accent ? "var(--color-text)" : "transparent" }} />
-                <div className="text-xs" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)", fontSize: "9px" }}>{p.name}</div>
+                <div
+                  className="w-10 h-10 rounded-lg border-2 transition-all"
+                  style={{
+                    background: p.accent,
+                    borderColor: theme.colorAmber === p.accent ? "var(--color-text)" : "transparent",
+                  }}
+                />
+                <div
+                  className="text-xs"
+                  style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)", fontSize: "9px" }}
+                >
+                  {p.name}
+                </div>
               </div>
             ))}
           </div>
 
-          {/* Active swatches */}
           <div className="flex gap-2 flex-wrap mb-3">
             {[
               { label: "Фон", val: theme.colorBg },
@@ -256,19 +400,34 @@ export default function Settings({ onNavigate }: { onNavigate?: (page: string) =
               { label: "Успех", val: theme.colorTeal },
               { label: "Опасность", val: theme.colorRose },
               { label: "Текст", val: theme.colorText },
-            ].map(c => (
+            ].map((c) => (
               <div key={c.label} className="flex flex-col items-center gap-1">
-                <div className="w-8 h-8 rounded" style={{ background: c.val, border: "1px solid var(--color-border)" }} />
-                <div className="text-xs" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)", fontSize: "9px" }}>{c.label}</div>
+                <div
+                  className="w-8 h-8 rounded"
+                  style={{ background: c.val, border: "1px solid var(--color-border)" }}
+                />
+                <div
+                  className="text-xs"
+                  style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)", fontSize: "9px" }}
+                >
+                  {c.label}
+                </div>
               </div>
             ))}
           </div>
-          <div className="text-xs mb-3" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
-            Заголовок: {theme.fontDisplay.split(",")[0].replace(/'/g, "").trim()}<br />
-            Текст: {theme.fontBody.split(",")[0].replace(/'/g, "").trim()}<br />
+          <div
+            className="text-xs mb-3"
+            style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+          >
+            Заголовок: {theme.fontDisplay.split(",")[0].replace(/'/g, "").trim()}
+            <br />
+            Текст: {theme.fontBody.split(",")[0].replace(/'/g, "").trim()}
+            <br />
             Скругление: {theme.radiusCard}
           </div>
-          <Btn variant="ghost" onClick={() => onNavigate?.("theme")}>Открыть визуальный редактор →</Btn>
+          <Btn variant="ghost" onClick={() => onNavigate?.("theme")}>
+            Открыть визуальный редактор →
+          </Btn>
         </Card>
 
         {/* Системная информация */}
@@ -284,10 +443,18 @@ export default function Settings({ onNavigate }: { onNavigate?: (page: string) =
               { label: "Яндекс Такси", val: "Подключён" },
               { label: "SMS-шлюз", val: "Eskiz.uz — активен" },
               { label: "Аналитика", val: "Google Analytics 4" },
-            ].map(s => (
-              <div key={s.label} className="flex flex-wrap justify-between gap-2 text-sm py-1.5" style={{ borderBottom: "1px solid var(--color-border)" }}>
+            ].map((s) => (
+              <div
+                key={s.label}
+                className="flex flex-wrap justify-between gap-2 text-sm py-1.5"
+                style={{ borderBottom: "1px solid var(--color-border)" }}
+              >
                 <span style={{ color: "var(--color-muted)" }}>{s.label}</span>
-                <span style={{ color: "var(--color-text)", fontFamily: "var(--font-mono)", fontSize: "12px" }}>{s.val}</span>
+                <span
+                  style={{ color: "var(--color-text)", fontFamily: "var(--font-mono)", fontSize: "12px" }}
+                >
+                  {s.val}
+                </span>
               </div>
             ))}
           </div>
@@ -295,47 +462,102 @@ export default function Settings({ onNavigate }: { onNavigate?: (page: string) =
 
         {/* Опасная зона */}
         <div className="col-span-2">
-          <Card className="p-5" style={{ border: "1px solid color-mix(in srgb, var(--color-rose) 30%, transparent)" } as React.CSSProperties}>
+          <Card
+            className="p-5"
+            style={
+              {
+                border: "1px solid color-mix(in srgb, var(--color-rose) 30%, transparent)",
+              } as React.CSSProperties
+            }
+          >
             <SectionTitle>Опасная зона</SectionTitle>
             <div className="flex gap-4 flex-wrap">
               <div className="flex-1 min-w-0 sm:min-w-60">
-                <div className="text-sm font-medium mb-0.5" style={{ color: "var(--color-text)" }}>Очистить кэш</div>
-                <div className="text-xs mb-3" style={{ color: "var(--color-muted)" }}>Принудительное обновление всех кэшированных страниц и CDN</div>
-                <Btn variant="ghost" onClick={() => location.reload()}>Очистить кэш</Btn>
+                <div className="text-sm font-medium mb-0.5" style={{ color: "var(--color-text)" }}>
+                  Очистить кэш
+                </div>
+                <div className="text-xs mb-3" style={{ color: "var(--color-muted)" }}>
+                  Принудительное обновление всех кэшированных страниц и CDN
+                </div>
+                <Btn variant="ghost" onClick={() => location.reload()}>
+                  Очистить кэш
+                </Btn>
               </div>
               <div className="flex-1 min-w-0 sm:min-w-60">
-                <div className="text-sm font-medium mb-0.5" style={{ color: "var(--color-text)" }}>Экспорт данных</div>
-                <div className="text-xs mb-3" style={{ color: "var(--color-muted)" }}>Скачать полный дамп базы данных в ZIP-архиве</div>
-                <Btn variant="ghost" onClick={exportData}>{exporting ? "Готовим…" : "Экспортировать"}</Btn>
+                <div className="text-sm font-medium mb-0.5" style={{ color: "var(--color-text)" }}>
+                  Экспорт данных
+                </div>
+                <div className="text-xs mb-3" style={{ color: "var(--color-muted)" }}>
+                  Скачать полный дамп базы данных в ZIP-архиве
+                </div>
+                <Btn variant="ghost" onClick={exportData}>
+                  {exporting ? "Готовим…" : "Экспортировать"}
+                </Btn>
               </div>
               <div className="flex-1 min-w-0 sm:min-w-60">
-                <div className="text-sm font-medium mb-0.5" style={{ color: "var(--color-rose)" }}>Удалить аккаунт</div>
-                <div className="text-xs mb-3" style={{ color: "var(--color-muted)" }}>Навсегда удалить этот администраторский аккаунт</div>
-                <Btn variant="danger" onClick={() => setShowDeleteConfirm(true)}>Удалить аккаунт</Btn>
+                <div className="text-sm font-medium mb-0.5" style={{ color: "var(--color-rose)" }}>
+                  Удалить аккаунт
+                </div>
+                <div className="text-xs mb-3" style={{ color: "var(--color-muted)" }}>
+                  Навсегда удалить этот администраторский аккаунт
+                </div>
+                <Btn variant="danger" onClick={() => setShowDeleteConfirm(true)}>
+                  Удалить аккаунт
+                </Btn>
               </div>
             </div>
           </Card>
         </div>
       </div>
       {showDeleteConfirm && (
-        <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: "rgba(0,0,0,0.75)" }} onClick={() => setShowDeleteConfirm(false)}>
-          <div className="rounded-2xl w-full max-w-sm p-6" style={{ background: "var(--color-panel)", border: "1px solid rgba(196,90,66,0.4)" }} onClick={e => e.stopPropagation()}>
+        <div
+          className="fixed inset-0 flex items-center justify-center z-50"
+          style={{ background: "rgba(0,0,0,0.75)" }}
+          onClick={() => setShowDeleteConfirm(false)}
+        >
+          <div
+            className="rounded-2xl w-full max-w-sm p-6"
+            style={{ background: "var(--color-panel)", border: "1px solid rgba(196,90,66,0.4)" }}
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="text-4xl mb-4 text-center">⚠</div>
-            <h3 className="text-lg font-semibold mb-2 text-center" style={{ fontFamily: "var(--font-display)", color: "var(--color-rose)" }}>Удалить аккаунт?</h3>
+            <h3
+              className="text-lg font-semibold mb-2 text-center"
+              style={{ fontFamily: "var(--font-display)", color: "var(--color-rose)" }}
+            >
+              Удалить аккаунт?
+            </h3>
             <p className="text-sm mb-5 text-center" style={{ color: "var(--color-muted)" }}>
-              Это действие необратимо. Все данные аккаунта будут удалены навсегда. Напишите <strong style={{ color: "var(--color-text)" }}>УДАЛИТЬ</strong> для подтверждения.
+              Это действие необратимо. Все данные аккаунта будут удалены навсегда. Напишите{" "}
+              <strong style={{ color: "var(--color-text)" }}>УДАЛИТЬ</strong> для подтверждения.
             </p>
-            <input type="text" placeholder="УДАЛИТЬ"
+            <input
+              type="text"
+              placeholder="УДАЛИТЬ"
               className="w-full rounded px-3 py-2 text-sm outline-none mb-4 text-center"
-              style={{ background: "var(--color-surface)", border: "1px solid rgba(196,90,66,0.4)", color: "var(--color-text)", fontFamily: "var(--font-mono)" }}
+              style={{
+                background: "var(--color-surface)",
+                border: "1px solid rgba(196,90,66,0.4)",
+                color: "var(--color-text)",
+                fontFamily: "var(--font-mono)",
+              }}
               id="delete-confirm-input"
             />
             <div className="flex flex-wrap gap-3">
-              <Btn variant="ghost" onClick={() => setShowDeleteConfirm(false)}>Отмена</Btn>
-              <Btn variant="danger" onClick={() => {
-                const val = (document.getElementById("delete-confirm-input") as HTMLInputElement)?.value;
-                if (val === "УДАЛИТЬ") { setShowDeleteConfirm(false); }
-              }}>Удалить навсегда</Btn>
+              <Btn variant="ghost" onClick={() => setShowDeleteConfirm(false)}>
+                Отмена
+              </Btn>
+              <Btn
+                variant="danger"
+                onClick={() => {
+                  const val = (document.getElementById("delete-confirm-input") as HTMLInputElement)?.value;
+                  if (val === "УДАЛИТЬ") {
+                    setShowDeleteConfirm(false);
+                  }
+                }}
+              >
+                Удалить навсегда
+              </Btn>
             </div>
           </div>
         </div>

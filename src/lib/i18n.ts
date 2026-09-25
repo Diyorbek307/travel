@@ -56,14 +56,14 @@ function row(
 }
 
 export const СЛОВАРЬ = {
-  // ── Нижнее меню ──────────────────────────────────────────────────
+  // Нижнее меню
   nav_home: row("Home", "Главная", "Bosh sahifa", "首页", "홈", "Start", "Accueil", "ホーム", "Ana sayfa", "الرئيسية"),
   nav_explore: row("Explore", "Исследовать", "Kashf etish", "探索", "탐색", "Entdecken", "Explorer", "さがす", "Keşfet", "استكشاف"),
   nav_map: row("Map", "Карта", "Xarita", "地图", "지도", "Karte", "Carte", "地図", "Harita", "الخريطة"),
   nav_audio: row("Audio", "Аудио", "Audio", "语音", "오디오", "Audio", "Audio", "音声", "Sesli", "الصوت"),
   nav_profile: row("Profile", "Профиль", "Profil", "我的", "프로필", "Profil", "Profil", "プロフィール", "Profil", "الملف"),
 
-  // ── Общие кнопки ─────────────────────────────────────────────────
+  // Общие кнопки
   common_search: row("Search", "Найти", "Qidirish", "搜索", "검색", "Suchen", "Rechercher", "検索", "Ara", "بحث"),
   common_back: row("Back", "Назад", "Orqaga", "返回", "뒤로", "Zurück", "Retour", "戻る", "Geri", "رجوع"),
   common_open: row("Open", "Открыть", "Ochish", "打开", "열기", "Öffnen", "Ouvrir", "開く", "Aç", "فتح"),
@@ -79,7 +79,7 @@ export const СЛОВАРЬ = {
   common_from: row("from", "от", "dan", "起", "부터", "ab", "à partir de", "から", "başlangıç", "من"),
   common_night: row("per night", "за ночь", "bir kecha", "每晚", "1박", "pro Nacht", "par nuit", "1泊", "gecelik", "لليلة"),
 
-  // ── Стартовый экран ──────────────────────────────────────────────
+  // Стартовый экран
   splash_tagline: row(
     "Discover the beauty of Uzbekistan",
     "Открой красоту Узбекистана",
@@ -132,7 +132,7 @@ export const СЛОВАРЬ = {
   splash_langs: row("languages", "языков", "til", "种语言", "개 언어", "Sprachen", "langues", "言語", "dil", "لغة"),
   splash_rating: row("rating", "рейтинг", "reyting", "评分", "평점", "Bewertung", "note", "評価", "puan", "التقييم"),
 
-  // ── Регистрация и вход ───────────────────────────────────────────
+  // Регистрация и вход
   reg_title: row("Create account", "Создать аккаунт", "Hisob yaratish", "创建账户", "계정 만들기", "Konto erstellen", "Créer un compte", "アカウント作成", "Hesap oluştur", "إنشاء حساب"),
   reg_sub: row(
     "To save routes and favourites",
@@ -204,7 +204,7 @@ export const СЛОВАРЬ = {
   reset_sent_title: row("Request received", "Заявка принята", "Soʻrov qabul qilindi", "请求已收到", "요청이 접수되었습니다", "Anfrage erhalten", "Demande reçue", "リクエストを受け付けました", "İstek alındı", "تم استلام الطلب"),
   reset_sent_body: row("If an account exists for this address, support will send a password reset link. The link is valid for one hour.", "Если на этот адрес есть аккаунт, поддержка вышлет ссылку для смены пароля. Ссылка действует один час.", "Agar bu manzilda hisob boʻlsa, qoʻllab-quvvatlash parol almashtirish havolasini yuboradi. Havola bir soat amal qiladi.", "如果该邮箱有账户，客服会发送密码重置链接。链接一小时内有效。", "이 주소에 계정이 있으면 고객지원이 비밀번호 재설정 링크를 보냅니다. 링크는 한 시간 동안 유효합니다.", "Wenn für diese Adresse ein Konto besteht, sendet der Support einen Link zum Zurücksetzen. Der Link gilt eine Stunde.", "Si un compte existe pour cette adresse, le support enverra un lien de réinitialisation. Le lien est valable une heure.", "このアドレスにアカウントがあれば、サポートが再設定リンクを送ります。リンクは1時間有効です。", "Bu adrese ait bir hesap varsa destek, şifre sıfırlama bağlantısı gönderir. Bağlantı bir saat geçerlidir.", "إذا كان لهذا العنوان حساب، سيرسل الدعم رابط إعادة تعيين كلمة المرور. الرابط صالح لمدة ساعة."),
 
-  // ── Главная ──────────────────────────────────────────────────────
+  // Главная
   home_welcome: row("Welcome", "Добро пожаловать", "Xush kelibsiz", "欢迎", "환영합니다", "Willkommen", "Bienvenue", "ようこそ", "Hoş geldiniz", "أهلاً بك"),
   home_search_ph: row("Where do you want to go?", "Куда вы хотите поехать?", "Qayerga bormoqchisiz?", "您想去哪里？", "어디로 가고 싶으세요?", "Wohin möchten Sie reisen?", "Où souhaitez-vous aller ?", "どこへ行きますか？", "Nereye gitmek istersiniz?", "إلى أين تريد الذهاب؟"),
   home_places: row("Places", "Места", "Joylar", "景点", "명소", "Orte", "Lieux", "スポット", "Yerler", "أماكن"),
@@ -218,7 +218,7 @@ export const СЛОВАРЬ = {
   home_why: row("Why choose HelloUZ?", "Почему выбирают HelloUZ?", "Nega HelloUZ tanlanadi?", "为什么选择 HelloUZ？", "왜 HelloUZ일까요?", "Warum HelloUZ?", "Pourquoi HelloUZ ?", "なぜHelloUZなのか", "Neden HelloUZ?", "لماذا HelloUZ؟"),
   home_all: row("All →", "Все →", "Barchasi →", "全部 →", "전체 →", "Alle →", "Tout →", "すべて →", "Tümü →", "الكل →"),
 
-  // ── Исследовать ──────────────────────────────────────────────────
+  // Исследовать
   explore_kicker: row("EXPLORE", "ИССЛЕДОВАТЬ", "KASHF ETISH", "探索", "탐색", "ENTDECKEN", "EXPLORER", "さがす", "KEŞFET", "استكشاف"),
   explore_title: row("Discover Uzbekistan", "Открой Узбекистан", "Oʻzbekistonni kashf eting", "发现乌兹别克斯坦", "우즈베키스탄 발견", "Usbekistan entdecken", "Découvrez l'Ouzbékistan", "ウズベキスタンを発見", "Özbekistan'ı keşfet", "اكتشف أوزبكستان"),
   f_history: row("History", "История", "Tarix", "历史", "역사", "Geschichte", "Histoire", "歴史", "Tarih", "التاريخ"),
@@ -227,7 +227,7 @@ export const СЛОВАРЬ = {
   f_nature: row("Nature", "Природа", "Tabiat", "自然", "자연", "Natur", "Nature", "自然", "Doğa", "الطبيعة"),
   f_bazaars: row("Bazaars", "Базары", "Bozorlar", "集市", "시장", "Basare", "Bazars", "バザール", "Pazarlar", "أسواق"),
 
-  // ── Карта и маршруты ─────────────────────────────────────────────
+  // Карта и маршруты
   map_kicker: row("ROUTES & MAP", "МАРШРУТЫ И КАРТА", "MARSHRUT VA XARITA", "路线与地图", "경로 및 지도", "ROUTEN & KARTE", "ITINÉRAIRES & CARTE", "ルートと地図", "ROTALAR VE HARİTA", "المسارات والخريطة"),
   map_title: row("Plan your trip", "Спланируй поездку", "Sayohatni rejalashtiring", "规划行程", "여행 계획하기", "Reise planen", "Planifiez votre voyage", "旅行を計画", "Yolculuğunu planla", "خطط لرحلتك"),
   map_tab_map: row("Map", "Карта", "Xarita", "地图", "지도", "Karte", "Carte", "地図", "Harita", "الخريطة"),
@@ -246,7 +246,7 @@ export const СЛОВАРЬ = {
   map_on_foot: row("On foot", "Пешком", "Piyoda", "步行", "도보", "Zu Fuß", "À pied", "徒歩", "Yürüyerek", "سيراً"),
   map_selected_city: row("Selected city", "Выбранный город", "Tanlangan shahar", "已选城市", "선택한 도시", "Ausgewählte Stadt", "Ville sélectionnée", "選択した都市", "Seçilen şehir", "المدينة المختارة"),
 
-  // ── Такси ────────────────────────────────────────────────────────
+  // Такси
   taxi_geo_unsupported: row("This device can't determine its location", "Устройство не умеет определять местоположение", "Qurilma joylashuvni aniqlay olmaydi", "此设备无法定位", "이 기기는 위치를 확인할 수 없어요", "Dieses Gerät kann den Standort nicht bestimmen", "Cet appareil ne peut pas se localiser", "この端末は位置情報を取得できません", "Bu cihaz konumu belirleyemiyor", "لا يستطيع هذا الجهاز تحديد الموقع"),
   taxi_geo_failed: row("Couldn't find you — we'll start from the city centre", "Не удалось определить — поедем от центра города", "Aniqlab boʻlmadi — shahar markazidan boramiz", "无法定位——将从市中心出发", "위치를 찾지 못했어요 — 도심에서 출발할게요", "Standort unbekannt – wir starten im Stadtzentrum", "Localisation impossible — départ du centre-ville", "現在地がわかりません。市の中心から出発します", "Konum bulunamadı — şehir merkezinden çıkılacak", "تعذّر تحديد موقعك — سننطلق من وسط المدينة"),
   taxi_title: row("Taxi", "Такси", "Taksi", "出租车", "택시", "Taxi", "Taxi", "タクシー", "Taksi", "تاكسي"),
@@ -258,7 +258,7 @@ export const СЛОВАРЬ = {
   taxi_open_go: row("Open in Yandex Go", "Открыть в Яндекс Go", "Yandex Go'da ochish", "在 Yandex Go 打开", "Yandex Go에서 열기", "In Yandex Go öffnen", "Ouvrir dans Yandex Go", "Yandex Goで開く", "Yandex Go'da aç", "افتح في Yandex Go"),
   taxi_pick_dest: row("Choose a destination", "Выберите, куда едем", "Manzilni tanlang", "请选择目的地", "목적지를 선택하세요", "Ziel wählen", "Choisissez la destination", "行き先を選択", "Varış noktası seçin", "اختر الوجهة"),
 
-  // ── Аудио ────────────────────────────────────────────────────────
+  // Аудио
   audio_kicker: row("AUDIO GUIDE", "АУДИОГИД", "AUDIO YOʻRIQCHI", "语音导览", "오디오 가이드", "AUDIOGUIDE", "AUDIOGUIDE", "音声ガイド", "SESLİ REHBER", "الدليل الصوتي"),
   audio_title: row("Listen to stories", "Слушай истории", "Hikoyalarni tinglang", "聆听故事", "이야기를 들어보세요", "Geschichten hören", "Écoutez les histoires", "物語を聴く", "Hikâyeleri dinle", "استمع إلى القصص"),
   audio_lang: row("Audio guide language", "Язык аудиогида", "Audio yoʻriqchi tili", "语音导览语言", "오디오 가이드 언어", "Sprache des Audioguides", "Langue de l'audioguide", "音声ガイドの言語", "Sesli rehber dili", "لغة الدليل الصوتي"),
@@ -278,7 +278,7 @@ export const СЛОВАРЬ = {
     "لا توجد أدلة صوتية بعد. ستظهر هنا بمجرد تسجيلها.",
   ),
 
-  // ── Профиль ──────────────────────────────────────────────────────
+  // Профиль
   prof_traveler: row("Traveler", "Путешественник", "Sayohatchi", "旅行者", "여행자", "Reisende:r", "Voyageur", "旅行者", "Gezgin", "مسافر"),
   prof_passport: row("Passport", "Паспорт", "Pasport", "护照", "여권", "Pass", "Passeport", "パスポート", "Pasaport", "جواز"),
   prof_bookings: row("Bookings", "Заявки", "Buyurtmalar", "预订", "예약", "Buchungen", "Réservations", "予約", "Rezervasyonlar", "الحجوزات"),
@@ -299,7 +299,7 @@ export const СЛОВАРЬ = {
   prof_logout: row("Log out", "Выйти", "Chiqish", "退出登录", "로그아웃", "Abmelden", "Se déconnecter", "ログアウト", "Çıkış yap", "تسجيل الخروج"),
   prof_account: row("Account", "Аккаунт", "Hisob", "账户", "계정", "Konto", "Compte", "アカウント", "Hesap", "الحساب"),
 
-  // ── Оплата ───────────────────────────────────────────────────────
+  // Оплата
   pay_premium: row("HelloUZ Pro", "HelloUZ Pro", "HelloUZ Pro", "HelloUZ Pro", "HelloUZ Pro", "HelloUZ Pro", "HelloUZ Pro", "HelloUZ Pro", "HelloUZ Pro", "HelloUZ Pro"),
   pay_no_ads: row("No ads", "Без рекламы", "Reklamasiz", "无广告", "광고 없음", "Keine Werbung", "Sans publicité", "広告なし", "Reklamsız", "بدون إعلانات"),
   pay_pay: row("Pay", "Оплатить", "Toʻlash", "支付", "결제", "Bezahlen", "Payer", "支払う", "Öde", "ادفع"),
@@ -319,7 +319,7 @@ export const СЛОВАРЬ = {
     "الدفع الإلكتروني غير مفعّل بعد.",
   ),
 
-  // ── Погода ───────────────────────────────────────────────────────
+  // Погода
   w_clear: row("Clear", "Ясно", "Ochiq", "晴", "맑음", "Klar", "Dégagé", "快晴", "Açık", "صافٍ"),
   w_partly: row("Partly cloudy", "Малооблачно", "Ozgina bulutli", "少云", "구름 조금", "Leicht bewölkt", "Peu nuageux", "晴れ時々曇り", "Az bulutlu", "غائم جزئياً"),
   w_cloudy: row("Cloudy", "Облачно", "Bulutli", "多云", "흐림", "Bewölkt", "Nuageux", "曇り", "Bulutlu", "غائم"),
@@ -576,7 +576,7 @@ export const СЛОВАРЬ = {
   pr_sockets: row("Power sockets", "Розетки", "Rozetkalar", "电源插座", "콘센트", "Steckdosen", "Prises électriques", "電源プラグ", "Prizler", "المقابس"),
   pr_note: row("Detailed tips are shown in the language they were written in.", "Подробные советы показаны на языке, на котором написаны.", "Batafsil maslahatlar yozilgan tilida koʻrsatiladi.", "详细提示以其撰写语言显示。", "자세한 팁은 작성된 언어로 표시됩니다.", "Ausführliche Tipps erscheinen in ihrer Originalsprache.", "Les conseils détaillés sont affichés dans leur langue d'origine.", "詳細なヒントは記載言語で表示されます。", "Ayrıntılı ipuçları yazıldığı dilde gösterilir.", "تظهر النصائح التفصيلية بلغتها الأصلية."),
 
-  // ── Экраны деталей: места, отели, рестораны, маршруты ─────────────
+  // Экраны деталей: места, отели, рестораны, маршруты
   d_description: row("Description", "Описание", "Tavsif", "简介", "설명", "Beschreibung", "Description", "説明", "Açıklama", "الوصف"),
   d_about_hotel: row("About the hotel", "Об отеле", "Mehmonxona haqida", "关于酒店", "호텔 정보", "Über das Hotel", "À propos de l'hôtel", "ホテルについて", "Otel hakkında", "عن الفندق"),
   d_facilities: row("Facilities", "Удобства", "Qulayliklar", "设施", "편의시설", "Ausstattung", "Équipements", "設備", "Olanaklar", "المرافق"),
@@ -596,7 +596,7 @@ export const СЛОВАРЬ = {
   d_start: row("Start", "Начать", "Boshlash", "开始", "시작", "Starten", "Démarrer", "開始", "Başlat", "ابدأ"),
   d_save: row("Save", "Сохранить", "Saqlash", "保存", "저장", "Speichern", "Enregistrer", "保存", "Kaydet", "حفظ"),
 
-  // ── Карточки-колоды на главной ───────────────────────────────────
+  // Карточки-колоды на главной
   uz_country: row("Uzbekistan", "Узбекистан", "Oʻzbekiston", "乌兹别克斯坦", "우즈베키스탄", "Usbekistan", "Ouzbékistan", "ウズベキスタン", "Özbekistan", "أوزبكستان"),
   card_dist: row("Dist.", "Расст.", "Masofa", "距离", "거리", "Entf.", "Dist.", "距離", "Mesafe", "المسافة"),
   card_temp: row("Temp.", "Темп.", "Harorat", "气温", "기온", "Temp.", "Temp.", "気温", "Sıcaklık", "الحرارة"),
@@ -611,7 +611,7 @@ export const СЛОВАРЬ = {
   deck_popular_cities: row("Popular cities", "Популярные города", "Mashhur shaharlar", "热门城市", "인기 도시", "Beliebte Städte", "Villes populaires", "人気の都市", "Popüler şehirler", "المدن الشائعة"),
   deck_city_badge: row("City", "Город", "Shahar", "城市", "도시", "Stadt", "Ville", "都市", "Şehir", "مدينة"),
 
-  // ── Главный экран: секции и подписи ──────────────────────────────
+  // Главный экран: секции и подписи
   home_city_tagline: row("Heart of the Silk Road · 2,750 years of history · UNESCO", "Сердце Шёлкового пути · 2750 лет истории · ЮНЕСКО", "Ipak yoʻli yuragi · 2750 yillik tarix · YuNESKO", "丝绸之路的心脏 · 2750 年历史 · 联合国教科文组织", "실크로드의 심장 · 2,750년 역사 · 유네스코", "Herz der Seidenstraße · 2.750 Jahre Geschichte · UNESCO", "Cœur de la Route de la soie · 2 750 ans d'histoire · UNESCO", "シルクロードの心臓 · 2750年の歴史 · ユネスコ", "İpek Yolu'nun kalbi · 2.750 yıllık tarih · UNESCO", "قلب طريق الحرير · 2750 عاماً من التاريخ · اليونسكو"),
   home_events: row("Events & festivals", "События и фестивали", "Tadbir va festivallar", "活动与节庆", "행사 & 축제", "Events & Festivals", "Événements et festivals", "イベント＆祭り", "Etkinlikler ve festivaller", "الفعاليات والمهرجانات"),
   home_remind: row("Remind me", "Напомнить", "Eslatish", "提醒我", "알림 설정", "Erinnern", "Me rappeler", "リマインド", "Hatırlat", "ذكّرني"),
@@ -629,7 +629,7 @@ export const СЛОВАРЬ = {
   why_made: row("UZ-made", "UZ-made", "UZ-made", "乌兹别克出品", "UZ 제작", "UZ-made", "Made in UZ", "UZ製", "UZ yapımı", "صنع أوزبكي"),
   why_made_sub: row("With love", "С любовью", "Mehr bilan", "用心打造", "정성껏", "Mit Liebe", "Avec amour", "愛を込めて", "Sevgiyle", "بحبّ"),
 
-  // ── Поддержка ────────────────────────────────────────────────────
+  // Поддержка
   sup_hours: row("We reply during business hours", "Отвечаем в рабочие часы", "Ish vaqtida javob beramiz", "工作时间内回复", "업무 시간에 답변드립니다", "Wir antworten zu den Geschäftszeiten", "Nous répondons aux heures ouvrables", "営業時間内に返信します", "Çalışma saatlerinde yanıtlıyoruz", "نردّ خلال ساعات العمل"),
   sup_loading: row("Loading conversation…", "Загружаем переписку…", "Yozishmalar yuklanmoqda…", "正在加载对话…", "대화를 불러오는 중…", "Konversation wird geladen…", "Chargement de la conversation…", "会話を読み込み中…", "Sohbet yükleniyor…", "جارٍ تحميل المحادثة…"),
   sup_empty1: row("Write to us — we'll reply right here.", "Напишите нам — ответим здесь же.", "Bizga yozing — shu yerda javob beramiz.", "给我们留言——就在这里回复。", "메시지를 남겨주세요 — 여기서 답변드려요.", "Schreiben Sie uns — wir antworten hier.", "Écrivez-nous — nous répondrons ici.", "メッセージをどうぞ——ここで返信します。", "Bize yazın — burada yanıtlarız.", "راسلنا — سنردّ هنا." ),
@@ -637,7 +637,7 @@ export const СЛОВАРЬ = {
   sup_error: row("Couldn't send — please try again.", "Не отправилось — попробуйте ещё раз.", "Yuborilmadi — qayta urinib koʻring.", "发送失败，请重试。", "전송하지 못했어요. 다시 시도해 주세요.", "Nicht gesendet – bitte erneut versuchen.", "Envoi impossible — réessayez.", "送信できませんでした。もう一度お試しください。", "Gönderilemedi — lütfen tekrar deneyin.", "تعذّر الإرسال — حاول مرة أخرى."),
   sup_ph: row("Message", "Сообщение", "Xabar", "消息", "메시지", "Nachricht", "Message", "メッセージ", "Mesaj", "رسالة"),
 
-  // ── Планировщик маршрута и транспорт ─────────────────────────────
+  // Планировщик маршрута и транспорт
   map_where: row("Where to?", "Куда едем?", "Qayerga boramiz?", "去哪里？", "어디로 갈까요?", "Wohin?", "Où va-t-on ?", "どこへ？", "Nereye?", "إلى أين؟"),
   map_howlong: row("How long?", "Сколько времени?", "Qancha vaqt?", "多长时间？", "얼마나?", "Wie lange?", "Combien de temps ?", "どれくらい？", "Ne kadar süre?", "كم من الوقت؟"),
   map_interests: row("Interests", "Интересы", "Qiziqishlar", "兴趣", "관심사", "Interessen", "Centres d'intérêt", "興味", "İlgi alanları", "الاهتمامات"),
@@ -649,7 +649,7 @@ export const СЛОВАРЬ = {
   map_ai_route: row("AI Route", "AI Маршрут", "AI Marshrut", "AI 路线", "AI 경로", "KI-Route", "Itinéraire IA", "AIルート", "Yapay zekâ rotası", "مسار ذكي"),
   tr_subtitle: row("Travel across Uzbekistan", "Перевозки по Узбекистану", "Oʻzbekiston boʻylab qatnovlar", "乌兹别克斯坦境内出行", "우즈베키스탄 국내 이동", "Reisen durch Usbekistan", "Transports à travers l'Ouzbékistan", "ウズベキスタン国内の移動", "Özbekistan genelinde ulaşım", "التنقّل عبر أوزبكستان"),
 
-  // ── Premium-модал и профиль ──────────────────────────────────────
+  // Premium-модал и профиль
   prem_sub_incl: row("Ad-free · Everything included", "Без рекламы · Всё включено", "Reklamasiz · Hammasi kiritilgan", "无广告 · 全部包含", "광고 없음 · 모두 포함", "Werbefrei · Alles inklusive", "Sans pub · Tout inclus", "広告なし · すべて込み", "Reklamsız · Her şey dahil", "بلا إعلانات · كل شيء مشمول"),
   prem_per_month: row("/ month", "/мес", "/oy", "/月", "/월", "/Monat", "/mois", "/月", "/ay", "/شهر"),
   prem_per_year: row("/ year", "/год", "/yil", "/年", "/년", "/Jahr", "/an", "/年", "/yıl", "/سنة"),
@@ -660,7 +660,7 @@ export const СЛОВАРЬ = {
   prof_premium_active: row("HelloUZ Premium active", "HelloUZ Premium активен", "HelloUZ Premium faol", "HelloUZ Premium 已激活", "HelloUZ Premium 활성", "HelloUZ Premium aktiv", "HelloUZ Premium actif", "HelloUZ Premium 有効", "HelloUZ Premium etkin", "HelloUZ Premium مُفعّل"),
   prof_emergency: row("Emergency help", "Экстренная помощь", "Favqulodda yordam", "紧急求助", "긴급 도움", "Notfallhilfe", "Aide d'urgence", "緊急支援", "Acil yardım", "مساعدة طارئة"),
 
-  // ── Заказ такси (taxi_title / taxi_from_here / taxi_hide_map уже есть выше) ──
+  // Заказ такси (taxi_title / taxi_from_here / taxi_hide_map уже есть выше)
   taxi_from_city: row("City centre", "Центр города", "Shahar markazi", "市中心", "시내 중심", "Stadtzentrum", "Centre-ville", "市の中心", "Şehir merkezi", "وسط المدينة"),
   taxi_where: row("Where to", "Куда едем", "Qayerga", "去哪里", "어디로", "Wohin", "Où aller", "行き先", "Nereye", "إلى أين"),
   taxi_show_map: row("On the map", "На карте", "Xaritada", "在地图上", "지도에서", "Auf der Karte", "Sur la carte", "地図で", "Haritada", "على الخريطة"),
@@ -671,7 +671,7 @@ export const СЛОВАРЬ = {
   taxi_footer: row("The ride is handled by Yandex Go: payment, car and ride support are there.", "Поездку оформляет Яндекс Go: там оплата, машина и поддержка по поездке.", "Safarni Yandex Go rasmiylashtiradi: toʻlov, mashina va yordam oʻsha yerda.", "行程由 Yandex Go 处理：支付、车辆和行程支持都在其中。", "탑승은 Yandex Go가 처리합니다: 결제·차량·지원이 그곳에 있습니다.", "Die Fahrt wickelt Yandex Go ab: Zahlung, Auto und Support sind dort.", "La course est gérée par Yandex Go : paiement, voiture et assistance y sont.", "配車はYandex Goが担当します。支払い・車両・サポートはそちらで。", "Yolculuğu Yandex Go yürütür: ödeme, araç ve destek oradadır.", "الرحلة يديرها Yandex Go: الدفع والسيارة والدعم هناك."),
   taxi_my_location: row("My location", "Моё местоположение", "Mening joylashuvim", "我的位置", "내 위치", "Mein Standort", "Ma position", "現在地", "Konumum", "موقعي"),
 
-  // ── Хвосты: настройки, штампы, QR, отзыв, офлайн ─────────────────
+  // Хвосты: настройки, штампы, QR, отзыв, офлайн
   s_satellite: row("Satellite", "Спутник", "Sun'iy yo'ldosh", "卫星", "위성", "Satellit", "Satellite", "衛星", "Uydu", "قمر صناعي"),
   s_gps_audio: row("GPS audio guide", "GPS-аудиогид", "GPS audio yoʻriqchi", "GPS 语音导览", "GPS 오디오 가이드", "GPS-Audioguide", "Audioguide GPS", "GPS音声ガイド", "GPS sesli rehber", "دليل صوتي GPS"),
   unit_km: row("km", "км", "km", "公里", "km", "km", "km", "km", "km", "كم"),
@@ -716,7 +716,7 @@ export const СЛОВАРЬ = {
   unit_mb: row("MB", "МБ", "MB", "MB", "MB", "MB", "Mo", "MB", "MB", "م.ب"),
   off_guides: row("guides", "гидов", "yoʻriqchi", "个导览", "개 가이드", "Guides", "guides", "件のガイド", "rehber", "أدلة"),
 
-  // ── Экран аудиогида (audio_kicker/lang/available уже есть выше) ──
+  // Экран аудиогида (audio_kicker/lang/available уже есть выше)
   audio_listen: row("Listen to stories", "Слушай истории", "Hikoyalarni tinglang", "聆听故事", "이야기를 들어보세요", "Geschichten hören", "Écoutez les histoires", "物語を聴く", "Hikâyeleri dinleyin", "استمع إلى الحكايات"),
   audio_all: row("All", "Все", "Barchasi", "全部", "전체", "Alle", "Toutes", "すべて", "Tümü", "الكل"),
   audio_ready: row("The recording is ready — tap it to start. The browser only enables sound after a tap.", "Запись готова — нажмите на неё, чтобы начать. Браузер включает звук только по касанию.", "Yozuv tayyor — boshlash uchun bosing. Brauzer ovozni faqat teginishdan keyin yoqadi.", "录音已就绪——点击即可播放。浏览器仅在点击后启用声音。", "녹음이 준비되었습니다 — 눌러서 시작하세요. 브라우저는 탭한 뒤에만 소리를 켭니다.", "Die Aufnahme ist bereit — zum Starten antippen. Der Browser aktiviert Ton erst nach Berührung.", "L'enregistrement est prêt — touchez-le pour démarrer. Le navigateur n'active le son qu'après un appui.", "録音の準備ができました——タップして再生。ブラウザはタップ後にのみ音を有効にします。", "Kayıt hazır — başlatmak için dokunun. Tarayıcı sesi yalnızca dokununca açar.", "التسجيل جاهز — اضغط عليه للبدء. المتصفّح يفعّل الصوت بعد اللمس فقط."),

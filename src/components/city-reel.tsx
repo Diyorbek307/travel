@@ -48,10 +48,7 @@ export default function CityReel({
       setВиден(true);
       return;
     }
-    const наб = new IntersectionObserver(
-      ([e]) => setВиден(e.isIntersecting),
-      { threshold: 0.35 },
-    );
+    const наб = new IntersectionObserver(([e]) => setВиден(e.isIntersecting), { threshold: 0.35 });
     наб.observe(узел);
     return () => наб.disconnect();
   }, []);

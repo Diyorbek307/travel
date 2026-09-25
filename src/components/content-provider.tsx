@@ -13,8 +13,9 @@ import { useT } from "@/components/lang-provider";
  * набора.
  */
 const МЕДИА_РЕКЛАМЫ = new Map(
-  (ВШИТЫЕ_РЕКЛАМЫ as { id: string; imageUrl?: string; videoUrl?: string; skipAfter?: number }[])
-    .map((a) => [a.id, { imageUrl: a.imageUrl, videoUrl: a.videoUrl, skipAfter: a.skipAfter }] as const),
+  (ВШИТЫЕ_РЕКЛАМЫ as { id: string; imageUrl?: string; videoUrl?: string; skipAfter?: number }[]).map(
+    (a) => [a.id, { imageUrl: a.imageUrl, videoUrl: a.videoUrl, skipAfter: a.skipAfter }] as const,
+  ),
 );
 
 /**
@@ -83,12 +84,25 @@ export function useAppContent() {
   // name переводим тоже: в неродном интерфейсе кириллическое название рядом
   // с переведённым текстом читалось как ошибка. city НЕ трогаем — это ключ
   // поиска погоды; его перевод делается на месте показа (трК на карточке).
-  const мПлейс = (p: (typeof content.places)[number]) => ({ ...p, nameRu: p.name, typeRu: p.type, name: трК(p.name), type: трК(p.type), desc: трК(p.desc), entry: трК(p.entry) });
+  const мПлейс = (p: (typeof content.places)[number]) => ({
+    ...p,
+    nameRu: p.name,
+    typeRu: p.type,
+    name: трК(p.name),
+    type: трК(p.type),
+    desc: трК(p.desc),
+    entry: трК(p.entry),
+  });
   // Удобства (facilities) не переводим здесь: иконку в деталях выбирают по
   // русскому ключу, поэтому перевод делается на месте показа (details.tsx),
   // где сырой ключ остаётся для иконки, а рядом рисуется его перевод.
   const мОтель = (h: (typeof content.hotels)[number]) => ({ ...h, tag: трК(h.tag), desc: трК(h.desc) });
-  const мРест = (r: (typeof content.restaurants)[number]) => ({ ...r, name: трК(r.name), cuisine: трК(r.cuisine), desc: трК(r.desc) });
+  const мРест = (r: (typeof content.restaurants)[number]) => ({
+    ...r,
+    name: трК(r.name),
+    cuisine: трК(r.cuisine),
+    desc: трК(r.desc),
+  });
 
   /*
    * База засеяна старой зеленью #2E7D5A/#1A5C3A — до смены палитры на
@@ -108,8 +122,12 @@ export function useAppContent() {
     PLACES: content.places.filter((p) => видно(p.status, ["active", "seasonal"])).map(мПлейс),
     HOTELS: content.hotels.filter((h) => видно(h.status, ["active"])).map(мОтель),
     RESTAURANTS: content.restaurants.filter((r) => видно(r.status, ["active"])).map(мРест),
-    ROUTES: content.routes.filter((r) => видно(r.status, ["active"])).map((r) => ({ ...r, color: мЦвет(r.color) })),
-    EVENTS: content.events.filter((e) => видно(e.status, ["active", "upcoming"])).map((e) => ({ ...e, color: мЦвет(e.color) })),
+    ROUTES: content.routes
+      .filter((r) => видно(r.status, ["active"]))
+      .map((r) => ({ ...r, color: мЦвет(r.color) })),
+    EVENTS: content.events
+      .filter((e) => видно(e.status, ["active", "upcoming"]))
+      .map((e) => ({ ...e, color: мЦвет(e.color) })),
     // На главной показываются только отмеченные города; порядок задаёт
     // редактор в панели.
     POPULAR_CITIES: content.cities.filter((c) => c.featured && видно(c.status, ["active"])),

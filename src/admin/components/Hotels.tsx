@@ -13,7 +13,15 @@ import type { ManagedHotel as Hotel } from "@/lib/types";
  * приложения, — и правится в обоих местах сразу.
  */
 
-type HotelForm = { name: string; city: string; stars: string; rooms: string; priceFrom: string; img: string; desc: string };
+type HotelForm = {
+  name: string;
+  city: string;
+  stars: string;
+  rooms: string;
+  priceFrom: string;
+  img: string;
+  desc: string;
+};
 const EMPTY_FORM: HotelForm = { name: "", city: "", stars: "3", rooms: "", priceFrom: "", img: "", desc: "" };
 
 const СТАТУС: Record<string, string> = {
@@ -80,7 +88,9 @@ export default function Hotels() {
     if (!form.name.trim() || !form.city) return;
     const priceFrom = Number(form.priceFrom) || 80;
     // Без фото карточка в приложении пустая — подставляем общий снимок.
-    const фото = form.img.trim() || "https://images.unsplash.com/photo-1664602078796-68ee76b3fc59?w=800&h=600&fit=crop&auto=format";
+    const фото =
+      form.img.trim() ||
+      "https://images.unsplash.com/photo-1664602078796-68ee76b3fc59?w=800&h=600&fit=crop&auto=format";
     const newHotel: Hotel = {
       id: `h-${Date.now().toString(36)}`,
       name: form.name.trim(),
@@ -107,7 +117,9 @@ export default function Hotels() {
   const toggleSuspend = (id: string) =>
     setHotels((prev) =>
       prev.map((h) =>
-        h.id === id ? { ...h, status: h.status === "active" ? ("suspended" as const) : ("active" as const) } : h,
+        h.id === id
+          ? { ...h, status: h.status === "active" ? ("suspended" as const) : ("active" as const) }
+          : h,
       ),
     );
 
@@ -120,14 +132,23 @@ export default function Hotels() {
   const поля = (
     <div className="flex flex-col gap-3 mb-5">
       {ПОЛЯ.map(([k, label, type]) => (
-        <label key={k} className="text-xs" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
+        <label
+          key={k}
+          className="text-xs"
+          style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+        >
           {label.toUpperCase()}
           <input
             type={type}
             value={form[k]}
             onChange={(e) => setForm((p) => ({ ...p, [k]: e.target.value }))}
             className="mt-1 w-full rounded px-3 py-2 text-sm outline-none"
-            style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", color: "var(--color-text)", fontFamily: "var(--font-body)" }}
+            style={{
+              background: "var(--color-surface)",
+              border: "1px solid var(--color-border)",
+              color: "var(--color-text)",
+              fontFamily: "var(--font-body)",
+            }}
           />
         </label>
       ))}
@@ -139,7 +160,12 @@ export default function Hotels() {
           value={form.city}
           onChange={(e) => setForm((p) => ({ ...p, city: e.target.value }))}
           className="mt-1 w-full rounded px-3 py-2 text-sm outline-none"
-          style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", color: "var(--color-text)", fontFamily: "var(--font-body)" }}
+          style={{
+            background: "var(--color-surface)",
+            border: "1px solid var(--color-border)",
+            color: "var(--color-text)",
+            fontFamily: "var(--font-body)",
+          }}
         >
           <option value="">— выберите —</option>
           {cities.map((c) => (
@@ -156,7 +182,12 @@ export default function Hotels() {
           value={form.desc}
           onChange={(e) => setForm((p) => ({ ...p, desc: e.target.value }))}
           className="mt-1 w-full rounded px-3 py-2 text-sm outline-none"
-          style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", color: "var(--color-text)", fontFamily: "var(--font-body)" }}
+          style={{
+            background: "var(--color-surface)",
+            border: "1px solid var(--color-border)",
+            color: "var(--color-text)",
+            fontFamily: "var(--font-body)",
+          }}
         />
       </label>
     </div>
@@ -167,7 +198,16 @@ export default function Hotels() {
       <PageHeader
         title="Отели"
         subtitle={`${filtered.length} объектов · ${активных} работают`}
-        action={<Btn onClick={() => { setForm(EMPTY_FORM); setShowAdd(true); }}>+ Добавить отель</Btn>}
+        action={
+          <Btn
+            onClick={() => {
+              setForm(EMPTY_FORM);
+              setShowAdd(true);
+            }}
+          >
+            + Добавить отель
+          </Btn>
+        }
       />
 
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-7">
@@ -176,9 +216,21 @@ export default function Hotels() {
           { label: "РАБОТАЮТ", val: String(активных) },
           { label: "ВСЕГО НОМЕРОВ", val: String(totalRooms) },
         ].map((s) => (
-          <div key={s.label} className="rounded-lg px-4 py-3" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }}>
-            <div className="text-xs mb-1.5" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>{s.label}</div>
-            <div className="text-2xl font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--color-amber)" }}>
+          <div
+            key={s.label}
+            className="rounded-lg px-4 py-3"
+            style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }}
+          >
+            <div
+              className="text-xs mb-1.5"
+              style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+            >
+              {s.label}
+            </div>
+            <div
+              className="text-2xl font-semibold"
+              style={{ fontFamily: "var(--font-display)", color: "var(--color-amber)" }}
+            >
               {s.val}
             </div>
           </div>
@@ -223,26 +275,48 @@ export default function Hotels() {
       </div>
 
       {view === "cards" ? (
-        <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(min(320px, 100%), 1fr))" }}>
+        <div
+          className="grid gap-4"
+          style={{ gridTemplateColumns: "repeat(auto-fill, minmax(min(320px, 100%), 1fr))" }}
+        >
           {filtered.map((h) => (
-            <div key={h.id} className="rounded-lg overflow-hidden" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }}>
+            <div
+              key={h.id}
+              className="rounded-lg overflow-hidden"
+              style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }}
+            >
               <div className="flex flex-wrap gap-0">
                 {h.img ? (
-                  <img src={h.img} alt={h.name} className="w-24 h-24 object-cover shrink-0" style={{ background: "var(--color-dim)" }} />
+                  <img
+                    src={h.img}
+                    alt={h.name}
+                    className="w-24 h-24 object-cover shrink-0"
+                    style={{ background: "var(--color-dim)" }}
+                  />
                 ) : (
-                  <div className="flex w-24 h-24 shrink-0 items-center justify-center text-2xl" style={{ background: "var(--color-dim)" }}>🏨</div>
+                  <div
+                    className="flex w-24 h-24 shrink-0 items-center justify-center text-2xl"
+                    style={{ background: "var(--color-dim)" }}
+                  >
+                    🏨
+                  </div>
                 )}
                 <div className="flex-1 p-3 min-w-0">
                   <div className="flex flex-wrap items-start justify-between gap-2">
                     <div className="min-w-0">
-                      <div className="font-medium text-sm truncate" style={{ color: "var(--color-text)" }}>{h.name}</div>
+                      <div className="font-medium text-sm truncate" style={{ color: "var(--color-text)" }}>
+                        {h.name}
+                      </div>
                       <div className="text-xs mt-0.5" style={{ color: "var(--color-muted)" }}>
                         {h.city} · {"★".repeat(h.stars)}
                       </div>
                     </div>
                     <Badge label={СТАТУС[h.status] ?? h.status} color={statusColor(h.status)} />
                   </div>
-                  <div className="flex flex-wrap gap-4 mt-2 text-xs" style={{ fontFamily: "var(--font-mono)", color: "var(--color-muted)" }}>
+                  <div
+                    className="flex flex-wrap gap-4 mt-2 text-xs"
+                    style={{ fontFamily: "var(--font-mono)", color: "var(--color-muted)" }}
+                  >
                     <span style={{ color: "var(--color-amber)" }}>★ {h.rating || "—"}</span>
                     <span>От ${h.priceFrom}/ночь</span>
                     <span>{h.rooms} номеров</span>
@@ -254,15 +328,32 @@ export default function Hotels() {
                   )}
                 </div>
               </div>
-              <div className="px-3 py-2.5 flex items-center gap-2 flex-wrap" style={{ borderTop: "1px solid var(--color-border)" }}>
+              <div
+                className="px-3 py-2.5 flex items-center gap-2 flex-wrap"
+                style={{ borderTop: "1px solid var(--color-border)" }}
+              >
                 {h.facilities.map((a) => (
-                  <span key={a} className="text-xs px-1.5 py-0.5 rounded" style={{ background: "var(--color-dim)", color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
+                  <span
+                    key={a}
+                    className="text-xs px-1.5 py-0.5 rounded"
+                    style={{
+                      background: "var(--color-dim)",
+                      color: "var(--color-muted)",
+                      fontFamily: "var(--font-mono)",
+                    }}
+                  >
                     {a}
                   </span>
                 ))}
                 <div className="ml-auto flex flex-wrap gap-2">
-                  <Btn variant="ghost" small onClick={() => openEdit(h)}>Изменить</Btn>
-                  <Btn variant={h.status === "active" ? "danger" : "ghost"} small onClick={() => toggleSuspend(h.id)}>
+                  <Btn variant="ghost" small onClick={() => openEdit(h)}>
+                    Изменить
+                  </Btn>
+                  <Btn
+                    variant={h.status === "active" ? "danger" : "ghost"}
+                    small
+                    onClick={() => toggleSuspend(h.id)}
+                  >
                     {h.status === "active" ? "Отключить" : "Включить"}
                   </Btn>
                 </div>
@@ -274,16 +365,34 @@ export default function Hotels() {
         <Table
           cols={["ОТЕЛЬ", "ГОРОД", "ЗВ.", "НОМЕРОВ", "ОТ/НОЧЬ", "РЕЙТИНГ", "СТАТУС", ""]}
           rows={filtered.map((h) => [
-            <span key="n" className="font-medium text-sm" style={{ color: "var(--color-text)" }}>{h.name}</span>,
-            <span key="c" style={{ color: "var(--color-muted)" }}>{h.city}</span>,
-            <span key="s" style={{ color: "var(--color-amber)" }}>{"★".repeat(h.stars)}</span>,
-            <span key="r" style={{ fontFamily: "var(--font-mono)" }}>{h.rooms}</span>,
-            <span key="p" style={{ fontFamily: "var(--font-mono)" }}>${h.priceFrom}</span>,
-            <span key="t" style={{ color: "var(--color-amber)", fontFamily: "var(--font-mono)" }}>★ {h.rating || "—"}</span>,
+            <span key="n" className="font-medium text-sm" style={{ color: "var(--color-text)" }}>
+              {h.name}
+            </span>,
+            <span key="c" style={{ color: "var(--color-muted)" }}>
+              {h.city}
+            </span>,
+            <span key="s" style={{ color: "var(--color-amber)" }}>
+              {"★".repeat(h.stars)}
+            </span>,
+            <span key="r" style={{ fontFamily: "var(--font-mono)" }}>
+              {h.rooms}
+            </span>,
+            <span key="p" style={{ fontFamily: "var(--font-mono)" }}>
+              ${h.priceFrom}
+            </span>,
+            <span key="t" style={{ color: "var(--color-amber)", fontFamily: "var(--font-mono)" }}>
+              ★ {h.rating || "—"}
+            </span>,
             <Badge key="st" label={СТАТУС[h.status] ?? h.status} color={statusColor(h.status)} />,
             <div key="a" className="flex flex-wrap gap-2">
-              <Btn variant="ghost" small onClick={() => openEdit(h)}>Изменить</Btn>
-              <Btn variant={h.status === "active" ? "danger" : "ghost"} small onClick={() => toggleSuspend(h.id)}>
+              <Btn variant="ghost" small onClick={() => openEdit(h)}>
+                Изменить
+              </Btn>
+              <Btn
+                variant={h.status === "active" ? "danger" : "ghost"}
+                small
+                onClick={() => toggleSuspend(h.id)}
+              >
                 {h.status === "active" ? "Отключить" : "Включить"}
               </Btn>
             </div>,
@@ -295,7 +404,10 @@ export default function Hotels() {
         <div
           className="fixed inset-0 flex items-center justify-center z-50 p-4"
           style={{ background: "rgba(0,0,0,0.7)" }}
-          onClick={() => { setEditing(null); setShowAdd(false); }}
+          onClick={() => {
+            setEditing(null);
+            setShowAdd(false);
+          }}
         >
           <div
             className="rounded-2xl w-full max-w-md p-6 max-h-[90dvh] overflow-y-auto"
@@ -303,11 +415,17 @@ export default function Hotels() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex flex-wrap items-center justify-between gap-2 mb-5">
-              <h3 className="text-lg font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}>
+              <h3
+                className="text-lg font-semibold"
+                style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}
+              >
                 {editing ? "Редактировать отель" : "Добавить отель"}
               </h3>
               <button
-                onClick={() => { setEditing(null); setShowAdd(false); }}
+                onClick={() => {
+                  setEditing(null);
+                  setShowAdd(false);
+                }}
                 className="opacity-50 hover:opacity-100 cursor-pointer text-xl"
                 style={{ color: "var(--color-text)" }}
               >
@@ -316,11 +434,21 @@ export default function Hotels() {
             </div>
             {поля}
             <div className="flex flex-wrap gap-3">
-              <Btn variant="ghost" onClick={() => { setEditing(null); setShowAdd(false); }}>Отмена</Btn>
+              <Btn
+                variant="ghost"
+                onClick={() => {
+                  setEditing(null);
+                  setShowAdd(false);
+                }}
+              >
+                Отмена
+              </Btn>
               <Btn onClick={editing ? saveEdit : saveNew}>{editing ? "Сохранить" : "Добавить"}</Btn>
             </div>
             {!editing && (!form.name.trim() || !form.city) && (
-              <p className="mt-3 text-xs" style={{ color: "var(--color-muted)" }}>Нужны название и город.</p>
+              <p className="mt-3 text-xs" style={{ color: "var(--color-muted)" }}>
+                Нужны название и город.
+              </p>
             )}
           </div>
         </div>

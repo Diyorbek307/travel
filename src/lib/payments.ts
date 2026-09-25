@@ -86,7 +86,9 @@ export function clickСсылка(сумма: number, order: string): string | n
 
 /** Куда вернуть человека после оплаты — на сам сайт. */
 function возврат(): string {
-  return process.env.APP_BASE_URL || process.env.RENDER_EXTERNAL_URL || "https://uzbekistan-travel.onrender.com";
+  return (
+    process.env.APP_BASE_URL || process.env.RENDER_EXTERNAL_URL || "https://uzbekistan-travel.onrender.com"
+  );
 }
 
 export function ссылкаОплаты(система: Система, сумма: number, order: string): string | null {

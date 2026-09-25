@@ -7,105 +7,271 @@ import { GeomPattern, LogoMark, Wordmark } from "./ui";
 import { useT } from "@/components/lang-provider";
 import { задатьНастройку } from "@/lib/settings";
 
-export function SplashScreen({ onStart, onLogin }:{ onStart:()=>void; onLogin:()=>void }) {
+export function SplashScreen({ onStart, onLogin }: { onStart: () => void; onLogin: () => void }) {
   const { t } = useT();
   // Цифры витрины редактируются в панели. Пока ответ не пришёл (или сети
   // нет) — показываем разумные значения по умолчанию, экран не пустует.
-  const [цифры, setЦифры] = useState({ statPlaces:"500+", statLangs:"10", statRating:"4.9" });
+  const [цифры, setЦифры] = useState({ statPlaces: "500+", statLangs: "10", statRating: "4.9" });
   useEffect(() => {
     let живо = true;
     fetch("/api/site-config")
-      .then(r => r.ok ? r.json() : null)
-      .then(c => { if (живо && c) setЦифры(c); })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((c) => {
+        if (живо && c) setЦифры(c);
+      })
       .catch(() => {});
-    return () => { живо = false; };
+    return () => {
+      живо = false;
+    };
   }, []);
   return (
     <div className="flex flex-col h-full relative overflow-hidden">
-      <img src="https://images.unsplash.com/photo-1664602078796-68ee76b3fc59?w=800&h=1000&fit=crop&auto=format" alt="Регистан" className="absolute inset-0 w-full h-full object-cover"/>
-      <div className="absolute inset-0" style={{background:"linear-gradient(180deg,rgba(7,120,111,0.5) 0%,rgba(0,0,0,0.1) 40%,rgba(0,0,0,0.82) 100%)"}}/>
-      <div className="relative z-10 flex items-center gap-3 px-6 pt-16"><span data-brand-logo className="inline-flex shrink-0"><LogoMark size={44} intro tone="#ffffff"/></span><div><p className="leading-none"><Wordmark size={26} light style={{textShadow:"0 2px 12px rgba(0,0,0,0.55)"}}/></p><p className="text-white text-xs mt-1 font-medium" style={{textShadow:"0 1px 8px rgba(0,0,0,0.6)"}}>{t("splash_tagline")}</p></div></div>
-      <div className="relative z-10 flex justify-end px-4 mt-2"><GeomPattern opacity={0.22}/></div>
+      <img
+        src="https://images.unsplash.com/photo-1664602078796-68ee76b3fc59?w=800&h=1000&fit=crop&auto=format"
+        alt="Регистан"
+        className="absolute inset-0 w-full h-full object-cover"
+      />
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            "linear-gradient(180deg,rgba(7,120,111,0.5) 0%,rgba(0,0,0,0.1) 40%,rgba(0,0,0,0.82) 100%)",
+        }}
+      />
+      <div className="relative z-10 flex items-center gap-3 px-6 pt-16">
+        <span data-brand-logo className="inline-flex shrink-0">
+          <LogoMark size={44} intro tone="#ffffff" />
+        </span>
+        <div>
+          <p className="leading-none">
+            <Wordmark size={26} light style={{ textShadow: "0 2px 12px rgba(0,0,0,0.55)" }} />
+          </p>
+          <p
+            className="text-white text-xs mt-1 font-medium"
+            style={{ textShadow: "0 1px 8px rgba(0,0,0,0.6)" }}
+          >
+            {t("splash_tagline")}
+          </p>
+        </div>
+      </div>
+      <div className="relative z-10 flex justify-end px-4 mt-2">
+        <GeomPattern opacity={0.22} />
+      </div>
       <div className="relative z-10 mt-auto px-6 pb-12">
-        <h1 className="text-white font-bold leading-tight mb-3" style={{fontSize:36,fontFamily:"var(--font-heading)"}}>{t("splash_tagline")}</h1>
+        <h1
+          className="text-white font-bold leading-tight mb-3"
+          style={{ fontSize: 36, fontFamily: "var(--font-heading)" }}
+        >
+          {t("splash_tagline")}
+        </h1>
         <p className="text-white/75 text-sm mb-8 leading-relaxed">{t("splash_sub")}</p>
-        <button onClick={onStart} className="w-full py-4 rounded-2xl text-base font-bold mb-3 flex items-center justify-center gap-2" style={{background:ACCENT_FILL}}>
+        <button
+          onClick={onStart}
+          className="w-full py-4 rounded-2xl text-base font-bold mb-3 flex items-center justify-center gap-2"
+          style={{ background: ACCENT_FILL }}
+        >
           <span className="text-white">{t("splash_start")}</span>
-          <svg className="rtl-flip" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          <svg
+            className="rtl-flip"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="white"
+            strokeWidth="2.5"
+          >
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
         </button>
-        <button onClick={onLogin} className="w-full py-3 rounded-2xl text-sm font-semibold border" style={{color:"white",borderColor:"rgba(255,255,255,0.3)"}}>{t("splash_login")}</button>
-        <div className="flex justify-center gap-8 mt-8">{[[цифры.statPlaces,t("splash_places")],[цифры.statLangs,t("splash_langs")],[цифры.statRating,t("splash_rating")]].map(([v,l])=><div key={l} className="text-center"><p className="text-white font-bold text-lg leading-none" style={{fontFamily:"var(--font-heading)"}}>{v}</p><p className="text-white/60 text-[10px] mt-0.5">{l}</p></div>)}</div>
+        <button
+          onClick={onLogin}
+          className="w-full py-3 rounded-2xl text-sm font-semibold border"
+          style={{ color: "white", borderColor: "rgba(255,255,255,0.3)" }}
+        >
+          {t("splash_login")}
+        </button>
+        <div className="flex justify-center gap-8 mt-8">
+          {[
+            [цифры.statPlaces, t("splash_places")],
+            [цифры.statLangs, t("splash_langs")],
+            [цифры.statRating, t("splash_rating")],
+          ].map(([v, l]) => (
+            <div key={l} className="text-center">
+              <p
+                className="text-white font-bold text-lg leading-none"
+                style={{ fontFamily: "var(--font-heading)" }}
+              >
+                {v}
+              </p>
+              <p className="text-white/60 text-[10px] mt-0.5">{l}</p>
+            </div>
+          ))}
+        </div>
         {/* Знак национального туристического бренда — на белой плашке,
             как того требует любое фирменное руководство: поверх фотографии
             тёмно-синие буквы знака иначе тонут. */}
         <div className="mt-6 flex justify-center">
-          <img src="/uzbekistan-brand.png" alt="Uzbekistan" className="brand-mark-invert" style={{height:26,width:"auto",opacity:0.85}}/>
+          <img
+            src="/uzbekistan-brand.png"
+            alt="Uzbekistan"
+            className="brand-mark-invert"
+            style={{ height: 26, width: "auto", opacity: 0.85 }}
+          />
         </div>
       </div>
     </div>
   );
 }
 
-// ── Onboarding ────────────────────────────────────────────────────────────────
+// Знакомство с приложением
 
-export function OnboardingLang({ onNext }:{ onNext:()=>void }) {
+export function OnboardingLang({ onNext }: { onNext: () => void }) {
   const { lang, setLang, t } = useT();
   return (
-    <div className="flex flex-col h-full animate-slide-up" style={{background:CREAM}}>
-      <div className="relative h-52 flex-shrink-0" style={{background:ACCENT_FILL}}>
-        <div className="absolute inset-0 flex items-center justify-center opacity-15"><GeomPattern opacity={1}/></div>
-        <div className="relative z-10 flex flex-col items-center justify-center h-full gap-3"><LogoMark size={52} intro tone="#ffffff"/><p className="text-white text-2xl font-bold" style={{fontFamily:"var(--font-heading)"}}>{t("onb_welcome")}</p><p className="text-white/70 text-sm">{t("onb_choose_lang")}</p></div>
+    <div className="flex flex-col h-full animate-slide-up" style={{ background: CREAM }}>
+      <div className="relative h-52 flex-shrink-0" style={{ background: ACCENT_FILL }}>
+        <div className="absolute inset-0 flex items-center justify-center opacity-15">
+          <GeomPattern opacity={1} />
+        </div>
+        <div className="relative z-10 flex flex-col items-center justify-center h-full gap-3">
+          <LogoMark size={52} intro tone="#ffffff" />
+          <p className="text-white text-2xl font-bold" style={{ fontFamily: "var(--font-heading)" }}>
+            {t("onb_welcome")}
+          </p>
+          <p className="text-white/70 text-sm">{t("onb_choose_lang")}</p>
+        </div>
       </div>
       <div className="flex-1 overflow-y-auto hide-scroll px-4 pt-5 space-y-2.5">
-        {LOCALES.map((код)=>{
-          const выбран = lang===код;
+        {LOCALES.map((код) => {
+          const выбран = lang === код;
           return (
-          <button key={код} onClick={()=>setLang(код)} className="w-full flex items-center justify-between px-4 py-3.5 rounded-2xl border" style={выбран?{background:ACCENT_SOFT,borderColor:GREEN}:{background:SURFACE,borderColor:BORDER}}>
-            <span className="text-base font-medium" style={{color:TEXT}}>{LOCALE_META[код].label}</span>
-            <div className="w-5 h-5 rounded-full border-2 flex items-center justify-center" style={выбран?{borderColor:GREEN,background:ACCENT_FILL}:{borderColor:BORDER}}>
-              {выбран&&<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>}
-            </div>
-          </button>
+            <button
+              key={код}
+              onClick={() => setLang(код)}
+              className="w-full flex items-center justify-between px-4 py-3.5 rounded-2xl border"
+              style={
+                выбран
+                  ? { background: ACCENT_SOFT, borderColor: GREEN }
+                  : { background: SURFACE, borderColor: BORDER }
+              }
+            >
+              <span className="text-base font-medium" style={{ color: TEXT }}>
+                {LOCALE_META[код].label}
+              </span>
+              <div
+                className="w-5 h-5 rounded-full border-2 flex items-center justify-center"
+                style={выбран ? { borderColor: GREEN, background: ACCENT_FILL } : { borderColor: BORDER }}
+              >
+                {выбран && (
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                )}
+              </div>
+            </button>
           );
         })}
       </div>
       <div className="px-4 pb-8 pt-3">
-        <button onClick={onNext} className="w-full py-4 rounded-2xl text-white font-bold text-sm flex items-center justify-center gap-2" style={{background:ACCENT_FILL}}>{t("onb_continue")} <svg className="rtl-flip" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"/></svg></button>
-        <div className="flex items-center justify-center gap-2 mt-4"><div className="w-6 h-1.5 rounded-full" style={{background:ACCENT_FILL}}/><div className="w-1.5 h-1.5 rounded-full" style={{background:BORDER}}/></div>
+        <button
+          onClick={onNext}
+          className="w-full py-4 rounded-2xl text-white font-bold text-sm flex items-center justify-center gap-2"
+          style={{ background: ACCENT_FILL }}
+        >
+          {t("onb_continue")}{" "}
+          <svg
+            className="rtl-flip"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="white"
+            strokeWidth="2.5"
+          >
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </button>
+        <div className="flex items-center justify-center gap-2 mt-4">
+          <div className="w-6 h-1.5 rounded-full" style={{ background: ACCENT_FILL }} />
+          <div className="w-1.5 h-1.5 rounded-full" style={{ background: BORDER }} />
+        </div>
       </div>
     </div>
   );
 }
 
-export function OnboardingInterests({ onDone }:{ onDone:()=>void }) {
+export function OnboardingInterests({ onDone }: { onDone: () => void }) {
   const { t } = useT();
   const [sel, setSel] = useState<string[]>(["История"]);
-  const toggle=(v:string)=>setSel(p=>p.includes(v)?p.filter(x=>x!==v):[...p,v]);
+  const toggle = (v: string) => setSel((p) => (p.includes(v) ? p.filter((x) => x !== v) : [...p, v]));
   // Значение остаётся русским: по нему на главной подбираются места. Подпись — переводится.
-  const items: {e:string; l:string; k:TKey}[]=[{e:"🏛️",l:"История",k:"i_history"},{e:"🕌",l:"Мечети",k:"i_mosques"},{e:"🏺",l:"Музеи",k:"i_museums"},{e:"🌿",l:"Природа",k:"i_nature"},{e:"🍽️",l:"Кухня",k:"i_cuisine"},{e:"🛍️",l:"Базары",k:"i_bazaars"},{e:"🏨",l:"Отели",k:"i_hotels"},{e:"🎵",l:"Культура",k:"i_culture"},{e:"🚗",l:"Трекинг",k:"i_trekking"},{e:"📸",l:"Фото",k:"i_photo"},{e:"🤝",l:"Местная жизнь",k:"i_local"},{e:"🏇",l:"Спорт",k:"i_sport"}];
+  const items: { e: string; l: string; k: TKey }[] = [
+    { e: "🏛️", l: "История", k: "i_history" },
+    { e: "🕌", l: "Мечети", k: "i_mosques" },
+    { e: "🏺", l: "Музеи", k: "i_museums" },
+    { e: "🌿", l: "Природа", k: "i_nature" },
+    { e: "🍽️", l: "Кухня", k: "i_cuisine" },
+    { e: "🛍️", l: "Базары", k: "i_bazaars" },
+    { e: "🏨", l: "Отели", k: "i_hotels" },
+    { e: "🎵", l: "Культура", k: "i_culture" },
+    { e: "🚗", l: "Трекинг", k: "i_trekking" },
+    { e: "📸", l: "Фото", k: "i_photo" },
+    { e: "🤝", l: "Местная жизнь", k: "i_local" },
+    { e: "🏇", l: "Спорт", k: "i_sport" },
+  ];
   return (
-    <div className="flex flex-col h-full animate-slide-up" style={{background:CREAM}}>
-      <div className="px-5 pt-14 pb-5 bg-white border-b" style={{borderColor:BORDER}}>
-        <p className="text-xs font-medium mb-0.5" style={{color:GREEN,letterSpacing:"0.1em"}}>{t("onb_step2")}</p>
-        <h2 className="text-2xl font-bold" style={{color:TEXT,fontFamily:"var(--font-heading)"}}>{t("onb_interests_q")}</h2>
-        <p className="text-sm mt-1" style={{color:MUTED}}>{t("onb_interests_sub")}</p>
+    <div className="flex flex-col h-full animate-slide-up" style={{ background: CREAM }}>
+      <div className="px-5 pt-14 pb-5 bg-white border-b" style={{ borderColor: BORDER }}>
+        <p className="text-xs font-medium mb-0.5" style={{ color: GREEN, letterSpacing: "0.1em" }}>
+          {t("onb_step2")}
+        </p>
+        <h2 className="text-2xl font-bold" style={{ color: TEXT, fontFamily: "var(--font-heading)" }}>
+          {t("onb_interests_q")}
+        </h2>
+        <p className="text-sm mt-1" style={{ color: MUTED }}>
+          {t("onb_interests_sub")}
+        </p>
       </div>
       <div className="flex-1 overflow-y-auto hide-scroll px-4 pt-4">
         <div className="grid grid-cols-3 gap-3">
-          {items.map(({e,l,k})=>(
-            <button key={l} onClick={()=>toggle(l)} className="flex flex-col items-center gap-2 p-4 rounded-2xl border" style={sel.includes(l)?{background:ACCENT_FILL,borderColor:GREEN}:{background:SURFACE,borderColor:BORDER}}>
+          {items.map(({ e, l, k }) => (
+            <button
+              key={l}
+              onClick={() => toggle(l)}
+              className="flex flex-col items-center gap-2 p-4 rounded-2xl border"
+              style={
+                sel.includes(l)
+                  ? { background: ACCENT_FILL, borderColor: GREEN }
+                  : { background: SURFACE, borderColor: BORDER }
+              }
+            >
               <span className="text-2xl">{e}</span>
-              <span className="text-xs font-semibold" style={{color:sel.includes(l)?WHITE:TEXT}}>{t(k)}</span>
+              <span className="text-xs font-semibold" style={{ color: sel.includes(l) ? WHITE : TEXT }}>
+                {t(k)}
+              </span>
             </button>
           ))}
         </div>
       </div>
       <div className="px-4 pb-8 pt-3">
-        <button onClick={()=>{задатьНастройку("interests", sel); onDone();}} disabled={sel.length===0} className="w-full py-4 rounded-2xl text-white font-bold text-sm flex items-center justify-center gap-2 disabled:opacity-50" style={{background:ACCENT_FILL}}>{t("onb_start")} 🚀</button>
-        <div className="flex items-center justify-center gap-2 mt-4"><div className="w-1.5 h-1.5 rounded-full" style={{background:BORDER}}/><div className="w-6 h-1.5 rounded-full" style={{background:ACCENT_FILL}}/></div>
+        <button
+          onClick={() => {
+            задатьНастройку("interests", sel);
+            onDone();
+          }}
+          disabled={sel.length === 0}
+          className="w-full py-4 rounded-2xl text-white font-bold text-sm flex items-center justify-center gap-2 disabled:opacity-50"
+          style={{ background: ACCENT_FILL }}
+        >
+          {t("onb_start")} 🚀
+        </button>
+        <div className="flex items-center justify-center gap-2 mt-4">
+          <div className="w-1.5 h-1.5 rounded-full" style={{ background: BORDER }} />
+          <div className="w-6 h-1.5 rounded-full" style={{ background: ACCENT_FILL }} />
+        </div>
       </div>
     </div>
   );
 }
 
-// ── Overlays ──────────────────────────────────────────────────────────────────
+// Поверх экрана

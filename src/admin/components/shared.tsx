@@ -1,4 +1,12 @@
-export function PageHeader({ title, subtitle, action }: { title: string; subtitle?: string; action?: React.ReactNode }) {
+export function PageHeader({
+  title,
+  subtitle,
+  action,
+}: {
+  title: string;
+  subtitle?: string;
+  action?: React.ReactNode;
+}) {
   return (
     <div className="mb-7 flex flex-wrap items-start justify-between gap-3">
       <div className="min-w-0">
@@ -121,7 +129,9 @@ export function Btn({
     <button
       type={type}
       onClick={onClick}
-      className={`rounded font-medium transition-opacity hover:opacity-80 cursor-pointer ${small ? "text-xs px-3 py-1.5" : "text-sm px-4 py-2"}`}
+      className={`rounded font-medium transition-opacity hover:opacity-80 cursor-pointer ${
+        small ? "text-xs px-3 py-1.5" : "text-sm px-4 py-2"
+      }`}
       style={{ fontFamily: "var(--font-body)", ...styles[variant] }}
     >
       {children}
@@ -129,13 +139,7 @@ export function Btn({
   );
 }
 
-export function Table({
-  cols,
-  rows,
-}: {
-  cols: string[];
-  rows: React.ReactNode[][];
-}) {
+export function Table({ cols, rows }: { cols: string[]; rows: React.ReactNode[][] }) {
   return (
     /*
      * Таблица прокручивается вбок, а не сжимается.
@@ -145,10 +149,7 @@ export function Table({
      * Минимальная ширина держит колонки читаемыми, а лишнее уезжает
      * под палец.
      */
-    <div
-      className="overflow-x-auto rounded-lg"
-      style={{ border: "1px solid var(--color-border)" }}
-    >
+    <div className="overflow-x-auto rounded-lg" style={{ border: "1px solid var(--color-border)" }}>
       <table className="w-full min-w-[46rem] text-sm">
         <thead>
           <tr style={{ background: "var(--color-panel)", borderBottom: "1px solid var(--color-border)" }}>
@@ -191,7 +192,15 @@ export function Table({
   );
 }
 
-export function Card({ children, className, style }: { children: React.ReactNode; className?: string; style?: React.CSSProperties }) {
+export function Card({
+  children,
+  className,
+  style,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  style?: React.CSSProperties;
+}) {
   return (
     <div
       className={`rounded-lg ${className ?? ""}`}
@@ -233,8 +242,8 @@ export function ДемоРаздел({ что }: { что: string }) {
     >
       <span className="text-base leading-none">⚠️</span>
       <span>
-        <b>Данные примерные.</b> {что} Цифрам на этом экране верить нельзя — это образец
-        того, как раздел будет выглядеть с настоящим источником.
+        <b>Данные примерные.</b> {что} Цифрам на этом экране верить нельзя — это образец того, как раздел
+        будет выглядеть с настоящим источником.
       </span>
     </div>
   );

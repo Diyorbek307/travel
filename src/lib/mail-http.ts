@@ -38,9 +38,7 @@ export interface HttpПисьмо {
 }
 
 /** Отправляет и возвращает причину отказа, если он был. */
-export async function отправитьПоHttp(
-  письмо: HttpПисьмо,
-): Promise<{ ok: boolean; detail: string }> {
+export async function отправитьПоHttp(письмо: HttpПисьмо): Promise<{ ok: boolean; detail: string }> {
   const провайдер = httpПровайдер();
   if (провайдер === "нет") return { ok: false, detail: "HTTP-провайдер не задан" };
 

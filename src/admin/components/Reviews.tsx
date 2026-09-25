@@ -76,7 +76,10 @@ export default function Reviews() {
       <div className="mb-7 grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard label="ВСЕГО" value={String(отзывы.length)} />
         <StatCard label="СРЕДНЯЯ ОЦЕНКА" value={среднее} />
-        <StatCard label="ОПУБЛИКОВАНЫ" value={String(отзывы.filter((r) => r.status === "published").length)} />
+        <StatCard
+          label="ОПУБЛИКОВАНЫ"
+          value={String(отзывы.filter((r) => r.status === "published").length)}
+        />
         <StatCard label="СКРЫТЫ" value={String(отзывы.filter((r) => r.status === "hidden").length)} />
       </div>
 
@@ -124,7 +127,12 @@ export default function Reviews() {
                   {r.name}
                 </span>
                 <span className="block truncate text-xs" style={{ color: "var(--color-muted)" }}>
-                  {r.placeName} · {new Date(r.createdAt).toLocaleDateString("ru", { day: "numeric", month: "short", year: "numeric" })}
+                  {r.placeName} ·{" "}
+                  {new Date(r.createdAt).toLocaleDateString("ru", {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                  })}
                 </span>
               </span>
               <Звёзды n={r.rating} />

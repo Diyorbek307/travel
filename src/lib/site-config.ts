@@ -34,9 +34,18 @@ export async function readSiteConfig(): Promise<SiteConfig> {
 
 export async function writeSiteConfig(next: SiteConfig): Promise<void> {
   const чисто: SiteConfig = {
-    statPlaces: String(next.statPlaces ?? "").trim().slice(0, 12) || САЙТ_ПО_УМОЛЧАНИЮ.statPlaces,
-    statLangs: String(next.statLangs ?? "").trim().slice(0, 12) || САЙТ_ПО_УМОЛЧАНИЮ.statLangs,
-    statRating: String(next.statRating ?? "").trim().slice(0, 12) || САЙТ_ПО_УМОЛЧАНИЮ.statRating,
+    statPlaces:
+      String(next.statPlaces ?? "")
+        .trim()
+        .slice(0, 12) || САЙТ_ПО_УМОЛЧАНИЮ.statPlaces,
+    statLangs:
+      String(next.statLangs ?? "")
+        .trim()
+        .slice(0, 12) || САЙТ_ПО_УМОЛЧАНИЮ.statLangs,
+    statRating:
+      String(next.statRating ?? "")
+        .trim()
+        .slice(0, 12) || САЙТ_ПО_УМОЛЧАНИЮ.statRating,
   };
   await хранилище.update(() => [чисто, undefined]);
 }

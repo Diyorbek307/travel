@@ -63,9 +63,7 @@ export async function GET() {
   }
 
   const средняяОценка =
-    отзывы.length > 0
-      ? Number((отзывы.reduce((s, r) => s + r.rating, 0) / отзывы.length).toFixed(1))
-      : 0;
+    отзывы.length > 0 ? Number((отзывы.reduce((s, r) => s + r.rating, 0) / отзывы.length).toFixed(1)) : 0;
 
   return NextResponse.json(
     {
@@ -86,7 +84,11 @@ export async function GET() {
           tour: брони.filter((b) => b.kind === "tour").length,
         },
       },
-      отзывы: { всего: отзывы.length, средняяОценка, скрытые: отзывы.filter((r) => r.status === "hidden").length },
+      отзывы: {
+        всего: отзывы.length,
+        средняяОценка,
+        скрытые: отзывы.filter((r) => r.status === "hidden").length,
+      },
       поддержка: {
         веток: ветки.length,
         непрочитанных: ветки.reduce((s, t) => s + t.unreadForStaff, 0),

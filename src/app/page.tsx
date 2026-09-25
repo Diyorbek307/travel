@@ -3,18 +3,9 @@
 import { useCallback, useEffect, useState } from "react";
 import BottomNav from "@/components/bottom-nav";
 import SideMenu from "@/components/side-menu";
-import {
-  HotelDetail,
-  PlaceDetail,
-  RestaurantDetail,
-  RouteDetail,
-} from "@/components/details";
+import { HotelDetail, PlaceDetail, RestaurantDetail, RouteDetail } from "@/components/details";
 import { NotifsPanel, PremiumModal, SearchModal } from "@/components/modals";
-import {
-  OnboardingInterests,
-  OnboardingLang,
-  SplashScreen,
-} from "@/components/onboarding";
+import { OnboardingInterests, OnboardingLang, SplashScreen } from "@/components/onboarding";
 import HomeScreen from "@/components/screens/home";
 import ExploreScreen, { type ФильтрОбзора } from "@/components/screens/explore";
 import MapScreen from "@/components/screens/map";
@@ -280,15 +271,25 @@ function App() {
     if (phase === "interests") return setPhase("lang"), true;
     if (phase === "app" && tab !== "home") return switchTab("home"), true;
     return false;
-  }, [showSearch, showNotifs, showPremium, showMenu, showPractical, showTransport, showFavorites, showTrip, detail, phase, tab]);
-
+  }, [
+    showSearch,
+    showNotifs,
+    showPremium,
+    showMenu,
+    showPractical,
+    showTransport,
+    showFavorites,
+    showTrip,
+    detail,
+    phase,
+    tab,
+  ]);
 
   return (
     <div className="device-shell">
       {!introDone && <IntroCinematic onDone={() => setIntroDone(true)} />}
       <NativeBack onBack={назадНаШаг} />
       <div className="device">
-
         {phase === "checking" && (
           <div className="absolute inset-0 z-40">
             <AuthSplash />
@@ -384,8 +385,14 @@ function App() {
               <div className="overlay-screen device-safe-top absolute inset-0 z-40">
                 <TripScreen
                   onBack={() => setShowTrip(false)}
-                  onPlace={(p) => { setShowTrip(false); openPlace(p); }}
-                  onПуть={(название, город) => { setShowTrip(false); openПуть(название, город); }}
+                  onPlace={(p) => {
+                    setShowTrip(false);
+                    openPlace(p);
+                  }}
+                  onПуть={(название, город) => {
+                    setShowTrip(false);
+                    openПуть(название, город);
+                  }}
                 />
               </div>
             )}
@@ -393,10 +400,22 @@ function App() {
               <div className="overlay-screen device-safe-top absolute inset-0 z-40">
                 <FavoritesScreen
                   onBack={() => setShowFavorites(false)}
-                  onPlace={(p) => { setShowFavorites(false); openPlace(p); }}
-                  onHotel={(h) => { setShowFavorites(false); openHotel(h); }}
-                  onRestaurant={(r) => { setShowFavorites(false); openRestaurant(r); }}
-                  onRoute={(m) => { setShowFavorites(false); openRoute(m); }}
+                  onPlace={(p) => {
+                    setShowFavorites(false);
+                    openPlace(p);
+                  }}
+                  onHotel={(h) => {
+                    setShowFavorites(false);
+                    openHotel(h);
+                  }}
+                  onRestaurant={(r) => {
+                    setShowFavorites(false);
+                    openRestaurant(r);
+                  }}
+                  onRoute={(m) => {
+                    setShowFavorites(false);
+                    openRoute(m);
+                  }}
                 />
               </div>
             )}
@@ -428,9 +447,7 @@ function App() {
                 onLogout={logout}
               />
             )}
-            {showPremium && (
-              <PremiumModal onClose={() => setShowPremium(false)} />
-            )}
+            {showPremium && <PremiumModal onClose={() => setShowPremium(false)} />}
 
             <div className="device-content flex-1 overflow-hidden">
               <div key={tabKey} className="app-page animate-fade-in h-full">
@@ -516,25 +533,18 @@ function Screen({ tab, detail, ...p }: ScreenProps) {
     switch (detail.kind) {
       case "place":
         return (
-          <PlaceDetail
-            place={detail.value}
-            onBack={p.onCloseDetail}
-            onToast={p.onToast}
-            onПуть={p.onПуть}
-          />
+          <PlaceDetail place={detail.value} onBack={p.onCloseDetail} onToast={p.onToast} onПуть={p.onПуть} />
         );
       case "hotel":
         return <HotelDetail hotel={detail.value} onBack={p.onCloseDetail} />;
       case "restaurant":
-        return (
-          <RestaurantDetail r={detail.value} onBack={p.onCloseDetail} onПуть={p.onПуть} />
-        );
+        return <RestaurantDetail r={detail.value} onBack={p.onCloseDetail} onПуть={p.onПуть} />;
       case "route":
-        return <RouteDetail route={detail.value} onBack={p.onCloseDetail} onПуть={p.onПуть} onToast={p.onToast} />;
-      case "путь":
         return (
-          <RouteView название={detail.название} город={detail.город} onBack={p.onCloseDetail} />
+          <RouteDetail route={detail.value} onBack={p.onCloseDetail} onПуть={p.onПуть} onToast={p.onToast} />
         );
+      case "путь":
+        return <RouteView название={detail.название} город={detail.город} onBack={p.onCloseDetail} />;
     }
   }
 
@@ -571,6 +581,13 @@ function Screen({ tab, detail, ...p }: ScreenProps) {
     case "audio":
       return <AudioScreen isPremium={p.isPremium} сразуИграть={p.кодЗаписи} />;
     case "profile":
-      return <ProfileScreen onLogout={p.onLogout} user={p.user} isPremium={p.isPremium} startView={p.profileView} />;
+      return (
+        <ProfileScreen
+          onLogout={p.onLogout}
+          user={p.user}
+          isPremium={p.isPremium}
+          startView={p.profileView}
+        />
+      );
   }
 }

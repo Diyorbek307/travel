@@ -1,0 +1,13 @@
+# Переводы и наполнение: одна запись — одна строка, так их проще
+# сверять между языками. Форматировщик разнёс бы их на десятки строк.
+src/lib/i18n.ts
+src/lib/content-i18n.ts
+src/data/
+src/admin/data/
+
+node_modules/
+.next/
+landing/
+android/
+ios/
+public/

@@ -67,7 +67,7 @@ export default function Header({ active, разделы, onNavigate, sidebarColl
   }, []);
 
   const filtered = query
-    ? разделы.filter(s => s.label.toLowerCase().includes(query.toLowerCase()))
+    ? разделы.filter((s) => s.label.toLowerCase().includes(query.toLowerCase()))
     : разделы;
 
   const grouped = filtered.reduce<Record<string, Раздел[]>>((acc, item) => {
@@ -75,7 +75,7 @@ export default function Header({ active, разделы, onNavigate, sidebarColl
     return acc;
   }, {});
 
-  const activePage = разделы.find(s => s.id === active);
+  const activePage = разделы.find((s) => s.id === active);
 
   return (
     <>
@@ -90,13 +90,12 @@ export default function Header({ active, разделы, onNavigate, sidebarColl
           zIndex: 20,
         }}
       >
-        {/* Sidebar toggle */}
         <button
           onClick={onToggleSidebar}
           className="w-7 h-7 flex flex-col items-center justify-center gap-1 rounded cursor-pointer hover:opacity-70 transition-opacity shrink-0"
           title="Свернуть боковое меню"
         >
-          {[0, 1, 2].map(i => (
+          {[0, 1, 2].map((i) => (
             <div
               key={i}
               className="rounded-full transition-all"
@@ -109,9 +108,10 @@ export default function Header({ active, разделы, onNavigate, sidebarColl
           ))}
         </button>
 
-        {/* Breadcrumb */}
         <div className="flex flex-wrap items-center gap-1.5 text-sm min-w-0">
-          <span className="hidden md:inline" style={{ color: "var(--color-faint)" }}>HelloUZ Админ</span>
+          <span className="hidden md:inline" style={{ color: "var(--color-faint)" }}>
+            HelloUZ Админ
+          </span>
           <span style={{ color: "var(--color-faint)" }}>›</span>
           <span className="font-medium truncate" style={{ color: "var(--color-text)" }}>
             {activePage?.label ?? active}
@@ -125,16 +125,22 @@ export default function Header({ active, разделы, onNavigate, sidebarColl
                 fontFamily: "var(--font-mono)",
               }}
             >
-              {saveState === "saving" ? "· сохраняем…" : saveState === "saved" ? "· сохранено ✓" : "· не сохранено — проверьте связь"}
+              {saveState === "saving"
+                ? "· сохраняем…"
+                : saveState === "saved"
+                ? "· сохранено ✓"
+                : "· не сохранено — проверьте связь"}
             </span>
           )}
         </div>
 
         <div className="min-w-0 flex-1" />
 
-        {/* Search trigger */}
         <button
-          onClick={() => { setShowSearch(true); setTimeout(() => searchRef.current?.focus(), 50); }}
+          onClick={() => {
+            setShowSearch(true);
+            setTimeout(() => searchRef.current?.focus(), 50);
+          }}
           className="flex flex-wrap items-center gap-2 px-3 py-1.5 rounded text-sm cursor-pointer hover:opacity-80 transition-opacity"
           style={{
             background: "var(--color-panel)",
@@ -146,17 +152,27 @@ export default function Header({ active, разделы, onNavigate, sidebarColl
         >
           <span style={{ fontSize: "12px" }}>⌕</span>
           <span className="min-w-0 flex-1 text-left text-xs">Поиск…</span>
-          <kbd className="text-xs px-1.5 py-0.5 rounded" style={{ background: "var(--color-dim)", color: "var(--color-muted)", fontFamily: "var(--font-mono)", fontSize: "9px" }}>
+          <kbd
+            className="text-xs px-1.5 py-0.5 rounded"
+            style={{
+              background: "var(--color-dim)",
+              color: "var(--color-muted)",
+              fontFamily: "var(--font-mono)",
+              fontSize: "9px",
+            }}
+          >
             ⌘K
           </kbd>
         </button>
 
-        {/* Notifications */}
         <div className="relative" ref={notifRef}>
           <button
             onClick={() => setShowNotifs(!showNotifs)}
             className="w-8 h-8 rounded flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity relative"
-            style={{ background: showNotifs ? "var(--color-panel)" : "transparent", border: "1px solid transparent" }}
+            style={{
+              background: showNotifs ? "var(--color-panel)" : "transparent",
+              border: "1px solid transparent",
+            }}
           >
             <span style={{ color: "var(--color-muted)", fontSize: "14px" }}>◈</span>
             {unreadCount > 0 && (
@@ -181,16 +197,29 @@ export default function Header({ active, разделы, onNavigate, sidebarColl
                 flexDirection: "column",
               }}
             >
-              <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3" style={{ borderBottom: "1px solid var(--color-border)" }}>
-                <div className="font-medium text-sm" style={{ color: "var(--color-text)", fontFamily: "var(--font-display)" }}>
+              <div
+                className="flex flex-wrap items-center justify-between gap-2 px-4 py-3"
+                style={{ borderBottom: "1px solid var(--color-border)" }}
+              >
+                <div
+                  className="font-medium text-sm"
+                  style={{ color: "var(--color-text)", fontFamily: "var(--font-display)" }}
+                >
                   Уведомления
                   {unreadCount > 0 && (
-                    <span className="ml-2 text-xs px-1.5 py-0.5 rounded-full" style={{ background: "var(--color-rose)", color: "#fff" }}>
+                    <span
+                      className="ml-2 text-xs px-1.5 py-0.5 rounded-full"
+                      style={{ background: "var(--color-rose)", color: "#fff" }}
+                    >
                       {unreadCount}
                     </span>
                   )}
                 </div>
-                <button onClick={markAllRead} className="text-xs cursor-pointer hover:opacity-70" style={{ color: "var(--color-amber)", fontFamily: "var(--font-mono)" }}>
+                <button
+                  onClick={markAllRead}
+                  className="text-xs cursor-pointer hover:opacity-70"
+                  style={{ color: "var(--color-amber)", fontFamily: "var(--font-mono)" }}
+                >
                   Прочитать все
                 </button>
               </div>
@@ -201,16 +230,22 @@ export default function Header({ active, разделы, onNavigate, sidebarColl
                     Новых событий нет
                   </div>
                 )}
-                {notifs.map(n => (
+                {notifs.map((n) => (
                   <div
                     key={n.id}
                     className="flex flex-wrap gap-3 px-4 py-3 cursor-pointer transition-colors"
                     style={{
                       borderBottom: "1px solid var(--color-border)",
-                      background: n.read ? "transparent" : "color-mix(in srgb, var(--color-amber) 5%, transparent)",
+                      background: n.read
+                        ? "transparent"
+                        : "color-mix(in srgb, var(--color-amber) 5%, transparent)",
                     }}
-                    onMouseEnter={e => (e.currentTarget.style.background = "var(--color-surface)")}
-                    onMouseLeave={e => (e.currentTarget.style.background = n.read ? "transparent" : "color-mix(in srgb, var(--color-amber) 5%, transparent)")}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = "var(--color-surface)")}
+                    onMouseLeave={(e) =>
+                      (e.currentTarget.style.background = n.read
+                        ? "transparent"
+                        : "color-mix(in srgb, var(--color-amber) 5%, transparent)")
+                    }
                     onClick={() => {
                       markRead(n.id);
                       onNavigate(n.action);
@@ -225,12 +260,22 @@ export default function Header({ active, разделы, onNavigate, sidebarColl
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex flex-wrap items-start justify-between gap-2">
-                        <div className="text-sm font-medium leading-tight" style={{ color: n.read ? "var(--color-muted)" : "var(--color-text)" }}>
+                        <div
+                          className="text-sm font-medium leading-tight"
+                          style={{ color: n.read ? "var(--color-muted)" : "var(--color-text)" }}
+                        >
                           {n.title}
                         </div>
-                        {!n.read && <div className="w-2 h-2 rounded-full shrink-0 mt-1" style={{ background: "var(--color-amber)" }} />}
+                        {!n.read && (
+                          <div
+                            className="w-2 h-2 rounded-full shrink-0 mt-1"
+                            style={{ background: "var(--color-amber)" }}
+                          />
+                        )}
                       </div>
-                      <div className="text-xs mt-0.5 leading-relaxed" style={{ color: "var(--color-muted)" }}>{n.body}</div>
+                      <div className="text-xs mt-0.5 leading-relaxed" style={{ color: "var(--color-muted)" }}>
+                        {n.body}
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -239,14 +284,16 @@ export default function Header({ active, разделы, onNavigate, sidebarColl
           )}
         </div>
 
-        {/* Profile avatar */}
         <button
           onClick={() => onNavigate("settings")}
           className="flex flex-wrap items-center gap-2 rounded-full cursor-pointer hover:opacity-80 transition-opacity"
         >
           <div
             className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold"
-            style={{ background: меня ? ROLE_META[меня.role].color : "var(--color-amber)", color: "var(--color-on-accent)" }}
+            style={{
+              background: меня ? ROLE_META[меня.role].color : "var(--color-amber)",
+              color: "var(--color-on-accent)",
+            }}
             title={меня?.name}
           >
             {(меня?.name ?? "AD").slice(0, 2).toUpperCase()}
@@ -267,54 +314,91 @@ export default function Header({ active, разделы, onNavigate, sidebarColl
         </form>
       </header>
 
-      {/* Command palette overlay */}
       {showSearch && (
         <div
           className="fixed inset-0 z-50 flex items-start justify-center pt-24"
           style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }}
-          onClick={() => { setShowSearch(false); setQuery(""); }}
+          onClick={() => {
+            setShowSearch(false);
+            setQuery("");
+          }}
         >
           <div
             className="rounded-xl overflow-hidden w-full max-w-lg shadow-2xl"
             style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }}
-            onClick={e => e.stopPropagation()}
+            onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex flex-wrap items-center gap-3 px-4 py-3" style={{ borderBottom: "1px solid var(--color-border)" }}>
+            <div
+              className="flex flex-wrap items-center gap-3 px-4 py-3"
+              style={{ borderBottom: "1px solid var(--color-border)" }}
+            >
               <span style={{ color: "var(--color-muted)", fontSize: "16px" }}>⌕</span>
               <input
                 ref={searchRef}
                 type="text"
                 placeholder="Поиск страниц, пользователей, туров…"
                 value={query}
-                onChange={e => setQuery(e.target.value)}
+                onChange={(e) => setQuery(e.target.value)}
                 className="min-w-0 flex-1 outline-none bg-transparent text-sm"
                 style={{ color: "var(--color-text)", fontFamily: "var(--font-body)" }}
               />
-              <kbd className="text-xs px-2 py-1 rounded" style={{ background: "var(--color-dim)", color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>ESC</kbd>
+              <kbd
+                className="text-xs px-2 py-1 rounded"
+                style={{
+                  background: "var(--color-dim)",
+                  color: "var(--color-muted)",
+                  fontFamily: "var(--font-mono)",
+                }}
+              >
+                ESC
+              </kbd>
             </div>
             <div className="overflow-y-auto" style={{ maxHeight: "400px" }}>
               {Object.entries(grouped).map(([group, items]) => (
                 <div key={group}>
-                  <div className="px-4 py-2 text-xs tracking-widest uppercase" style={{ color: "var(--color-faint)", fontFamily: "var(--font-mono)" }}>
+                  <div
+                    className="px-4 py-2 text-xs tracking-widest uppercase"
+                    style={{ color: "var(--color-faint)", fontFamily: "var(--font-mono)" }}
+                  >
                     {group}
                   </div>
-                  {items.map(item => (
+                  {items.map((item) => (
                     <button
                       key={item.id}
-                      onClick={() => { onNavigate(item.id); setShowSearch(false); setQuery(""); }}
+                      onClick={() => {
+                        onNavigate(item.id);
+                        setShowSearch(false);
+                        setQuery("");
+                      }}
                       className="w-full flex flex-wrap items-center gap-3 px-4 py-2.5 text-sm text-left cursor-pointer transition-colors hover:opacity-80"
                       style={{
-                        background: active === item.id ? "color-mix(in srgb, var(--color-amber) 10%, transparent)" : "transparent",
+                        background:
+                          active === item.id
+                            ? "color-mix(in srgb, var(--color-amber) 10%, transparent)"
+                            : "transparent",
                         color: active === item.id ? "var(--color-amber)" : "var(--color-text)",
                         fontFamily: "var(--font-body)",
-                        borderLeft: active === item.id ? "2px solid var(--color-amber)" : "2px solid transparent",
+                        borderLeft:
+                          active === item.id ? "2px solid var(--color-amber)" : "2px solid transparent",
                       }}
-                      onMouseEnter={e => (e.currentTarget.style.background = "var(--color-surface)")}
-                      onMouseLeave={e => (e.currentTarget.style.background = active === item.id ? "color-mix(in srgb, var(--color-amber) 10%, transparent)" : "transparent")}
+                      onMouseEnter={(e) => (e.currentTarget.style.background = "var(--color-surface)")}
+                      onMouseLeave={(e) =>
+                        (e.currentTarget.style.background =
+                          active === item.id
+                            ? "color-mix(in srgb, var(--color-amber) 10%, transparent)"
+                            : "transparent")
+                      }
                     >
                       <span style={{ color: "var(--color-faint)", fontSize: "12px" }}>→</span>
                       {item.label}
-                      {active === item.id && <span className="ml-auto text-xs" style={{ color: "var(--color-amber)", fontFamily: "var(--font-mono)" }}>текущая</span>}
+                      {active === item.id && (
+                        <span
+                          className="ml-auto text-xs"
+                          style={{ color: "var(--color-amber)", fontFamily: "var(--font-mono)" }}
+                        >
+                          текущая
+                        </span>
+                      )}
                     </button>
                   ))}
                 </div>

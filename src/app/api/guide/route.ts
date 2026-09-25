@@ -59,7 +59,9 @@ function справочник(c: Content): string {
 
   строки.push("\nСОБЫТИЯ:");
   for (const с of c.events.filter((x) => видно(x.status)))
-    строки.push(`- ${с.name} — ${с.city}, ${с.date}${с.endDate ? `–${с.endDate}` : ""}, ${с.venue}. ${с.desc}`);
+    строки.push(
+      `- ${с.name} — ${с.city}, ${с.date}${с.endDate ? `–${с.endDate}` : ""}, ${с.venue}. ${с.desc}`,
+    );
 
   return строки.join("\n");
 }

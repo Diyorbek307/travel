@@ -181,7 +181,10 @@ export default function RouteView({
   function навигатор(): string | null {
     if (!цель) return null;
     const п = new URLSearchParams();
-    п.set("rtext", откуда ? `${откуда.lat},${откуда.lon}~${цель.lat},${цель.lon}` : `~${цель.lat},${цель.lon}`);
+    п.set(
+      "rtext",
+      откуда ? `${откуда.lat},${откуда.lon}~${цель.lat},${цель.lon}` : `~${цель.lat},${цель.lon}`,
+    );
     п.set("rtt", "auto");
     return `https://yandex.ru/maps/?${п.toString()}`;
   }
@@ -190,14 +193,25 @@ export default function RouteView({
 
   return (
     <div className="flex h-full flex-col" style={{ background: CREAM }}>
-      <div className="flex items-center gap-3 border-b px-4 pt-14 pb-3" style={{ background: SURFACE, borderColor: BORDER }}>
+      <div
+        className="flex items-center gap-3 border-b px-4 pt-14 pb-3"
+        style={{ background: SURFACE, borderColor: BORDER }}
+      >
         <button
           onClick={onBack}
           className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
           style={{ background: CREAM }}
           aria-label={t("common_back")}
         >
-          <svg className="rtl-flip" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={TEXT} strokeWidth="2.5">
+          <svg
+            className="rtl-flip"
+            width="15"
+            height="15"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke={TEXT}
+            strokeWidth="2.5"
+          >
             <path d="M15 18l-6-6 6-6" />
           </svg>
         </button>
@@ -205,7 +219,10 @@ export default function RouteView({
           <p className="text-xs font-medium" style={{ color: GREEN, letterSpacing: "0.1em" }}>
             {t("route_kicker")}
           </p>
-          <h1 className="truncate text-lg font-bold" style={{ color: TEXT, fontFamily:"var(--font-heading)" }}>
+          <h1
+            className="truncate text-lg font-bold"
+            style={{ color: TEXT, fontFamily: "var(--font-heading)" }}
+          >
             {трК(название)}
           </h1>
         </div>
@@ -220,7 +237,10 @@ export default function RouteView({
           </div>
         ) : (
           <>
-            <div className="overflow-hidden rounded-2xl border shadow-sm" style={{ background: SURFACE, borderColor: BORDER }}>
+            <div
+              className="overflow-hidden rounded-2xl border shadow-sm"
+              style={{ background: SURFACE, borderColor: BORDER }}
+            >
               {/*
                 Есть ключ Google — показываем его карту с его же маршрутом.
                 Нет ключа — карту OpenStreetMap с линией, которую посчитал
@@ -273,8 +293,8 @@ export default function RouteView({
                   {состояние === "нашли"
                     ? t("geo_you_here")
                     : состояние === "ищем"
-                      ? t("geo_searching")
-                      : t("geo_unavailable")}
+                    ? t("geo_searching")
+                    : t("geo_unavailable")}
                 </span>
               </div>
               <div className="my-1 ml-1 h-6 w-px" style={{ background: BORDER }} />
@@ -333,12 +353,12 @@ export default function RouteView({
                 {состояние === "отказ"
                   ? t("geo_denied_hint")
                   : считаем
-                    ? t("route_calc")
-                    : дорога
-                      ? t("route_by_streets").replace("{s}", дорога.источник)
-                      : способы.length > 0
-                        ? t("route_calc_failed")
-                        : t("route_straight_note")}
+                  ? t("route_calc")
+                  : дорога
+                  ? t("route_by_streets").replace("{s}", дорога.источник)
+                  : способы.length > 0
+                  ? t("route_calc_failed")
+                  : t("route_straight_note")}
               </p>
             </div>
 

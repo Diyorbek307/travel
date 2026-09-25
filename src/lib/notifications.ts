@@ -61,7 +61,10 @@ export function useУведомления(): Уведомление[] {
         .catch(() => undefined);
       fetch("/api/support")
         .then((r) => (r.ok ? r.json() : { messages: [] }))
-        .then((d: { messages?: Сообщение[] }) => живо && setОтветы((d.messages ?? []).filter((m) => m.author === "staff")))
+        .then(
+          (d: { messages?: Сообщение[] }) =>
+            живо && setОтветы((d.messages ?? []).filter((m) => m.author === "staff")),
+        )
         .catch(() => undefined);
     };
     подтянуть();

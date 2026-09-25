@@ -138,9 +138,7 @@ export async function sendMail(letter: Letter): Promise<boolean> {
     // сейчас не ходят. Запоминаем это, иначе регистрация продолжала бы
     // требовать код, который некому доставить.
     if (httpПровайдер() !== "нет") последняяОтправка = false;
-    console.info(
-      `[почта не настроена] «${letter.subject}» для ${letter.to}\n${letter.text}`,
-    );
+    console.info(`[почта не настроена] «${letter.subject}» для ${letter.to}\n${letter.text}`);
     return false;
   }
   try {
@@ -186,11 +184,7 @@ export async function проверитьПочту(): Promise<{
   }
 
   if (!mailConfigured()) {
-    const нет = [
-      !HOST && "SMTP_HOST",
-      !USER && "SMTP_USER",
-      !PASS && "SMTP_PASSWORD",
-    ].filter(Boolean);
+    const нет = [!HOST && "SMTP_HOST", !USER && "SMTP_USER", !PASS && "SMTP_PASSWORD"].filter(Boolean);
     return {
       ok: false,
       detail:
@@ -220,8 +214,16 @@ export async function проверитьПочту(): Promise<{
    * дело, и придираться к нему нельзя.
    */
   const ПОЧТОВИКИ: { сервер: string; имя: string; домены: string[] }[] = [
-    { сервер: "smtp.yandex", имя: "Яндекс", домены: ["yandex.ru", "yandex.com", "ya.ru", "yandex.kz", "yandex.by", "yandex.uz"] },
-    { сервер: "smtp.mail.ru", имя: "Mail.ru", домены: ["mail.ru", "inbox.ru", "bk.ru", "list.ru", "internet.ru"] },
+    {
+      сервер: "smtp.yandex",
+      имя: "Яндекс",
+      домены: ["yandex.ru", "yandex.com", "ya.ru", "yandex.kz", "yandex.by", "yandex.uz"],
+    },
+    {
+      сервер: "smtp.mail.ru",
+      имя: "Mail.ru",
+      домены: ["mail.ru", "inbox.ru", "bk.ru", "list.ru", "internet.ru"],
+    },
     { сервер: "smtp.gmail.com", имя: "Gmail", домены: ["gmail.com", "googlemail.com"] },
   ];
 
@@ -234,7 +236,13 @@ export async function проверитьПочту(): Promise<{
       ok: false,
       detail:
         `SMTP_HOST указывает на ${серверПочтовик.имя} (${HOST}), а ящик ${USER} — на ${ящикПочтовик.имя}. ` +
-        `Чужой сервер такой адрес не пустит. Нужен ${ящикПочтовик === ПОЧТОВИКИ[1] ? "smtp.mail.ru" : ящикПочтовик === ПОЧТОВИКИ[0] ? "smtp.yandex.ru" : "smtp.gmail.com"}.`,
+        `Чужой сервер такой адрес не пустит. Нужен ${
+          ящикПочтовик === ПОЧТОВИКИ[1]
+            ? "smtp.mail.ru"
+            : ящикПочтовик === ПОЧТОВИКИ[0]
+            ? "smtp.yandex.ru"
+            : "smtp.gmail.com"
+        }.`,
       настройки,
     };
   }
@@ -272,16 +280,15 @@ export async function проверитьПочту(): Promise<{
     };
     const верно = известные[(HOST ?? "").toLowerCase()];
 
-    const подсказка =
-      /timeout|ETIMEDOUT|ECONNREFUSED|ENOTFOUND|EAI_AGAIN/i.test(текст)
-        ? ` — сервер не отвечает. Если настройки верны, значит хостинг не выпускает почтовые порты наружу: ` +
-          `так делают почти все, чтобы через них не рассылали спам. Обойти это настройками SMTP нельзя — ` +
-          `задайте BREVO_API_KEY, и письма пойдут по HTTPS.` +
-          (верно ? ` Для своего сервера верно: ${верно}.` : "")
-        : /auth|535|credentials|authentication/i.test(текст)
-          ? " — вход не принят. Нужен пароль приложения, а не пароль от почты, " +
-            "и включённый доступ внешним программам в настройках ящика."
-          : "";
+    const подсказка = /timeout|ETIMEDOUT|ECONNREFUSED|ENOTFOUND|EAI_AGAIN/i.test(текст)
+      ? ` — сервер не отвечает. Если настройки верны, значит хостинг не выпускает почтовые порты наружу: ` +
+        `так делают почти все, чтобы через них не рассылали спам. Обойти это настройками SMTP нельзя — ` +
+        `задайте BREVO_API_KEY, и письма пойдут по HTTPS.` +
+        (верно ? ` Для своего сервера верно: ${верно}.` : "")
+      : /auth|535|credentials|authentication/i.test(текст)
+      ? " — вход не принят. Нужен пароль приложения, а не пароль от почты, " +
+        "и включённый доступ внешним программам в настройках ящика."
+      : "";
     return { ok: false, detail: текст + подсказка, настройки };
   }
 }

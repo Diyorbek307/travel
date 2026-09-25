@@ -1,13 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import {
-  LOCALE_META,
-  переведи,
-  языкУстройства,
-  type Locale,
-  type TKey,
-} from "@/lib/i18n";
+import { LOCALE_META, переведи, языкУстройства, type Locale, type TKey } from "@/lib/i18n";
 import { переведиКонтент } from "@/lib/content-i18n";
 
 /**

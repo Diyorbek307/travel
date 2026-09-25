@@ -88,7 +88,7 @@ export default function SupportChat({ onBack }: { onBack: () => void }) {
           ← {t("common_back")}
         </button>
         <div className="min-w-0">
-          <p className="text-sm font-bold" style={{ color: TEXT, fontFamily:"var(--font-heading)" }}>
+          <p className="text-sm font-bold" style={{ color: TEXT, fontFamily: "var(--font-heading)" }}>
             {t("prof_support")}
           </p>
           <p className="text-[11px]" style={{ color: MUTED }}>
@@ -160,7 +160,15 @@ export default function SupportChat({ onBack }: { onBack: () => void }) {
           style={{ background: GOLD, color: ON_GOLD }}
           aria-label={t("a11y_send")}
         >
-          <svg className="rtl-flip" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+          <svg
+            className="rtl-flip"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+          >
             <polyline points="9 18 15 12 9 6" />
           </svg>
         </button>

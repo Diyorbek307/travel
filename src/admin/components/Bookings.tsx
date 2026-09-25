@@ -87,10 +87,7 @@ export default function Bookings() {
 
   return (
     <div className="p-4 sm:p-7">
-      <PageHeader
-        title="Бронирования"
-        subtitle={загрузка ? "Загружаем…" : `${брони.length} заявок`}
-      />
+      <PageHeader title="Бронирования" subtitle={загрузка ? "Загружаем…" : `${брони.length} заявок`} />
 
       <div className="mb-7 grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard label="ВСЕГО" value={String(брони.length)} />
@@ -112,8 +109,7 @@ export default function Bookings() {
           className="rounded-lg p-8 text-center text-sm leading-relaxed"
           style={{ background: "var(--color-panel)", color: "var(--color-muted)" }}
         >
-          Заявок пока нет. Они появятся здесь, когда турист забронирует номер, столик или тур в
-          приложении.
+          Заявок пока нет. Они появятся здесь, когда турист забронирует номер, столик или тур в приложении.
         </div>
       )}
 
@@ -135,7 +131,10 @@ export default function Bookings() {
               </span>
               {/* Пожелания туриста: без них подтвердить бронь вслепую. */}
               {b.note && (
-                <span className="mt-1 block whitespace-pre-wrap text-xs" style={{ color: "var(--color-text)" }}>
+                <span
+                  className="mt-1 block whitespace-pre-wrap text-xs"
+                  style={{ color: "var(--color-text)" }}
+                >
                   «{b.note}»
                 </span>
               )}

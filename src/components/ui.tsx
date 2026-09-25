@@ -4,14 +4,24 @@ import { useT } from "@/components/lang-provider";
 
 /** Мелкие элементы, которые встречаются на каждом втором экране. */
 
-export function Badge({ text, color = GREEN, onPhoto = false }: { text: string; color?: string; onPhoto?: boolean }) {
+export function Badge({
+  text,
+  color = GREEN,
+  onPhoto = false,
+}: {
+  text: string;
+  color?: string;
+  onPhoto?: boolean;
+}) {
   return (
     <span
       className={`rounded-full px-2 py-0.5 text-[9px] font-bold ${onPhoto ? "backdrop-blur-sm" : ""}`}
       // Та же краска, что у текста, но разбавленная до фона. Через
       // color-mix, а не hex-хвостом: цвет бывает и CSS-переменной.
       // На фотографии бледная подложка теряется — там тёмное стекло.
-      style={onPhoto ? { background: "rgba(0,0,0,0.45)", color: "#fff" } : { background: мягко(color, 10), color }}
+      style={
+        onPhoto ? { background: "rgba(0,0,0,0.45)", color: "#fff" } : { background: мягко(color, 10), color }
+      }
     >
       {text}
     </span>

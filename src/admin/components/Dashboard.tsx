@@ -86,10 +86,26 @@ export default function Dashboard({ onNavigate }: { onNavigate: (id: string) => 
       <PageHeader title="Обзор" subtitle={сегодня} />
 
       <div className="mb-7 grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard label="ЗАРЕГИСТРИРОВАНО" value={String(s.пользователи.всего)} sub={`${s.пользователи.активные} активных`} />
-        <StatCard label="ЗАЯВОК НА БРОНЬ" value={String(s.брони.всего)} sub={`${s.брони.новые} ждут ответа`} />
-        <StatCard label="ОТЗЫВОВ" value={String(s.отзывы.всего)} sub={s.отзывы.всего ? `оценка ${s.отзывы.средняяОценка}` : "пока нет"} />
-        <StatCard label="ОБРАЩЕНИЙ" value={String(s.поддержка.веток)} sub={`${s.поддержка.непрочитанных} без ответа`} />
+        <StatCard
+          label="ЗАРЕГИСТРИРОВАНО"
+          value={String(s.пользователи.всего)}
+          sub={`${s.пользователи.активные} активных`}
+        />
+        <StatCard
+          label="ЗАЯВОК НА БРОНЬ"
+          value={String(s.брони.всего)}
+          sub={`${s.брони.новые} ждут ответа`}
+        />
+        <StatCard
+          label="ОТЗЫВОВ"
+          value={String(s.отзывы.всего)}
+          sub={s.отзывы.всего ? `оценка ${s.отзывы.средняяОценка}` : "пока нет"}
+        />
+        <StatCard
+          label="ОБРАЩЕНИЙ"
+          value={String(s.поддержка.веток)}
+          sub={`${s.поддержка.непрочитанных} без ответа`}
+        />
       </div>
 
       {/* Требуют внимания прямо сейчас */}
@@ -111,7 +127,10 @@ export default function Dashboard({ onNavigate }: { onNavigate: (id: string) => 
         </Card>
       )}
 
-      <div className="mb-6 grid gap-6" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(min(280px, 100%), 1fr))" }}>
+      <div
+        className="mb-6 grid gap-6"
+        style={{ gridTemplateColumns: "repeat(auto-fill, minmax(min(280px, 100%), 1fr))" }}
+      >
         {/* Рост числа аккаунтов */}
         <Card className="p-5">
           <SectionTitle>Регистрации за год</SectionTitle>
@@ -170,7 +189,10 @@ export default function Dashboard({ onNavigate }: { onNavigate: (id: string) => 
                   <span className="min-w-0 flex-1 text-sm" style={{ color: "var(--color-muted)" }}>
                     {label}
                   </span>
-                  <span className="h-1.5 w-14 shrink-0 overflow-hidden rounded-full sm:w-28" style={{ background: "var(--color-dim)" }}>
+                  <span
+                    className="h-1.5 w-14 shrink-0 overflow-hidden rounded-full sm:w-28"
+                    style={{ background: "var(--color-dim)" }}
+                  >
                     <span
                       className="block h-full rounded-full"
                       style={{ width: `${(Number(n) / s.брони.всего) * 100}%`, background: String(color) }}

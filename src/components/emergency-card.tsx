@@ -47,13 +47,24 @@ export default function EmergencyCard() {
 
   return (
     <div className="rounded-2xl p-4 border" style={{ background: SURFACE, borderColor: BORDER }}>
-      <p className="mb-3 text-sm font-bold" style={{ color: TEXT }}>🆘 {t("prof_emergency")}</p>
+      <p className="mb-3 text-sm font-bold" style={{ color: TEXT }}>
+        🆘 {t("prof_emergency")}
+      </p>
       <div className="grid grid-cols-2 gap-2">
         {номера.map((s) => (
-          <a key={s.l} href={`tel:${s.n}`} className="block rounded-xl p-3 text-left active:scale-[0.98]" style={{ background: CREAM }}>
+          <a
+            key={s.l}
+            href={`tel:${s.n}`}
+            className="block rounded-xl p-3 text-left active:scale-[0.98]"
+            style={{ background: CREAM }}
+          >
             <span className="text-xl">{s.e}</span>
-            <p className="mt-1 text-xs font-semibold" style={{ color: TEXT }}>{s.l}</p>
-            <p className="font-mono text-sm font-bold" style={{ color: "var(--gold-ink)" }}>{s.n}</p>
+            <p className="mt-1 text-xs font-semibold" style={{ color: TEXT }}>
+              {s.l}
+            </p>
+            <p className="font-mono text-sm font-bold" style={{ color: "var(--gold-ink)" }}>
+              {s.n}
+            </p>
           </a>
         ))}
       </div>
@@ -63,11 +74,20 @@ export default function EmergencyCard() {
         className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold text-white disabled:opacity-70"
         style={{ background: состояние === "sent" ? "#1a8f4a" : "#dc2626" }}
       >
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>
-        {состояние === "sending" ? t("sos_sending") : состояние === "sent" ? t("sos_sent") : t("prof_send_location")}
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+          <circle cx="12" cy="10" r="3" />
+        </svg>
+        {состояние === "sending"
+          ? t("sos_sending")
+          : состояние === "sent"
+          ? t("sos_sent")
+          : t("prof_send_location")}
       </button>
       {состояние === "fail" && (
-        <p className="mt-2 text-xs" style={{ color: "#dc2626" }}>{t("sos_fail")}</p>
+        <p className="mt-2 text-xs" style={{ color: "#dc2626" }}>
+          {t("sos_fail")}
+        </p>
       )}
     </div>
   );

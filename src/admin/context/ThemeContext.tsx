@@ -96,7 +96,11 @@ const ThemeContext = createContext<ThemeContextType>({
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [isDark, setIsDark] = useState<boolean>(() => {
-    try { return localStorage.getItem("uz-admin-mode") !== "light"; } catch { return true; }
+    try {
+      return localStorage.getItem("uz-admin-mode") !== "light";
+    } catch {
+      return true;
+    }
   });
 
   const [theme, setTheme] = useState<ThemeVars>(() => {
@@ -130,14 +134,18 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     root.style.setProperty("--font-display", theme.fontDisplay);
     root.style.setProperty("--font-body", theme.fontBody);
     root.style.setProperty("--sidebar-width", theme.sidebarWidth);
-    try { localStorage.setItem("uz-admin-theme", JSON.stringify(theme)); } catch {}
+    try {
+      localStorage.setItem("uz-admin-theme", JSON.stringify(theme));
+    } catch {}
   }, [theme]);
 
   const toggleMode = () => {
     const next = !isDark;
     setIsDark(next);
     setTheme(next ? DARK_THEME : LIGHT_THEME);
-    try { localStorage.setItem("uz-admin-mode", next ? "dark" : "light"); } catch {}
+    try {
+      localStorage.setItem("uz-admin-mode", next ? "dark" : "light");
+    } catch {}
   };
 
   const setVar = (key: keyof ThemeVars, val: string) => {

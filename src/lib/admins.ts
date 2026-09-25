@@ -60,9 +60,7 @@ export function логинГоден(x: string): boolean {
 }
 
 export async function listAdmins(): Promise<PublicAdmin[]> {
-  return (await хранилище.read())
-    .map(publicAdmin)
-    .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+  return (await хранилище.read()).map(publicAdmin).sort((a, b) => a.createdAt.localeCompare(b.createdAt));
 }
 
 export async function findAdminByUsername(username: string): Promise<AdminAccount | null> {
@@ -149,10 +147,7 @@ export async function deleteAdmin(id: string): Promise<void> {
  * Возвращает запись при успехе, иначе null. Сравнение пароля —
  * постоянного времени внутри verifyPassword.
  */
-export async function authenticateAdmin(
-  username: string,
-  password: string,
-): Promise<AdminAccount | null> {
+export async function authenticateAdmin(username: string, password: string): Promise<AdminAccount | null> {
   const admin = await findAdminByUsername(username);
   if (!admin || admin.disabled) return null;
   const ok = await verifyPassword(password, admin.passwordHash);

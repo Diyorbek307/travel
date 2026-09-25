@@ -3,8 +3,6 @@ import { PageHeader, Badge, Btn, Table } from "./shared";
 import { useEntity } from "../context/useEntity";
 import type { ManagedPlace as Dest } from "@/lib/types";
 
-
-
 export default function Destinations() {
   const [view, setView] = useState<"grid" | "table">("grid");
   const [dests, setDests] = useEntity("places");
@@ -13,16 +11,18 @@ export default function Destinations() {
 
   const filtered = filter === "all" ? dests : dests.filter((d) => d.status === filter);
 
-  const statusColor = (s: string) =>
-    s === "active" ? "teal" : s === "seasonal" ? "amber" : "dim";
+  const statusColor = (s: string) => (s === "active" ? "teal" : s === "seasonal" ? "amber" : "dim");
 
   const toggleStatus = (id: string) => {
     setDests((prev) =>
       prev.map((d) =>
         d.id === id
-          ? { ...d, status: d.status === "active" ? "seasonal" : d.status === "seasonal" ? "draft" : "active" }
-          : d
-      )
+          ? {
+              ...d,
+              status: d.status === "active" ? "seasonal" : d.status === "seasonal" ? "draft" : "active",
+            }
+          : d,
+      ),
     );
   };
 
@@ -31,14 +31,44 @@ export default function Destinations() {
       <PageHeader
         title="Направления"
         subtitle={`${filtered.length} направлений`}
-        action={<Btn onClick={() => setSelected({ id: "", name: "", city: "", type: "", region: "", rating: 0, reviews: 0, distance: "", entry: "", hours: "", visits: 0, tours: 0, status: "draft", img: "", desc: "", audio: false, qr: false })}>+ Добавить</Btn>}
+        action={
+          <Btn
+            onClick={() =>
+              setSelected({
+                id: "",
+                name: "",
+                city: "",
+                type: "",
+                region: "",
+                rating: 0,
+                reviews: 0,
+                distance: "",
+                entry: "",
+                hours: "",
+                visits: 0,
+                tours: 0,
+                status: "draft",
+                img: "",
+                desc: "",
+                audio: false,
+                qr: false,
+              })
+            }
+          >
+            + Добавить
+          </Btn>
+        }
       />
 
-      {/* Filters + view toggle */}
       <div className="flex flex-wrap items-center justify-between gap-2 mb-6">
         <div className="flex flex-wrap gap-1.5">
           {(["all", "active", "seasonal", "draft"] as const).map((f) => {
-            const filterLabel: Record<string, string> = { all: "Все", active: "Активные", seasonal: "Сезонные", draft: "Черновик" };
+            const filterLabel: Record<string, string> = {
+              all: "Все",
+              active: "Активные",
+              seasonal: "Сезонные",
+              draft: "Черновик",
+            };
             return (
               <button
                 key={f}
@@ -75,12 +105,19 @@ export default function Destinations() {
       </div>
 
       {view === "grid" ? (
-        <div className="grid gap-5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(min(280px, 100%), 1fr))" }}>
+        <div
+          className="grid gap-5"
+          style={{ gridTemplateColumns: "repeat(auto-fill, minmax(min(280px, 100%), 1fr))" }}
+        >
           {filtered.map((d) => (
             <div
               key={d.id}
               className="rounded-lg overflow-hidden cursor-pointer transition-all hover:translate-y-[-2px]"
-              style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)", transition: "transform 0.15s, border-color 0.15s" }}
+              style={{
+                background: "var(--color-panel)",
+                border: "1px solid var(--color-border)",
+                transition: "transform 0.15s, border-color 0.15s",
+              }}
               onClick={() => setSelected(d)}
               onMouseEnter={(e) => {
                 (e.currentTarget as HTMLDivElement).style.borderColor = "var(--color-amber)";
@@ -96,7 +133,7 @@ export default function Destinations() {
                   style={{ background: "linear-gradient(to top, rgba(13,12,10,0.7) 0%, transparent 60%)" }}
                 />
                 <div className="absolute top-3 right-3">
-                  <Badge label={d.status} color={statusColor(d.status) as any} />
+                  <Badge label={d.status} color={statusColor(d.status)} />
                 </div>
               </div>
               <div className="p-4">
@@ -112,14 +149,23 @@ export default function Destinations() {
                       {d.region}
                     </div>
                   </div>
-                  <div className="text-sm font-medium" style={{ color: "var(--color-amber)", fontFamily: "var(--font-mono)" }}>
+                  <div
+                    className="text-sm font-medium"
+                    style={{ color: "var(--color-amber)", fontFamily: "var(--font-mono)" }}
+                  >
                     ★ {d.rating}
                   </div>
                 </div>
-                <p className="text-xs mt-2 leading-relaxed line-clamp-2" style={{ color: "var(--color-muted)" }}>
+                <p
+                  className="text-xs mt-2 leading-relaxed line-clamp-2"
+                  style={{ color: "var(--color-muted)" }}
+                >
                   {d.desc}
                 </p>
-                <div className="flex flex-wrap items-center gap-4 mt-3 text-xs" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
+                <div
+                  className="flex flex-wrap items-center gap-4 mt-3 text-xs"
+                  style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+                >
                   <span>{d.visits.toLocaleString()} посещений</span>
                   <span>{d.tours} туров</span>
                 </div>
@@ -131,21 +177,26 @@ export default function Destinations() {
         <Table
           cols={["НАЗВАНИЕ", "РЕГИОН", "РЕЙТИНГ", "ПОСЕЩЕНИЯ", "ТУРЫ", "СТАТУС", ""]}
           rows={filtered.map((d) => [
-            <span className="font-medium" style={{ color: "var(--color-text)" }}>{d.name}</span>,
+            <span className="font-medium" style={{ color: "var(--color-text)" }}>
+              {d.name}
+            </span>,
             <span style={{ color: "var(--color-muted)" }}>{d.region}</span>,
             <span style={{ color: "var(--color-amber)", fontFamily: "var(--font-mono)" }}>★ {d.rating}</span>,
             <span style={{ fontFamily: "var(--font-mono)" }}>{d.visits.toLocaleString()}</span>,
             <span style={{ fontFamily: "var(--font-mono)" }}>{d.tours}</span>,
-            <Badge label={d.status} color={statusColor(d.status) as any} />,
+            <Badge label={d.status} color={statusColor(d.status)} />,
             <div className="flex flex-wrap gap-2">
-              <Btn variant="ghost" small onClick={() => toggleStatus(d.id)}>Статус</Btn>
-              <Btn variant="ghost" small onClick={() => setSelected(d)}>Изменить</Btn>
+              <Btn variant="ghost" small onClick={() => toggleStatus(d.id)}>
+                Статус
+              </Btn>
+              <Btn variant="ghost" small onClick={() => setSelected(d)}>
+                Изменить
+              </Btn>
             </div>,
           ])}
         />
       )}
 
-      {/* Detail panel */}
       {selected && (
         <div
           className="fixed inset-0 flex items-center justify-center z-50"
@@ -161,7 +212,10 @@ export default function Destinations() {
               <img src={selected.img} alt={selected.name} className="w-full h-full object-cover" />
               <div
                 className="absolute inset-0"
-                style={{ background: "linear-gradient(to top, color-mix(in srgb, var(--color-bg) 85%, transparent) 0%, transparent 50%)" }}
+                style={{
+                  background:
+                    "linear-gradient(to top, color-mix(in srgb, var(--color-bg) 85%, transparent) 0%, transparent 50%)",
+                }}
               />
               <div className="absolute bottom-4 left-5">
                 <h2
@@ -191,18 +245,30 @@ export default function Destinations() {
                   { label: "Посещений", val: selected.visits.toLocaleString() },
                   { label: "Туров", val: String(selected.tours) },
                 ].map((s) => (
-                  <div key={s.label} className="rounded p-3 text-center" style={{ background: "var(--color-surface)" }}>
-                    <div className="text-lg font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--color-amber)" }}>
+                  <div
+                    key={s.label}
+                    className="rounded p-3 text-center"
+                    style={{ background: "var(--color-surface)" }}
+                  >
+                    <div
+                      className="text-lg font-semibold"
+                      style={{ fontFamily: "var(--font-display)", color: "var(--color-amber)" }}
+                    >
                       {s.val}
                     </div>
-                    <div className="text-xs mt-0.5" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
+                    <div
+                      className="text-xs mt-0.5"
+                      style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+                    >
                       {s.label}
                     </div>
                   </div>
                 ))}
               </div>
               <div className="flex flex-wrap gap-3 justify-end">
-                <Btn variant="ghost" onClick={() => setSelected(null)}>Закрыть</Btn>
+                <Btn variant="ghost" onClick={() => setSelected(null)}>
+                  Закрыть
+                </Btn>
                 <Btn onClick={() => setSelected(null)}>Сохранить</Btn>
               </div>
             </div>

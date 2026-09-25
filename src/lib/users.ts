@@ -246,7 +246,6 @@ export async function updateUser(
   });
 }
 
-
 /**
  * Продлить Premium на несколько месяцев или снять (месяцев = 0).
  *
@@ -332,19 +331,22 @@ export async function createVerification(email: string): Promise<string> {
   await коды.update((все) => {
     const прошлая = все.find((v) => v.email === email);
     const прочие = все.filter((v) => v.email !== email);
-    return [[
-      ...прочие,
-    {
-      email,
-      code,
-      expiresAt: new Date(Date.now() + VERIFY_TTL_MS).toISOString(),
-      attempts: 0,
-      sentAt: new Date().toISOString(),
-      // Счётчик переживает выдачу нового кода: иначе пауза сбрасывалась
-      // бы каждой отправкой и не росла никогда.
-      resends: прошлая ? прошлая.resends + 1 : 0,
-      },
-    ], undefined];
+    return [
+      [
+        ...прочие,
+        {
+          email,
+          code,
+          expiresAt: new Date(Date.now() + VERIFY_TTL_MS).toISOString(),
+          attempts: 0,
+          sentAt: new Date().toISOString(),
+          // Счётчик переживает выдачу нового кода: иначе пауза сбрасывалась
+          // бы каждой отправкой и не росла никогда.
+          resends: прошлая ? прошлая.resends + 1 : 0,
+        },
+      ],
+      undefined,
+    ];
   });
   return code;
 }

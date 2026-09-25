@@ -83,7 +83,7 @@ export const USERS: User[] = [
     ],
   },
   {
-    id: 7, name: "Bobur Tashkentov", email: "bobur.t@uztravel.uz", phone: "+998 91 234 5678",
+    id: 7, name: "Bobur Tashkentov", email: "bobur.t@hellouz.uz", phone: "+998 91 234 5678",
     country: "Uzbekistan", flag: "🇺🇿", joined: "Mar 1, 2023", bookings: 0, spent: 0,
     role: "guide", status: "active", avatar: "B", lastSeen: "5 min ago",
     location: { lat: 39.65, lng: 66.97, city: "Samarkand" },

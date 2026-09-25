@@ -81,7 +81,11 @@ export default function MyBookings() {
 
       <ul className="grid gap-2.5">
         {брони.map((b) => (
-          <li key={b.id} className="rounded-2xl p-4" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
+          <li
+            key={b.id}
+            className="rounded-2xl p-4"
+            style={{ background: SURFACE, border: `1px solid ${BORDER}` }}
+          >
             <div className="mb-1 flex flex-wrap items-center justify-between gap-2">
               <span className="text-[11px]" style={{ color: MUTED }}>
                 {ВИД[b.kind].значок} {t(ВИД[b.kind].ключ)}
@@ -90,7 +94,7 @@ export default function MyBookings() {
                 {t(СТАТУС[b.status].ключ)}
               </span>
             </div>
-            <p className="text-sm font-bold" style={{ color: TEXT, fontFamily:"var(--font-heading)" }}>
+            <p className="text-sm font-bold" style={{ color: TEXT, fontFamily: "var(--font-heading)" }}>
               {b.itemName}
             </p>
             <p className="mt-1 text-xs" style={{ color: MUTED }}>

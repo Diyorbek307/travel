@@ -141,10 +141,14 @@ export function AdSpotlight({ isPremium, cities }: { isPremium: boolean; cities?
   return (
     <div className="px-4 pt-5">
       <div className="mb-2.5 flex items-center justify-between">
-        <p className="text-base font-bold" style={{ color: TEXT, fontFamily:"var(--font-heading)" }}>
+        <p className="text-base font-bold" style={{ color: TEXT, fontFamily: "var(--font-heading)" }}>
           ✨ {t("ad_offer_title")}
         </p>
-        <button onClick={() => setСкрыт(true)} className="text-[10px] transition-all active:scale-95" style={{ color: MUTED }}>
+        <button
+          onClick={() => setСкрыт(true)}
+          className="text-[10px] transition-all active:scale-95"
+          style={{ color: MUTED }}
+        >
           {t("ad_hide")}
         </button>
       </div>
@@ -194,7 +198,10 @@ export function AdSpotlight({ isPremium, cities }: { isPremium: boolean; cities?
                   </span>
                 )}
               </div>
-              <p className="font-bold leading-tight" style={{ color: текст, fontSize: 17, fontFamily:"var(--font-heading)" }}>
+              <p
+                className="font-bold leading-tight"
+                style={{ color: текст, fontSize: 17, fontFamily: "var(--font-heading)" }}
+              >
                 {трК(ad.title)}
               </p>
               <p className="mt-1 text-[11px] leading-snug" style={{ color: текст, opacity: 0.82 }}>
@@ -237,7 +244,7 @@ export function AdShelf({ isPremium }: { isPremium: boolean }) {
   return (
     <div className="pt-5">
       <div className="mb-3 flex items-center gap-2 px-4">
-        <p className="text-base font-bold" style={{ color: TEXT, fontFamily:"var(--font-heading)" }}>
+        <p className="text-base font-bold" style={{ color: TEXT, fontFamily: "var(--font-heading)" }}>
           🎒 {t("ad_shelf_title")}
         </p>
         <Пометка тёмный={false} />
@@ -261,7 +268,12 @@ export function AdShelf({ isPremium }: { isPremium: boolean }) {
             </p>
             <p
               className="mt-0.5 overflow-hidden text-[10px] leading-snug"
-              style={{ color: MUTED, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}
+              style={{
+                color: MUTED,
+                display: "-webkit-box",
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: "vertical",
+              }}
             >
               {трК(ad.sub)}
             </p>
@@ -428,7 +440,10 @@ export function AdInterstitial({
         }}
         // Тап по видео сперва включает звук (браузер не даёт автозвук),
         // и только когда он уже есть — ведёт на сайт рекламодателя.
-        onClick={() => { if (!звук) включитьЗвук(); else перейти(ad); }}
+        onClick={() => {
+          if (!звук) включитьЗвук();
+          else перейти(ad);
+        }}
         className="absolute inset-0 h-full w-full object-cover"
       />
 
@@ -442,7 +457,12 @@ export function AdInterstitial({
       <div className="relative flex items-start justify-between p-4 device-safe-top">
         <span
           className="rounded-full px-2.5 py-1 text-[10px] font-bold uppercase"
-          style={{ letterSpacing: "0.14em", background: "rgba(0,0,0,0.5)", color: "rgba(255,255,255,0.92)", backdropFilter: "blur(8px)" }}
+          style={{
+            letterSpacing: "0.14em",
+            background: "rgba(0,0,0,0.5)",
+            color: "rgba(255,255,255,0.92)",
+            backdropFilter: "blur(8px)",
+          }}
         >
           {t("ad_label")}
         </span>
@@ -450,7 +470,11 @@ export function AdInterstitial({
         {осталось > 0 ? (
           <span
             className="flex h-9 min-w-9 items-center justify-center rounded-full px-3 text-xs font-bold"
-            style={{ background: "rgba(0,0,0,0.5)", color: "rgba(255,255,255,0.85)", backdropFilter: "blur(8px)" }}
+            style={{
+              background: "rgba(0,0,0,0.5)",
+              color: "rgba(255,255,255,0.85)",
+              backdropFilter: "blur(8px)",
+            }}
           >
             {t("ad_skip_in")} {осталось}
           </span>
@@ -478,10 +502,16 @@ export function AdInterstitial({
 
       {/* Низ: рекламодатель, текст и кнопка перехода. */}
       <div className="relative mt-auto p-4 device-safe-bottom">
-        <p className="mb-0.5 text-[11px] font-bold uppercase" style={{ letterSpacing: "0.1em", color: "rgba(255,255,255,0.7)" }}>
+        <p
+          className="mb-0.5 text-[11px] font-bold uppercase"
+          style={{ letterSpacing: "0.1em", color: "rgba(255,255,255,0.7)" }}
+        >
           {трК(ad.label)}
         </p>
-        <p className="mb-2 text-xl font-bold leading-tight" style={{ color: "#fff", fontFamily:"var(--font-heading)" }}>
+        <p
+          className="mb-2 text-xl font-bold leading-tight"
+          style={{ color: "#fff", fontFamily: "var(--font-heading)" }}
+        >
           {трК(ad.title)}
         </p>
         <button

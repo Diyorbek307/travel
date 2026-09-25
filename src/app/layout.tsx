@@ -21,8 +21,7 @@ export const metadata: Metadata = {
   // подставилась бы относительным путём, и превью в мессенджерах пустое.
   metadataBase: new URL("https://uzbekistan-travel.onrender.com"),
   title: "HelloUZ — открой Узбекистан",
-  description:
-    "Маршруты, аудиогиды, отели и рестораны Узбекистана в одном приложении.",
+  description: "Маршруты, аудиогиды, отели и рестораны Узбекистана в одном приложении.",
   manifest: "/manifest.webmanifest",
   applicationName: "HelloUZ",
   // Карточка, которую видят, когда ссылку кидают в Telegram/WhatsApp/соцсети.
@@ -31,15 +30,13 @@ export const metadata: Metadata = {
     siteName: "HelloUZ",
     locale: "ru_RU",
     title: "HelloUZ — открой красоту Узбекистана",
-    description:
-      "Маршруты, аудиогиды, AI-гид и всё об Узбекистане. 10 языков, работает офлайн.",
+    description: "Маршруты, аудиогиды, AI-гид и всё об Узбекистане. 10 языков, работает офлайн.",
     images: [{ url: "/og.jpg", width: 1200, height: 630, alt: "HelloUZ" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "HelloUZ — открой красоту Узбекистана",
-    description:
-      "Маршруты, аудиогиды, AI-гид и всё об Узбекистане. 10 языков, работает офлайн.",
+    description: "Маршруты, аудиогиды, AI-гид и всё об Узбекистане. 10 языков, работает офлайн.",
     images: ["/og.jpg"],
   },
   /*

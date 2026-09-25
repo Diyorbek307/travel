@@ -11,10 +11,7 @@ export async function GET() {
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   const ветка = await getThread(user.id);
-  return NextResponse.json(
-    { messages: ветка?.messages ?? [] },
-    { headers: { "Cache-Control": "no-store" } },
-  );
+  return NextResponse.json({ messages: ветка?.messages ?? [] }, { headers: { "Cache-Control": "no-store" } });
 }
 
 export async function POST(request: Request) {
