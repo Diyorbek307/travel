@@ -53,7 +53,7 @@ export function OnboardingLang({ onNext }:{ onNext:(l:string)=>void; defaultLang
     <div className="flex flex-col h-full animate-slide-up" style={{background:CREAM}}>
       <div className="relative h-52 flex-shrink-0" style={{background:GREEN}}>
         <div className="absolute inset-0 flex items-center justify-center opacity-15"><GeomPattern opacity={1}/></div>
-        <div className="relative z-10 flex flex-col items-center justify-center h-full gap-3"><LogoMark size={52} intro/><p className="text-white text-2xl font-bold" style={{fontFamily:"'Fraunces',serif"}}>{t("onb_welcome")}</p><p className="text-white/70 text-sm">{t("onb_choose_lang")}</p></div>
+        <div className="relative z-10 flex flex-col items-center justify-center h-full gap-3"><LogoMark size={52} intro tone="#ffffff"/><p className="text-white text-2xl font-bold" style={{fontFamily:"'Fraunces',serif"}}>{t("onb_welcome")}</p><p className="text-white/70 text-sm">{t("onb_choose_lang")}</p></div>
       </div>
       <div className="flex-1 overflow-y-auto hide-scroll px-4 pt-5 space-y-2.5">
         {LOCALES.map((код)=>{

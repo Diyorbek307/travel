@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { LOGO_D, STAR_D, STAR_GOLD } from "./ui";
+import { LOGO_D } from "./ui";
 
 /**
  * Кинематографичная заставка запуска: «UZBEKISTAN — ONE JOURNEY».
@@ -30,11 +30,8 @@ const ФЛЕШ = [
   И("1654861857666-1e8c438cbe4a"),
 ];
 
-const T = "translate(50 50) scale(0.66) translate(-85.5 -99)";
-const T_STAR = `${T} translate(85 84.5) scale(1.15) translate(-85 -84.5)`;
-
 /** Маска в форме знака — сквозь неё видно город «внутри логотипа». */
-const МАСКА_SVG = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='${LOGO_D}' transform='${T}' fill='white' fill-rule='evenodd'/></svg>`;
+const МАСКА_SVG = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='${LOGO_D}' fill='white'/></svg>`;
 const МАСКА = `url("data:image/svg+xml,${encodeURIComponent(МАСКА_SVG)}")`;
 const маска = {
   WebkitMaskImage: МАСКА,
@@ -53,9 +50,9 @@ const БЛИК = 8200; // блик неона перед посадкой
 const ДЛИНА = 9000;
 const УХОД = 820;
 
-/** Доля знака внутри квадрата viewBox 100×100 (из bbox пути × 0.66). */
-const ЗНАК_Ш = 0.812;
-const ЗНАК_В = 0.911;
+/** Доля знака внутри квадрата viewBox 100×100 (знак 86 × 78.7). */
+const ЗНАК_Ш = 0.86;
+const ЗНАК_В = 0.787;
 
 export default function IntroCinematic({ onDone }: { onDone: () => void }) {
   const [уходит, setУходит] = useState(false);
@@ -220,18 +217,14 @@ export default function IntroCinematic({ onDone }: { onDone: () => void }) {
             ))}
           </div>
 
-          {/* Сплошной белый знак (+ золотая звезда проступает при посадке,
-              как у логотипа шапки). */}
+          {/* Сплошной белый знак — ровно такой, как в шапке. */}
           <svg ref={логоRef} viewBox="0 0 100 100" className="absolute inset-0 h-full w-full"
             style={{ overflow: "visible", opacity: 0, animation: `intro-white .6s ease ${БЕЛЫЙ / 1000}s both` }}>
-            <path d={LOGO_D} transform={T} fill="#ffffff" fillRule="evenodd"
+            <path d={LOGO_D} fill="#ffffff"
               style={{
-                filter: уходит ? "drop-shadow(0 1px 2px rgba(0,0,0,0.35))" : "drop-shadow(0 0 4px #ffffffcc) drop-shadow(0 0 14px #ffffff88)",
+                filter: уходит ? "drop-shadow(0 1px 2px rgba(0,0,0,0.3))" : "drop-shadow(0 0 4px #ffffffcc) drop-shadow(0 0 14px #ffffff88)",
                 transition: `filter ${плавно}`,
               }} />
-            <g transform={T_STAR}>
-              <path d={STAR_D} fill={STAR_GOLD} style={{ opacity: уходит ? 1 : 0, transition: `opacity ${плавно}` }} />
-            </g>
           </svg>
 
           {/* Блик неона — полоса света пробегает по знаку перед посадкой. */}
@@ -246,7 +239,7 @@ export default function IntroCinematic({ onDone }: { onDone: () => void }) {
           {/* Белый светящийся контур — рамка знака-окна. */}
           <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full"
             style={{ overflow: "visible", opacity: уходит ? 0 : 1, transition: `opacity ${плавно}` }}>
-            <path d={LOGO_D} transform={T} fill="none" stroke="#ffffff" strokeWidth={0.9} pathLength={1}
+            <path d={LOGO_D} fill="none" stroke="#ffffff" strokeWidth={0.9} pathLength={1}
               vectorEffect="non-scaling-stroke"
               style={{ strokeDasharray: 1, strokeDashoffset: 1, filter: "drop-shadow(0 0 5px #ffffffcc)", animation: `intro-draw 1.2s ease ${ОКНО / 1000}s forwards` }} />
           </svg>
