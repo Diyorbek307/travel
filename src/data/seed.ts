@@ -106,6 +106,23 @@ const restaurants: ManagedRestaurant[] = RESTAURANTS.map((r, i) => {
   };
 });
 
+/**
+ * Гиды туров — демонстрационные имена, чтобы в «Экскурсиях» было видно,
+ * кто ведёт группу. Настоящих вписывают в панели, раздел «Туры».
+ */
+const ГИДЫ: Record<string, string> = {
+  r1: "Азиз Каримов",
+  r2: "Дилноза Юсупова",
+  r3: "Шерзод Рахимов",
+  r4: "Малика Турсунова",
+  r5: "Дилноза Юсупова",
+  r6: "Бобур Алиев",
+  r7: "Нигора Хамидова",
+  r8: "Улугбек Сафаров",
+  r9: "Азиз Каримов",
+  r10: "Гульнара Бекмуратова",
+};
+
 const routes: ManagedRoute[] = ROUTES.map((r, i) => ({
   ...r,
   id: slug(r.id, i),
@@ -118,7 +135,7 @@ const routes: ManagedRoute[] = ROUTES.map((r, i) => ({
   category: r.badge,
   bookings: 0,
   maxGroup: 16,
-  guide: "",
+  guide: ГИДЫ[r.id] ?? "",
   nextDep: "",
   rating: 4.7,
   status: "active",
