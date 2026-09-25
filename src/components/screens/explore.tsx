@@ -84,7 +84,7 @@ export function ExploreScreen({
   onTransport: () => void;
   onPractical: () => void;
 }) {
-  const { AUDIO, CITIES, HOTELS, PLACES, POPULAR_CITIES, RESTAURANTS, ROUTES } = useAppContent();
+  const { CITIES, HOTELS, PLACES, POPULAR_CITIES, RESTAURANTS, ROUTES } = useAppContent();
   const { t, трК, lang } = useT();
   const { pos } = useGeo();
   const рядом = ближайшийГород(pos);
@@ -177,7 +177,6 @@ export function ExploreScreen({
       },
       { ключ: "ai", заголовок: t("ex_ai"), под: t("ex_ai_sub"), go: () => onРаздел("ai") },
       { ключ: "routes", заголовок: t("home_routes"), под: t("map_tab_ai"), go: () => onTab("map") },
-      { ключ: "audio", заголовок: t("ex_audio"), под: String(AUDIO.length), go: () => onTab("audio") },
       { ключ: "tips", заголовок: t("ex_tips"), под: t("home_practical_sub"), go: onPractical },
     ];
     return (

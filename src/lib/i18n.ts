@@ -429,7 +429,6 @@ export const СЛОВАРЬ = {
   dist_center: row("in the centre", "в центре", "markazda", "在市中心", "도심", "im Zentrum", "au centre", "中心部", "merkezde", "في المركز"),
   ex_cities: row("Cities", "Города", "Shaharlar", "城市", "도시", "Städte", "Villes", "都市", "Şehirler", "المدن"),
   ex_all_cities: row("All cities", "Все города", "Barcha shaharlar", "所有城市", "모든 도시", "Alle Städte", "Toutes les villes", "すべての都市", "Tüm şehirler", "كل المدن"),
-  ex_audio: row("Audio guides", "Аудиогиды", "Audiogidlar", "语音导览", "오디오 가이드", "Audioguides", "Audioguides", "音声ガイド", "Sesli rehberler", "أدلة صوتية"),
   ex_tips: row("Tips", "Советы", "Maslahatlar", "旅行贴士", "여행 팁", "Tipps", "Conseils", "旅のヒント", "İpuçları", "نصائح"),
   ex_sections: row("What are you looking for?", "Что ищете?", "Nima qidiryapsiz?", "你想找什么？", "무엇을 찾으세요?", "Was suchst du?", "Que cherchez-vous ?", "何をお探しですか？", "Ne arıyorsunuz?", "عمّ تبحث؟"),
   ex_near: row("Near you", "Рядом с вами", "Yaqiningizda", "在你附近", "내 주변", "In deiner Nähe", "Près de vous", "近く", "Yakınınızda", "بالقرب منك"),
