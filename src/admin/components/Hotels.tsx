@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { PageHeader, Badge, Btn, Table } from "./shared";
 import { useEntity } from "../context/useEntity";
-import type { ManagedHotel as Hotel } from "@/lib/types";
+import type { HotelKind, ManagedHotel as Hotel } from "@/lib/types";
 
 /**
  * Отели.
@@ -21,8 +21,26 @@ type HotelForm = {
   priceFrom: string;
   img: string;
   desc: string;
+  kind: HotelKind;
 };
-const EMPTY_FORM: HotelForm = { name: "", city: "", stars: "3", rooms: "", priceFrom: "", img: "", desc: "" };
+const EMPTY_FORM: HotelForm = {
+  name: "",
+  city: "",
+  stars: "3",
+  rooms: "",
+  priceFrom: "",
+  img: "",
+  desc: "",
+  kind: "hotel",
+};
+
+/**
+ * Вид гостиницы. В приложении по нему работают чипы «Отели / Мотели /
+ * Хостелы» внутри раздела «Гостиницы». У старых записей поля нет — они
+ * считаются отелями.
+ */
+const ВИД: Record<HotelKind, string> = { hotel: "Отель", motel: "Мотель", hostel: "Хостел" };
+const видОтеля = (h: Hotel): HotelKind => h.kind ?? "hotel";
 
 const СТАТУС: Record<string, string> = {
   active: "работает",
@@ -43,6 +61,7 @@ export default function Hotels() {
   const [hotels, setHotels] = useEntity("hotels");
   const [cities] = useEntity("cities");
   const [filter, setFilter] = useState("all");
+  const [kindFilter, setKindFilter] = useState<HotelKind | "all">("all");
   const [view, setView] = useState<"cards" | "table">("cards");
   const [editing, setEditing] = useState<Hotel | null>(null);
   const [showAdd, setShowAdd] = useState(false);
@@ -58,6 +77,7 @@ export default function Hotels() {
       priceFrom: String(h.priceFrom),
       img: h.img,
       desc: h.desc,
+      kind: видОтеля(h),
     });
   };
 
@@ -78,6 +98,7 @@ export default function Hotels() {
           price: `$${priceFrom}`,
           img: form.img.trim() || h.img,
           desc: form.desc.trim(),
+          kind: form.kind,
         };
       }),
     );
@@ -108,6 +129,7 @@ export default function Hotels() {
       desc: form.desc.trim(),
       img: фото,
       imgs: фото ? [фото] : [],
+      kind: form.kind,
     };
     setHotels((prev) => [...prev, newHotel]);
     setShowAdd(false);
@@ -123,7 +145,15 @@ export default function Hotels() {
       ),
     );
 
-  const filtered = filter === "all" ? hotels : hotels.filter((h) => h.city === filter);
+  // Удаление необратимо и сразу убирает гостиницу у туристов, поэтому
+  // спрашиваем. Чаще хватает «Отключить» — запись остаётся в панели.
+  const remove = (h: Hotel) => {
+    if (!confirm(`Удалить «${h.name}»? Гостиница сразу исчезнет у туристов.`)) return;
+    setHotels((prev) => prev.filter((x) => x.id !== h.id));
+  };
+
+  const поГороду = filter === "all" ? hotels : hotels.filter((h) => h.city === filter);
+  const filtered = kindFilter === "all" ? поГороду : поГороду.filter((h) => видОтеля(h) === kindFilter);
   const filterCities = ["all", ...Array.from(new Set(hotels.map((h) => h.city)))];
   const statusColor = (s: string) => (s === "active" ? "teal" : s === "maintenance" ? "amber" : "rose");
   const totalRooms = filtered.reduce((s, h) => s + h.rooms, 0);
@@ -152,6 +182,26 @@ export default function Hotels() {
           />
         </label>
       ))}
+      <label className="text-xs" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
+        ВИД
+        <select
+          value={form.kind}
+          onChange={(e) => setForm((p) => ({ ...p, kind: e.target.value as HotelKind }))}
+          className="mt-1 w-full rounded px-3 py-2 text-sm outline-none"
+          style={{
+            background: "var(--color-surface)",
+            border: "1px solid var(--color-border)",
+            color: "var(--color-text)",
+            fontFamily: "var(--font-body)",
+          }}
+        >
+          {(Object.keys(ВИД) as HotelKind[]).map((k) => (
+            <option key={k} value={k}>
+              {ВИД[k]}
+            </option>
+          ))}
+        </select>
+      </label>
       {/* Город — из списка: приложение ищет погоду и фильтрует по точному
           названию, «Tashkent» вместо «Ташкент» у него не найдётся. */}
       <label className="text-xs" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
@@ -196,7 +246,7 @@ export default function Hotels() {
   return (
     <div className="p-4 sm:p-7">
       <PageHeader
-        title="Отели"
+        title="Гостиницы"
         subtitle={`${filtered.length} объектов · ${активных} работают`}
         action={
           <Btn
@@ -205,7 +255,7 @@ export default function Hotels() {
               setShowAdd(true);
             }}
           >
-            + Добавить отель
+            + Добавить гостиницу
           </Btn>
         }
       />
@@ -252,6 +302,25 @@ export default function Hotels() {
               }}
             >
               {c === "all" ? "Все" : c}
+            </button>
+          ))}
+          <div className="w-px h-5 shrink-0 self-center" style={{ background: "var(--color-border)" }} />
+          {(["all", "hotel", "motel", "hostel"] as const).map((k) => (
+            <button
+              key={k}
+              onClick={() => setKindFilter(k)}
+              className="px-3 py-1.5 rounded text-xs transition-all cursor-pointer"
+              style={{
+                background:
+                  kindFilter === k
+                    ? "color-mix(in srgb, var(--color-amber) 15%, transparent)"
+                    : "transparent",
+                color: kindFilter === k ? "var(--color-amber)" : "var(--color-muted)",
+                border: "1px solid var(--color-border)",
+                fontFamily: "var(--font-mono)",
+              }}
+            >
+              {k === "all" ? "Все виды" : ВИД[k]}
             </button>
           ))}
         </div>
@@ -308,7 +377,7 @@ export default function Hotels() {
                         {h.name}
                       </div>
                       <div className="text-xs mt-0.5" style={{ color: "var(--color-muted)" }}>
-                        {h.city} · {"★".repeat(h.stars)}
+                        {ВИД[видОтеля(h)]} · {h.city} · {"★".repeat(h.stars)}
                       </div>
                     </div>
                     <Badge label={СТАТУС[h.status] ?? h.status} color={statusColor(h.status)} />
@@ -356,6 +425,9 @@ export default function Hotels() {
                   >
                     {h.status === "active" ? "Отключить" : "Включить"}
                   </Btn>
+                  <Btn variant="danger" small onClick={() => remove(h)}>
+                    Удалить
+                  </Btn>
                 </div>
               </div>
             </div>
@@ -363,10 +435,13 @@ export default function Hotels() {
         </div>
       ) : (
         <Table
-          cols={["ОТЕЛЬ", "ГОРОД", "ЗВ.", "НОМЕРОВ", "ОТ/НОЧЬ", "РЕЙТИНГ", "СТАТУС", ""]}
+          cols={["НАЗВАНИЕ", "ВИД", "ГОРОД", "ЗВ.", "НОМЕРОВ", "ОТ/НОЧЬ", "РЕЙТИНГ", "СТАТУС", ""]}
           rows={filtered.map((h) => [
             <span key="n" className="font-medium text-sm" style={{ color: "var(--color-text)" }}>
               {h.name}
+            </span>,
+            <span key="k" style={{ color: "var(--color-muted)" }}>
+              {ВИД[видОтеля(h)]}
             </span>,
             <span key="c" style={{ color: "var(--color-muted)" }}>
               {h.city}
@@ -395,6 +470,9 @@ export default function Hotels() {
               >
                 {h.status === "active" ? "Отключить" : "Включить"}
               </Btn>
+              <Btn variant="danger" small onClick={() => remove(h)}>
+                Удалить
+              </Btn>
             </div>,
           ])}
         />
@@ -419,7 +497,7 @@ export default function Hotels() {
                 className="text-lg font-semibold"
                 style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}
               >
-                {editing ? "Редактировать отель" : "Добавить отель"}
+                {editing ? "Редактировать гостиницу" : "Добавить гостиницу"}
               </h3>
               <button
                 onClick={() => {

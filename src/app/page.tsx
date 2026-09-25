@@ -209,6 +209,12 @@ function App() {
     setTab("map");
     переход();
   };
+  // Экскурсия из «Исследовать» открывается поверх этой же вкладки: после
+  // «назад» человек возвращается в список экскурсий, а не на карту.
+  const openExcursion = (value: Route) => {
+    setDetail({ kind: "route", value });
+    переход();
+  };
 
   const openHotel = (value: Hotel) => {
     отметитьВизит(value.city);
@@ -494,6 +500,7 @@ function App() {
                   onCloseDetail={closeDetail}
                   onPlace={openPlace}
                   onRoute={openRoute}
+                  onExcursion={openExcursion}
                   onHotel={openHotel}
                   onRestaurant={openRestaurant}
                   onПуть={openПуть}
@@ -542,6 +549,7 @@ interface ScreenProps {
   onCloseDetail: () => void;
   onPlace: (p: Place) => void;
   onRoute: (r: Route) => void;
+  onExcursion: (r: Route) => void;
   onHotel: (h: Hotel) => void;
   onRestaurant: (r: Restaurant) => void;
   onПуть: (название: string, город: string) => void;
@@ -614,6 +622,7 @@ function Screen({ tab, detail, ...p }: ScreenProps) {
           onPlace={p.onPlace}
           onHotel={p.onHotel}
           onRestaurant={p.onRestaurant}
+          onRoute={p.onExcursion}
           isPremium={p.isPremium}
           раздел={p.разделОбзора}
           onРаздел={p.onРазделОбзора}

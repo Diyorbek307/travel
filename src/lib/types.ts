@@ -37,7 +37,21 @@ export interface Route {
   color: string;
   badge: string;
   stops: RouteStop[];
+  /**
+   * Город экскурсии — по нему работает общий фильтр «Исследовать».
+   * У многодневных туров через всю страну города нет: они видны только
+   * при «Все города».
+   */
+  city?: string;
+  /** Фото для карточки экскурсии; без него — цветная плашка со значком. */
+  img?: string;
 }
+
+/** Вид гостиницы. Без поля — обычный отель: так записи из базы не ломаются. */
+export type HotelKind = "hotel" | "motel" | "hostel";
+
+/** Ресторан или бар. Без поля — ресторан. */
+export type RestaurantKind = "restaurant" | "bar";
 
 export interface Hotel {
   id: string;
@@ -51,6 +65,7 @@ export interface Hotel {
   desc: string;
   facilities: string[];
   imgs: string[];
+  kind?: HotelKind;
 }
 
 export interface Restaurant {
@@ -64,6 +79,7 @@ export interface Restaurant {
   open: string;
   img: string;
   desc: string;
+  kind?: RestaurantKind;
 }
 
 /** Карточка в колоде на главной — одна форма и для городов, и для мест. */

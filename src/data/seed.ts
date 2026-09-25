@@ -109,8 +109,11 @@ const restaurants: ManagedRestaurant[] = RESTAURANTS.map((r, i) => {
 const routes: ManagedRoute[] = ROUTES.map((r, i) => ({
   ...r,
   id: slug(r.id, i),
-  // Цена маршрута — из подписи вида «5 мест · 12 км · ~$26».
-  price: priceNumber(r.sub.split("·").pop() ?? "0"),
+  // Цена маршрута — из подписи вида «5 мест · 12 км · ~$26». Только
+  // если там правда сумма в долларах: у «22 остановки · 1400 км» последний
+  // кусок — расстояние, и тур показывался туристу за $1400. Нет суммы —
+  // цена 0, и карточка её не показывает, пока её не впишут в панели.
+  price: /\$\s*\d/.test(r.sub.split("·").pop() ?? "") ? priceNumber(r.sub.split("·").pop() ?? "0") : 0,
   difficulty: r.stops.length > 12 ? "Сложный" : r.stops.length > 6 ? "Средний" : "Лёгкий",
   category: r.badge,
   bookings: 0,

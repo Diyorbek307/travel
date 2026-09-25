@@ -75,10 +75,10 @@ const NAV_GROUPS = [
   {
     label: "Контент",
     items: [
-      { id: "destinations", label: "Направления", icon: "◉" },
-      { id: "tours", label: "Туры", icon: "◎" },
-      { id: "hotels", label: "Отели", icon: "▣" },
-      { id: "restaurants", label: "Рестораны", icon: "◇" },
+      { id: "destinations", label: "Места и музеи", icon: "◉" },
+      { id: "tours", label: "Туры и экскурсии", icon: "◎" },
+      { id: "hotels", label: "Гостиницы", icon: "▣" },
+      { id: "restaurants", label: "Рестораны и бары", icon: "◇" },
       { id: "events", label: "События", icon: "◈" },
       { id: "audio", label: "Аудиогиды", icon: "◉" },
       { id: "cities", label: "Города", icon: "⬡" },

@@ -443,6 +443,26 @@ button[aria-disabled="true"] {
   }
 }
 
+/*
+ * Плитки «Исследовать» появляются лесенкой: задержку каждой задаёт
+ * экран по её номеру. Заполнение только «назад» (backwards): после конца
+ * анимация отпускает transform, иначе он перебил бы проседание плитки
+ * при нажатии.
+ */
+.tile-in {
+  animation: tile-in 0.42s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+@keyframes tile-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 /* Движение — украшение, а не смысл: тем, кто просил его отключить,
    показываем статичный кадр вместо бесконечных циклов. */
 @media (prefers-reduced-motion: reduce) {
@@ -452,6 +472,13 @@ button[aria-disabled="true"] {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+/* Задержка лесенки осталась бы и без длительности — плитки выходили бы
+   с запозданием. Тем, кто просил покоя, показываем их сразу. */
+@media (prefers-reduced-motion: reduce) {
+  .tile-in {
+    animation: none;
   }
 }
 

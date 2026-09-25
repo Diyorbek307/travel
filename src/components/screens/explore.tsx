@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { Hotel, Place, Restaurant, Tab } from "@/lib/types";
+import type { Hotel, HotelKind, ManagedRoute, Place, Restaurant, Route, Tab } from "@/lib/types";
 import { ACCENT_FILL, BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE, ON_GOLD } from "@/lib/theme";
 import { ТИПЫ_МЕСТ } from "@/data/content";
 import type { TKey } from "@/lib/i18n";
@@ -17,13 +17,22 @@ import { AnimatedBg } from "@/components/animated-bg";
 import CityReel from "@/components/city-reel";
 import { ВИДЕО, ФОН_ВИДЕО, кадрыГорода } from "@/data/city-reels";
 import { AdInline } from "@/components/ads";
+import AiGuide from "@/components/ai-guide";
 
 /**
  * Раздел внутри «Исследовать». Без раздела экран — сетка плиток, как
  * витрина услуг: человек сначала выбирает, что ищет, и только потом
  * видит список.
  */
-export type РазделОбзора = "cities" | "places" | "hotels" | "restaurants";
+export type РазделОбзора =
+  | "cities"
+  | "places"
+  | "museums"
+  | "hotels"
+  | "restaurants"
+  | "bars"
+  | "excursions"
+  | "ai";
 
 /*
  * Город — не отдельный мир, а фильтр над всеми разделами.
@@ -51,6 +60,7 @@ export function ExploreScreen({
   onPlace,
   onHotel,
   onRestaurant,
+  onRoute,
   isPremium,
   раздел,
   onРаздел,
@@ -63,6 +73,7 @@ export function ExploreScreen({
   onPlace: (p: Place) => void;
   onHotel: (h: Hotel) => void;
   onRestaurant: (r: Restaurant) => void;
+  onRoute: (r: Route) => void;
   isPremium: boolean;
   раздел?: РазделОбзора;
   onРаздел: (р?: РазделОбзора) => void;
@@ -73,8 +84,8 @@ export function ExploreScreen({
   onTransport: () => void;
   onPractical: () => void;
 }) {
-  const { AUDIO, CITIES, HOTELS, PLACES, POPULAR_CITIES, RESTAURANTS } = useAppContent();
-  const { t, трК } = useT();
+  const { AUDIO, CITIES, HOTELS, PLACES, POPULAR_CITIES, RESTAURANTS, ROUTES } = useAppContent();
+  const { t, трК, lang } = useT();
   const { pos } = useGeo();
   const рядом = ближайшийГород(pos);
   const выбран = город ? CITIES.find((c) => c.name === город) : undefined;
@@ -92,8 +103,18 @@ export function ExploreScreen({
   const вГороде = <T extends { city: string }>(список: T[]) =>
     город ? список.filter((x) => x.city === город) : список;
   const места = вГороде(PLACES);
+  const музеи = места.filter((p) => (ТИПЫ_МЕСТ["Музеи"] ?? []).includes(p.typeRu ?? p.type));
   const отели = вГороде(HOTELS);
-  const рестораны = вГороде(RESTAURANTS);
+  // Бары — те же заведения из раздела ресторанов, но с видом «bar»: их
+  // ищут вечером и по другой причине, поэтому у них своя плитка, а в
+  // «Ресторанах» их нет.
+  const рестораны = вГороде(RESTAURANTS).filter((r) => r.kind !== "bar");
+  const бары = вГороде(RESTAURANTS).filter((r) => r.kind === "bar");
+  // У многодневного тура через всю страну города нет: при выбранном
+  // городе он не показывается, иначе фильтр врал бы.
+  const экскурсии = город ? ROUTES.filter((r) => r.city === город) : ROUTES;
+  // Пустой список предлагает снять город — если он выбран.
+  const сброс = город ? () => onГород(null) : undefined;
 
   /*
    * Чипы городов — только там, где есть что показать: город без единой
@@ -134,73 +155,30 @@ export function ExploreScreen({
   );
 
   if (!раздел) {
-    const плитки: {
-      ключ: string;
-      заголовок: string;
-      под: string;
-      эмодзи: string;
-      пусто?: boolean;
-      go: () => void;
-    }[] = [
-      {
-        ключ: "cities",
-        заголовок: t("ex_cities"),
-        под: String(CITIES.length),
-        эмодзи: "🕌",
-        go: () => onРаздел("cities"),
-      },
-      {
-        ключ: "places",
-        заголовок: t("home_places"),
-        под: String(места.length),
-        эмодзи: "🏛️",
-        пусто: места.length === 0,
-        go: () => onРаздел("places"),
-      },
-      {
-        ключ: "hotels",
-        заголовок: t("home_hotels"),
-        под: String(отели.length),
-        эмодзи: "🏨",
-        пусто: отели.length === 0,
-        go: () => onРаздел("hotels"),
-      },
+    const число = (n: number) => ({ под: String(n), пусто: n === 0 });
+    const плитки: ПлиткаДанные[] = [
+      { ключ: "cities", заголовок: t("ex_cities"), под: String(CITIES.length), go: () => onРаздел("cities") },
+      { ключ: "hotels", заголовок: t("ex_stay"), ...число(отели.length), go: () => onРаздел("hotels") },
       {
         ключ: "restaurants",
         заголовок: t("home_restaurants"),
-        под: String(рестораны.length),
-        эмодзи: "🍽️",
-        пусто: рестораны.length === 0,
+        ...число(рестораны.length),
         go: () => onРаздел("restaurants"),
       },
+      { ключ: "bars", заголовок: t("ex_bars"), ...число(бары.length), go: () => onРаздел("bars") },
+      { ключ: "museums", заголовок: t("f_museums"), ...число(музеи.length), go: () => onРаздел("museums") },
+      { ключ: "places", заголовок: t("ex_sights"), ...число(места.length), go: () => onРаздел("places") },
+      { ключ: "transport", заголовок: t("home_transport"), под: t("home_transport_sub"), go: onTransport },
       {
-        ключ: "routes",
-        заголовок: t("home_routes"),
-        под: t("map_tab_ai"),
-        эмодзи: "🗺️",
-        go: () => onTab("map"),
+        ключ: "excursions",
+        заголовок: t("ex_excursions"),
+        ...число(экскурсии.length),
+        go: () => onРаздел("excursions"),
       },
-      {
-        ключ: "transport",
-        заголовок: t("home_transport"),
-        под: t("home_transport_sub"),
-        эмодзи: "🚆",
-        go: onTransport,
-      },
-      {
-        ключ: "audio",
-        заголовок: t("ex_audio"),
-        под: String(AUDIO.length),
-        эмодзи: "🎧",
-        go: () => onTab("audio"),
-      },
-      {
-        ключ: "tips",
-        заголовок: t("ex_tips"),
-        под: t("home_practical_sub"),
-        эмодзи: "💡",
-        go: onPractical,
-      },
+      { ключ: "ai", заголовок: t("ex_ai"), под: t("ex_ai_sub"), go: () => onРаздел("ai") },
+      { ключ: "routes", заголовок: t("home_routes"), под: t("map_tab_ai"), go: () => onTab("map") },
+      { ключ: "audio", заголовок: t("ex_audio"), под: String(AUDIO.length), go: () => onTab("audio") },
+      { ключ: "tips", заголовок: t("ex_tips"), под: t("home_practical_sub"), go: onPractical },
     ];
     return (
       <div className="flex flex-col h-full" style={{ background: CREAM }}>
@@ -219,35 +197,13 @@ export function ExploreScreen({
           </p>
           {/*
             Две колонки на телефоне, как витрина услуг: название и число
-            слева сверху, крупная картинка выглядывает из угла. Раздел, где
-            в выбранном городе пусто, приглушён, но нажимается — внутри
-            можно сразу сменить город.
+            слева сверху, иллюстрация выглядывает из правого нижнего угла.
+            Раздел, где в выбранном городе пусто, приглушён, но нажимается —
+            внутри можно сразу сменить город.
           */}
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
-            {плитки.map((п) => (
-              <button
-                key={п.ключ}
-                onClick={п.go}
-                className="relative h-[124px] overflow-hidden rounded-2xl border bg-white p-3.5 text-left shadow-sm transition-all active:scale-[0.97]"
-                style={{ borderColor: BORDER, opacity: п.пусто ? 0.55 : 1 }}
-              >
-                <p
-                  className="text-[15px] font-bold leading-tight"
-                  style={{ color: TEXT, fontFamily: "var(--font-heading)" }}
-                >
-                  {п.заголовок}
-                </p>
-                <p className="mt-1 line-clamp-2 pr-12 text-[10px] leading-snug" style={{ color: MUTED }}>
-                  {п.под}
-                </p>
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute -bottom-2 -right-1 select-none"
-                  style={{ fontSize: 58, lineHeight: 1, transform: "rotate(-10deg)" }}
-                >
-                  {п.эмодзи}
-                </span>
-              </button>
+            {плитки.map((п, i) => (
+              <Плитка key={п.ключ} плитка={п} номер={i} lang={lang} />
             ))}
           </div>
 
@@ -261,14 +217,30 @@ export function ExploreScreen({
 
   const заголовки: Record<РазделОбзора, TKey> = {
     cities: "ex_cities",
-    places: "home_places",
-    hotels: "home_hotels",
+    places: "ex_sights",
+    museums: "f_museums",
+    hotels: "ex_stay",
     restaurants: "home_restaurants",
+    bars: "ex_bars",
+    excursions: "ex_excursions",
+    ai: "ex_ai",
   };
+  const назад = () => onРаздел(undefined);
+
+  // Чат занимает экран целиком и прокручивается сам: общая прокрутка
+  // раздела увела бы поле ввода за край.
+  if (раздел === "ai") {
+    return (
+      <div className="flex flex-col h-full" style={{ background: CREAM }}>
+        <Шапка кикер="HelloUZ" заголовок={t("ex_ai")} фон={фон} onBack={назад} />
+        <AiGuide />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-full" style={{ background: CREAM }}>
-      <Шапка кикер="HelloUZ" заголовок={t(заголовки[раздел])} фон={фон} onBack={() => onРаздел(undefined)}>
+      <Шапка кикер="HelloUZ" заголовок={t(заголовки[раздел])} фон={фон} onBack={назад}>
         {раздел !== "cities" && чипыГородов}
       </Шапка>
       <div className="flex-1 overflow-y-auto hide-scroll p-4">
@@ -281,20 +253,78 @@ export function ExploreScreen({
             }}
           />
         )}
-        {раздел === "places" && <СписокМест места={места} onPlace={onPlace} />}
-        {раздел === "hotels" && <СписокОтелей отели={отели} onHotel={onHotel} />}
-        {раздел === "restaurants" && <СписокРесторанов рестораны={рестораны} onRestaurant={onRestaurant} />}
-        {город && раздел !== "cities" && (
-          <button
-            onClick={() => onГород(null)}
-            className="mx-auto mt-4 block rounded-full px-4 py-2 text-xs font-semibold"
-            style={{ background: SURFACE, color: GREEN, border: `1px solid ${BORDER}` }}
-          >
-            {t("ex_all_cities")} →
-          </button>
+        {раздел === "places" && <СписокМест места={места} onPlace={onPlace} сброс={сброс} />}
+        {раздел === "museums" && <СписокМест места={музеи} onPlace={onPlace} сброс={сброс} безТипов />}
+        {раздел === "hotels" && <СписокОтелей отели={отели} onHotel={onHotel} сброс={сброс} />}
+        {раздел === "restaurants" && (
+          <СписокРесторанов рестораны={рестораны} onRestaurant={onRestaurant} сброс={сброс} />
         )}
+        {раздел === "bars" && <СписокРесторанов рестораны={бары} onRestaurant={onRestaurant} сброс={сброс} />}
+        {раздел === "excursions" && <СписокЭкскурсий туры={экскурсии} onRoute={onRoute} сброс={сброс} />}
       </div>
     </div>
+  );
+}
+
+type ПлиткаДанные = {
+  ключ: string;
+  заголовок: string;
+  под: string;
+  пусто?: boolean;
+  go: () => void;
+};
+
+/**
+ * Плитка раздела: название слева сверху, иллюстрация в правом нижнем
+ * углу. Картинка чуть выходит за край и обрезается скруглением — так она
+ * выглядит частью карточки, а не наклейкой. Фон у иллюстраций прозрачный,
+ * поэтому в тёмной теме плитка просто темнеет.
+ *
+ * Длинные слова («Достопримечательности») переносит браузер по правилам
+ * языка: для этого у текста стоит lang. Словаря переносов нет у части
+ * браузеров (Chromium на Linux, некоторые Android) — там слово резалось
+ * где попало, поэтому в самых длинных подписях словаря стоят мягкие
+ * переносы (\u00AD) по слогам.
+ */
+function Плитка({ плитка, номер, lang }: { плитка: ПлиткаДанные; номер: number; lang: string }) {
+  return (
+    <button
+      onClick={плитка.go}
+      className="tile-in group relative flex h-[130px] flex-col items-start justify-start overflow-hidden rounded-[20px] border p-3.5 text-left transition-transform duration-150 active:scale-[0.97]"
+      style={{
+        background: SURFACE,
+        borderColor: BORDER,
+        boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
+        opacity: плитка.пусто ? 0.6 : 1,
+        animationDelay: `${номер * 45}ms`,
+      }}
+    >
+      <p
+        lang={lang}
+        className="relative z-10 text-[15px] font-bold leading-tight"
+        style={{
+          color: TEXT,
+          fontFamily: "var(--font-heading)",
+          hyphens: "auto",
+        }}
+      >
+        {плитка.заголовок}
+      </p>
+      <p
+        lang={lang}
+        className="relative z-10 mt-1 line-clamp-2 max-w-[55%] text-[10px] leading-snug"
+        style={{ color: MUTED, hyphens: "auto" }}
+      >
+        {плитка.под}
+      </p>
+      <img
+        src={`/tiles/${плитка.ключ}.webp`}
+        alt=""
+        loading="lazy"
+        draggable={false}
+        className="pointer-events-none absolute -bottom-[10%] -right-[8%] aspect-square w-[60%] select-none object-contain transition-transform duration-300 group-hover:scale-105"
+      />
+    </button>
   );
 }
 
@@ -391,12 +421,58 @@ function Шапка({
   );
 }
 
-function Пусто() {
+/**
+ * Пустой раздел. Чаще всего пусто не вообще, а в выбранном городе —
+ * поэтому рядом сразу кнопка снять город, а не только грустная надпись.
+ */
+function Пусто({ сброс }: { сброс?: () => void }) {
   const { t } = useT();
   return (
-    <p className="py-10 text-center text-sm sm:col-span-2 xl:col-span-3" style={{ color: MUTED }}>
-      {t("explore_empty")}
-    </p>
+    <div className="flex flex-col items-center gap-3 py-10 text-center sm:col-span-2 xl:col-span-3">
+      <p className="text-sm" style={{ color: MUTED }}>
+        {t("ex_soon")}
+      </p>
+      {сброс && (
+        <button
+          onClick={сброс}
+          className="rounded-full px-4 py-2 text-xs font-semibold"
+          style={{ background: SURFACE, color: GREEN, border: `1px solid ${BORDER}` }}
+        >
+          {t("ex_all_cities")} →
+        </button>
+      )}
+    </div>
+  );
+}
+
+/** Ряд чипов-фильтров внутри раздела: подтипы мест, виды гостиниц. */
+function Чипы<T extends string>({
+  варианты,
+  выбран,
+  onВыбор,
+}: {
+  варианты: { значение: T; подпись: TKey }[];
+  выбран: T;
+  onВыбор: (v: T) => void;
+}) {
+  const { t } = useT();
+  return (
+    <div className="-mx-4 mb-3 flex gap-2 overflow-x-auto px-4 hide-scroll">
+      {варианты.map((в) => (
+        <button
+          key={в.значение}
+          onClick={() => onВыбор(в.значение)}
+          className="flex-shrink-0 rounded-full border px-3.5 py-1.5 text-xs font-semibold"
+          style={
+            выбран === в.значение
+              ? { background: ACCENT_FILL, color: WHITE, borderColor: "transparent" }
+              : { background: SURFACE, color: MUTED, borderColor: BORDER }
+          }
+        >
+          {t(в.подпись)}
+        </button>
+      ))}
+    </div>
   );
 }
 
@@ -459,7 +535,18 @@ function СписокГородов({ рядом, onВыбор }: { рядом: 
   );
 }
 
-function СписокМест({ места, onPlace }: { места: Place[]; onPlace: (p: Place) => void }) {
+function СписокМест({
+  места,
+  onPlace,
+  сброс,
+  безТипов = false,
+}: {
+  места: Place[];
+  onPlace: (p: Place) => void;
+  сброс?: () => void;
+  /** В «Музеях» подтип уже выбран плиткой — чипы там лишние. */
+  безТипов?: boolean;
+}) {
   const { t, трК } = useT();
   const погода = useWeather(); // настоящая погода города (Open-Meteo)
   const { pos } = useGeo(); // живое местоположение для расстояний
@@ -475,22 +562,7 @@ function СписокМест({ места, onPlace }: { места: Place[]; on
 
   return (
     <>
-      <div className="-mx-4 mb-3 flex gap-2 overflow-x-auto px-4 hide-scroll">
-        {ТИПЫ.map((т) => (
-          <button
-            key={т.значение}
-            onClick={() => setТип(т.значение)}
-            className="flex-shrink-0 rounded-full border px-3.5 py-1.5 text-xs font-semibold"
-            style={
-              тип === т.значение
-                ? { background: ACCENT_FILL, color: WHITE, borderColor: "transparent" }
-                : { background: SURFACE, color: MUTED, borderColor: BORDER }
-            }
-          >
-            {t(т.подпись)}
-          </button>
-        ))}
-      </div>
+      {!безТипов && <Чипы варианты={ТИПЫ} выбран={тип} onВыбор={setТип} />}
       {/*
         Сетка вместо столбца. На телефоне это по-прежнему один столбец,
         а на широком экране карточки встают рядом: иначе каждая
@@ -498,7 +570,7 @@ function СписокМест({ места, onPlace }: { места: Place[]; on
         картинкой в углу.
       */}
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-        {список.length === 0 && <Пусто />}
+        {список.length === 0 && <Пусто сброс={сброс} />}
         {главное && (
           <button
             onClick={() => onPlace(главное)}
@@ -603,82 +675,107 @@ function СписокМест({ места, onPlace }: { места: Place[]; on
   );
 }
 
-function СписокОтелей({ отели, onHotel }: { отели: Hotel[]; onHotel: (h: Hotel) => void }) {
+/** Виды гостиниц — чипами внутри раздела, а не отдельными плитками. */
+const ВИДЫ_ГОСТИНИЦ: { значение: HotelKind | "all"; подпись: TKey }[] = [
+  { значение: "all", подпись: "common_all" },
+  { значение: "hotel", подпись: "hk_hotels" },
+  { значение: "motel", подпись: "hk_motels" },
+  { значение: "hostel", подпись: "hk_hostels" },
+];
+
+function СписокОтелей({
+  отели,
+  onHotel,
+  сброс,
+}: {
+  отели: Hotel[];
+  onHotel: (h: Hotel) => void;
+  сброс?: () => void;
+}) {
   const { t, трК } = useT();
   const дг = useДеньги();
+  const [вид, setВид] = useState<HotelKind | "all">("all");
+  // Без поля «вид» — обычный отель: так записи, заведённые до появления
+  // видов, не пропадают из фильтра «Отели».
+  const список = вид === "all" ? отели : отели.filter((h) => (h.kind ?? "hotel") === вид);
   return (
-    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-      {отели.length === 0 && <Пусто />}
-      {отели.map((h) => (
-        <button
-          key={h.id}
-          onClick={() => onHotel(h)}
-          className="w-full bg-white rounded-2xl overflow-hidden shadow-sm border text-left active:scale-[0.98] transition-all"
-          style={{ borderColor: BORDER }}
-        >
-          <div className="relative h-40">
-            <img src={h.img} alt={h.name} className="w-full h-full object-cover" />
-            <div
-              className="absolute inset-0"
-              style={{ background: "linear-gradient(to top,rgba(0,0,0,0.65) 0%,transparent 55%)" }}
-            />
-            <div className="absolute top-3 left-3">
-              <span
-                className="text-[9px] font-bold px-2 py-0.5 rounded-full"
-                style={{ background: GOLD, color: ON_GOLD }}
-              >
-                {h.tag}
-              </span>
-            </div>
-            <div className="absolute bottom-0 left-0 right-0 p-3">
-              <p className="text-white font-bold text-sm" style={{ fontFamily: "var(--font-heading)" }}>
-                {h.name}
-              </p>
-              <div className="flex items-center gap-2 mt-0.5">
-                <StarRow rating={h.rating} onPhoto />
-                <span className="text-white/70 text-xs">{трК(h.city)}</span>
+    <>
+      <Чипы варианты={ВИДЫ_ГОСТИНИЦ} выбран={вид} onВыбор={setВид} />
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        {список.length === 0 && <Пусто сброс={сброс} />}
+        {список.map((h) => (
+          <button
+            key={h.id}
+            onClick={() => onHotel(h)}
+            className="w-full bg-white rounded-2xl overflow-hidden shadow-sm border text-left active:scale-[0.98] transition-all"
+            style={{ borderColor: BORDER }}
+          >
+            <div className="relative h-40">
+              <img src={h.img} alt={h.name} className="w-full h-full object-cover" />
+              <div
+                className="absolute inset-0"
+                style={{ background: "linear-gradient(to top,rgba(0,0,0,0.65) 0%,transparent 55%)" }}
+              />
+              <div className="absolute top-3 left-3">
+                <span
+                  className="text-[9px] font-bold px-2 py-0.5 rounded-full"
+                  style={{ background: GOLD, color: ON_GOLD }}
+                >
+                  {h.tag}
+                </span>
+              </div>
+              <div className="absolute bottom-0 left-0 right-0 p-3">
+                <p className="text-white font-bold text-sm" style={{ fontFamily: "var(--font-heading)" }}>
+                  {h.name}
+                </p>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <StarRow rating={h.rating} onPhoto />
+                  <span className="text-white/70 text-xs">{трК(h.city)}</span>
+                </div>
               </div>
             </div>
-          </div>
-          <div className="px-3 py-2.5 flex items-center justify-between">
-            <div className="flex gap-1.5 flex-wrap">
-              {h.facilities.slice(0, 3).map((f) => (
-                <span
-                  key={f}
-                  className="text-[9px] font-medium px-2 py-0.5 rounded-full"
-                  style={{ background: CREAM, color: MUTED }}
-                >
-                  {f}
-                </span>
-              ))}
+            <div className="px-3 py-2.5 flex items-center justify-between">
+              <div className="flex gap-1.5 flex-wrap">
+                {h.facilities.slice(0, 3).map((f) => (
+                  <span
+                    key={f}
+                    className="text-[9px] font-medium px-2 py-0.5 rounded-full"
+                    style={{ background: CREAM, color: MUTED }}
+                  >
+                    {f}
+                  </span>
+                ))}
+              </div>
+              <div className="text-right flex-shrink-0">
+                <p className="font-bold text-base" style={{ color: GREEN }}>
+                  {дг.цена(h.price)}
+                </p>
+                <p className="text-[9px]" style={{ color: MUTED }}>
+                  {t("home_per_night")}
+                </p>
+              </div>
             </div>
-            <div className="text-right flex-shrink-0">
-              <p className="font-bold text-base" style={{ color: GREEN }}>
-                {дг.цена(h.price)}
-              </p>
-              <p className="text-[9px]" style={{ color: MUTED }}>
-                {t("home_per_night")}
-              </p>
-            </div>
-          </div>
-        </button>
-      ))}
-    </div>
+          </button>
+        ))}
+      </div>
+    </>
   );
 }
 
 function СписокРесторанов({
   рестораны,
   onRestaurant,
+  сброс,
 }: {
   рестораны: Restaurant[];
   onRestaurant: (r: Restaurant) => void;
+  сброс?: () => void;
 }) {
   const { трК } = useT();
   const дг = useДеньги();
   return (
     <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-      {рестораны.length === 0 && <Пусто />}
+      {рестораны.length === 0 && <Пусто сброс={сброс} />}
       {рестораны.map((r) => (
         <button
           key={r.id}
@@ -702,6 +799,62 @@ function СписокРесторанов({
               <span className="text-xs font-bold" style={{ color: "#C1603A" }}>
                 {дг.цена(r.price)}
               </span>
+            </div>
+          </div>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/**
+ * Экскурсии — туры с ценой, гидом и длительностью. Нажатие открывает
+ * карточку маршрута со всеми остановками.
+ */
+function СписокЭкскурсий({
+  туры,
+  onRoute,
+  сброс,
+}: {
+  туры: ManagedRoute[];
+  onRoute: (r: Route) => void;
+  сброс?: () => void;
+}) {
+  const { t, трК } = useT();
+  const дг = useДеньги();
+  return (
+    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+      {туры.length === 0 && <Пусто сброс={сброс} />}
+      {туры.map((r) => (
+        <button
+          key={r.id}
+          onClick={() => onRoute(r)}
+          className="w-full flex gap-3 bg-white rounded-2xl overflow-hidden shadow-sm text-left border active:scale-[0.98]"
+          style={{ borderColor: BORDER }}
+        >
+          <div
+            className="w-24 flex-shrink-0 flex items-center justify-center text-3xl"
+            style={{ background: r.color, minHeight: 104 }}
+          >
+            {r.img ? <img src={r.img} alt={r.title} className="h-full w-full object-cover" /> : r.icon}
+          </div>
+          <div className="flex-1 py-3 pr-3 min-w-0">
+            <Badge text={трК(r.badge)} color={GREEN} />
+            <p className="font-bold text-sm leading-tight mt-1" style={{ color: TEXT }}>
+              {трК(r.title)}
+            </p>
+            <p className="text-[10px] mt-0.5 truncate" style={{ color: MUTED }}>
+              {[r.city && трК(r.city), трК(r.duration), r.guide && `${t("ex_guide")}: ${r.guide}`]
+                .filter(Boolean)
+                .join(" · ")}
+            </p>
+            <div className="flex items-center justify-between mt-2">
+              {r.rating > 0 ? <StarRow rating={r.rating} /> : <span />}
+              {r.price > 0 && (
+                <span className="text-xs font-bold" style={{ color: GREEN }}>
+                  {дг.цена(`$${r.price}`)}
+                </span>
+              )}
             </div>
           </div>
         </button>

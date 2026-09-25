@@ -1,22 +1,64 @@
 import { useState } from "react";
 import { PageHeader, Badge, Btn, Table } from "./shared";
 import { useEntity } from "../context/useEntity";
-import type { ManagedRoute as Tour } from "@/lib/types";
+import type { ManagedRoute as Tour, RouteStop } from "@/lib/types";
+
+/**
+ * Туры — в приложении это раздел «Экскурсии».
+ *
+ * Раньше «Добавить» писал название в поле, которое потом не читалось, и
+ * тур не создавался вовсе, а «Изменить» только показывал цифры. Теперь
+ * одна форма и для нового тура, и для правки: черновик применяется разом
+ * по «Сохранить», и изменения сразу видны у туристов.
+ */
+
+const КАТЕГОРИИ = ["Культура", "Классика", "Приключения", "Ремёсла", "Экспедиция", "Еда", "Город", "Природа"];
+const СЛОЖНОСТЬ = ["Лёгкий", "Средний", "Сложный"];
+const СТАТУС: Record<string, string> = {
+  active: "активен",
+  paused: "приостановлен",
+  draft: "черновик",
+  suspended: "отключён",
+};
+
+const ПУСТОЙ: Tour = {
+  id: "",
+  title: "",
+  sub: "",
+  duration: "",
+  icon: "🗺️",
+  // Цвет — настоящий hex: переменные панели приложение не знает.
+  color: "#0E6F66",
+  badge: "Культура",
+  stops: [],
+  city: "",
+  img: "",
+  price: 0,
+  difficulty: "Лёгкий",
+  category: "Культура",
+  bookings: 0,
+  maxGroup: 12,
+  guide: "",
+  nextDep: "",
+  rating: 0,
+  status: "draft",
+};
+
+const ПУСТАЯ_ОСТАНОВКА: RouteStop = { time: "", name: "", dur: "", note: "", entry: "" };
+
+const полеСтиль = {
+  background: "var(--color-surface)",
+  border: "1px solid var(--color-border)",
+  color: "var(--color-text)",
+  fontFamily: "var(--font-body)",
+} as const;
 
 export default function Tours() {
   const [tours, setTours] = useEntity("routes");
+  const [cities] = useEntity("cities");
   const [filter, setFilter] = useState("all");
   const [catFilter, setCatFilter] = useState("all");
-  const [editing, setEditing] = useState<Tour | null>(null);
-  const [showAdd, setShowAdd] = useState(false);
-  const [newTour, setNewTour] = useState({
-    title: "",
-    duration: "",
-    price: "",
-    category: "Культура",
-    guide: "",
-    maxGroup: "",
-  });
+  const [черновик, setЧерновик] = useState<Tour | null>(null);
 
   const categories = ["all", ...Array.from(new Set(tours.map((t) => t.category)))];
   const statusFilter = filter === "all" ? tours : tours.filter((t) => t.status === filter);
@@ -32,14 +74,47 @@ export default function Tours() {
     );
   };
 
+  const save = () => {
+    if (!черновик || !черновик.title.trim()) return;
+    // Пустые строки остановок не сохраняем: в карточке они были бы дырами.
+    const stops = черновик.stops.filter((s) => s.name.trim());
+    const тур: Tour = {
+      ...черновик,
+      title: черновик.title.trim(),
+      stops,
+      badge: черновик.category,
+      // Подпись под названием в приложении — из остановок и цены.
+      sub: [stops.length ? `${stops.length} остановок` : "", черновик.price ? `~$${черновик.price}` : ""]
+        .filter(Boolean)
+        .join(" · "),
+      city: черновик.city || undefined,
+      img: черновик.img?.trim() || undefined,
+      guide: черновик.guide.trim(),
+    };
+    if (тур.id) setTours((prev) => prev.map((t) => (t.id === тур.id ? тур : t)));
+    else setTours((prev) => [...prev, { ...тур, id: `tour-${Date.now().toString(36)}` }]);
+    setЧерновик(null);
+  };
+
+  // Удаление необратимо и сразу убирает экскурсию у туристов — спрашиваем.
+  const remove = (t: Tour) => {
+    if (!confirm(`Удалить тур «${t.title}»? Экскурсия сразу исчезнет у туристов.`)) return;
+    setTours((prev) => prev.filter((x) => x.id !== t.id));
+    setЧерновик(null);
+  };
+
+  const правка = <K extends keyof Tour>(k: K, v: Tour[K]) => setЧерновик((d) => d && { ...d, [k]: v });
+  const правкаОстановки = (i: number, k: keyof RouteStop, v: string) =>
+    setЧерновик((d) => d && { ...d, stops: d.stops.map((s, j) => (j === i ? { ...s, [k]: v } : s)) });
+
   const totalRevenue = filtered.reduce((s, t) => s + t.price * t.bookings, 0);
 
   return (
     <div className="p-4 sm:p-7">
       <PageHeader
-        title="Туры"
+        title="Туры и экскурсии"
         subtitle={`${filtered.length} туров · $${totalRevenue.toLocaleString()} общая выручка`}
-        action={<Btn onClick={() => setShowAdd(true)}>+ Добавить тур</Btn>}
+        action={<Btn onClick={() => setЧерновик(ПУСТОЙ)}>+ Добавить тур</Btn>}
       />
 
       <div className="flex flex-wrap items-center gap-3 mb-6">
@@ -94,7 +169,7 @@ export default function Tours() {
       </div>
 
       <Table
-        cols={["НАЗВАНИЕ", "ДЛИТЕЛЬНОСТЬ", "ЦЕНА", "СЛОЖНОСТЬ", "ОТПРАВЛЕНИЕ", "ГИД", "БРОНИ", "СТАТУС", ""]}
+        cols={["НАЗВАНИЕ", "ГОРОД", "ДЛИТЕЛЬНОСТЬ", "ЦЕНА", "СЛОЖНОСТЬ", "ГИД", "БРОНИ", "СТАТУС", ""]}
         rows={filtered.map((t) => [
           <div>
             <div className="font-medium text-sm" style={{ color: "var(--color-text)" }}>
@@ -104,6 +179,7 @@ export default function Tours() {
               {t.category}
             </div>
           </div>,
+          <span style={{ color: "var(--color-muted)", fontSize: "12px" }}>{t.city || "вся страна"}</span>,
           <span style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)", fontSize: "12px" }}>
             {t.duration}
           </span>,
@@ -111,17 +187,14 @@ export default function Tours() {
             ${t.price.toLocaleString()}
           </span>,
           <Badge label={t.difficulty} color={diffColor(t.difficulty)} />,
-          <span style={{ color: "var(--color-muted)", fontSize: "12px", fontFamily: "var(--font-mono)" }}>
-            {t.nextDep}
-          </span>,
-          <span style={{ color: "var(--color-muted)", fontSize: "12px" }}>{t.guide}</span>,
+          <span style={{ color: "var(--color-muted)", fontSize: "12px" }}>{t.guide || "—"}</span>,
           <div>
             <span style={{ color: "var(--color-text)", fontFamily: "var(--font-mono)" }}>{t.bookings}</span>
             <span style={{ color: "var(--color-muted)", fontSize: "11px" }}>/{t.maxGroup} max</span>
           </div>,
-          <Badge label={t.status} color={statusColor(t.status)} />,
+          <Badge label={СТАТУС[t.status] ?? t.status} color={statusColor(t.status)} />,
           <div className="flex flex-wrap gap-2">
-            <Btn variant="ghost" small onClick={() => setEditing(t)}>
+            <Btn variant="ghost" small onClick={() => setЧерновик(t)}>
               Изменить
             </Btn>
             <Btn
@@ -131,18 +204,21 @@ export default function Tours() {
             >
               {t.status === "active" ? "Приостановить" : "Активировать"}
             </Btn>
+            <Btn variant="danger" small onClick={() => remove(t)}>
+              Удалить
+            </Btn>
           </div>,
         ])}
       />
 
-      {showAdd && (
+      {черновик && (
         <div
-          className="fixed inset-0 flex items-center justify-center z-50"
+          className="fixed inset-0 flex items-center justify-center z-50 p-4"
           style={{ background: "rgba(0,0,0,0.7)" }}
-          onClick={() => setShowAdd(false)}
+          onClick={() => setЧерновик(null)}
         >
           <div
-            className="rounded-2xl w-full max-w-md p-6"
+            className="rounded-2xl w-full max-w-2xl p-6 max-h-[90dvh] overflow-y-auto"
             style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }}
             onClick={(e) => e.stopPropagation()}
           >
@@ -151,193 +227,245 @@ export default function Tours() {
                 className="text-lg font-semibold"
                 style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}
               >
-                Новый тур
+                {черновик.id ? "Изменить тур" : "Новый тур"}
               </h3>
               <button
-                onClick={() => setShowAdd(false)}
+                onClick={() => setЧерновик(null)}
                 className="opacity-50 hover:opacity-100 cursor-pointer text-xl"
                 style={{ color: "var(--color-text)" }}
               >
                 ×
               </button>
             </div>
-            <div className="flex flex-col gap-3 mb-4">
-              {(
-                [
-                  ["name", "Название тура", "text"],
-                  ["duration", "Длительность", "text"],
-                  ["price", "Цена ($)", "number"],
-                  ["guide", "Гид", "text"],
-                  ["maxGroup", "Макс. группа", "number"],
-                ] as [string, string, string][]
-              ).map(([k, label, type]) => (
-                <div key={k}>
-                  <label
-                    className="text-xs block mb-1"
-                    style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
-                  >
-                    {label.toUpperCase()}
-                  </label>
-                  <input
-                    type={type}
-                    value={newTour[k as keyof typeof newTour]}
-                    onChange={(e) => setNewTour((p) => ({ ...p, [k]: e.target.value }))}
-                    className="w-full rounded px-3 py-2 text-sm outline-none"
-                    style={{
-                      background: "var(--color-surface)",
-                      border: "1px solid var(--color-border)",
-                      color: "var(--color-text)",
-                      fontFamily: "var(--font-body)",
-                    }}
-                  />
-                </div>
-              ))}
-              <div>
-                <label
-                  className="text-xs block mb-1.5"
-                  style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
-                >
-                  КАТЕГОРИЯ
-                </label>
-                <div className="flex gap-1.5 flex-wrap">
-                  {["Культура", "Приключения", "Ремёсла", "Экспедиция", "Еда", "Город"].map((c) => (
-                    <button
-                      key={c}
-                      onClick={() => setNewTour((p) => ({ ...p, category: c }))}
-                      className="px-2.5 py-1 rounded text-xs cursor-pointer"
-                      style={{
-                        background: newTour.category === c ? "var(--color-amber)" : "var(--color-surface)",
-                        color: newTour.category === c ? "var(--color-on-accent)" : "var(--color-muted)",
-                        border: "1px solid var(--color-border)",
-                      }}
-                    >
-                      {c}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <Btn variant="ghost" onClick={() => setShowAdd(false)}>
-                Отмена
-              </Btn>
-              <Btn
-                onClick={() => {
-                  if (!newTour.title) return;
-                  setTours((prev) => [
-                    ...prev,
-                    {
-                      id: `new-${Date.now()}`,
-                      title: newTour.title,
-                      duration: newTour.duration || "1 день",
-                      price: Number(newTour.price) || 100,
-                      difficulty: "Лёгкий",
-                      category: newTour.category,
-                      bookings: 0,
-                      maxGroup: Number(newTour.maxGroup) || 12,
-                      status: "draft" as const,
-                      nextDep: "",
-                      guide: newTour.guide || "Не назначен",
-                      rating: 0,
-                      // Цвет — настоящий hex: переменные панели приложение не знает.
-                      sub: newTour.category,
-                      icon: "🗺️",
-                      color: "#0E6F66",
-                      badge: newTour.category,
-                      stops: [],
-                    },
-                  ]);
-                  setShowAdd(false);
-                  setNewTour({
-                    title: "",
-                    duration: "",
-                    price: "",
-                    category: "Культура",
-                    guide: "",
-                    maxGroup: "",
-                  });
-                }}
-              >
-                Создать
-              </Btn>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {editing && (
-        <div
-          className="fixed inset-0 flex items-center justify-center z-50"
-          style={{ background: "rgba(0,0,0,0.7)" }}
-          onClick={() => setEditing(null)}
-        >
-          <div
-            className="rounded-xl w-full max-w-md p-6"
-            style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex flex-wrap items-start justify-between gap-3 mb-5">
-              <div>
-                <h3
-                  className="text-lg font-semibold"
-                  style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}
-                >
-                  {editing.title}
-                </h3>
-                <div className="text-xs mt-0.5" style={{ color: "var(--color-muted)" }}>
-                  Тур ID #{editing.id}
-                </div>
-              </div>
-              <button
-                className="text-xl opacity-50 hover:opacity-100 cursor-pointer"
-                style={{ color: "var(--color-text)" }}
-                onClick={() => setEditing(null)}
-              >
-                ×
-              </button>
-            </div>
-
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
-              {[
-                { label: "Длительность", val: editing.duration },
-                { label: "Цена", val: `$${editing.price}` },
-                { label: "Сложность", val: editing.difficulty },
-                { label: "Брони", val: String(editing.bookings) },
-                { label: "Размер группы", val: String(editing.maxGroup) },
-                { label: "Рейтинг", val: editing.rating > 0 ? `★ ${editing.rating}` : "Н/Д" },
-              ].map((s) => (
-                <div key={s.label} className="rounded p-3" style={{ background: "var(--color-surface)" }}>
-                  <div
-                    className="text-xs mb-1"
-                    style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
-                  >
-                    {s.label}
-                  </div>
-                  <div className="text-sm font-medium" style={{ color: "var(--color-text)" }}>
-                    {s.val}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="mb-5 rounded p-3" style={{ background: "var(--color-surface)" }}>
-              <div
-                className="text-xs mb-1"
+              <label
+                className="text-xs sm:col-span-2"
                 style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
               >
-                Гид
+                НАЗВАНИЕ
+                <input
+                  type="text"
+                  value={черновик.title ?? ""}
+                  onChange={(e) => правка("title", e.target.value)}
+                  className="mt-1 w-full rounded px-3 py-2 text-sm outline-none"
+                  style={полеСтиль}
+                />
+              </label>
+              {/* Город — из списка: по нему работает фильтр «Исследовать».
+                  Тур через всю страну оставляют без города. */}
+              <label
+                className="text-xs"
+                style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+              >
+                ГОРОД
+                <select
+                  value={черновик.city ?? ""}
+                  onChange={(e) => правка("city", e.target.value)}
+                  className="mt-1 w-full rounded px-3 py-2 text-sm outline-none"
+                  style={полеСтиль}
+                >
+                  <option value="">— вся страна —</option>
+                  {cities.map((c) => (
+                    <option key={c.id} value={c.name}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label
+                className="text-xs "
+                style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+              >
+                ДЛИТЕЛЬНОСТЬ (например, 8 ч или 3 дня)
+                <input
+                  type="text"
+                  value={черновик.duration ?? ""}
+                  onChange={(e) => правка("duration", e.target.value)}
+                  className="mt-1 w-full rounded px-3 py-2 text-sm outline-none"
+                  style={полеСтиль}
+                />
+              </label>
+              <label
+                className="text-xs "
+                style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+              >
+                ЦЕНА ($)
+                <input
+                  type="number"
+                  value={черновик.price ?? ""}
+                  onChange={(e) => правка("price", Number(e.target.value) || 0)}
+                  className="mt-1 w-full rounded px-3 py-2 text-sm outline-none"
+                  style={полеСтиль}
+                />
+              </label>
+              <label
+                className="text-xs "
+                style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+              >
+                ГИД
+                <input
+                  type="text"
+                  value={черновик.guide ?? ""}
+                  onChange={(e) => правка("guide", e.target.value)}
+                  className="mt-1 w-full rounded px-3 py-2 text-sm outline-none"
+                  style={полеСтиль}
+                />
+              </label>
+              <label
+                className="text-xs "
+                style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+              >
+                МАКС. ГРУППА
+                <input
+                  type="number"
+                  value={черновик.maxGroup ?? ""}
+                  onChange={(e) => правка("maxGroup", Number(e.target.value) || 0)}
+                  className="mt-1 w-full rounded px-3 py-2 text-sm outline-none"
+                  style={полеСтиль}
+                />
+              </label>
+              <label
+                className="text-xs"
+                style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+              >
+                КАТЕГОРИЯ
+                <select
+                  value={черновик.category}
+                  onChange={(e) => правка("category", e.target.value)}
+                  className="mt-1 w-full rounded px-3 py-2 text-sm outline-none"
+                  style={полеСтиль}
+                >
+                  {[...new Set([...КАТЕГОРИИ, черновик.category])].map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label
+                className="text-xs"
+                style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+              >
+                СЛОЖНОСТЬ
+                <select
+                  value={черновик.difficulty}
+                  onChange={(e) => правка("difficulty", e.target.value)}
+                  className="mt-1 w-full rounded px-3 py-2 text-sm outline-none"
+                  style={полеСтиль}
+                >
+                  {СЛОЖНОСТЬ.map((d) => (
+                    <option key={d} value={d}>
+                      {d}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label
+                className="text-xs"
+                style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+              >
+                СТАТУС
+                <select
+                  value={черновик.status}
+                  onChange={(e) => правка("status", e.target.value as Tour["status"])}
+                  className="mt-1 w-full rounded px-3 py-2 text-sm outline-none"
+                  style={полеСтиль}
+                >
+                  {(["active", "paused", "draft"] as const).map((с) => (
+                    <option key={с} value={с}>
+                      {СТАТУС[с]}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label
+                className="text-xs sm:col-span-2"
+                style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+              >
+                ФОТО — ССЫЛКА НА КАРТИНКУ
+                <input
+                  type="url"
+                  value={черновик.img ?? ""}
+                  onChange={(e) => правка("img", e.target.value)}
+                  className="mt-1 w-full rounded px-3 py-2 text-sm outline-none"
+                  style={полеСтиль}
+                />
+              </label>
+            </div>
+
+            {/* Остановки — то, что турист видит в карточке маршрута по порядку. */}
+            <div className="mb-5">
+              <div className="flex items-center justify-between mb-2">
+                <span
+                  className="text-xs"
+                  style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+                >
+                  ОСТАНОВКИ ({черновик.stops.length})
+                </span>
+                <Btn
+                  variant="ghost"
+                  small
+                  onClick={() => правка("stops", [...черновик.stops, ПУСТАЯ_ОСТАНОВКА])}
+                >
+                  + Остановка
+                </Btn>
               </div>
-              <div className="text-sm" style={{ color: "var(--color-text)" }}>
-                {editing.guide}
+              <div className="flex flex-col gap-2">
+                {черновик.stops.map((ст, i) => (
+                  <div
+                    key={i}
+                    className="grid grid-cols-2 sm:grid-cols-[80px_1fr_80px_1fr_auto] gap-2 items-center"
+                  >
+                    {(
+                      [
+                        ["time", "Время"],
+                        ["name", "Место"],
+                        ["dur", "Сколько"],
+                        ["note", "Заметка"],
+                      ] as const
+                    ).map(([k, ph]) => (
+                      <input
+                        key={k}
+                        placeholder={ph}
+                        value={ст[k]}
+                        onChange={(e) => правкаОстановки(i, k, e.target.value)}
+                        className="w-full rounded px-2 py-1.5 text-xs outline-none"
+                        style={полеСтиль}
+                      />
+                    ))}
+                    <Btn
+                      variant="ghost"
+                      small
+                      onClick={() =>
+                        правка(
+                          "stops",
+                          черновик.stops.filter((_, j) => j !== i),
+                        )
+                      }
+                    >
+                      ✕
+                    </Btn>
+                  </div>
+                ))}
               </div>
             </div>
 
             <div className="flex flex-wrap gap-3 justify-end">
-              <Btn variant="ghost" onClick={() => setEditing(null)}>
+              {черновик.id && (
+                <Btn variant="danger" onClick={() => remove(черновик)}>
+                  Удалить
+                </Btn>
+              )}
+              <Btn variant="ghost" onClick={() => setЧерновик(null)}>
                 Отмена
               </Btn>
-              <Btn onClick={() => setEditing(null)}>Сохранить</Btn>
+              <Btn onClick={save}>{черновик.id ? "Сохранить" : "Создать"}</Btn>
             </div>
+            {!черновик.title.trim() && (
+              <p className="mt-3 text-xs" style={{ color: "var(--color-muted)" }}>
+                Нужно название.
+              </p>
+            )}
           </div>
         </div>
       )}

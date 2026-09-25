@@ -2,14 +2,84 @@ import { useState } from "react";
 import { PageHeader, Badge, Btn, Table } from "./shared";
 import { useEntity } from "../context/useEntity";
 import type { ManagedPlace as Dest } from "@/lib/types";
+import { ТИПЫ_МЕСТ } from "@/data/content";
+
+/**
+ * Типы мест — из того же списка, по которому приложение раскладывает их
+ * по фильтрам («История», «Музеи»…). Тип вписывается выбором, а не
+ * руками: «музей» с маленькой буквы в плитку «Музеи» уже не попал бы.
+ */
+const ТИПЫ = Array.from(new Set(Object.values(ТИПЫ_МЕСТ).flat()));
+
+const ПУСТОЕ: Dest = {
+  id: "",
+  name: "",
+  city: "",
+  type: "Музей",
+  region: "",
+  rating: 0,
+  reviews: 0,
+  distance: "",
+  entry: "",
+  hours: "",
+  visits: 0,
+  tours: 0,
+  status: "draft",
+  img: "",
+  desc: "",
+  audio: false,
+  qr: false,
+};
+
+const СТАТУС: Record<string, string> = {
+  active: "активно",
+  seasonal: "сезонное",
+  draft: "черновик",
+  suspended: "отключено",
+};
+
+const полеСтиль = {
+  background: "var(--color-surface)",
+  border: "1px solid var(--color-border)",
+  color: "var(--color-text)",
+  fontFamily: "var(--font-body)",
+} as const;
 
 export default function Destinations() {
   const [view, setView] = useState<"grid" | "table">("grid");
   const [dests, setDests] = useEntity("places");
+  const [cities] = useEntity("cities");
   const [filter, setFilter] = useState("all");
+  const [typeFilter, setTypeFilter] = useState("all");
+  // Черновик правки: и новое место, и изменение старого правятся копией
+  // и применяются разом по «Сохранить».
   const [selected, setSelected] = useState<Dest | null>(null);
 
-  const filtered = filter === "all" ? dests : dests.filter((d) => d.status === filter);
+  const поСтатусу = filter === "all" ? dests : dests.filter((d) => d.status === filter);
+  const filtered = typeFilter === "all" ? поСтатусу : поСтатусу.filter((d) => d.type === typeFilter);
+  const типыВСписке = ["all", ...Array.from(new Set([...ТИПЫ, ...dests.map((d) => d.type)]))];
+
+  const save = () => {
+    if (!selected || !selected.name.trim() || !selected.city) return;
+    const место: Dest = { ...selected, name: selected.name.trim(), region: selected.region || selected.city };
+    if (место.id) {
+      setDests((prev) => prev.map((d) => (d.id === место.id ? место : d)));
+    } else {
+      // Без фото карточка в приложении пустая — подставляем общий снимок.
+      const фото =
+        место.img.trim() ||
+        "https://images.unsplash.com/photo-1664602078796-68ee76b3fc59?w=800&h=600&fit=crop&auto=format";
+      setDests((prev) => [...prev, { ...место, id: `p-${Date.now().toString(36)}`, img: фото }]);
+    }
+    setSelected(null);
+  };
+
+  // Удаление необратимо и сразу убирает место у туристов — спрашиваем.
+  const remove = (d: Dest) => {
+    if (!confirm(`Удалить «${d.name}»? Место сразу исчезнет у туристов.`)) return;
+    setDests((prev) => prev.filter((x) => x.id !== d.id));
+    setSelected(null);
+  };
 
   const statusColor = (s: string) => (s === "active" ? "teal" : s === "seasonal" ? "amber" : "dim");
 
@@ -29,35 +99,9 @@ export default function Destinations() {
   return (
     <div className="p-4 sm:p-7">
       <PageHeader
-        title="Направления"
-        subtitle={`${filtered.length} направлений`}
-        action={
-          <Btn
-            onClick={() =>
-              setSelected({
-                id: "",
-                name: "",
-                city: "",
-                type: "",
-                region: "",
-                rating: 0,
-                reviews: 0,
-                distance: "",
-                entry: "",
-                hours: "",
-                visits: 0,
-                tours: 0,
-                status: "draft",
-                img: "",
-                desc: "",
-                audio: false,
-                qr: false,
-              })
-            }
-          >
-            + Добавить
-          </Btn>
-        }
+        title="Места"
+        subtitle={`${filtered.length} мест · достопримечательности и музеи`}
+        action={<Btn onClick={() => setSelected(ПУСТОЕ)}>+ Добавить место</Btn>}
       />
 
       <div className="flex flex-wrap items-center justify-between gap-2 mb-6">
@@ -85,6 +129,25 @@ export default function Destinations() {
               </button>
             );
           })}
+          <div className="w-px h-5 shrink-0 self-center" style={{ background: "var(--color-border)" }} />
+          {типыВСписке.map((т) => (
+            <button
+              key={т}
+              onClick={() => setTypeFilter(т)}
+              className="px-3 py-1.5 rounded text-xs transition-all cursor-pointer"
+              style={{
+                background:
+                  typeFilter === т
+                    ? "color-mix(in srgb, var(--color-amber) 15%, transparent)"
+                    : "transparent",
+                color: typeFilter === т ? "var(--color-amber)" : "var(--color-muted)",
+                border: "1px solid var(--color-border)",
+                fontFamily: "var(--font-mono)",
+              }}
+            >
+              {т === "all" ? "Все типы" : т}
+            </button>
+          ))}
         </div>
         <div className="flex flex-wrap gap-1">
           {(["grid", "table"] as const).map((v) => (
@@ -133,7 +196,7 @@ export default function Destinations() {
                   style={{ background: "linear-gradient(to top, rgba(13,12,10,0.7) 0%, transparent 60%)" }}
                 />
                 <div className="absolute top-3 right-3">
-                  <Badge label={d.status} color={statusColor(d.status)} />
+                  <Badge label={СТАТУС[d.status] ?? d.status} color={statusColor(d.status)} />
                 </div>
               </div>
               <div className="p-4">
@@ -146,7 +209,7 @@ export default function Destinations() {
                       {d.name}
                     </div>
                     <div className="text-xs mt-0.5" style={{ color: "var(--color-muted)" }}>
-                      {d.region}
+                      {d.type} · {d.city}
                     </div>
                   </div>
                   <div
@@ -175,22 +238,25 @@ export default function Destinations() {
         </div>
       ) : (
         <Table
-          cols={["НАЗВАНИЕ", "РЕГИОН", "РЕЙТИНГ", "ПОСЕЩЕНИЯ", "ТУРЫ", "СТАТУС", ""]}
+          cols={["НАЗВАНИЕ", "ТИП", "ГОРОД", "РЕЙТИНГ", "ПОСЕЩЕНИЯ", "СТАТУС", ""]}
           rows={filtered.map((d) => [
             <span className="font-medium" style={{ color: "var(--color-text)" }}>
               {d.name}
             </span>,
-            <span style={{ color: "var(--color-muted)" }}>{d.region}</span>,
+            <span style={{ color: "var(--color-muted)" }}>{d.type}</span>,
+            <span style={{ color: "var(--color-muted)" }}>{d.city}</span>,
             <span style={{ color: "var(--color-amber)", fontFamily: "var(--font-mono)" }}>★ {d.rating}</span>,
             <span style={{ fontFamily: "var(--font-mono)" }}>{d.visits.toLocaleString()}</span>,
-            <span style={{ fontFamily: "var(--font-mono)" }}>{d.tours}</span>,
-            <Badge label={d.status} color={statusColor(d.status)} />,
+            <Badge label={СТАТУС[d.status] ?? d.status} color={statusColor(d.status)} />,
             <div className="flex flex-wrap gap-2">
               <Btn variant="ghost" small onClick={() => toggleStatus(d.id)}>
                 Статус
               </Btn>
               <Btn variant="ghost" small onClick={() => setSelected(d)}>
                 Изменить
+              </Btn>
+              <Btn variant="danger" small onClick={() => remove(d)}>
+                Удалить
               </Btn>
             </div>,
           ])}
@@ -199,79 +265,150 @@ export default function Destinations() {
 
       {selected && (
         <div
-          className="fixed inset-0 flex items-center justify-center z-50"
+          className="fixed inset-0 flex items-center justify-center z-50 p-4"
           style={{ background: "rgba(0,0,0,0.7)" }}
           onClick={() => setSelected(null)}
         >
           <div
-            className="rounded-xl overflow-hidden w-full max-w-lg"
+            className="rounded-xl w-full max-w-lg p-6 max-h-[90dvh] overflow-y-auto"
             style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="relative h-52" style={{ background: "var(--color-dim)" }}>
-              <img src={selected.img} alt={selected.name} className="w-full h-full object-cover" />
-              <div
-                className="absolute inset-0"
-                style={{
-                  background:
-                    "linear-gradient(to top, color-mix(in srgb, var(--color-bg) 85%, transparent) 0%, transparent 50%)",
-                }}
-              />
-              <div className="absolute bottom-4 left-5">
-                <h2
-                  className="text-2xl font-semibold"
-                  style={{ fontFamily: "var(--font-display)", color: "#fff" }}
-                >
-                  {selected.name}
-                </h2>
-                <div className="text-sm mt-0.5" style={{ color: "rgba(255,255,255,0.6)" }}>
-                  {selected.region}
-                </div>
-              </div>
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-5">
+              <h3
+                className="text-lg font-semibold"
+                style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}
+              >
+                {selected.id ? "Изменить место" : "Новое место"}
+              </h3>
               <button
-                className="absolute top-4 right-4 text-white opacity-70 hover:opacity-100 cursor-pointer text-xl leading-none"
+                className="opacity-50 hover:opacity-100 cursor-pointer text-xl"
+                style={{ color: "var(--color-text)" }}
                 onClick={() => setSelected(null)}
               >
                 ×
               </button>
             </div>
-            <div className="p-5">
-              <p className="text-sm leading-relaxed mb-4" style={{ color: "var(--color-muted)" }}>
-                {selected.desc}
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
-                {[
-                  { label: "Рейтинг", val: `★ ${selected.rating}` },
-                  { label: "Посещений", val: selected.visits.toLocaleString() },
-                  { label: "Туров", val: String(selected.tours) },
-                ].map((s) => (
-                  <div
-                    key={s.label}
-                    className="rounded p-3 text-center"
-                    style={{ background: "var(--color-surface)" }}
-                  >
-                    <div
-                      className="text-lg font-semibold"
-                      style={{ fontFamily: "var(--font-display)", color: "var(--color-amber)" }}
-                    >
-                      {s.val}
-                    </div>
-                    <div
-                      className="text-xs mt-0.5"
-                      style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
-                    >
-                      {s.label}
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className="flex flex-wrap gap-3 justify-end">
-                <Btn variant="ghost" onClick={() => setSelected(null)}>
-                  Закрыть
-                </Btn>
-                <Btn onClick={() => setSelected(null)}>Сохранить</Btn>
-              </div>
+            {selected.img && (
+              <img
+                src={selected.img}
+                alt={selected.name}
+                className="mb-4 h-36 w-full rounded object-cover"
+                style={{ background: "var(--color-dim)" }}
+              />
+            )}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
+              {(
+                [
+                  ["name", "Название", "sm:col-span-2"],
+                  ["entry", "Вход (например, $5 или Бесплатно)", ""],
+                  ["hours", "Часы работы", ""],
+                  ["img", "Фото — ссылка на картинку", "sm:col-span-2"],
+                ] as const
+              ).map(([k, label, cls]) => (
+                <label
+                  key={k}
+                  className={`text-xs ${cls}`}
+                  style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+                >
+                  {label.toUpperCase()}
+                  <input
+                    value={selected[k]}
+                    onChange={(e) => setSelected((d) => d && { ...d, [k]: e.target.value })}
+                    className="mt-1 w-full rounded px-3 py-2 text-sm outline-none"
+                    style={полеСтиль}
+                  />
+                </label>
+              ))}
+              {/* Город — из списка: приложение фильтрует по точному названию. */}
+              <label
+                className="text-xs"
+                style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+              >
+                ГОРОД
+                <select
+                  value={selected.city}
+                  onChange={(e) => setSelected((d) => d && { ...d, city: e.target.value })}
+                  className="mt-1 w-full rounded px-3 py-2 text-sm outline-none"
+                  style={полеСтиль}
+                >
+                  <option value="">— выберите —</option>
+                  {cities.map((c) => (
+                    <option key={c.id} value={c.name}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label
+                className="text-xs"
+                style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+              >
+                ТИП
+                <select
+                  value={selected.type}
+                  onChange={(e) => setSelected((d) => d && { ...d, type: e.target.value })}
+                  className="mt-1 w-full rounded px-3 py-2 text-sm outline-none"
+                  style={полеСтиль}
+                >
+                  {/* Тип, которого нет в списке (заведён раньше), не теряем. */}
+                  {[...new Set([...ТИПЫ, selected.type].filter(Boolean))].map((т) => (
+                    <option key={т} value={т}>
+                      {т}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label
+                className="text-xs"
+                style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+              >
+                СТАТУС
+                <select
+                  value={selected.status}
+                  onChange={(e) =>
+                    setSelected((d) => d && { ...d, status: e.target.value as Dest["status"] })
+                  }
+                  className="mt-1 w-full rounded px-3 py-2 text-sm outline-none"
+                  style={полеСтиль}
+                >
+                  {(["active", "seasonal", "draft", "suspended"] as const).map((с) => (
+                    <option key={с} value={с}>
+                      {СТАТУС[с]}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label
+                className="text-xs sm:col-span-2"
+                style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+              >
+                ОПИСАНИЕ
+                <textarea
+                  rows={3}
+                  value={selected.desc}
+                  onChange={(e) => setSelected((d) => d && { ...d, desc: e.target.value })}
+                  className="mt-1 w-full rounded px-3 py-2 text-sm outline-none resize-none"
+                  style={полеСтиль}
+                />
+              </label>
             </div>
+            <div className="flex flex-wrap gap-3 justify-end">
+              {selected.id && (
+                <Btn variant="danger" onClick={() => remove(selected)}>
+                  Удалить
+                </Btn>
+              )}
+              <Btn variant="ghost" onClick={() => setSelected(null)}>
+                Отмена
+              </Btn>
+              <Btn onClick={save}>{selected.id ? "Сохранить" : "Добавить"}</Btn>
+            </div>
+            {(!selected.name.trim() || !selected.city) && (
+              <p className="mt-3 text-xs" style={{ color: "var(--color-muted)" }}>
+                Нужны название и город.
+              </p>
+            )}
           </div>
         </div>
       )}

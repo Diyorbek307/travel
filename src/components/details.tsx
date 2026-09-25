@@ -6,7 +6,8 @@ import { useAudioPlayer, времяЗвука } from "./audio-player";
 import { useSettings } from "@/lib/settings";
 import BookingForm from "./booking-form";
 import ReviewForm from "./review-form";
-import type { Hotel, Place, Restaurant, Route } from "@/lib/types";
+import type { Hotel, HotelKind, Place, Restaurant, Route } from "@/lib/types";
+import type { TKey } from "@/lib/i18n";
 import {
   ACCENT_FILL,
   BORDER,
@@ -304,6 +305,12 @@ export function PlaceDetail({
 
 // Карточка отеля
 
+const ВИД_ГОСТИНИЦЫ: Record<HotelKind, TKey> = {
+  hotel: "hk_hotel",
+  motel: "hk_motel",
+  hostel: "hk_hostel",
+};
+
 export function HotelDetail({ hotel, onBack }: { hotel: Hotel; onBack: () => void }) {
   const { t, трК } = useT();
   const [imgIdx, setImgIdx] = useState(0);
@@ -381,6 +388,9 @@ export function HotelDetail({ hotel, onBack }: { hotel: Hotel; onBack: () => voi
         </div>
         <div className="absolute bottom-0 left-0 right-0 p-4">
           <div className="flex items-center gap-2 mb-1">
+            {/* Вид — чтобы по карточке было сразу видно, отель это или хостел:
+                от этого зависят и цена, и ожидания. Без поля — отель. */}
+            <Badge text={t(ВИД_ГОСТИНИЦЫ[hotel.kind ?? "hotel"])} onPhoto />
             <Badge text={hotel.tag} onPhoto />
             <Badge text={трК(hotel.city)} onPhoto />
           </div>
