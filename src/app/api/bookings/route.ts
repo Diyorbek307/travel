@@ -30,7 +30,7 @@ export async function POST(request: Request) {
   if (!ВИДЫ.includes(kind)) return NextResponse.json({ error: "kind_invalid" }, { status: 400 });
 
   const itemId = typeof body.itemId === "string" ? body.itemId : "";
-  const itemName = typeof body.itemName === "string" ? body.itemName.trim() : "";
+  const itemName = typeof body.itemName === "string" ? body.itemName.trim().slice(0, 120) : "";
   if (!itemId || !itemName) return NextResponse.json({ error: "item_required" }, { status: 400 });
 
   const guests = Number(body.guests);
@@ -39,9 +39,21 @@ export async function POST(request: Request) {
   }
 
   const date = typeof body.date === "string" ? body.date : "";
-  // Бронь задним числом — почти всегда опечатка в календаре.
-  if (!date || new Date(date).getTime() < Date.now() - 86_400_000) {
+  const когда = new Date(date).getTime();
+  // Бронь задним числом — почти всегда опечатка в календаре. Нечитаемая
+  // дата даёт NaN, а сравнение с NaN всегда ложно — её ловим отдельно.
+  if (!Number.isFinite(когда) || когда < Date.now() - 86_400_000) {
     return NextResponse.json({ error: "date_invalid" }, { status: 400 });
+  }
+
+  // Ночи — только у отеля. Не пришли (старая версия приложения) — не
+  // беда, заявка всё равно дойдёт; пришли кривые — отказ.
+  let nights: number | undefined;
+  if (kind === "hotel" && body.nights !== undefined) {
+    nights = Number(body.nights);
+    if (!Number.isInteger(nights) || nights < 1 || nights > 60) {
+      return NextResponse.json({ error: "nights_invalid" }, { status: 400 });
+    }
   }
 
   const бронь = await createBooking({
@@ -51,6 +63,7 @@ export async function POST(request: Request) {
     itemName,
     date,
     guests,
+    nights,
     note: typeof body.note === "string" ? body.note.trim().slice(0, 500) : "",
   });
 

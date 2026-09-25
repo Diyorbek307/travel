@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { отказЕсли } from "@/lib/admin-auth";
-import { readContent, writeContent } from "@/lib/store";
+import { patchContent, readContent } from "@/lib/store";
 import type { Content, ContentKey } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -33,8 +33,7 @@ export async function PUT(request: Request) {
   }
 
   const incoming = body as Partial<Record<ContentKey, unknown>>;
-  const current = await readContent();
-  const next = { ...current } as Content;
+  const разделы: Partial<Record<ContentKey, unknown[]>> = {};
 
   for (const key of KEYS) {
     const value = incoming[key];
@@ -44,9 +43,9 @@ export async function PUT(request: Request) {
     }
     // Состав раздела проверяет вызывающая сторона; здесь важно лишь,
     // что пришёл массив под известным ключом.
-    (next[key] as unknown[]) = value;
+    разделы[key] = value;
   }
 
-  await writeContent(next);
+  await patchContent(разделы as Partial<Content>);
   return NextResponse.json({ ok: true });
 }

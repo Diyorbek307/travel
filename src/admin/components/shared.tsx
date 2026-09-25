@@ -91,11 +91,14 @@ export function Btn({
   variant = "primary",
   onClick,
   small,
+  type = "button",
 }: {
   children: React.ReactNode;
   variant?: "primary" | "ghost" | "danger";
   onClick?: (e: React.MouseEvent) => void;
   small?: boolean;
+  /** По умолчанию «button»: иначе внутри формы любая кнопка её отправляет. */
+  type?: "button" | "submit";
 }) {
   const styles = {
     primary: {
@@ -116,6 +119,7 @@ export function Btn({
   };
   return (
     <button
+      type={type}
       onClick={onClick}
       className={`rounded font-medium transition-opacity hover:opacity-80 cursor-pointer ${small ? "text-xs px-3 py-1.5" : "text-sm px-4 py-2"}`}
       style={{ fontFamily: "var(--font-body)", ...styles[variant] }}
@@ -234,4 +238,17 @@ export function ДемоРаздел({ что }: { что: string }) {
       </span>
     </div>
   );
+}
+
+/**
+ * Число со словом по-русски: 1 переписка, 2 переписки, 5 переписок,
+ * 21 переписка. Формы — [одна, две, пять].
+ */
+export function склонение(n: number, [одна, две, пять]: [string, string, string]): string {
+  const м = Math.abs(n) % 100;
+  const д = м % 10;
+  if (м >= 11 && м <= 14) return `${n} ${пять}`;
+  if (д === 1) return `${n} ${одна}`;
+  if (д >= 2 && д <= 4) return `${n} ${две}`;
+  return `${n} ${пять}`;
 }

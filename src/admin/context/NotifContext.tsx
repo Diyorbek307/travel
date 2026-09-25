@@ -1,56 +1,69 @@
 "use client";
 
-import React, { createContext, useContext, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { можетДомен } from "@/lib/admin-roles";
+import { useМеня } from "./MeContext";
 
 export type Notif = {
-  id: number;
-  type: "booking" | "review" | "chat" | "transport" | "system" | "payment";
+  id: "sos" | "booking" | "chat";
   title: string;
   body: string;
-  time: string;
+  /** Раздел панели, куда ведёт уведомление. */
+  action: string;
   read: boolean;
-  action?: string; // panel id to navigate to
 };
 
-const SEED: Notif[] = [
-  { id: 1, type: "booking", title: "New booking confirmed", body: "Ahmed Khalil booked 6 seats on Silk Road Classic — $11,340", time: "2 min ago", read: false, action: "bookings" },
-  { id: 2, type: "chat", title: "New message", body: "Yuki Tanaka: 'Can I book the same experience for December?'", time: "2 hr ago", read: false, action: "chat" },
-  { id: 3, type: "review", title: "Review flagged", body: "A review on Khiva Night Tour was flagged for moderation", time: "3 hr ago", read: false, action: "reviews" },
-  { id: 4, type: "transport", title: "Flight delayed", body: "QX-88 Tashkent → Fergana delayed by 45 minutes", time: "4 hr ago", read: false, action: "transport" },
-  { id: 5, type: "payment", title: "Promotion payment received", body: "Samarkand Coffee House — $180 monthly fee collected", time: "5 hr ago", read: true, action: "ads" },
-  { id: 6, type: "system", title: "Backup completed", body: "Daily database backup completed successfully — 2.4 GB", time: "6 hr ago", read: true },
-  { id: 7, type: "booking", title: "Booking cancellation", body: "Dmitri Volkov cancelled BK-2636 — no refund issued", time: "8 hr ago", read: true, action: "bookings" },
-  { id: 8, type: "chat", title: "New message", body: "Maria Chen: 'Can I pay in installments?'", time: "Yesterday", read: true, action: "chat" },
-  { id: 9, type: "review", title: "New 5-star review", body: "Tariq Hassan gave 5 stars to Aral Sea Expedition", time: "Yesterday", read: true, action: "reviews" },
-  { id: 10, type: "system", title: "Hotel capacity warning", body: "Malika Classic Hotel at 92% capacity for October", time: "2 days ago", read: true },
-];
+type Счётчики = Record<Notif["id"], number>;
 
-type NotifContextType = {
-  notifs: Notif[];
-  markRead: (id: number) => void;
-  markAllRead: () => void;
-  unreadCount: number;
-};
+/**
+ * Уведомления панели — из живых данных: свежие SOS, новые брони и
+ * сообщения без ответа. Раньше здесь лежал десяток выдуманных событий на
+ * английском, и колокольчик каждый раз горел «4 непрочитанных».
+ *
+ * «Прочитано» означает «это число я уже видел»: когда придёт ещё одна
+ * бронь или сообщение, уведомление загорится снова. Операции видят
+ * поддержка и владелец — редактору эти уведомления ни к чему.
+ */
+export function useУведомления() {
+  const меня = useМеня();
+  const операции = меня ? можетДомен(меня.role, "operations") : false;
+  const [счёт, setСчёт] = useState<Счётчики>({ sos: 0, booking: 0, chat: 0 });
+  const [видел, setВидел] = useState<Partial<Счётчики>>({});
 
-const NotifContext = createContext<NotifContextType>({
-  notifs: [],
-  markRead: () => {},
-  markAllRead: () => {},
-  unreadCount: 0,
-});
+  const обновить = useCallback(async () => {
+    if (!операции) return;
+    try {
+      const [стат, sos] = await Promise.all([
+        fetch("/api/admin/stats").then((r) => (r.ok ? r.json() : null)),
+        fetch("/api/sos").then((r) => (r.ok ? r.json() : null)),
+      ]);
+      setСчёт({
+        sos: (sos?.alerts ?? []).filter((a: { status: string }) => a.status === "new").length,
+        booking: стат?.брони?.новые ?? 0,
+        chat: стат?.поддержка?.непрочитанных ?? 0,
+      });
+    } catch {
+      // Сеть моргнула — оставляем прежние числа до следующего опроса.
+    }
+  }, [операции]);
 
-export function NotifProvider({ children }: { children: React.ReactNode }) {
-  const [notifs, setNotifs] = useState<Notif[]>(SEED);
+  useEffect(() => {
+    обновить();
+    const t = setInterval(обновить, 30_000);
+    return () => clearInterval(t);
+  }, [обновить]);
 
-  const markRead = (id: number) => setNotifs(p => p.map(n => n.id === id ? { ...n, read: true } : n));
-  const markAllRead = () => setNotifs(p => p.map(n => ({ ...n, read: true })));
-  const unreadCount = notifs.filter(n => !n.read).length;
+  const notifs: Notif[] = [];
+  const добавить = (id: Notif["id"], title: string, body: string, action: string) => {
+    if (счёт[id] > 0) notifs.push({ id, title, body, action, read: видел[id] === счёт[id] });
+  };
+  добавить("sos", "SOS-сигналы", `Новых сигналов: ${счёт.sos} — турист ждёт помощи`, "sos");
+  добавить("booking", "Новые брони", `Ждут подтверждения: ${счёт.booking}`, "bookings");
+  добавить("chat", "Поддержка", `Сообщений без ответа: ${счёт.chat}`, "chat");
 
-  return (
-    <NotifContext.Provider value={{ notifs, markRead, markAllRead, unreadCount }}>
-      {children}
-    </NotifContext.Provider>
-  );
+  const markRead = (id: Notif["id"]) => setВидел((p) => ({ ...p, [id]: счёт[id] }));
+  const markAllRead = () => setВидел({ ...счёт });
+  const unreadCount = notifs.filter((n) => !n.read).length;
+
+  return { notifs, markRead, markAllRead, unreadCount };
 }
-
-export const useNotifs = () => useContext(NotifContext);

@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BORDER, GREEN, MUTED, TEXT, WHITE, SURFACE } from "@/lib/theme";
+import { BORDER, GREEN, MUTED, TEXT, SURFACE } from "@/lib/theme";
 import { useT } from "@/components/lang-provider";
-import type { TKey } from "@/lib/i18n";
+import { датаСловами, type TKey } from "@/lib/i18n";
 
 /**
  * Заявки, оставленные туристом.
@@ -19,6 +19,7 @@ interface Booking {
   itemName: string;
   date: string;
   guests: number;
+  nights?: number;
   status: "new" | "confirmed" | "cancelled";
   createdAt: string;
 }
@@ -37,7 +38,7 @@ const СТАТУС: Record<Booking["status"], { ключ: TKey; цвет: string
 };
 
 export default function MyBookings() {
-  const { t } = useT();
+  const { t, lang } = useT();
   const [брони, setБрони] = useState<Booking[]>([]);
   const [загрузка, setЗагрузка] = useState(true);
   const [нуженВход, setНуженВход] = useState(false);
@@ -60,13 +61,13 @@ export default function MyBookings() {
     <div className="flex-1 overflow-y-auto px-4 py-4">
       {загрузка && (
         <p className="py-10 text-center text-sm" style={{ color: MUTED }}>
-          Загружаем…
+          {t("common_loading")}
         </p>
       )}
 
       {!загрузка && нуженВход && (
         <p className="py-10 text-center text-sm" style={{ color: MUTED }}>
-          Войдите в аккаунт, чтобы видеть свои заявки.
+          {t("bk_login_to_see")}
         </p>
       )}
 
@@ -93,7 +94,8 @@ export default function MyBookings() {
               {b.itemName}
             </p>
             <p className="mt-1 text-xs" style={{ color: MUTED }}>
-              {b.date} · {b.guests} {b.guests === 1 ? "гость" : "гостей"}
+              {датаСловами(new Date(`${b.date}T12:00:00`), lang, "short")} · {t("bk_guests")}: {b.guests}
+              {b.nights ? ` · ${t("d_nights")}: ${b.nights}` : ""}
             </p>
           </li>
         ))}

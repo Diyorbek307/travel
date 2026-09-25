@@ -16,6 +16,7 @@ interface Booking {
   itemName: string;
   date: string;
   guests: number;
+  nights?: number;
   note: string;
   status: "new" | "confirmed" | "cancelled";
   createdAt: string;
@@ -63,13 +64,16 @@ export default function Bookings() {
 
   async function сменить(id: string, status: Booking["status"]) {
     // Показываем изменение сразу, не дожидаясь ответа: список длинный, и
-    // задержка выглядела бы как несработавшая кнопка.
+    // задержка выглядела бы как несработавшая кнопка. Сервер отказал
+    // или сеть оборвалась — перечитываем список, чтобы не показывать
+    // статус, которого нет.
     setБрони((p) => p.map((b) => (b.id === id ? { ...b, status } : b)));
-    await fetch("/api/admin/bookings", {
+    const res = await fetch("/api/admin/bookings", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id, status }),
-    }).catch(() => подтянуть());
+    }).catch(() => null);
+    if (!res?.ok) подтянуть();
   }
 
   const список = фильтр === "all" ? брони : брони.filter((b) => b.status === фильтр);
@@ -127,7 +131,14 @@ export default function Bookings() {
               <span className="block truncate">{b.itemName}</span>
               <span className="block text-xs" style={{ color: "var(--color-muted)" }}>
                 {ВИД[b.kind]}
+                {b.nights ? ` · ночей: ${b.nights}` : ""}
               </span>
+              {/* Пожелания туриста: без них подтвердить бронь вслепую. */}
+              {b.note && (
+                <span className="mt-1 block whitespace-pre-wrap text-xs" style={{ color: "var(--color-text)" }}>
+                  «{b.note}»
+                </span>
+              )}
             </span>,
             b.date,
             String(b.guests),

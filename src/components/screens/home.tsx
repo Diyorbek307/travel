@@ -1,4 +1,5 @@
 import type { Hotel, Place, Restaurant, Tab } from "@/lib/types";
+import type { ФильтрОбзора } from "./explore";
 import type { TKey } from "@/lib/i18n";
 import { датаСловами } from "@/lib/i18n";
 import { ACCENT_FILL, BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE, ACCENT_SOFT, ACCENT_DEEP, GLOW, контрастныйТекст, ON_GOLD } from "@/lib/theme";
@@ -12,8 +13,9 @@ import { GeomPattern, LogoMark, Wordmark } from "../ui";
 import { AnimatedBg } from "@/components/animated-bg";
 import { CardDeck, CityDeck } from "@/components/card-deck";
 import { напомнитьОСобытии } from "@/lib/calendar";
-import { useПрочитанные } from "@/lib/notifs-read";
-import { NOTIFS } from "@/data/content";
+import { useУведомления } from "@/lib/notifications";
+import { ТИПЫ_МЕСТ } from "@/data/content";
+import { useSettings } from "@/lib/settings";
 import CityReel from "@/components/city-reel";
 import { ВИДЕО, ФОН_ВИДЕО, кадрыГорода } from "@/data/city-reels";
 import { useДеньги } from "@/lib/money";
@@ -23,7 +25,7 @@ import { glass, glassLight } from "@/lib/theme";
 import TaxiOrder from "@/components/taxi-order";
 
 
-export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, onRestaurant, onMenu, onTab, onTransport, onToast, isPremium }:{ onPlace:(p:Place)=>void; onSearch:(q?:string)=>void; onHotel:(h:Hotel)=>void; onNotifs:()=>void; onPractical:()=>void; onRestaurant:(r:Restaurant)=>void; onMenu:()=>void; onTab:(t:Tab)=>void; onTransport:()=>void; onToast:(m:string)=>void; isPremium:boolean; }) {
+export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, onRestaurant, onMenu, onTab, onExplore, onTransport, onToast, isPremium }:{ onPlace:(p:Place)=>void; onSearch:(q?:string)=>void; onHotel:(h:Hotel)=>void; onNotifs:()=>void; onPractical:()=>void; onRestaurant:(r:Restaurant)=>void; onMenu:()=>void; onTab:(t:Tab)=>void; onExplore:(f?:ФильтрОбзора)=>void; onTransport:()=>void; onToast:(m:string)=>void; isPremium:boolean; }) {
   const { EVENTS, HOTELS, PLACES, RESTAURANTS } = useAppContent();
   const { t, lang, трК } = useT();
   const погода = useWeather();
@@ -31,9 +33,16 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
   // Город пользователя для таргетинга рекламы (по геолокации).
   const городРекл = ближайшийГород(useGeo().pos);
   const дг = useДеньги();
-  // Точка на колокольчике раньше горела всегда — даже после «Прочитать все».
-  const прочитанные = useПрочитанные();
-  const естьНепрочитанные = NOTIFS.some((n) => n.unread && !прочитанные.includes(n.title));
+  // Точка на колокольчике — только когда правда есть непрочитанное.
+  const естьНепрочитанные = useУведомления().some((n) => n.unread);
+  // Интересы из онбординга: подходящие места поднимаем в начало колоды,
+  // остальные идут следом в прежнем порядке.
+  const { interests } = useSettings();
+  const близкиеТипы = new Set(interests.flatMap((i) => ТИПЫ_МЕСТ[i] ?? []));
+  const подходит = (p: Place) => близкиеТипы.has(p.typeRu ?? p.type);
+  const местаПоИнтересам = близкиеТипы.size
+    ? [...PLACES.filter(подходит), ...PLACES.filter((p) => !подходит(p))]
+    : PLACES;
   return (
     <div className="flex flex-col h-full overflow-y-auto hide-scroll" style={{background:CREAM}}>
 
@@ -112,13 +121,15 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
       {/* ── Quick action grid ── */}
       <div className="px-4 pt-4">
         <div className="grid grid-cols-4 gap-2.5 mb-2.5">
+          {/* Под плиткой — сколько записей и правда есть в базе, а не
+              круглое число из макета. */}
           {([
-            {e:"🏛️",l:t("home_places"),    sub:"500+",   tab:"explore" as Tab, action:undefined},
-            {e:"🗺️",l:t("home_routes"), sub:t("map_tab_ai"),  tab:"map"    as Tab, action:undefined},
-            {e:"🏨",l:t("home_hotels"),    sub:"50+",     tab:"explore" as Tab, action:undefined},
-            {e:"🍽️",l:t("home_restaurants"),sub:"200+",    tab:"explore" as Tab, action:undefined},
+            {e:"🏛️",l:t("home_places"),     sub:String(PLACES.length),      go:()=>onExplore()},
+            {e:"🗺️",l:t("home_routes"),     sub:t("map_tab_ai"),            go:()=>onTab("map")},
+            {e:"🏨",l:t("home_hotels"),     sub:String(HOTELS.length),      go:()=>onExplore("Отели")},
+            {e:"🍽️",l:t("home_restaurants"),sub:String(RESTAURANTS.length), go:()=>onExplore("Рестораны")},
           ]).map(c=>(
-            <button key={c.l} onClick={()=>onTab(c.tab)} className="flex flex-col items-center gap-1.5 rounded-2xl border bg-white py-3 text-center shadow-sm transition-all active:scale-95 lg:gap-2 lg:py-6" style={{borderColor:BORDER}}>
+            <button key={c.l} onClick={c.go} className="flex flex-col items-center gap-1.5 rounded-2xl border bg-white py-3 text-center shadow-sm transition-all active:scale-95 lg:gap-2 lg:py-6" style={{borderColor:BORDER}}>
               <span className="text-2xl lg:text-3xl">{c.e}</span>
               <p className="text-[10px] font-bold lg:text-sm" style={{color:TEXT}}>{c.l}</p>
               <p className="text-[9px] lg:text-xs" style={{color:MUTED}}>{c.sub}</p>
@@ -164,7 +175,7 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
       <CityDeck onSearch={onSearch}/>
 
       {/* ── Place Card Deck — image-23 style ── */}
-      <CardDeck places={PLACES} onPlace={onPlace}/>
+      <CardDeck places={местаПоИнтересам} onPlace={onPlace}/>
 
       {/* ── Events ── */}
       <div className="pt-5">
@@ -197,7 +208,7 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
               <img src={h.img} alt={h.name} className="absolute inset-0 w-full h-full object-cover"/>
               <div className="absolute inset-0" style={{background:"linear-gradient(to top,rgba(0,0,0,0.95) 0%,rgba(0,0,0,0.2) 50%,transparent 100%)"}}/>
               {/* Tag */}
-              <div className="absolute top-3 left-3"><span className="text-[8px] font-bold px-2 py-0.5 rounded-full" style={{background:"rgba(233,196,106,0.92)",color:TEXT}}>{h.tag}</span></div>
+              <div className="absolute top-3 left-3"><span className="text-[8px] font-bold px-2 py-0.5 rounded-full" style={{background:"rgba(233,196,106,0.92)",color:ON_GOLD}}>{h.tag}</span></div>
               {/* Weather */}
               {(()=>{const w=погода.get(h.city);return w?<div className="absolute top-3 right-3"><span className="text-[8px] font-bold px-2 py-0.5 rounded-full" style={{background:"rgba(0,0,0,0.5)",backdropFilter:"blur(6px)",color:"white"}}>{w.icon}{w.temp}°</span></div>:null;})()}
               {/* Info */}
@@ -223,7 +234,7 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
       <div className="pt-5">
         <div className="flex items-center justify-between mb-3 px-4">
           <p className="font-bold text-base" style={{color:TEXT,fontFamily:"var(--font-heading)"}}>{t("home_best_rest")}</p>
-          <button onClick={()=>onTab("explore")} className="text-xs font-medium" style={{color:GREEN}}>{t("home_all")}</button>
+          <button onClick={()=>onExplore("Рестораны")} className="text-xs font-medium" style={{color:GREEN}}>{t("home_all")}</button>
         </div>
         <div className="flex gap-3 overflow-x-auto hide-scroll px-4 pb-1">
           {RESTAURANTS.slice(0,8).map(r=>(
@@ -270,8 +281,6 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
     </div>
   );
 }
-
-// ── Explore Screen ─────────────────────────────────────────────────────────────
 
 export default HomeScreen;
 

@@ -320,6 +320,8 @@ export interface PublicUser {
   hasPhoto: boolean;
   country: string;
   phone: string;
+  /** До какого момента оплачен Premium; null или нет поля — не оплачен. */
+  premiumUntil?: string | null;
   createdAt: string;
   lastSeenAt: string;
 }

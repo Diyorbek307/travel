@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { addSupportMessage, getThread } from "@/lib/community";
 import { currentUser } from "@/lib/session";
+import { подЛимитом } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 
@@ -19,6 +20,8 @@ export async function GET() {
 export async function POST(request: Request) {
   const user = await currentUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  if (!подЛимитом(`support:${user.id}`, 20, 60_000))
+    return NextResponse.json({ error: "too_many" }, { status: 429 });
 
   let body: Record<string, unknown>;
   try {

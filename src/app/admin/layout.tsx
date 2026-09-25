@@ -27,7 +27,7 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Админ-панель — Узбекистан",
+  title: "Админ-панель — HelloUZ",
   robots: { index: false, follow: false },
 };
 

@@ -6,37 +6,27 @@ import { useSyncExternalStore } from "react";
  * Настройки приложения — на устройстве (localStorage), переживают перезапуск.
  *
  * Тема применяется к <html data-theme>, остальное просто сохраняется и
- * отражается в интерфейсе. По умолчанию — светлая тема.
+ * отражается в интерфейсе. По умолчанию тема — как в системе телефона.
  */
 
 export interface Настройки {
   /** «system» — слушаем настройку телефона; иначе ручной выбор. */
   theme: "system" | "light" | "dark";
-  autoplay: boolean; // автозапуск аудиогида при открытии места
-  gps: boolean; // GPS-аудиогид у объектов
-  offline: boolean; // офлайн-карты
+  /** Открыл место — его аудиогид начинается сам. */
+  autoplay: boolean;
   units: "metric" | "imperial";
   /** Валюта отображения цен. По умолчанию доллар. */
   currency: string;
-  mapStyle: "standard" | "sat";
-  notifNear: boolean;
-  notifEvents: boolean;
-  notifNew: boolean;
-  notifNews: boolean;
+  /** Интересы из онбординга — по ним на главной первыми идут подходящие места. */
+  interests: string[];
 }
 
 const ПОУМОЛЧАНИЮ: Настройки = {
   theme: "system",
   autoplay: false,
-  gps: true,
-  offline: true,
   units: "metric",
   currency: "USD",
-  mapStyle: "standard",
-  notifNear: true,
-  notifEvents: false,
-  notifNew: true,
-  notifNews: true,
+  interests: [],
 };
 
 const КЛЮЧ = "uzup.settings";

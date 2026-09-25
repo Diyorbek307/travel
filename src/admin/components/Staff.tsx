@@ -27,7 +27,7 @@ const ОШИБКИ: Record<string, string> = {
   username_taken: "Такой логин уже занят",
   username_reserved: "Логин admin закреплён за владельцем",
   bad_username: "Логин: латиница, цифры, точка/дефис, 3–32 знака",
-  weak_password: "Пароль не короче 6 знаков",
+  weak_password: "Пароль не короче 8 знаков",
   bad_role: "Неизвестная роль",
   not_found: "Запись не найдена",
 };
@@ -104,8 +104,8 @@ export default function Staff() {
   }
 
   async function создать() {
-    if (!нов.username.trim() || нов.password.length < 6) {
-      setОшибка("Заполните логин и пароль (от 6 знаков).");
+    if (!нов.username.trim() || нов.password.length < 8) {
+      setОшибка("Заполните логин и пароль (от 8 знаков).");
       return;
     }
     const ok = await послать({ action: "create", ...нов });
@@ -121,8 +121,8 @@ export default function Staff() {
   }
 
   async function задатьПароль(id: string) {
-    if (новыйПароль.length < 6) {
-      setОшибка("Пароль не короче 6 знаков.");
+    if (новыйПароль.length < 8) {
+      setОшибка("Пароль не короче 8 знаков.");
       return;
     }
     const ok = await послать({ action: "password", id, password: новыйПароль });
@@ -273,7 +273,7 @@ export default function Staff() {
                   type="text"
                   value={новыйПароль}
                   onChange={(e) => setНовыйПароль(e.target.value)}
-                  placeholder="от 6 знаков"
+                  placeholder="от 8 знаков"
                   className="flex-1 rounded-lg px-3 py-2 text-sm outline-none"
                   style={поле}
                 />
@@ -306,7 +306,7 @@ export default function Staff() {
                 <div>
                   <label className="text-xs block mb-1" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>ПАРОЛЬ</label>
                   <input type="text" value={нов.password} onChange={(e) => setНов((p) => ({ ...p, password: e.target.value }))}
-                    placeholder="от 6 знаков" className="w-full rounded-lg px-3 py-2 text-sm outline-none" style={поле} />
+                    placeholder="от 8 знаков" className="w-full rounded-lg px-3 py-2 text-sm outline-none" style={поле} />
                 </div>
                 <div>
                   <label className="text-xs block mb-2" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>РОЛЬ</label>

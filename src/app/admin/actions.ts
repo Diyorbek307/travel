@@ -23,6 +23,11 @@ export async function login(_prev: LoginResult | null, formData: FormData): Prom
   // Логин можно не вводить: пустое поле — мастер-вход владельца.
   const username = нормЛогин(String(formData.get("username") ?? "") || ЛОГИН_ВЛАДЕЛЬЦА);
 
+  // И по логину: лимит по IP обходится подменой X-Forwarded-For.
+  if (!подЛимитом(`admin-login-user:${username}`, 10, 15 * 60_000)) {
+    return { ok: false, message: "Слишком много попыток. Подождите 15 минут." };
+  }
+
   let token: string | null = null;
 
   if (username === ЛОГИН_ВЛАДЕЛЬЦА) {

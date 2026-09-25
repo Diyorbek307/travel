@@ -5,9 +5,10 @@ import type { ChatMessage, PublicUser } from "@/lib/types";
 import { PremiumModal } from "@/components/modals";
 import SupportChat from "@/components/support-chat";
 import MyBookings from "@/components/my-bookings";
-import { ACCENT_FILL, BORDER, CREAM, GOLD, GREEN, GREEN_LIGHT, MUTED, TEXT, WHITE, SURFACE, ACCENT_SOFT, ACCENT_DEEP, ON_GOLD } from "@/lib/theme";
-import { ACHIEVEMENTS, AI_REPLIES, STAMPS } from "@/data/content";
-import { useVisits } from "@/lib/visits";
+import { ACCENT_FILL, BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE, ACCENT_SOFT, ACCENT_DEEP, ON_GOLD, мягко } from "@/lib/theme";
+import { ACHIEVEMENTS, AI_REPLIES, STAMPS, type УсловиеДостижения } from "@/data/content";
+import { useListened, useOpenedPlaces, useVisits } from "@/lib/visits";
+import { useAppContent } from "@/components/content-provider";
 import { useCurrency } from "@/components/currency-provider";
 import { useFavorites } from "@/lib/favorites";
 import { useTrip } from "@/lib/trip";
@@ -20,6 +21,27 @@ import { CurrencyConverter } from "@/components/screens/practical";
 import { AdInline } from "@/components/ads";
 import { faqТексты, условияТекст, политикаТекст } from "@/data/legal";
 
+
+/** Переключатель настройки. */
+function Toggle({ on, set }: { on: boolean; set: (v: boolean) => void }) {
+  return (
+    <button onClick={()=>set(!on)} role="switch" aria-checked={on} className="relative w-11 h-6 rounded-full transition-colors flex-shrink-0" style={{background:on?GREEN:BORDER}}>
+      <div className="absolute top-0.5 w-5 h-5 rounded-full shadow transition-all" style={{left:on?"22px":"2px",background:"#fff"}}/>
+    </button>
+  );
+}
+
+/** Строка настроек: значок, подпись и что-то справа. С onClick — кнопка. */
+function Row({ icon, label, sub, right, onClick }: { icon: string; label: string; sub?: string; right: React.ReactNode; onClick?: () => void }) {
+  const внутри=(<>
+    <span className="text-lg w-6 text-center flex-shrink-0">{icon}</span>
+    <div className="flex-1 min-w-0 text-left"><p className="text-sm font-medium" style={{color:TEXT}}>{label}</p>{sub&&<p className="text-[10px]" style={{color:MUTED}}>{sub}</p>}</div>
+    {right}
+  </>);
+  return onClick
+    ? <button onClick={onClick} className="w-full flex items-center gap-3 py-3 border-b last:border-0 active:opacity-60 transition-opacity" style={{borderColor:BORDER}}>{внутри}</button>
+    : <div className="flex items-center gap-3 py-3 border-b last:border-0" style={{borderColor:BORDER}}>{внутри}</div>;
+}
 
 export function SettingsView({ isPremium, user, onUpgrade, onLogout, onSupport }:{ isPremium:boolean; user:PublicUser|null; onUpgrade:()=>void; onLogout:()=>void; onSupport:()=>void }) {
   const { t, lang, setLang } = useT();
@@ -100,7 +122,14 @@ export function SettingsView({ isPremium, user, onUpgrade, onLogout, onSupport }
   // Сохранить правку профиля на сервере.
   const сохранитьПрофиль = async () => {
     try {
-      await fetch("/api/auth/me", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(новоеФото ? { ...форма, photo: новоеФото } : форма) });
+      const res = await fetch("/api/auth/me", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(новоеФото ? { ...форма, photo: новоеФото } : форма) });
+      // «Сохранено» только если сервер и правда сохранил: раньше тост
+      // выходил и тогда, когда он отказал (например, из-за фото).
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        тост(d.error === "photo_too_large" ? t("e_photo_large") : t("prof_save_failed"));
+        return;
+      }
       тост(t("prof_saved_ok"));
       setПанель(null);
       setНовоеФото(null);
@@ -118,14 +147,13 @@ export function SettingsView({ isPremium, user, onUpgrade, onLogout, onSupport }
     } catch { тост(t("err_network")); }
   };
 
-  // Удаление аккаунта.
+  // Удаление аккаунта. Выходим, только когда сервер подтвердил: иначе
+  // человек решил бы, что аккаунта больше нет, а он остался.
   const удалитьАккаунт = async () => {
-    try {
-      await fetch("/api/auth/me", { method: "DELETE" });
-    } finally {
-      setПанель(null);
-      onLogout();
-    }
+    const res = await fetch("/api/auth/me", { method: "DELETE" }).catch(() => null);
+    setПанель(null);
+    if (res?.ok) onLogout();
+    else тост(t("del_failed"));
   };
 
   const открытьПравку = () => {
@@ -142,21 +170,6 @@ export function SettingsView({ isPremium, user, onUpgrade, onLogout, onSupport }
   // Все настройки — из общего хранилища (сохраняются на устройстве).
   const нст = useSettings();
 
-  const Toggle=({on,set}:{on:boolean;set:(v:boolean)=>void})=>(
-    <button onClick={()=>set(!on)} className="relative w-11 h-6 rounded-full transition-colors flex-shrink-0" style={{background:on?GREEN:BORDER}}>
-      <div className="absolute top-0.5 w-5 h-5 rounded-full shadow transition-all" style={{left:on?"22px":"2px",background:"#fff"}}/>
-    </button>
-  );
-  const Row=({icon,label,sub,right,onClick}:{icon:string;label:string;sub?:string;right:React.ReactNode;onClick?:()=>void})=>{
-    const внутри=(<>
-      <span className="text-lg w-6 text-center flex-shrink-0">{icon}</span>
-      <div className="flex-1 min-w-0 text-left"><p className="text-sm font-medium" style={{color:TEXT}}>{label}</p>{sub&&<p className="text-[10px]" style={{color:MUTED}}>{sub}</p>}</div>
-      {right}
-    </>);
-    return onClick
-      ? <button onClick={onClick} className="w-full flex items-center gap-3 py-3 border-b last:border-0 active:opacity-60 transition-opacity" style={{borderColor:BORDER}}>{внутри}</button>
-      : <div className="flex items-center gap-3 py-3 border-b last:border-0" style={{borderColor:BORDER}}>{внутри}</div>;
-  };
   const шеврон=<svg className="rtl-flip" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={MUTED} strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>;
 
   return (
@@ -167,13 +180,13 @@ export function SettingsView({ isPremium, user, onUpgrade, onLogout, onSupport }
         <button onClick={onUpgrade} className="w-full rounded-2xl p-4 flex items-center gap-3 text-left active:scale-[0.98] transition-all" style={{background:`linear-gradient(135deg,#0a1f20,#0e3b38)`}}>
           <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0" style={{background:GOLD}}>👑</div>
           <div className="flex-1"><p className="text-white font-bold text-sm">HelloUZ Premium</p><p className="text-white/60 text-xs">{t("pay_no_ads")} · HelloUZ Pro</p></div>
-          <div className="px-3 py-1.5 rounded-xl text-xs font-bold" style={{background:GOLD,color:ON_GOLD}}>$4.99</div>
+          <div className="px-3 py-1.5 rounded-xl text-xs font-bold" style={{background:GOLD,color:ON_GOLD}}>39 000 {t("cur_uzs_word")}</div>
         </button>
       )}
       {isPremium&&(
         <div className="rounded-2xl p-4 flex items-center gap-3" style={{background:`linear-gradient(135deg,#0a1f20,#0e3b38)`}}>
           <div className="w-10 h-10 rounded-2xl flex items-center justify-center text-xl" style={{background:GOLD}}>👑</div>
-          <div><p className="text-white font-bold text-sm">{t("prof_premium_active")}</p><p className="text-white/50 text-xs">{t("prof_updated")}</p></div>
+          <div><p className="text-white font-bold text-sm">{t("prof_premium_active")}</p>{user?.premiumUntil&&<p className="text-white/50 text-xs">{t("prem_until")} {датаСловами(new Date(user.premiumUntil), lang, "long")}</p>}</div>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={GOLD} strokeWidth="2.5" className="ml-auto"><polyline points="20 6 9 17 4 12"/></svg>
         </div>
       )}
@@ -196,25 +209,11 @@ export function SettingsView({ isPremium, user, onUpgrade, onLogout, onSupport }
         </div>
       </div>
 
-      {/* Notifications */}
-      <div className="bg-white rounded-2xl px-4 shadow-sm border" style={{borderColor:BORDER}}>
-        <p className="font-bold text-xs pt-3 pb-1 uppercase tracking-widest" style={{color:MUTED}}>{t("prof_notifications")}</p>
-        <Row icon="📍" label={t("s_nearby")} sub={t("s_nearby_sub")} right={<Toggle on={нст.notifNear} set={v=>задатьНастройку("notifNear",v)}/>}/>
-        <Row icon="🎫" label={t("s_events")} sub={t("s_events_sub")} right={<Toggle on={нст.notifEvents} set={v=>задатьНастройку("notifEvents",v)}/>}/>
-        <Row icon="🆕" label={t("s_news_sub")} right={<Toggle on={нст.notifNew} set={v=>задатьНастройку("notifNew",v)}/>}/>
-        <Row icon="📰" label={t("s_news")} right={<Toggle on={нст.notifNews} set={v=>задатьНастройку("notifNews",v)}/>}/>
-      </div>
-
-      {/* Карта и навигация */}
+      {/* Карта и навигация. Здесь были переключатели уведомлений, GPS-гида,
+          офлайн-карт и спутникового слоя — ни один ни на что не влиял.
+          Офлайн теперь настоящий: города скачиваются во вкладке «Аудио». */}
       <div className="bg-white rounded-2xl px-4 shadow-sm border" style={{borderColor:BORDER}}>
         <p className="font-bold text-xs pt-3 pb-1 uppercase tracking-widest" style={{color:MUTED}}>{t("prof_map_nav")}</p>
-        <Row icon="🗺️" label={t("s_map_style")} right={
-          <div className="flex rounded-lg overflow-hidden border" style={{borderColor:BORDER}}>
-            {([["standard",t("nav_map")],["sat",t("s_satellite")]] as const).map(([s,ярлык])=><button key={s} onClick={()=>задатьНастройку("mapStyle",s)} className="px-2.5 py-1 text-[10px] font-bold" style={нст.mapStyle===s?{background:ACCENT_FILL,color:WHITE}:{background:CREAM,color:MUTED}}>{ярлык}</button>)}
-          </div>
-        }/>
-        <Row icon="📡" label={t("s_gps_audio")} sub={t("s_nearby_sub")} right={<Toggle on={нст.gps} set={v=>задатьНастройку("gps",v)}/>}/>
-        <Row icon="⬇️" label={t("s_offline_maps")} sub={t("s_offline_sub")} right={<Toggle on={нст.offline} set={v=>задатьНастройку("offline",v)}/>}/>
         <Row icon="📏" label={t("s_units")} right={
           <div className="flex rounded-lg overflow-hidden border" style={{borderColor:BORDER}}>
             {(["metric","imperial"] as const).map(u=><button key={u} onClick={()=>задатьНастройку("units",u)} className="px-2.5 py-1 text-[10px] font-bold" style={нст.units===u?{background:ACCENT_FILL,color:WHITE}:{background:CREAM,color:MUTED}}>{u==="metric"?t("unit_km"):t("unit_mi")}</button>)}
@@ -375,7 +374,7 @@ function snimok(адрес: string | null) {
   return <img src={адрес} alt="" className="h-full w-full object-cover" />;
 }
 
-export function ProfileScreen({ onLogout, user, startView }:{ onLogout:()=>void; user:PublicUser|null; startView?:"passport"|"bookings"|"support"|"chat"|"stats"|"settings" }) {
+export function ProfileScreen({ onLogout, user, isPremium, startView }:{ onLogout:()=>void; user:PublicUser|null; isPremium:boolean; startView?:"passport"|"bookings"|"support"|"chat"|"stats"|"settings" }) {
   /*
    * Имя берём из учётной записи, а не из образца.
    *
@@ -386,39 +385,55 @@ export function ProfileScreen({ onLogout, user, startView }:{ onLogout:()=>void;
    * понимает, что вошёл он, а не сосед.
    */
   const { t, трК, lang } = useT();
+  const { PLACES } = useAppContent();
 
-  // Штампы паспорта — по-настоящему: город считается посещённым, когда
-  // человек открыл в нём любое место/отель/ресторан (см. lib/visits).
+  // Паспорт и достижения — по тому, что человек правда открыл и
+  // послушал (см. lib/visits), а не заготовка из макета.
   const { rates } = useCurrency();
   const курсUZS = rates["UZS"];
   const визиты = useVisits();
+  const открытые = useOpenedPlaces();
+  const прослушано = useListened();
   // Числа в статистике раньше были вписаны руками («3 города, 847 км»)
   // и не менялись ни от чего. Считаем по тому, что человек правда сделал.
   const избранноеСписок = useFavorites();
   const маршрутСписок = useTrip();
   const штампы = STAMPS.map((s) => {
-    const iso = визиты[s.city];
-    return {
-      ...s,
-      earned: !!iso,
-      date: iso
-        ? датаСловами(new Date(iso), lang, "short")
-        : "—",
-    };
+    const iso = открытые[s.placeId];
+    return { ...s, earned: !!iso, date: iso ? датаСловами(new Date(iso), lang, "short") : "—" };
   });
+  const открытоМест = (подходит: (p: (typeof PLACES)[number]) => boolean) =>
+    PLACES.filter((p) => открытые[p.id] && подходит(p)).length;
+  const выполнено: Record<УсловиеДостижения, boolean> = {
+    "самарканд": Boolean(визиты["Самарканд"]),
+    "бухара": открытоМест((p) => p.city === "Бухара") >= 3,
+    "шёлковый-путь": ["Самарканд", "Бухара", "Хива"].every((г) => визиты[г]),
+    "музеи": открытоМест((p) => (p.typeRu ?? p.type) === "Музей") >= 2,
+    "избранное": избранноеСписок.length >= 5,
+    "аудио": Object.keys(прослушано).length > 0,
+  };
+  // Лента «Активность» — последние открытые места.
+  const активность = Object.entries(открытые)
+    .map(([id, iso]) => ({ место: PLACES.find((p) => p.id === id), iso }))
+    .filter((a) => a.место)
+    .sort((a, b) => b.iso.localeCompare(a.iso))
+    .slice(0, 5);
   const заработано = штампы.filter((s) => s.earned).length;
   const всегоШтампов = штампы.length;
   const процентШтампов = всегоШтампов ? Math.round((заработано / всегоШтампов) * 100) : 0;
   const имя = user ? `${user.firstName} ${user.lastName}`.trim() : t("prof_traveler");
   const откуда = user?.country ? `🌍 ${user.country}` : `🌍 ${t("prof_traveler")}`;
   const снимок = user?.hasPhoto ? `/api/photo/${user.id}` : null;
+  // Номер паспорта свой у каждого: год регистрации и хвост id аккаунта.
+  const номерПаспорта = user
+    ? `UZT-${new Date(user.createdAt).getFullYear()}-${user.id.replace(/[^a-z0-9]/gi, "").slice(-4).toUpperCase()}`
+    : "UZT-—";
   // Из бокового меню приходят прямо в нужный раздел: «Конвертер валют»
   // и «Экстренная помощь» живут внутри профиля, и открывать вместо них
   // паспорт — значит бросить человека искать самому.
   const [view, setView] = useState<"passport"|"bookings"|"support"|"chat"|"stats"|"settings">(startView ?? "passport");
-  const [isPremium, setIsPremium] = useState(false);
   const [showPremium, setShowPremium] = useState(false);
-  const [messages, setMessages] = useState<ChatMessage[]>([{role:"ai",text:трК("Assalomu alaykum! 👋 Я ваш AI-гид. Спрашивайте всё — история, маршруты, рестораны, транспорт, валюта!"),time:"09:41"}]);
+  const [messages, setMessages] = useState<ChatMessage[]>(()=>[{role:"ai",text:трК("Assalomu alaykum! 👋 Я ваш AI-гид. Спрашивайте всё — история, маршруты, рестораны, транспорт, валюта!"),time:new Date().toLocaleTimeString(lang,{hour:"2-digit",minute:"2-digit"})}]);
   const [input, setInput]   = useState("");
   const [typing, setTyping] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -433,16 +448,18 @@ export function ProfileScreen({ onLogout, user, startView }:{ onLogout:()=>void;
     setMessages(p=>[...p,{role:"user",text:трК(вопрос),time:now}]);
     setInput("");setTyping(true);
     setTimeout(()=>{
-      const рус=AI_REPLIES[вопрос]??"Отличный вопрос! Рекомендую посещать рано утром — свет, тишина, минимум туристов.";
+      const рус=AI_REPLIES[вопрос];
       // Курс в заготовленном ответе вписан навсегда и уже устарел.
       // Подставляем живой из того же источника, что и конвертер.
+      // На незнакомый вопрос гид честно говорит, что умеет, — раньше он
+      // на всё отвечал «рекомендую посещать рано утром».
       const текст = вопрос === "Курс валюты?" && курсUZS
         ? `💱 ${t("cur_title")}:
 
 $1 ≈ ${курсUZS.toLocaleString(lang, { maximumFractionDigits: 0 })} UZS
 
 ${t("cur_live_hint")}`
-        : трК(рус);
+        : рус ? трК(рус) : t("ai_unknown");
       setMessages(p=>[...p,{role:"ai",text:текст,time:new Date().toLocaleTimeString(lang,{hour:"2-digit",minute:"2-digit"})}]);
       setTyping(false);
     },1400);
@@ -463,7 +480,7 @@ ${t("cur_live_hint")}`
     // узкие карточки; во всю ширину они разъезжаются пустотой. Держим
     // читаемой колонкой по центру, на телефоне это по-прежнему вся ширина.
     <div className="flex flex-col h-full w-full max-w-xl mx-auto" style={{background:CREAM}}>
-      {showPremium&&<PremiumModal onClose={()=>setShowPremium(false)} onActivate={()=>{setIsPremium(true);setShowPremium(false);}}/>}
+      {showPremium&&<PremiumModal onClose={()=>setShowPremium(false)}/>}
 
       <div className="px-4 pt-14 pb-3 bg-white border-b" style={{borderColor:BORDER}}>
         <div className="flex items-center gap-3 mb-3">
@@ -477,9 +494,8 @@ ${t("cur_live_hint")}`
             <p className="font-bold text-base truncate" style={{color:TEXT,fontFamily:"var(--font-heading)"}}>{имя}</p>
             <p className="text-xs truncate" style={{color:MUTED}}>{откуда}</p>
             <div className="flex gap-1.5 mt-1">
-              <Badge text="EXPLORER" color={GREEN}/>
-              <Badge text="★ 3" color={GOLD}/>
-              {isPremium&&<Badge text="PREMIUM" color="#0a1f20"/>}
+              <Badge text={`🏅 ${заработано}/${всегоШтампов}`} color="var(--gold-ink)"/>
+              {isPremium&&<Badge text="PREMIUM" color="var(--gold-ink)"/>}
             </div>
           </div>
           {!isPremium&&<button onClick={()=>setShowPremium(true)} className="px-3 py-1.5 rounded-xl text-[10px] font-bold" style={{background:`linear-gradient(135deg,#0a1f20,#0e3b38)`,color:GOLD}}>👑 Pro</button>}
@@ -495,7 +511,7 @@ ${t("cur_live_hint")}`
           <div className="px-4">
             <div className="rounded-3xl overflow-hidden mb-4 shadow-lg" style={{background:`linear-gradient(135deg,${ACCENT_DEEP} 0%,${ACCENT_FILL} 100%)`}}>
               <div className="p-5">
-                <div className="flex items-start justify-between mb-4"><div><p className="text-[9px] font-bold tracking-widest uppercase" style={{color:GOLD}}>HelloUZ · Uzbekistan Travel</p><p className="text-white text-xl mt-0.5" style={{fontFamily:"var(--font-heading)",fontWeight:600}}>{t("prof_digital_passport")}</p></div><div className="text-right"><p className="text-white/40 text-[9px]">{t("prof_passport_no")}</p><p className="text-[10px] font-mono font-bold" style={{color:GOLD}}>UZT-2026-0841</p></div></div>
+                <div className="flex items-start justify-between mb-4"><div><p className="text-[9px] font-bold tracking-widest uppercase" style={{color:GOLD}}>HelloUZ · Uzbekistan Travel</p><p className="text-white text-xl mt-0.5" style={{fontFamily:"var(--font-heading)",fontWeight:600}}>{t("prof_digital_passport")}</p></div><div className="text-right"><p className="text-white/40 text-[9px]">{t("prof_passport_no")}</p><p className="text-[10px] font-mono font-bold" style={{color:GOLD}}>{номерПаспорта}</p></div></div>
                 <div className="flex items-center gap-3 rounded-2xl p-3" style={{background:"rgba(255,255,255,0.12)"}}>
                   <div className="w-11 h-11 rounded-xl flex items-center justify-center text-2xl flex-shrink-0 overflow-hidden" style={{background:"rgba(255,255,255,0.15)"}}>
                     {snimok(снимок) ?? "👤"}
@@ -508,10 +524,9 @@ ${t("cur_live_hint")}`
             </div>
             <p className="font-bold text-sm mb-3" style={{color:TEXT}}>{t("prof_stamps")}</p>
             <div className="grid grid-cols-3 gap-2.5 mb-4">{штампы.map((s,i)=><div key={i} className="rounded-2xl p-3 aspect-square flex flex-col items-center justify-center text-center shadow-sm" style={s.earned?{background:ACCENT_FILL}:{background:SURFACE,border:`2px dashed ${BORDER}`}}><span className="text-2xl mb-1">{s.icon}</span><p className="font-bold text-[9px] leading-tight" style={{color:s.earned?WHITE:MUTED}}>{трК(s.name)}</p><p className="text-[8px] mt-0.5" style={{color:s.earned?GOLD:"#C0B0A0"}}>{s.earned?s.date:трК("Не посещено")}</p></div>)}</div>
-            <div className="bg-white rounded-2xl p-4 mb-3 shadow-sm border" style={{borderColor:BORDER}}><div className="flex items-center justify-between mb-2"><p className="font-semibold text-sm" style={{color:TEXT}}>{t("prof_progress")}</p><p className="text-sm font-bold" style={{color:GREEN}}>{заработано}/{всегоШтампов}</p></div><div className="rounded-full h-2" style={{background:CREAM}}><div className="h-2 rounded-full" style={{background:ACCENT_FILL,width:`${процентШтампов}%`,transition:"width 0.4s"}}/></div><p className="text-xs mt-2" style={{color:MUTED}}>{t("prof_stamps_more")}</p></div>
-            <div className="rounded-2xl p-4 mb-4" style={{background:`linear-gradient(135deg,${GOLD},#C17B2F)`}}><p className="font-bold text-sm" style={{color:ON_GOLD}}>🎁 {t("prof_stamps_reward")}</p><p className="text-xs mt-1" style={{color:"rgba(28,22,6,0.7)"}}>{t("prof_stamps_partners")}</p></div>
+            <div className="bg-white rounded-2xl p-4 mb-3 shadow-sm border" style={{borderColor:BORDER}}><div className="flex items-center justify-between mb-2"><p className="font-semibold text-sm" style={{color:TEXT}}>{t("prof_progress")}</p><p className="text-sm font-bold" style={{color:GREEN}}>{заработано}/{всегоШтампов}</p></div><div className="rounded-full h-2" style={{background:CREAM}}><div className="h-2 rounded-full" style={{background:ACCENT_FILL,width:`${процентШтампов}%`,transition:"width 0.4s"}}/></div><p className="text-xs mt-2" style={{color:MUTED}}>{t("prof_stamps_hint")}</p></div>
             <p className="font-bold text-sm mb-3" style={{color:TEXT}}>{t("prof_achievements")}</p>
-            <div className="grid grid-cols-3 gap-2.5 pb-4">{ACHIEVEMENTS.map((a,i)=><div key={i} className="bg-white rounded-2xl p-3 text-center shadow-sm border" style={{borderColor:BORDER,opacity:a.earned?1:0.55}}><div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl mb-1.5 mx-auto" style={{background:a.color+"18"}}>{a.emoji}</div><p className="text-[9px] font-semibold leading-tight" style={{color:TEXT}}>{трК(a.title)}</p><p className="text-[8px] mt-0.5" style={{color:a.earned?GREEN:MUTED}}>{a.earned?`✓ ${t("ach_earned")}`:t("ach_progress")}</p></div>)}</div>
+            <div className="grid grid-cols-3 gap-2.5 pb-4">{ACHIEVEMENTS.map((a)=>{const есть=выполнено[a.условие];return <div key={a.title} className="bg-white rounded-2xl p-3 text-center shadow-sm border" style={{borderColor:BORDER,opacity:есть?1:0.55}}><div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl mb-1.5 mx-auto" style={{background:мягко(a.color,10)}}>{a.emoji}</div><p className="text-[9px] font-semibold leading-tight" style={{color:TEXT}}>{трК(a.title)}</p><p className="text-[8px] mt-0.5" style={{color:есть?GREEN:MUTED}}>{есть?`✓ ${t("ach_earned")}`:t("ach_progress")}</p></div>;})}</div>
           </div>
         </div>
       )}
@@ -540,7 +555,7 @@ ${t("cur_live_hint")}`
           <div className="px-4 space-y-4 pb-4">
             <div className="grid grid-cols-2 gap-3">{[{e:"🏙️",v:String(Object.keys(визиты).length),l:t("prof_cnt_cities")},{e:"🏅",v:`${заработано}/${всегоШтампов}`,l:t("prof_cnt_stamps")},{e:"❤️",v:String(избранноеСписок.length),l:t("prof_cnt_fav")},{e:"📋",v:String(маршрутСписок.length),l:t("prof_cnt_trip")}].map(s=><div key={s.l} className="bg-white rounded-2xl p-4 shadow-sm border text-center" style={{borderColor:BORDER}}><p className="text-3xl mb-1">{s.e}</p><p className="text-2xl font-bold" style={{color:GREEN,fontFamily:"var(--font-heading)"}}>{s.v}</p><p className="text-xs mt-0.5" style={{color:MUTED}}>{s.l}</p></div>)}</div>
             <CurrencyConverter/>
-            <div className="bg-white rounded-2xl p-4 shadow-sm border" style={{borderColor:BORDER}}><p className="font-bold text-sm mb-3" style={{color:TEXT}}>{t("prof_activity")}</p>{[{e:"🕌",a:"Посетил",p:"Площадь Регистан",t:"Сегодня, 09:30"},{e:"🎧",a:"Слушал",p:"Гид Шахи-Зинда",t:"Сегодня, 11:15"},{e:"✅",a:"Завершил",p:"Самарканд за 1 день",t:"12 авг"}].map((a,i)=><div key={i} className="flex items-center gap-3 py-2.5 border-b last:border-0" style={{borderColor:BORDER}}><span className="text-lg">{a.e}</span><div className="flex-1"><p className="text-sm" style={{color:TEXT}}><span style={{color:MUTED}}>{a.a}</span> {a.p}</p><p className="text-xs" style={{color:MUTED}}>{a.t}</p></div></div>)}</div>
+            <div className="bg-white rounded-2xl p-4 shadow-sm border" style={{borderColor:BORDER}}><p className="font-bold text-sm mb-3" style={{color:TEXT}}>{t("prof_activity")}</p>{активность.length===0?<p className="text-xs" style={{color:MUTED}}>{t("prof_act_empty")}</p>:активность.map(({место,iso})=><div key={место!.id} className="flex items-center gap-3 py-2.5 border-b last:border-0" style={{borderColor:BORDER}}><span className="text-lg">📍</span><div className="flex-1 min-w-0"><p className="text-sm truncate" style={{color:TEXT}}><span style={{color:MUTED}}>{t("prof_act_opened")}</span> {место!.name}</p><p className="text-xs" style={{color:MUTED}}>{трК(место!.city)} · {датаСловами(new Date(iso), lang, "short")}</p></div></div>)}</div>
             <EmergencyCard/>
           </div>
         </div>
@@ -552,6 +567,5 @@ ${t("cur_live_hint")}`
   );
 }
 
-// ── Nav ────────────────────────────────────────────────────────────────────────
 
 export default ProfileScreen;

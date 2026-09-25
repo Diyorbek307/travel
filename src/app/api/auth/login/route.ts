@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { подЛимитом, ipЗапроса } from "@/lib/rate-limit";
-import { mailConfigured, mailWorking, sendMail, письмоСКодом } from "@/lib/mail";
+import { mailWorking, sendMail, письмоСКодом } from "@/lib/mail";
 import {
   findByEmail,
   makeSession,
@@ -28,6 +28,11 @@ export async function POST(request: Request) {
 
   const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
   const password = typeof body.password === "string" ? body.password : "";
+
+  // Второй тормоз — по адресу. Лимит по IP обходится подменой
+  // X-Forwarded-For, а пароль одного аккаунта так не переберёшь.
+  if (!подЛимитом(`login-email:${email}`, 20, 15 * 60_000))
+    return NextResponse.json({ error: "too_many" }, { status: 429 });
 
   const user = await findByEmail(email);
   // Один ответ и на неизвестный адрес, и на неверный пароль: иначе форма

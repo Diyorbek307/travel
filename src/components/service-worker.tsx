@@ -14,6 +14,13 @@ export default function ServiceWorker() {
 
   useEffect(() => {
     if (!("serviceWorker" in navigator)) return;
+    // При разработке имена скриптов не меняются от правки к правке, и
+    // кэш отдавал бы вчерашний код. Кэшируем только боевую сборку, а
+    // оставшуюся с прошлых запусков регистрацию снимаем.
+    if (process.env.NODE_ENV !== "production") {
+      navigator.serviceWorker.getRegistrations().then((все) => все.forEach((р) => р.unregister()));
+      return;
+    }
     // Админ-панель офлайн не нужна: это закрытый инструмент, и держать
     // её страницы в кэше устройства ни к чему.
     if (pathname.startsWith("/admin")) return;

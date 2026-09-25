@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { readPhoto } from "@/lib/photos";
+import { readPhoto, типФото } from "@/lib/photos";
 
 export const dynamic = "force-dynamic";
 
@@ -17,12 +17,16 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   const dataUrl = await readPhoto(id);
   if (!dataUrl) return new NextResponse(null, { status: 404 });
 
-  const [заголовок, данные] = dataUrl.split(",");
-  const тип = заголовок.match(/data:([^;]+)/)?.[1] ?? "image/jpeg";
+  // Отдаём только картинки: всё прочее, даже если как-то попало в
+  // хранилище, наружу не уходит.
+  const тип = типФото(dataUrl);
+  if (!тип) return new NextResponse(null, { status: 404 });
+  const данные = dataUrl.slice(dataUrl.indexOf(",") + 1);
 
-  return new NextResponse(Buffer.from(данные ?? "", "base64"), {
+  return new NextResponse(Buffer.from(данные, "base64"), {
     headers: {
       "Content-Type": тип,
+      "X-Content-Type-Options": "nosniff",
       // Снимок меняется только вместе с профилем, а адрес при этом тот
       // же — поэтому недолго, но кэшируем.
       "Cache-Control": "private, max-age=3600",

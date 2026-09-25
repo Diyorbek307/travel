@@ -84,7 +84,7 @@ export function SideMenu({ onClose, onTab, currentTab, isPremium, onPremium, onL
               <span className="text-2xl">👑</span>
               <div className="text-left flex-1">
                 <p className="font-bold text-sm" style={{color:GOLD}}>HelloUZ Premium</p>
-                <p className="text-[9px]" style={{color:MUTED}}>{t("pay_no_ads")} · $4.99/{t("pay_month")}</p>
+                <p className="text-[9px]" style={{color:MUTED}}>{t("pay_no_ads")} · 39 000 {t("cur_uzs_word")}{t("prem_per_month")}</p>
               </div>
               <svg className="rtl-flip" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={GOLD} strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>
             </button>

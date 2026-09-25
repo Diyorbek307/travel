@@ -3,7 +3,7 @@
 import { useState } from "react";
 import type { Hotel, Place, Restaurant } from "@/lib/types";
 import { ACCENT_FILL, BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE, ON_GOLD } from "@/lib/theme";
-import { FILTER_TABS } from "@/data/content";
+import { FILTER_TABS, ТИПЫ_МЕСТ } from "@/data/content";
 import type { TKey } from "@/lib/i18n";
 import { useAppContent } from "@/components/content-provider";
 import { useT } from "@/components/lang-provider";
@@ -17,7 +17,10 @@ import { AnimatedBg } from "@/components/animated-bg";
 import { AdInline } from "@/components/ads";
 
 
-export function ExploreScreen({ onPlace, onHotel, onRestaurant, isPremium }:{ onPlace:(p:Place)=>void; onHotel:(h:Hotel)=>void; onRestaurant:(r:Restaurant)=>void; isPremium:boolean }) {
+/** С какого фильтра открыть: плитки «Отели» и «Рестораны» на главной ведут сразу в них. */
+export type ФильтрОбзора = "Отели" | "Рестораны";
+
+export function ExploreScreen({ onPlace, onHotel, onRestaurant, isPremium, начальныйФильтр }:{ onPlace:(p:Place)=>void; onHotel:(h:Hotel)=>void; onRestaurant:(r:Restaurant)=>void; isPremium:boolean; начальныйФильтр?:ФильтрОбзора }) {
   const { HOTELS, PLACES, RESTAURANTS } = useAppContent();
   const { t, трК } = useT();
   const погода = useWeather(); // настоящая погода города (Open-Meteo)
@@ -31,24 +34,10 @@ export function ExploreScreen({ onPlace, onHotel, onRestaurant, isPremium }:{ on
     "Музеи": "f_museums", "Природа": "f_nature", "Базары": "f_bazaars",
     "Отели": "home_hotels", "Рестораны": "home_restaurants",
   };
-  // Какие типы мест попадают под фильтр. Раньше тип сверялся первыми
-  // четырьмя буквами названия фильтра, и «История» находила единственное
-  // место с типом ровно «История» — мавзолеи, крепости, площади и минареты
-  // из неё выпадали, хотя это она и есть.
-  //
-  // Сверяем с typeRu: на карточке тип уже переведён, и в неродном языке
-  // сравнение с русским словом не сошлось бы ни разу.
-  const типыФильтра: Record<string, string[]> = {
-    "История": ["История", "Мавзолей", "Крепость", "Площадь", "Минарет", "Старый город"],
-    "Мечети": ["Мечеть"],
-    "Музеи": ["Музей"],
-    "Природа": ["Природа"],
-    "Базары": ["Базары"],
-  };
-  const [filter, setFilter] = useState("Всё");
+  const [filter, setFilter] = useState<string>(начальныйФильтр ?? "Всё");
   const showHotels = filter==="Отели";
   const showRests  = filter==="Рестораны";
-  const filtered = PLACES.filter(p=> filter==="Всё" || (типыФильтра[filter] ?? []).includes(p.typeRu ?? p.type));
+  const filtered = PLACES.filter(p=> filter==="Всё" || (ТИПЫ_МЕСТ[filter] ?? []).includes(p.typeRu ?? p.type));
   return (
     <div className="flex flex-col h-full" style={{background:CREAM}}>
       <div className="relative pt-14 pb-3 overflow-hidden border-b" style={{borderColor:BORDER,background:ACCENT_FILL}}>
@@ -84,7 +73,10 @@ export function ExploreScreen({ onPlace, onHotel, onRestaurant, isPremium }:{ on
         ))}
         {!showHotels&&!showRests&&(
           <>
-            {filter==="Всё"&&(
+            {filter==="Всё"&&PLACES.length===0&&(
+              <p className="py-10 text-center text-sm sm:col-span-2 xl:col-span-3" style={{color:MUTED}}>{t("explore_empty")}</p>
+            )}
+            {filter==="Всё"&&PLACES[0]&&(
               <button onClick={()=>onPlace(PLACES[0])} className="w-full relative rounded-2xl overflow-hidden shadow-sm text-left active:scale-[0.98] sm:col-span-2 xl:col-span-3" style={{height:180}}>
                 <img src={PLACES[0].img} alt={PLACES[0].name} className="w-full h-full object-cover"/>
                 <div className="absolute inset-0" style={{background:"linear-gradient(to top,rgba(0,0,0,0.7) 0%,transparent 55%)"}}/>
@@ -108,7 +100,5 @@ export function ExploreScreen({ onPlace, onHotel, onRestaurant, isPremium }:{ on
     </div>
   );
 }
-
-// ── Map Screen ─────────────────────────────────────────────────────────────────
 
 export default ExploreScreen;

@@ -43,6 +43,12 @@ export interface User {
   phone: string;
   /** Почта подтверждена кодом из письма. */
   emailVerified: boolean;
+  /**
+   * До какого момента оплачен Premium. Ставит владелец в панели, увидев
+   * платёж: автоматической проверки оплаты пока нет. Поле появилось
+   * позже остальных, поэтому у старых записей его может не быть.
+   */
+  premiumUntil?: string | null;
   createdAt: string;
   lastSeenAt: string;
 }
@@ -240,6 +246,38 @@ export async function updateUser(
   });
 }
 
+
+/**
+ * Продлить Premium на несколько месяцев или снять (месяцев = 0).
+ *
+ * Продление считается от текущего срока, если он ещё не истёк: человек,
+ * оплативший заранее, не теряет оставшиеся дни. Считается внутри очереди
+ * хранилища, чтобы два нажатия подряд не прочитали один и тот же срок.
+ */
+export async function продлитьPremium(id: string, месяцев: number): Promise<User | null> {
+  return хранилище.update<User | null>((users) => {
+    const i = users.findIndex((u) => u.id === id);
+    if (i === -1) return [users, null];
+
+    let до: string | null = null;
+    if (месяцев > 0) {
+      const сейчас = new Date();
+      const прежний = users[i].premiumUntil ? new Date(users[i].premiumUntil as string) : null;
+      const от = прежний && прежний > сейчас ? прежний : сейчас;
+      от.setMonth(от.getMonth() + месяцев);
+      до = от.toISOString();
+    }
+
+    const копия = [...users];
+    копия[i] = { ...копия[i], premiumUntil: до };
+    return [копия, копия[i]];
+  });
+}
+
+/** Действует ли Premium прямо сейчас. */
+export function premiumАктивен(u: { premiumUntil?: string | null }): boolean {
+  return Boolean(u.premiumUntil && new Date(u.premiumUntil).getTime() > Date.now());
+}
 
 /* ------------------------------------------------------------------ */
 /* Подтверждение почты                                                */

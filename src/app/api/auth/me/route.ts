@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { savePhoto, deletePhoto } from "@/lib/photos";
+import { savePhoto, deletePhoto, фотоГодится } from "@/lib/photos";
 import {
   deleteUser,
   findById,
@@ -29,7 +29,10 @@ export async function GET() {
   if (!userId) return NextResponse.json({ user: null }, { headers: { "Cache-Control": "no-store" } });
 
   const user = await findById(userId);
-  if (!user) return NextResponse.json({ user: null }, { headers: { "Cache-Control": "no-store" } });
+  // Неподтверждённая почта — не вход, как и в остальных маршрутах.
+  if (!user?.emailVerified) {
+    return NextResponse.json({ user: null }, { headers: { "Cache-Control": "no-store" } });
+  }
 
   await touchUser(user.id);
 
@@ -57,9 +60,10 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: "bad_json" }, { status: 400 });
   }
 
-  // Фото — отдельным хранилищем: пустая строка/ null убирает снимок.
+  // Фото — отдельным хранилищем: пустая строка или null убирает снимок.
   let hasPhoto: boolean | undefined;
   if (typeof body.photo === "string" && body.photo.startsWith("data:")) {
+    if (!фотоГодится(body.photo)) return NextResponse.json({ error: "photo_too_large" }, { status: 400 });
     await savePhoto(userId, body.photo);
     hasPhoto = true;
   } else if (body.photo === null || body.photo === "") {

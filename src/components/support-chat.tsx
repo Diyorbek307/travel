@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ACCENT_FILL, BORDER, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE, ON_GOLD } from "@/lib/theme";
+import { ACCENT_FILL, BORDER, GOLD, MUTED, TEXT, WHITE, SURFACE, ON_GOLD } from "@/lib/theme";
 import { useT } from "@/components/lang-provider";
 
 /**
@@ -23,8 +23,9 @@ interface Message {
 const ОПРОС_МС = 5000;
 
 export default function SupportChat({ onBack }: { onBack: () => void }) {
-  const { t } = useT();
+  const { t, lang } = useT();
   const [messages, setMessages] = useState<Message[]>([]);
+  const [ошибка, setОшибка] = useState(false);
   const [text, setText] = useState("");
   const [загрузка, setЗагрузка] = useState(true);
   const [отправка, setОтправка] = useState(false);
@@ -57,17 +58,21 @@ export default function SupportChat({ onBack }: { onBack: () => void }) {
     if (!значение) return;
 
     setОтправка(true);
+    setОшибка(false);
     setText("");
     try {
-      await fetch("/api/support", {
+      const res = await fetch("/api/support", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: значение }),
       });
+      if (!res.ok) throw new Error(String(res.status));
       await подтянуть();
     } catch {
-      // Вернём текст в поле, чтобы человек не набирал заново.
+      // Сеть или отказ сервера: возвращаем текст в поле, чтобы человек
+      // не набирал заново, и честно говорим, что не ушло.
       setText(значение);
+      setОшибка(true);
     } finally {
       setОтправка(false);
     }
@@ -120,7 +125,9 @@ export default function SupportChat({ onBack }: { onBack: () => void }) {
                 }
               >
                 <p className="whitespace-pre-wrap break-words">{m.text}</p>
-                <p className="mt-1 text-[10px] opacity-60">{m.createdAt.slice(11, 16)}</p>
+                <p className="mt-1 text-[10px] opacity-60">
+                  {new Date(m.createdAt).toLocaleTimeString(lang, { hour: "2-digit", minute: "2-digit" })}
+                </p>
               </div>
             </div>
           );
@@ -128,6 +135,11 @@ export default function SupportChat({ onBack }: { onBack: () => void }) {
         <div ref={низ} />
       </div>
 
+      {ошибка && (
+        <p className="shrink-0 px-4 pb-1 text-xs" style={{ color: "#c1603a", background: "var(--cream)" }}>
+          {t("sup_error")}
+        </p>
+      )}
       <form
         onSubmit={отправить}
         className="flex shrink-0 items-center gap-2 p-3"

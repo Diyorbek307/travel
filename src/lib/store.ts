@@ -29,6 +29,15 @@ export async function readContent(): Promise<Content> {
   return { ...SEED, ...(await хранилище.read()) };
 }
 
-export async function writeContent(next: Content): Promise<void> {
-  await хранилище.update(() => [next, undefined]);
+/**
+ * Сохранить присланные разделы.
+ *
+ * Слияние идёт внутри очереди хранилища. Прочитай мы документ снаружи,
+ * как раньше, два редактора, сохранившие разные разделы одновременно,
+ * затёрли бы правку друг друга: каждый писал бы свою старую копию
+ * остального. Заодно в хранилище ложится только то, что правили, а
+ * нетронутые разделы продолжают браться из семян.
+ */
+export async function patchContent(разделы: Partial<Content>): Promise<void> {
+  await хранилище.update((сохранено) => [{ ...сохранено, ...разделы }, undefined]);
 }

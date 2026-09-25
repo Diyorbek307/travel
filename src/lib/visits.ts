@@ -3,50 +3,71 @@
 import { useSyncExternalStore } from "react";
 
 /**
- * Отметки о посещённых городах — на устройстве, без сервера и ключей.
+ * Что человек уже видел — на устройстве, без сервера и ключей.
  *
- * «Цифровой паспорт» собирает штампы по-настоящему: открыл место/отель/
- * ресторан города — получил штамп этого города с датой. Храним в
- * localStorage как { город: датаПервогоВизита(ISO) }. Города — русские
- * ключи из данных (как и у STAMPS), поэтому совпадают напрямую.
+ * Из этого собираются «Цифровой паспорт» и достижения в профиле:
+ *  - города: открыл место, отель или ресторан города — город посещён;
+ *  - места: открыл карточку места — штамп этого места;
+ *  - аудиогиды: включил запись — она засчитана.
+ *
+ * Хранится как { ключ: датаПервогоРаза(ISO) }: дата фиксируется один раз.
+ * Города — русские ключи из данных, места — их id.
  */
 
-const КЛЮЧ = "uzup.visits";
-type Визиты = Record<string, string>;
+type Отметки = Record<string, string>;
+const ПУСТО: Отметки = {};
 
-const ПУСТО: Визиты = {};
+/** Хранилище одного вида отметок в localStorage с подпиской для React. */
+function отметки(ключ: string) {
+  const прочитать = (): Отметки => {
+    if (typeof localStorage === "undefined") return ПУСТО;
+    try {
+      return JSON.parse(localStorage.getItem(ключ) || "{}") as Отметки;
+    } catch {
+      return ПУСТО;
+    }
+  };
 
-function прочитать(): Визиты {
-  if (typeof localStorage === "undefined") return ПУСТО;
-  try {
-    return JSON.parse(localStorage.getItem(КЛЮЧ) || "{}") as Визиты;
-  } catch {
-    return ПУСТО;
-  }
-}
+  let снимок: Отметки = прочитать();
+  const подписчики = new Set<() => void>();
 
-let снимок: Визиты = прочитать();
-const подписчики = new Set<() => void>();
-
-/** Отметить город посещённым (только первый раз — дата фиксируется). */
-export function отметитьВизит(город: string | undefined | null): void {
-  if (!город || typeof localStorage === "undefined") return;
-  const v = прочитать();
-  if (v[город]) return; // уже отмечен — дату не трогаем
-  v[город] = new Date().toISOString();
-  localStorage.setItem(КЛЮЧ, JSON.stringify(v));
-  снимок = v; // новая ссылка → подписчики перерисуются
-  подписчики.forEach((f) => f());
-}
-
-/** Реактивная карта визитов { город: датаISO }. */
-export function useVisits(): Визиты {
-  return useSyncExternalStore(
-    (cb) => {
-      подписчики.add(cb);
-      return () => подписчики.delete(cb);
+  return {
+    /** Отметить впервые. Уже отмечено — дату не трогаем. */
+    отметить(что: string | undefined | null) {
+      if (!что || typeof localStorage === "undefined") return;
+      const v = прочитать();
+      if (v[что]) return;
+      v[что] = new Date().toISOString();
+      try {
+        localStorage.setItem(ключ, JSON.stringify(v));
+      } catch {
+        // Хранилище переполнено или закрыто — отметка просто не сохранится.
+      }
+      снимок = v; // новая ссылка → подписчики перерисуются
+      подписчики.forEach((f) => f());
     },
-    () => снимок,
-    () => ПУСТО,
-  );
+    use(): Отметки {
+      return useSyncExternalStore(
+        (cb) => {
+          подписчики.add(cb);
+          return () => подписчики.delete(cb);
+        },
+        () => снимок,
+        () => ПУСТО,
+      );
+    },
+  };
 }
+
+const города = отметки("uzup.visits");
+const места = отметки("uzup.opened");
+const аудио = отметки("uzup.listened");
+
+export const отметитьВизит = города.отметить;
+export const useVisits = () => города.use();
+
+export const отметитьМесто = места.отметить;
+export const useOpenedPlaces = () => места.use();
+
+export const отметитьПрослушанное = аудио.отметить;
+export const useListened = () => аудио.use();

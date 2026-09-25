@@ -113,6 +113,8 @@ export interface Booking {
   /** Дата поездки или визита — то, что выбрал человек. */
   date: string;
   guests: number;
+  /** Сколько ночей — только у отеля. */
+  nights?: number;
   note: string;
   status: BookingStatus;
   createdAt: string;
@@ -176,6 +178,17 @@ export async function createSos(input: Omit<SosAlert, "id" | "status" | "created
   return s;
 }
 
+/** Оператор взял сигнал в работу — он больше не горит как новый. */
+export async function отметитьSos(sosId: string): Promise<void> {
+  await сигналы.update((все) => {
+    const i = все.findIndex((s) => s.id === sosId);
+    if (i === -1) return [все, undefined];
+    const копия = [...все];
+    копия[i] = { ...копия[i], status: "seen" };
+    return [копия, undefined];
+  });
+}
+
 /* ------------------------------------------------------------------ */
 /* Отзывы                                                             */
 /* ------------------------------------------------------------------ */
@@ -219,8 +232,12 @@ export async function createReview(input: Omit<Review, "id" | "status" | "create
   return отзывы.update<Review>((все) => {
     // Один человек — один отзыв на место. Повторный заменяет прежний,
     // иначе рейтинг накручивается с одного аккаунта.
-    const без = все.filter((r) => !(r.userId === input.userId && r.placeId === input.placeId));
-    return [[...без, отзыв], отзыв];
+    const прежний = все.find((r) => r.userId === input.userId && r.placeId === input.placeId);
+    const без = все.filter((r) => r !== прежний);
+    // Скрытый модератором отзыв остаётся скрытым и после правки: иначе
+    // его обходили бы простой повторной отправкой.
+    const итог = прежний?.status === "hidden" ? { ...отзыв, status: "hidden" as const } : отзыв;
+    return [[...без, итог], итог];
   });
 }
 

@@ -16,6 +16,30 @@ import { значения } from "./storage";
  * Где именно лежит значение — в базе или в файле — решает storage.ts.
  */
 
+/** Какие картинки принимаем. Тип потом уходит в Content-Type ответа. */
+const ТИПЫ = "jpeg|png|webp|gif";
+const ФОРМА = new RegExp(`^data:image/(?:${ТИПЫ});base64,[A-Za-z0-9+/]+=*$`);
+
+/** Снимок профиля, а не фотоархив: data-URL не длиннее 400 000 знаков. */
+export const MAX_PHOTO_CHARS = 400_000;
+
+/**
+ * Годится ли присланное как снимок профиля.
+ *
+ * Проверка не только на размер. Тип из data-URL отдаётся браузеру как
+ * есть, и без неё под видом снимка можно было положить
+ * `data:text/html;base64,...` — страница со скриптом открылась бы с
+ * нашего адреса.
+ */
+export function фотоГодится(dataUrl: string): boolean {
+  return dataUrl.length <= MAX_PHOTO_CHARS && ФОРМА.test(dataUrl);
+}
+
+/** Тип картинки из data-URL, если он из разрешённых. */
+export function типФото(dataUrl: string): string | null {
+  return new RegExp(`^data:(image/(?:${ТИПЫ}));base64,`).exec(dataUrl)?.[1] ?? null;
+}
+
 /** Ключ собираем сами: в идентификаторе могло бы прийти «..». */
 function ключ(userId: string): string {
   return `photo:${userId.replace(/[^\w-]/g, "")}`;

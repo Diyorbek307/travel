@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { PageHeader, Badge, Btn } from "./shared";
+import { PageHeader, Badge, Btn, склонение } from "./shared";
 import { useNarrow } from "../context/useNarrow";
 
 /**
@@ -73,6 +73,18 @@ export default function Chat() {
 
   const ветка = ветки.find((t) => t.userId === активный) ?? null;
 
+  // Турист написал, пока оператор смотрит в его переписку, — это уже
+  // прочитано, незачем держать счётчик «новых».
+  const новыхВОткрытой = ветка && показатьПереписку ? ветка.unreadForStaff : 0;
+  useEffect(() => {
+    if (!активный || новыхВОткрытой === 0) return;
+    fetch("/api/admin/support", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId: активный, markRead: true }),
+    }).catch(() => {});
+  }, [активный, новыхВОткрытой]);
+
   useEffect(() => {
     низ.current?.scrollIntoView({ block: "end" });
   }, [ветка?.messages.length]);
@@ -94,11 +106,16 @@ export default function Chat() {
     const значение = текст.trim();
     if (!значение || !активный) return;
     setТекст("");
-    await fetch("/api/admin/support", {
+    const res = await fetch("/api/admin/support", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ userId: активный, text: значение }),
-    }).catch(() => setТекст(значение));
+    }).catch(() => null);
+    // Не ушло — возвращаем текст, чтобы оператор не набирал заново.
+    if (!res?.ok) {
+      setТекст(значение);
+      setОшибка("Ответ не отправлен — попробуйте ещё раз");
+    }
     подтянуть();
   }
 
@@ -111,8 +128,8 @@ export default function Chat() {
         subtitle={
           загрузка
             ? "Загружаем…"
-            : `${ветки.length} ${ветки.length === 1 ? "переписка" : "переписок"}` +
-              (всегоНепрочитанных ? ` · ${всегоНепрочитанных} новых` : "")
+            : склонение(ветки.length, ["переписка", "переписки", "переписок"]) +
+              (всегоНепрочитанных ? ` · новых: ${всегоНепрочитанных}` : "")
         }
       />
 
@@ -242,7 +259,7 @@ export default function Chat() {
                       color: "var(--color-text)",
                     }}
                   />
-                  <Btn small>Отправить</Btn>
+                  <Btn small type="submit">Отправить</Btn>
                 </form>
               </>
             )}

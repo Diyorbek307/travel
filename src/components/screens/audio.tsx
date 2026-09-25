@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { Place } from "@/lib/types";
 import { ACCENT_FILL, BORDER, CREAM, GREEN, MUTED, TEXT, WHITE, ACCENT_SOFT } from "@/lib/theme";
 import { PRACTICAL } from "@/data/content";
 import { useAppContent } from "@/components/content-provider";
@@ -10,6 +9,7 @@ import { useCurrency } from "@/components/currency-provider";
 import { OfflinePacks } from "@/components/widgets";
 import { AdInline } from "@/components/ads";
 import QrScanner, { КнопкаСканера } from "@/components/qr-scanner";
+import { useAudioPlayer, времяЗвука } from "@/components/audio-player";
 
 /**
  * Аудиогиды.
@@ -26,39 +26,38 @@ import QrScanner, { КнопкаСканера } from "@/components/qr-scanner";
  * когда корейских записей нет ни одной, значит обещать несуществующее.
  */
 
-function времяИзСекунд(с: number): string {
-  if (!с) return "";
-  const м = Math.floor(с / 60);
-  return `${м}:${String(с % 60).padStart(2, "0")}`;
-}
-
 export function AudioScreen({
-  onPlay,
   isPremium,
   сразуИграть,
 }: {
-  onPlay: (p: Place) => void;
   isPremium: boolean;
   /** Номер записи из кода на табличке: её включаем не дожидаясь нажатия. */
   сразуИграть?: string | null;
 }) {
-  const { AUDIO, PLACES } = useAppContent();
+  const { AUDIO } = useAppContent();
+  const плеер = useAudioPlayer();
   const { t, трК, lang } = useT();
   // Живой курс для карточки «Валюта»: вписанный в данные уже устарел.
   const { rates } = useCurrency();
   const курсUZS = rates["UZS"];
   const [язык, setЯзык] = useState<string | null>(null);
   const [сканер, setСканер] = useState(false);
-  const [играет, setИграет] = useState<string | null>(null);
-  const [ошибка, setОшибка] = useState<string | null>(null);
+  const [плохойКод, setПлохойКод] = useState(false);
+  const играет = плеер.играет ? плеер.запись?.id ?? null : null;
   /*
-   * Подсказка, а не ошибка. Браузеры повсеместно не дают включить звук
-   * без нажатия, и после кода на табличке человек упирается именно в это.
-   * Красная плашка тут пугает зря: ничего не сломалось, нужно одно
+   * «tap» — подсказка, а не ошибка. Браузеры повсеместно не дают включить
+   * звук без нажатия, и после кода на табличке человек упирается именно в
+   * это. Красная плашка тут пугает зря: ничего не сломалось, нужно одно
    * касание.
    */
-  const [нужноНажать, setНужноНажать] = useState(false);
-  const проигрыватель = useRef<HTMLAudioElement | null>(null);
+  const нужноНажать = плеер.ошибка === "tap";
+  const ошибка = плохойКод
+    ? t("audio_bad_code")
+    : плеер.ошибка === "blocked"
+      ? t("audio_blocked")
+      : плеер.ошибка === "failed"
+        ? t("audio_failed")
+        : null;
 
   // Языки только те, на которых записи действительно есть.
   const языки = useMemo(() => Array.from(new Set(AUDIO.map((а) => а.lang))), [AUDIO]);
@@ -87,45 +86,8 @@ export function AudioScreen({
       id = текст.trim();
     }
     const найдено = AUDIO.find((а) => а.id === id);
-    if (найдено) включить(найдено.id, найдено.url, найдено.placeId);
-    else setОшибка(t("audio_bad_code"));
-  }
-
-  function включить(id: string, url: string, placeId: string, самоНачало = false) {
-    setОшибка(null);
-    setНужноНажать(false);
-
-    if (играет === id) {
-      проигрыватель.current?.pause();
-      setИграет(null);
-      return;
-    }
-
-    проигрыватель.current?.pause();
-    const звук = new Audio(url);
-    звук.onerror = () => {
-      setИграет(null);
-      setОшибка(t("audio_failed"));
-    };
-    звук.onended = () => setИграет(null);
-    проигрыватель.current = звук;
-
-    звук
-      .play()
-      .then(() => {
-        setИграет(id);
-        // Мини-проигрыватель внизу показывает место, о котором рассказ.
-        const место = PLACES.find((п) => п.id === placeId);
-        if (место) onPlay(место);
-      })
-      .catch((e: unknown) => {
-        // NotAllowedError — это автозапуск без жеста, тут правда надо
-        // нажать ещё раз. Всё остальное (файла нет, формат не тот) —
-        // проблема самой записи, и «нажмите ещё раз» только злит.
-        const запрет = e instanceof DOMException && e.name === "NotAllowedError";
-        if (самоНачало && запрет) setНужноНажать(true);
-        else setОшибка(запрет ? t("audio_blocked") : t("audio_failed"));
-      });
+    setПлохойКод(!найдено);
+    if (найдено) плеер.включить(найдено);
   }
 
   /*
@@ -138,17 +100,14 @@ export function AudioScreen({
     if (!сразуИграть || ужеВключили.current === сразуИграть) return;
     const запись = AUDIO.find((а) => а.id === сразуИграть);
     if (!запись) {
-      if (AUDIO.length) setОшибка(t("audio_bad_code"));
+      if (AUDIO.length) setПлохойКод(true);
       return;
     }
     ужеВключили.current = сразуИграть;
-    включить(запись.id, запись.url, запись.placeId, true);
+    плеер.включить(запись, true);
     // Список приходит с сервера, поэтому ждём именно его.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [сразуИграть, AUDIO]);
-
-  // Уходя с экрана, звук выключаем: иначе он продолжает играть из ниоткуда.
-  useEffect(() => () => проигрыватель.current?.pause(), []);
 
   return (
     <div className="flex h-full flex-col" style={{ background: CREAM }}>
@@ -237,12 +196,15 @@ export function AudioScreen({
                       </p>
                       <p className="mt-0.5 truncate text-xs" style={{ color: MUTED }}>
                         {трК(а.placeName)} · {трК(а.lang)}
-                        {а.seconds ? ` · ${времяИзСекунд(а.seconds)}` : ""}
+                        {а.seconds ? ` · ${времяЗвука(а.seconds)}` : ""}
                       </p>
                     </div>
                     <button
-                      onClick={() => включить(а.id, а.url, а.placeId)}
-                      aria-label={это ? "Пауза" : "Слушать"}
+                      onClick={() => {
+                        setПлохойКод(false);
+                        плеер.включить(а);
+                      }}
+                      aria-label={это ? t("d_pause") : t("d_listen")}
                       className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl"
                       style={{ background: это ? GREEN : ACCENT_SOFT }}
                     >

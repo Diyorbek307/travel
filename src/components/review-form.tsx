@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BORDER, GOLD, MUTED, TEXT, WHITE, SURFACE, ON_GOLD } from "@/lib/theme";
+import { BORDER, GOLD, MUTED, TEXT, SURFACE, ON_GOLD } from "@/lib/theme";
 import { useT } from "@/components/lang-provider";
+import { датаСловами } from "@/lib/i18n";
 
 /**
  * Отзывы о месте.
@@ -16,9 +17,11 @@ import { useT } from "@/components/lang-provider";
 
 interface Review {
   id: string;
+  userId: string;
   rating: number;
   text: string;
   createdAt: string;
+  status?: "published" | "hidden";
   /** Имя автора. У отзывов, оставленных до его сохранения, отсутствует. */
   userName?: string;
 }
@@ -34,7 +37,7 @@ function Звёзды({ n, размер = 14 }: { n: number; размер?: numb
 
 export default function ReviewForm({ placeId, placeName }: { placeId: string; placeName: string }) {
   const [отзывы, setОтзывы] = useState<Review[]>([]);
-  const { t } = useT();
+  const { t, lang } = useT();
   const [rating, setRating] = useState(5);
   const [text, setText] = useState("");
   const [итог, setИтог] = useState<"нет" | "ок" | "нужен-вход" | "ошибка">("нет");
@@ -66,7 +69,12 @@ export default function ReviewForm({ placeId, placeName }: { placeId: string; pl
         return;
       }
       const d = (await res.json()) as { review: Review };
-      setОтзывы((p) => [d.review, ...p.filter((r) => r.id !== d.review.id)]);
+      // Прежний отзыв этого человека заменяется новым. Скрытый модератором
+      // так и остаётся скрытым — в общий список его не ставим.
+      setОтзывы((p) => {
+        const без = p.filter((r) => r.userId !== d.review.userId);
+        return d.review.status === "hidden" ? без : [d.review, ...без];
+      });
       setText("");
       setИтог("ок");
     } catch {
@@ -80,7 +88,7 @@ export default function ReviewForm({ placeId, placeName }: { placeId: string; pl
     отзывы.length > 0 ? (отзывы.reduce((s, r) => s + r.rating, 0) / отзывы.length).toFixed(1) : null;
 
   return (
-    <section className="mx-4 mb-4 rounded-2xl p-4" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
+    <section className="mb-4 rounded-2xl p-4" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <p className="text-sm font-bold" style={{ color: TEXT, fontFamily:"var(--font-heading)" }}>
           {t("rev_title")}
@@ -101,7 +109,7 @@ export default function ReviewForm({ placeId, placeName }: { placeId: string; pl
               onClick={() => setRating(n)}
               aria-label={`${n} из 5`}
               className="px-0.5 text-xl"
-              style={{ color: n <= rating ? GOLD : "rgba(0,0,0,0.18)" }}
+              style={{ color: n <= rating ? GOLD : "color-mix(in srgb, var(--muted) 40%, transparent)" }}
             >
               ★
             </button>
@@ -155,7 +163,7 @@ export default function ReviewForm({ placeId, placeName }: { placeId: string; pl
                   </span>
                 )}
                 <span className="text-[11px]" style={{ color: MUTED }}>
-                  {r.createdAt.slice(0, 10)}
+                  {датаСловами(new Date(r.createdAt), lang, "short")}
                 </span>
               </div>
               {r.text && (

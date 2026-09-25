@@ -16,7 +16,7 @@ import {
   SplashScreen,
 } from "@/components/onboarding";
 import HomeScreen from "@/components/screens/home";
-import ExploreScreen from "@/components/screens/explore";
+import ExploreScreen, { type ФильтрОбзора } from "@/components/screens/explore";
 import MapScreen from "@/components/screens/map";
 import AudioScreen from "@/components/screens/audio";
 import ProfileScreen from "@/components/screens/profile";
@@ -31,9 +31,10 @@ import { LangProvider } from "@/components/lang-provider";
 import { WeatherProvider } from "@/components/weather-provider";
 import { CurrencyProvider } from "@/components/currency-provider";
 import { GeoProvider } from "@/components/geo-provider";
+import { AudioPlayerProvider } from "@/components/audio-player";
 import { AuthSplash, LoginScreen, RegisterScreen } from "@/components/auth-screens";
 import NativeBack from "@/components/native-back";
-import { отметитьВизит } from "@/lib/visits";
+import { отметитьВизит, отметитьМесто } from "@/lib/visits";
 import { инитТему } from "@/lib/settings";
 import type { Hotel, Place, PublicUser, Restaurant, Route, Tab } from "@/lib/types";
 import WelcomeWow from "@/components/welcome-wow";
@@ -68,30 +69,6 @@ type Detail =
  */
 type Phase = "checking" | "splash" | "register" | "login" | "lang" | "interests" | "welcome" | "app";
 
-/**
- * Язык по настройкам телефона.
- *
- * Приложение поставит и иностранец, и открывать его на русском только
- * потому, что мы в Узбекистане, — неуважительно. Берём язык системы и
- * подставляем его в список первым выбором.
- */
-function языкУстройства(): string {
-  const код = (typeof navigator !== "undefined" ? navigator.language : "ru").slice(0, 2).toLowerCase();
-  const карта: Record<string, string> = {
-    en: "🇬🇧 English",
-    ru: "🇷🇺 Русский",
-    uz: "🇺🇿 O'zbek",
-    zh: "🇨🇳 中文",
-    ko: "🇰🇷 한국어",
-    de: "🇩🇪 Deutsch",
-    fr: "🇫🇷 Français",
-    ja: "🇯🇵 日本語",
-    tr: "🇹🇷 Türkçe",
-    ar: "🇸🇦 العربية",
-  };
-  return карта[код] ?? "🇬🇧 English";
-}
-
 export default function Page() {
   return (
     <ContentProvider>
@@ -99,7 +76,9 @@ export default function Page() {
         <WeatherProvider>
           <CurrencyProvider>
             <GeoProvider>
-              <App />
+              <AudioPlayerProvider>
+                <App />
+              </AudioPlayerProvider>
             </GeoProvider>
           </CurrencyProvider>
         </WeatherProvider>
@@ -110,7 +89,6 @@ export default function Page() {
 
 function App() {
   const [phase, setPhase] = useState<Phase>("checking");
-  const [lang, setLang] = useState(языкУстройства);
   const [user, setUser] = useState<PublicUser | null>(null);
   const [tab, setTab] = useState<Tab>("home");
   const [detail, setDetail] = useState<Detail | null>(null);
@@ -133,10 +111,13 @@ function App() {
   const [showFavorites, setShowFavorites] = useState(false);
   const [showTrip, setShowTrip] = useState(false);
   // С какого раздела открыть профиль, когда в него ведут из меню.
-  const [profileView, setProfileView] = useState<"stats"|undefined>(undefined);
+  const [profileView, setProfileView] = useState<"stats" | "bookings" | "support" | undefined>(undefined);
+  // С какого фильтра открыть «Исследовать», когда ведут с главной.
+  const [фильтрОбзора, setФильтрОбзора] = useState<ФильтрОбзора | undefined>(undefined);
 
-  const [isPremium, setIsPremium] = useState(false);
-  const [miniAudio, setMiniAudio] = useState<Place | null>(null);
+  // Premium включает владелец в панели, увидев оплату, — приложение
+  // только читает срок из аккаунта.
+  const isPremium = Boolean(user?.premiumUntil && new Date(user.premiumUntil).getTime() > Date.now());
   const [toast, setToast] = useState<string | null>(null);
 
   // Кинематографичная заставка при запуске — полная версия каждый раз
@@ -150,13 +131,14 @@ function App() {
   // Перемонтирует содержимое вкладки, чтобы въезд проигрывался заново.
   const [tabKey, setTabKey] = useState(0);
 
-  // Кто вошёл. Сессия живёт три месяца и продлевается при каждом
-  // запуске, поэтому постоянный пользователь пароль больше не вводит.
-  // Применяем сохранённую тему сразу при запуске (по умолчанию светлая).
+  // Сохранённую тему применяем сразу при запуске; по умолчанию она
+  // следует за системой телефона.
   useEffect(() => {
     инитТему();
   }, []);
 
+  // Кто вошёл. Сессия живёт три месяца и продлевается при каждом
+  // запуске, поэтому постоянный пользователь пароль больше не вводит.
   useEffect(() => {
     let cancelled = false;
     fetch("/api/auth/me")
@@ -184,7 +166,9 @@ function App() {
   const переход = () => setNavCount((n) => n + 1);
 
   const openPlace = (value: Place) => {
-    отметитьВизит(value.city); // штамп города в «Цифровой паспорт»
+    // Город и само место — в «Цифровой паспорт»: у места свой штамп.
+    отметитьВизит(value.city);
+    отметитьМесто(value.id);
     setDetail({ kind: "place", value });
     setTab("explore");
     переход();
@@ -249,6 +233,7 @@ function App() {
     setShowFavorites(false);
     setShowTrip(false);
     setProfileView(undefined);
+    setФильтрОбзора(undefined);
     setDetail(null);
     // Смена вкладки — тоже переход: так полноэкранная реклама выходит и
     // при обычном перелистывании разделов, а не только при открытии
@@ -256,6 +241,12 @@ function App() {
     if (next !== tab) переход();
     setTab(next);
     setTabKey((k) => k + 1);
+  };
+
+  const openExplore = (фильтр?: ФильтрОбзора) => {
+    switchTab("explore");
+    // После switchTab: он сбрасывает фильтр, а нам нужен выбранный.
+    setФильтрОбзора(фильтр);
   };
 
   const logout = async () => {
@@ -339,19 +330,13 @@ function App() {
 
         {phase === "lang" && (
           <div className="overlay-screen device-safe-top absolute inset-0 z-40">
-            <OnboardingLang
-              defaultLang={lang}
-              onNext={(picked) => {
-                setLang(picked);
-                setPhase("interests");
-              }}
-            />
+            <OnboardingLang onNext={() => setPhase("interests")} />
           </div>
         )}
 
         {phase === "interests" && (
           <div className="overlay-screen device-safe-top absolute inset-0 z-40">
-            <OnboardingInterests lang={lang} onDone={() => setPhase("welcome")} />
+            <OnboardingInterests onDone={() => setPhase("welcome")} />
           </div>
         )}
 
@@ -375,7 +360,16 @@ function App() {
                 }}
               />
             )}
-            {showNotifs && <NotifsPanel onClose={() => setShowNotifs(false)} />}
+            {showNotifs && (
+              <NotifsPanel
+                onClose={() => setShowNotifs(false)}
+                onOpen={(раздел) => {
+                  switchTab("profile");
+                  // После switchTab: он сбрасывает раздел профиля.
+                  setProfileView(раздел);
+                }}
+              />
+            )}
             {showPractical && (
               <div className="overlay-screen absolute inset-0 z-40">
                 <PracticalScreen onBack={() => setShowPractical(false)} />
@@ -435,13 +429,7 @@ function App() {
               />
             )}
             {showPremium && (
-              <PremiumModal
-                onClose={() => setShowPremium(false)}
-                onActivate={() => {
-                  setIsPremium(true);
-                  setShowPremium(false);
-                }}
-              />
+              <PremiumModal onClose={() => setShowPremium(false)} />
             )}
 
             <div className="device-content flex-1 overflow-hidden">
@@ -457,10 +445,11 @@ function App() {
                   onRestaurant={openRestaurant}
                   onПуть={openПуть}
                   profileView={profileView}
+                  фильтрОбзора={фильтрОбзора}
+                  onExplore={openExplore}
                   кодЗаписи={кодЗаписи}
                   onTab={switchTab}
                   onToast={showToast}
-                  onPlay={setMiniAudio}
                   onSearch={(q?: string) => {
                     setSearchQuery(q ?? "");
                     setShowSearch(true);
@@ -475,7 +464,7 @@ function App() {
               </div>
             </div>
 
-            {miniAudio && <MiniPlayer place={miniAudio} onClose={() => setMiniAudio(null)} />}
+            <MiniPlayer />
             {toast && <Toast msg={toast} onDone={() => setToast(null)} />}
 
             {/* Полноэкранная видео-реклама: сама решает, показываться ли,
@@ -500,11 +489,12 @@ interface ScreenProps {
   onHotel: (h: Hotel) => void;
   onRestaurant: (r: Restaurant) => void;
   onПуть: (название: string, город: string) => void;
-  profileView?: "stats";
+  profileView?: "stats" | "bookings" | "support";
+  фильтрОбзора?: ФильтрОбзора;
+  onExplore: (f?: ФильтрОбзора) => void;
   кодЗаписи: string | null;
   onTab: (t: Tab) => void;
   onToast: (msg: string) => void;
-  onPlay: (p: Place) => void;
   onSearch: (q?: string) => void;
   onNotifs: () => void;
   onPractical: () => void;
@@ -529,21 +519,15 @@ function Screen({ tab, detail, ...p }: ScreenProps) {
           <PlaceDetail
             place={detail.value}
             onBack={p.onCloseDetail}
-            onPlay={p.onPlay}
             onToast={p.onToast}
             onПуть={p.onПуть}
           />
         );
       case "hotel":
-        return <HotelDetail hotel={detail.value} onBack={p.onCloseDetail} onToast={p.onToast} />;
+        return <HotelDetail hotel={detail.value} onBack={p.onCloseDetail} />;
       case "restaurant":
         return (
-          <RestaurantDetail
-            r={detail.value}
-            onBack={p.onCloseDetail}
-            onToast={p.onToast}
-            onПуть={p.onПуть}
-          />
+          <RestaurantDetail r={detail.value} onBack={p.onCloseDetail} onПуть={p.onПуть} />
         );
       case "route":
         return <RouteDetail route={detail.value} onBack={p.onCloseDetail} onПуть={p.onПуть} onToast={p.onToast} />;
@@ -571,6 +555,7 @@ function Screen({ tab, detail, ...p }: ScreenProps) {
           onRestaurant={p.onRestaurant}
           onMenu={p.onMenu}
           onTab={p.onTab}
+          onExplore={p.onExplore}
           onTransport={p.onTransport}
           onToast={p.onToast}
           isPremium={p.isPremium}
@@ -583,13 +568,14 @@ function Screen({ tab, detail, ...p }: ScreenProps) {
           onHotel={p.onHotel}
           onRestaurant={p.onRestaurant}
           isPremium={p.isPremium}
+          начальныйФильтр={p.фильтрОбзора}
         />
       );
     case "map":
       return <MapScreen onRoute={p.onRoute} onAudio={() => p.onTab("audio")} />;
     case "audio":
-      return <AudioScreen onPlay={p.onPlay} isPremium={p.isPremium} сразуИграть={p.кодЗаписи} />;
+      return <AudioScreen isPremium={p.isPremium} сразуИграть={p.кодЗаписи} />;
     case "profile":
-      return <ProfileScreen onLogout={p.onLogout} user={p.user} startView={p.profileView} />;
+      return <ProfileScreen onLogout={p.onLogout} user={p.user} isPremium={p.isPremium} startView={p.profileView} />;
   }
 }

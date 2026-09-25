@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import AdminShell from "@/admin/shell";
-import { NotifProvider } from "@/admin/context/NotifContext";
 import { ThemeProvider } from "@/admin/context/ThemeContext";
 import { ContentProvider } from "@/admin/context/ContentContext";
 
@@ -22,13 +21,11 @@ export default function AdminApp() {
 
   return (
     <ThemeProvider>
-      <NotifProvider>
-        <ContentProvider>
-          <div className="admin-root">
-            <AdminShell />
-          </div>
-        </ContentProvider>
-      </NotifProvider>
+      <ContentProvider>
+        <div className="admin-root">
+          <AdminShell />
+        </div>
+      </ContentProvider>
     </ThemeProvider>
   );
 }

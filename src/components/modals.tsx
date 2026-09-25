@@ -2,45 +2,40 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useT } from "@/components/lang-provider";
-import { useПрочитанные, отметитьПрочитанным } from "@/lib/notifs-read";
+import { отметитьПрочитанным } from "@/lib/notifs-read";
+import { useУведомления, когда } from "@/lib/notifications";
 import type { Place } from "@/lib/types";
-import { ACCENT_FILL, BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE, ACCENT_SOFT, ON_GOLD } from "@/lib/theme";
-import { NOTIFS, SEARCH_POPULAR } from "@/data/content";
+import { ACCENT_FILL, BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE, ACCENT_SOFT, ON_GOLD, мягко } from "@/lib/theme";
+import { SEARCH_POPULAR } from "@/data/content";
 import { useAppContent } from "./content-provider";
-import { GeomPattern, LogoMark, StarRow } from "./ui";
-import { AnimatedBg } from "@/components/animated-bg";
+import { GeomPattern, StarRow } from "./ui";
 
 
-export function NotifsPanel({ onClose }:{ onClose:()=>void }) {
-  const { t, трК } = useT();
-  const { PLACES, POPULAR_CITIES } = useAppContent();
-  /*
-   * Прочитанное хранится на устройстве: раньше отметка жила в состоянии
-   * панели и пропадала вместе с ней, а точка на колокольчике оставалась
-   * гореть даже после «Прочитать все».
-   */
-  const прочитанные = useПрочитанные();
-  const notifs = NOTIFS.map((n)=>({ ...n, unread: n.unread && !прочитанные.includes(n.title) }));
+export function NotifsPanel({ onClose, onOpen }:{ onClose:()=>void; onOpen:(раздел:"bookings"|"support")=>void }) {
+  const { t, lang } = useT();
+  // Прочитанное хранится на устройстве: точка на колокольчике гаснет
+  // вместе с отметкой, а не живёт своей жизнью.
+  const notifs = useУведомления();
   const unread = notifs.filter(n=>n.unread).length;
   return (
     <div className="overlay-screen absolute inset-0 z-50 flex flex-col animate-slide-up" style={{background:CREAM}}>
       <div className="bg-white px-4 pt-14 pb-3 border-b" style={{borderColor:BORDER}}>
         <div className="flex items-center justify-between">
-          <div><h2 className="font-bold text-xl" style={{color:TEXT,fontFamily:"var(--font-heading)"}}>{t("prof_notifications")}</h2>{unread>0&&<p className="text-xs mt-0.5" style={{color:GREEN}}>{unread} непрочитанных</p>}</div>
+          <div><h2 className="font-bold text-xl" style={{color:TEXT,fontFamily:"var(--font-heading)"}}>{t("prof_notifications")}</h2>{unread>0&&<p className="text-xs mt-0.5" style={{color:GREEN}}>{t("notif_unread")}: {unread}</p>}</div>
           <div className="flex items-center gap-3">
-            {unread>0&&<button onClick={()=>отметитьПрочитанным(NOTIFS.map(n=>n.title))} className="text-xs font-semibold" style={{color:GREEN}}>{t("notif_read_all")}</button>}
+            {unread>0&&<button onClick={()=>отметитьПрочитанным(notifs.map(n=>n.id))} className="text-xs font-semibold" style={{color:GREEN}}>{t("notif_read_all")}</button>}
             <button onClick={onClose} className="w-9 h-9 rounded-xl flex items-center justify-center" style={{background:CREAM}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={TEXT} strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
           </div>
         </div>
       </div>
       <div className="flex-1 overflow-y-auto hide-scroll p-4 space-y-2.5">
-        {notifs.map((n,i)=>(
-          <button key={i} onClick={()=>отметитьПрочитанным([n.title])} className="w-full bg-white rounded-2xl p-4 border text-left flex items-start gap-3 shadow-sm" style={{borderColor:n.unread?GREEN:BORDER,borderWidth:n.unread?"1.5px":"1px"}}>
+        {notifs.map((n)=>(
+          <button key={n.id} onClick={()=>{ отметитьПрочитанным([n.id]); if(n.раздел){ onOpen(n.раздел); } }} className="w-full bg-white rounded-2xl p-4 border text-left flex items-start gap-3 shadow-sm" style={{borderColor:n.unread?GREEN:BORDER,borderWidth:n.unread?"1.5px":"1px"}}>
             <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{background:n.unread?ACCENT_SOFT:CREAM}}>{n.emoji}</div>
             <div className="flex-1 min-w-0">
-              <div className="flex items-center justify-between gap-2"><p className="font-bold text-sm" style={{color:TEXT}}>{трК(n.title)}</p>{n.unread&&<div className="w-2 h-2 rounded-full flex-shrink-0" style={{background:ACCENT_FILL}}/>}</div>
-              <p className="text-xs mt-0.5 leading-relaxed" style={{color:MUTED}}>{трК(n.body)}</p>
-              <p className="text-[10px] mt-1.5" style={{color:n.unread?GREEN:MUTED}}>{трК(n.time)}</p>
+              <div className="flex items-center justify-between gap-2"><p className="font-bold text-sm" style={{color:TEXT}}>{n.title}</p>{n.unread&&<div className="w-2 h-2 rounded-full flex-shrink-0" style={{background:ACCENT_FILL}}/>}</div>
+              <p className="text-xs mt-0.5 leading-relaxed whitespace-pre-line" style={{color:MUTED}}>{n.body}</p>
+              {n.время&&<p className="text-[10px] mt-1.5" style={{color:n.unread?GREEN:MUTED}}>{когда(n.время, lang)}</p>}
             </div>
           </button>
         ))}
@@ -119,13 +114,8 @@ export function SearchModal({ onClose, onPlace, initialQuery = "" }:{ onClose:()
   );
 }
 
-// ── Mini Audio Player ──────────────────────────────────────────────────────────
-
-// ── Currency Converter ─────────────────────────────────────────────────────────
-
-export function PremiumModal({ onClose, onActivate }:{ onClose:()=>void; onActivate:()=>void }) {
-  const { t, трК } = useT();
-  const { PLACES, POPULAR_CITIES } = useAppContent();
+export function PremiumModal({ onClose }:{ onClose:()=>void }) {
+  const { t } = useT();
   const [plan, setPlan] = useState<"month"|"year">("year");
   const [идёт, setИдёт] = useState(false);
   const [нетОплаты, setНетОплаты] = useState(false);
@@ -162,8 +152,6 @@ export function PremiumModal({ onClose, onActivate }:{ onClose:()=>void; onActiv
       setИдёт(false);
     }
   }
-  // Пока не пригодилось, но подключение premium остаётся на будущее.
-  void onActivate;
   const PERKS:{e:string;tk:import("@/lib/i18n").TKey;sk:import("@/lib/i18n").TKey}[]=[
     {e:"🚫",tk:"pay_no_ads",sk:"prem_no_ads_sub"},
     {e:"🎧",tk:"prem_all_audio",sk:"prem_all_audio_sub"},
@@ -208,7 +196,7 @@ export function PremiumModal({ onClose, onActivate }:{ onClose:()=>void; onActiv
             </div>
           ))}
         </div>
-        <div className="rounded-2xl p-4 mb-4 border" style={{background:"#FFF9EE",borderColor:GOLD+"44"}}>
+        <div className="rounded-2xl p-4 mb-4 border" style={{background:мягко(GOLD, 12),borderColor:мягко(GOLD, 30)}}>
           <p className="text-xs font-semibold text-center" style={{color:MUTED}}>{t("prem_guarantee")}</p>
         </div>
         <button onClick={оплатить} disabled={идёт} className="w-full py-4 rounded-2xl font-bold text-base mb-2 disabled:opacity-60" style={{background:GOLD,color:ON_GOLD}}>
@@ -225,5 +213,3 @@ export function PremiumModal({ onClose, onActivate }:{ onClose:()=>void; onActiv
     </div>
   );
 }
-
-// ── Settings View ──────────────────────────────────────────────────────────────

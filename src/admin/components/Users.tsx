@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { PageHeader, Badge, Btn, Table, StatCard } from "./shared";
+import { useМеня } from "../context/MeContext";
+import { можетДомен } from "@/lib/admin-roles";
 
 /**
  * Туристы платформы.
@@ -21,6 +23,7 @@ type User = {
   phone: string;
   photoUrl: string | null;
   emailVerified?: boolean;
+  premiumUntil?: string | null;
   createdAt: string;
   lastSeenAt: string;
 };
@@ -48,13 +51,23 @@ function активен(u: User): boolean {
   return Date.now() - new Date(u.lastSeenAt).getTime() < НЕАКТИВЕН_МС;
 }
 
+function premium(u: User): boolean {
+  return Boolean(u.premiumUntil && new Date(u.premiumUntil).getTime() > Date.now());
+}
+
 export default function Users() {
+  const меня = useМеня();
+  // Premium — выдача оплаченной услуги, её кнопки видит только владелец.
+  const можноДеньги = меня ? можетДомен(меня.role, "money") : false;
   const [users, setUsers] = useState<User[]>([]);
   const [загрузка, setЗагрузка] = useState(true);
   const [ошибка, setОшибка] = useState<string | null>(null);
   const [поиск, setПоиск] = useState("");
   const [фильтр, setФильтр] = useState<"all" | "active" | "dormant">("all");
   const [открыт, setОткрыт] = useState<User | null>(null);
+  // Удаление необратимо, поэтому в два нажатия.
+  const [точноУдалить, setТочноУдалить] = useState(false);
+  const [premiumИдёт, setPremiumИдёт] = useState(false);
   const [заявки, setЗаявки] = useState<Reset[]>([]);
   const [скопирован, setСкопирован] = useState<string | null>(null);
   const [коды, setКоды] = useState<Verify[]>([]);
@@ -126,11 +139,34 @@ export default function Users() {
     );
   }
 
+  function открыть(u: User | null) {
+    setОткрыт(u);
+    setТочноУдалить(false);
+  }
+
   async function удалить(id: string) {
     const res = await fetch(`/api/admin/users?id=${encodeURIComponent(id)}`, { method: "DELETE" });
     if (!res.ok) return;
     setUsers((p) => p.filter((u) => u.id !== id));
-    setОткрыт(null);
+    открыть(null);
+  }
+
+  /** Продлить Premium на месяцев (1 или 12) либо снять (0). */
+  async function изменитьPremium(id: string, months: number) {
+    setPremiumИдёт(true);
+    try {
+      const res = await fetch("/api/admin/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, months }),
+      });
+      if (!res.ok) return;
+      const d = (await res.json()) as { user: User };
+      setUsers((p) => p.map((u) => (u.id === id ? d.user : u)));
+      setОткрыт(d.user);
+    } finally {
+      setPremiumИдёт(false);
+    }
   }
 
   let список = users;
@@ -366,6 +402,7 @@ export default function Users() {
               <span className="min-w-0 truncate">
                 {u.firstName} {u.lastName}
               </span>
+              {premium(u) && <Badge label="premium" color="amber" />}
             </span>,
             u.email,
             u.country || "—",
@@ -375,7 +412,7 @@ export default function Users() {
               <Badge label={активен(u) ? "активен" : "спит"} color={активен(u) ? "teal" : "dim"} />
             </span>,
             <span key="a" className="flex gap-2">
-              <Btn variant="ghost" small onClick={() => setОткрыт(u)}>
+              <Btn variant="ghost" small onClick={() => открыть(u)}>
                 Открыть
               </Btn>
             </span>,
@@ -477,17 +514,53 @@ export default function Users() {
               );
             })()}
 
+            {/* Premium. Оплата проверяется глазами: владелец видит поступление
+                в кабинете Payme/Click и продлевает срок здесь. */}
+            <div className="mb-4">
+              <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
+                Premium
+              </p>
+              <p className="mb-2 text-sm" style={{ color: premium(открыт) ? "var(--color-amber)" : "var(--color-muted)" }}>
+                {premium(открыт) ? `Оплачен до ${дата(открыт.premiumUntil ?? "")}` : "Не оплачен"}
+              </p>
+              {можноДеньги ? (
+                <div className="flex flex-wrap gap-2">
+                  <Btn variant="ghost" small onClick={() => изменитьPremium(открыт.id, 1)}>
+                    {premiumИдёт ? "…" : "+1 месяц"}
+                  </Btn>
+                  <Btn variant="ghost" small onClick={() => изменитьPremium(открыт.id, 12)}>
+                    {premiumИдёт ? "…" : "+1 год"}
+                  </Btn>
+                  {premium(открыт) && (
+                    <Btn variant="danger" small onClick={() => изменитьPremium(открыт.id, 0)}>
+                      Снять
+                    </Btn>
+                  )}
+                </div>
+              ) : (
+                <p className="text-xs" style={{ color: "var(--color-faint)" }}>
+                  Выдаёт владелец, когда видит оплату.
+                </p>
+              )}
+            </div>
+
             <p className="mb-4 text-xs" style={{ color: "var(--color-faint)" }}>
               Паспортные данные не собираются.
             </p>
 
             <div className="flex flex-wrap gap-2">
-              <Btn variant="ghost" onClick={() => setОткрыт(null)}>
+              <Btn variant="ghost" onClick={() => открыть(null)}>
                 Закрыть
               </Btn>
-              <Btn variant="danger" onClick={() => удалить(открыт.id)}>
-                Удалить аккаунт
-              </Btn>
+              {точноУдалить ? (
+                <Btn variant="danger" onClick={() => удалить(открыт.id)}>
+                  Да, удалить навсегда
+                </Btn>
+              ) : (
+                <Btn variant="danger" onClick={() => setТочноУдалить(true)}>
+                  Удалить аккаунт
+                </Btn>
+              )}
             </div>
           </div>
         </div>

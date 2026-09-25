@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { требуетсяСекрет, вПродакшене } from "./secrets";
 import { можетДомен, рольСуществует, type AdminRole, type Домен } from "./admin-roles";
+import { findAdminById } from "./admins";
 
 /**
  * Доступ в админ-панель.
@@ -89,7 +90,15 @@ export async function currentAdmin(): Promise<AdminSession | null> {
   if (signature.length !== expected.length) return null;
   if (!timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) return null;
 
-  return { id, role };
+  if (id === ROOT_ID) return role === "owner" ? { id, role } : null;
+
+  // Именная запись: роль и блокировку берём из хранилища, а не из куки.
+  // Токен подписан честно, но выдан до изменений — иначе заблокированный,
+  // удалённый или пониженный сотрудник работал бы со старыми правами
+  // до конца смены.
+  const запись = await findAdminById(id);
+  if (!запись || запись.disabled) return null;
+  return { id, role: запись.role };
 }
 
 function rольOk(x: string): x is AdminRole {

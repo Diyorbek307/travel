@@ -12,15 +12,12 @@ import {
   ждатьДоОтправки,
 } from "@/lib/users";
 import { mailConfigured, mailWorking, sendMail, письмоСКодом } from "@/lib/mail";
-import { savePhoto } from "@/lib/photos";
+import { savePhoto, фотоГодится } from "@/lib/photos";
 
 export const dynamic = "force-dynamic";
 
 /** Простая проверка формы адреса — доставку она не гарантирует. */
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-
-/** Фотография хранится прямо в записи, поэтому ограничена по объёму. */
-const MAX_PHOTO_BYTES = 400_000;
 
 export async function POST(request: Request) {
   if (!подЛимитом(`register:${ipЗапроса(request)}`, 5, 60_000))
@@ -44,8 +41,8 @@ export async function POST(request: Request) {
   if (!firstName) return NextResponse.json({ error: "first_name_required" }, { status: 400 });
   if (!lastName) return NextResponse.json({ error: "last_name_required" }, { status: 400 });
 
-  const photo = typeof body.photo === "string" ? body.photo : null;
-  if (photo && photo.length > MAX_PHOTO_BYTES) {
+  const photo = typeof body.photo === "string" && body.photo ? body.photo : null;
+  if (photo && !фотоГодится(photo)) {
     return NextResponse.json({ error: "photo_too_large" }, { status: 400 });
   }
 
@@ -63,8 +60,6 @@ export async function POST(request: Request) {
     phone: str("phone"),
   });
 
-  // Снимок кладём отдельным файлом: в учётной записи остаётся только
-  // отметка, что он есть.
   // Занятость адреса окончательно решается внутри хранилища: проверка
   // выше отсекает большинство случаев, но при двух одновременных
   // запросах на один адрес оба прошли бы её.
@@ -72,8 +67,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "email_taken" }, { status: 409 });
   }
 
-  // Сессию не выдаём: сперва пусть подтвердит почту кодом из письма.
-  // Иначе на чужой адрес можно завести аккаунт и пользоваться им.
+  // Снимок кладём отдельным значением: в учётной записи остаётся только
+  // отметка, что он есть.
   if (photo) await savePhoto(user.id, photo);
 
   /*
@@ -107,6 +102,8 @@ export async function POST(request: Request) {
     return res;
   }
 
+  // Почта работает — сессию не выдаём, пока человек не подтвердит адрес
+  // кодом из письма. Иначе на чужую почту можно завести аккаунт.
   const code = await createVerification(user.email);
 
   /*

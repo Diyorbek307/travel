@@ -32,6 +32,15 @@ export default function Sos() {
     }
   }, []);
 
+  async function просмотрено(id: string) {
+    const res = await fetch("/api/sos", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    });
+    if (res.ok) setСигналы((p) => p.map((s) => (s.id === id ? { ...s, status: "seen" } : s)));
+  }
+
   useEffect(() => {
     подтянуть();
     // Экстренное — обновляем чаще, чтобы новый сигнал не ждал перезагрузки.
@@ -62,15 +71,26 @@ export default function Sos() {
                     {new Date(s.createdAt).toLocaleString("ru")} · {s.lat.toFixed(5)}, {s.lon.toFixed(5)}
                   </p>
                 </div>
-                <a
-                  href={`https://www.google.com/maps?q=${s.lat},${s.lon}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="rounded-lg px-3 py-2 text-sm font-semibold"
-                  style={{ background: "var(--color-amber)", color: "var(--color-on-accent)" }}
-                >
-                  📍 На карте
-                </a>
+                <div className="flex flex-wrap gap-2">
+                  {s.status === "new" && (
+                    <button
+                      onClick={() => просмотрено(s.id)}
+                      className="rounded-lg px-3 py-2 text-sm font-semibold"
+                      style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)", color: "var(--color-text)" }}
+                    >
+                      ✓ Просмотрено
+                    </button>
+                  )}
+                  <a
+                    href={`https://www.google.com/maps?q=${s.lat},${s.lon}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rounded-lg px-3 py-2 text-sm font-semibold"
+                    style={{ background: "var(--color-amber)", color: "var(--color-on-accent)" }}
+                  >
+                    📍 На карте
+                  </a>
+                </div>
               </div>
             </Card>
           ))}

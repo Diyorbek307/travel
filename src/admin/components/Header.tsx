@@ -1,55 +1,36 @@
 import { мягко } from "@/lib/theme";
 import { useState, useEffect, useRef } from "react";
-import { useNotifs } from "../context/NotifContext";
+import { useУведомления, type Notif } from "../context/NotifContext";
+import { useМеня } from "../context/MeContext";
+import { ROLE_META } from "@/lib/admin-roles";
 import { logout } from "@/app/admin/actions";
 
-const ICON: Record<string, string> = {
-  booking: "◫", review: "◇", chat: "◈", transport: "◉", system: "⬡", payment: "▣",
-};
-const ICON_COLOR: Record<string, string> = {
-  booking: "var(--color-teal)", review: "var(--color-amber)", chat: "var(--color-amber)",
-  transport: "var(--color-rose)", system: "var(--color-muted)", payment: "var(--color-teal)",
+const ICON: Record<Notif["id"], string> = { sos: "🆘", booking: "◫", chat: "◈" };
+const ICON_COLOR: Record<Notif["id"], string> = {
+  sos: "var(--color-rose)",
+  booking: "var(--color-teal)",
+  chat: "var(--color-amber)",
 };
 
-const ALL_SEARCH = [
-  { label: "Дашборд", id: "dashboard", group: "Операции" },
-  { label: "Бронирования", id: "bookings", group: "Операции" },
-  { label: "Чат поддержки", id: "chat", group: "Операции" },
-  { label: "Календарь туров", id: "calendar", group: "Операции" },
-  { label: "Аналитика", id: "analytics", group: "Операции" },
-  { label: "Направления", id: "destinations", group: "Контент" },
-  { label: "Туры", id: "tours", group: "Контент" },
-  { label: "Гиды", id: "guides", group: "Контент" },
-  { label: "Отели", id: "hotels", group: "Контент" },
-  { label: "Рестораны", id: "restaurants", group: "Контент" },
-  { label: "События", id: "events", group: "Контент" },
-  { label: "Города", id: "cities", group: "Контент" },
-  { label: "Пользователи", id: "users", group: "Пользователи" },
-  { label: "Карта геолокации", id: "tracking", group: "Пользователи" },
-  { label: "Отзывы", id: "reviews", group: "Пользователи" },
-  { label: "Реклама", id: "ads", group: "Монетизация" },
-  { label: "Промокоды", id: "promos", group: "Монетизация" },
-  { label: "Финансы", id: "finance", group: "Монетизация" },
-  { label: "Push-кампании", id: "push", group: "Монетизация" },
-  { label: "Транспорт", id: "transport", group: "Транспорт" },
-  { label: "Сотрудники", id: "staff", group: "Система" },
-  { label: "Уведомления", id: "notifs", group: "Система" },
-  { label: "Интеграции", id: "integrations", group: "Система" },
-  { label: "Управление доступом", id: "access", group: "Система" },
-  { label: "Превью приложения", id: "preview", group: "Инструменты" },
-  { label: "Визуальный редактор", id: "theme", group: "Инструменты" },
-  { label: "Настройки", id: "settings", group: "Аккаунт" },
-];
+/** Раздел для поиска: те же пункты, что в меню, — с учётом роли. */
+export interface Раздел {
+  id: string;
+  label: string;
+  group: string;
+}
 
 type Props = {
   active: string;
+  /** Разделы, доступные вошедшему. Поиск не ведёт никуда за их пределы. */
+  разделы: Раздел[];
   onNavigate: (id: string) => void;
   sidebarCollapsed: boolean;
   onToggleSidebar: () => void;
 };
 
-export default function Header({ active, onNavigate, sidebarCollapsed, onToggleSidebar }: Props) {
-  const { notifs, markRead, markAllRead, unreadCount } = useNotifs();
+export default function Header({ active, разделы, onNavigate, sidebarCollapsed, onToggleSidebar }: Props) {
+  const меня = useМеня();
+  const { notifs, markRead, markAllRead, unreadCount } = useУведомления();
   const [showNotifs, setShowNotifs] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [query, setQuery] = useState("");
@@ -84,15 +65,15 @@ export default function Header({ active, onNavigate, sidebarCollapsed, onToggleS
   }, []);
 
   const filtered = query
-    ? ALL_SEARCH.filter(s => s.label.toLowerCase().includes(query.toLowerCase()))
-    : ALL_SEARCH;
+    ? разделы.filter(s => s.label.toLowerCase().includes(query.toLowerCase()))
+    : разделы;
 
-  const grouped = filtered.reduce<Record<string, typeof ALL_SEARCH>>((acc, item) => {
+  const grouped = filtered.reduce<Record<string, Раздел[]>>((acc, item) => {
     (acc[item.group] ||= []).push(item);
     return acc;
   }, {});
 
-  const activePage = ALL_SEARCH.find(s => s.id === active);
+  const activePage = разделы.find(s => s.id === active);
 
   return (
     <>
@@ -128,7 +109,7 @@ export default function Header({ active, onNavigate, sidebarCollapsed, onToggleS
 
         {/* Breadcrumb */}
         <div className="flex flex-wrap items-center gap-1.5 text-sm min-w-0">
-          <span className="hidden md:inline" style={{ color: "var(--color-faint)" }}>Узбекистан Админ</span>
+          <span className="hidden md:inline" style={{ color: "var(--color-faint)" }}>HelloUZ Админ</span>
           <span style={{ color: "var(--color-faint)" }}>›</span>
           <span className="font-medium truncate" style={{ color: "var(--color-text)" }}>
             {activePage?.label ?? active}
@@ -201,26 +182,32 @@ export default function Header({ active, onNavigate, sidebarCollapsed, onToggleS
               </div>
 
               <div className="overflow-y-auto min-w-0 flex-1">
+                {notifs.length === 0 && (
+                  <div className="px-4 py-6 text-center text-sm" style={{ color: "var(--color-muted)" }}>
+                    Новых событий нет
+                  </div>
+                )}
                 {notifs.map(n => (
                   <div
                     key={n.id}
                     className="flex flex-wrap gap-3 px-4 py-3 cursor-pointer transition-colors"
                     style={{
                       borderBottom: "1px solid var(--color-border)",
-                      background: n.read ? "transparent" : "rgba(212,135,42,0.04)",
+                      background: n.read ? "transparent" : "color-mix(in srgb, var(--color-amber) 5%, transparent)",
                     }}
                     onMouseEnter={e => (e.currentTarget.style.background = "var(--color-surface)")}
-                    onMouseLeave={e => (e.currentTarget.style.background = n.read ? "transparent" : "rgba(212,135,42,0.04)")}
+                    onMouseLeave={e => (e.currentTarget.style.background = n.read ? "transparent" : "color-mix(in srgb, var(--color-amber) 5%, transparent)")}
                     onClick={() => {
                       markRead(n.id);
-                      if (n.action) { onNavigate(n.action); setShowNotifs(false); }
+                      onNavigate(n.action);
+                      setShowNotifs(false);
                     }}
                   >
                     <div
                       className="w-7 h-7 rounded-full flex items-center justify-center text-sm shrink-0 mt-0.5"
-                      style={{ background: мягко(ICON_COLOR[n.type], 12), color: ICON_COLOR[n.type] }}
+                      style={{ background: мягко(ICON_COLOR[n.id], 12), color: ICON_COLOR[n.id] }}
                     >
-                      {ICON[n.type]}
+                      {ICON[n.id]}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex flex-wrap items-start justify-between gap-2">
@@ -230,7 +217,6 @@ export default function Header({ active, onNavigate, sidebarCollapsed, onToggleS
                         {!n.read && <div className="w-2 h-2 rounded-full shrink-0 mt-1" style={{ background: "var(--color-amber)" }} />}
                       </div>
                       <div className="text-xs mt-0.5 leading-relaxed" style={{ color: "var(--color-muted)" }}>{n.body}</div>
-                      <div className="text-xs mt-1" style={{ color: "var(--color-faint)", fontFamily: "var(--font-mono)" }}>{n.time}</div>
                     </div>
                   </div>
                 ))}
@@ -246,9 +232,10 @@ export default function Header({ active, onNavigate, sidebarCollapsed, onToggleS
         >
           <div
             className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold"
-            style={{ background: "var(--color-amber)", color: "var(--color-on-accent)" }}
+            style={{ background: меня ? ROLE_META[меня.role].color : "var(--color-amber)", color: "var(--color-on-accent)" }}
+            title={меня?.name}
           >
-            AD
+            {(меня?.name ?? "AD").slice(0, 2).toUpperCase()}
           </div>
         </button>
 

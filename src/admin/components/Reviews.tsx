@@ -122,7 +122,7 @@ export default function Reviews() {
                   {r.name}
                 </span>
                 <span className="block truncate text-xs" style={{ color: "var(--color-muted)" }}>
-                  {r.placeName} · {r.createdAt.slice(0, 10)}
+                  {r.placeName} · {new Date(r.createdAt).toLocaleDateString("ru", { day: "numeric", month: "short", year: "numeric" })}
                 </span>
               </span>
               <Звёзды n={r.rating} />

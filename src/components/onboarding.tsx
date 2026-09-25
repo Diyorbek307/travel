@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { ACCENT_FILL, BORDER, CREAM, GREEN, MUTED, TEXT, WHITE, SURFACE, ACCENT_SOFT } from "@/lib/theme";
-import { LOCALE_META, LOCALES, type Locale, type TKey } from "@/lib/i18n";
+import { LOCALE_META, LOCALES, type TKey } from "@/lib/i18n";
 import { GeomPattern, LogoMark, Wordmark } from "./ui";
 import { useT } from "@/components/lang-provider";
+import { задатьНастройку } from "@/lib/settings";
 
 export function SplashScreen({ onStart, onLogin }:{ onStart:()=>void; onLogin:()=>void }) {
   const { t } = useT();
@@ -47,7 +48,7 @@ export function SplashScreen({ onStart, onLogin }:{ onStart:()=>void; onLogin:()
 
 // ── Onboarding ────────────────────────────────────────────────────────────────
 
-export function OnboardingLang({ onNext }:{ onNext:(l:string)=>void; defaultLang?:string }) {
+export function OnboardingLang({ onNext }:{ onNext:()=>void }) {
   const { lang, setLang, t } = useT();
   return (
     <div className="flex flex-col h-full animate-slide-up" style={{background:CREAM}}>
@@ -69,18 +70,18 @@ export function OnboardingLang({ onNext }:{ onNext:(l:string)=>void; defaultLang
         })}
       </div>
       <div className="px-4 pb-8 pt-3">
-        <button onClick={()=>onNext(lang)} className="w-full py-4 rounded-2xl text-white font-bold text-sm flex items-center justify-center gap-2" style={{background:ACCENT_FILL}}>{t("onb_continue")} <svg className="rtl-flip" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"/></svg></button>
+        <button onClick={onNext} className="w-full py-4 rounded-2xl text-white font-bold text-sm flex items-center justify-center gap-2" style={{background:ACCENT_FILL}}>{t("onb_continue")} <svg className="rtl-flip" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"/></svg></button>
         <div className="flex items-center justify-center gap-2 mt-4"><div className="w-6 h-1.5 rounded-full" style={{background:ACCENT_FILL}}/><div className="w-1.5 h-1.5 rounded-full" style={{background:BORDER}}/></div>
       </div>
     </div>
   );
 }
 
-export function OnboardingInterests({ lang:_lang, onDone }:{ lang:string; onDone:()=>void }) {
+export function OnboardingInterests({ onDone }:{ onDone:()=>void }) {
   const { t } = useT();
   const [sel, setSel] = useState<string[]>(["История"]);
   const toggle=(v:string)=>setSel(p=>p.includes(v)?p.filter(x=>x!==v):[...p,v]);
-  // Значение остаётся русским (по нему AI подбирает), подпись — переводится.
+  // Значение остаётся русским: по нему на главной подбираются места. Подпись — переводится.
   const items: {e:string; l:string; k:TKey}[]=[{e:"🏛️",l:"История",k:"i_history"},{e:"🕌",l:"Мечети",k:"i_mosques"},{e:"🏺",l:"Музеи",k:"i_museums"},{e:"🌿",l:"Природа",k:"i_nature"},{e:"🍽️",l:"Кухня",k:"i_cuisine"},{e:"🛍️",l:"Базары",k:"i_bazaars"},{e:"🏨",l:"Отели",k:"i_hotels"},{e:"🎵",l:"Культура",k:"i_culture"},{e:"🚗",l:"Трекинг",k:"i_trekking"},{e:"📸",l:"Фото",k:"i_photo"},{e:"🤝",l:"Местная жизнь",k:"i_local"},{e:"🏇",l:"Спорт",k:"i_sport"}];
   return (
     <div className="flex flex-col h-full animate-slide-up" style={{background:CREAM}}>
@@ -100,7 +101,7 @@ export function OnboardingInterests({ lang:_lang, onDone }:{ lang:string; onDone
         </div>
       </div>
       <div className="px-4 pb-8 pt-3">
-        <button onClick={onDone} disabled={sel.length===0} className="w-full py-4 rounded-2xl text-white font-bold text-sm flex items-center justify-center gap-2 disabled:opacity-50" style={{background:ACCENT_FILL}}>{t("onb_start")} 🚀</button>
+        <button onClick={()=>{задатьНастройку("interests", sel); onDone();}} disabled={sel.length===0} className="w-full py-4 rounded-2xl text-white font-bold text-sm flex items-center justify-center gap-2 disabled:opacity-50" style={{background:ACCENT_FILL}}>{t("onb_start")} 🚀</button>
         <div className="flex items-center justify-center gap-2 mt-4"><div className="w-1.5 h-1.5 rounded-full" style={{background:BORDER}}/><div className="w-6 h-1.5 rounded-full" style={{background:ACCENT_FILL}}/></div>
       </div>
     </div>

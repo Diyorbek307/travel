@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { BORDER, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE, ON_GOLD } from "@/lib/theme";
+import { BORDER, GOLD, GREEN, MUTED, TEXT, SURFACE, ON_GOLD } from "@/lib/theme";
 import { useT } from "@/components/lang-provider";
+import { датаСловами } from "@/lib/i18n";
 import type { BookingKind } from "@/lib/types";
 
 /**
@@ -12,17 +13,24 @@ import type { BookingKind } from "@/lib/types";
  * отелей и ресторанов нет, и обещать место мы не можем. Администратор
  * видит заявку в панели и подтверждает её сам. Формулировки об этом
  * говорят прямо — «заявка отправлена», а не «столик ваш».
+ *
+ * У отеля ночи и гостей человек уже выбрал в карточке — форма берёт их
+ * оттуда, а не спрашивает второй раз своими полями.
  */
 export default function BookingForm({
   kind,
   itemId,
   itemName,
+  ночей,
+  гостей,
 }: {
   kind: BookingKind;
   itemId: string;
   itemName: string;
+  ночей?: number;
+  гостей?: number;
 }) {
-  const { t } = useT();
+  const { t, lang } = useT();
   const [открыта, setОткрыта] = useState(false);
   const [date, setDate] = useState("");
   const [guests, setGuests] = useState(2);
@@ -30,8 +38,19 @@ export default function BookingForm({
   const [итог, setИтог] = useState<"нет" | "ок" | "нужен-вход" | "ошибка">("нет");
   const [идёт, setИдёт] = useState(false);
 
+  const изКарточки = гостей !== undefined;
+  const сколькоГостей = гостей ?? guests;
+
   const подпись =
     kind === "hotel" ? t("bk_hotel") : kind === "restaurant" ? t("bk_rest") : t("bk_tour");
+
+  /** Дата выезда по дате заезда и числу ночей — чтобы человек видел, на что просит. */
+  function выезд(): string | null {
+    if (!date || !ночей) return null;
+    const d = new Date(`${date}T12:00:00`);
+    d.setDate(d.getDate() + ночей);
+    return датаСловами(d, lang, "short");
+  }
 
   async function отправить(e: React.FormEvent) {
     e.preventDefault();
@@ -41,7 +60,7 @@ export default function BookingForm({
       const res = await fetch("/api/bookings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ kind, itemId, itemName, date, guests, note }),
+        body: JSON.stringify({ kind, itemId, itemName, date, guests: сколькоГостей, nights: ночей, note }),
       });
       if (res.status === 401) {
         setИтог("нужен-вход");
@@ -57,7 +76,7 @@ export default function BookingForm({
 
   if (итог === "ок") {
     return (
-      <div id="заявка" className="mx-4 mb-3 rounded-2xl p-4" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
+      <div id="заявка" className="mb-3 rounded-2xl p-4" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
         <p className="text-sm font-semibold" style={{ color: GREEN }}>
           {t("bk_sent_title")}
         </p>
@@ -70,7 +89,7 @@ export default function BookingForm({
 
   if (!открыта) {
     return (
-      <div id="заявка" className="mx-4 mb-3">
+      <div id="заявка" className="mb-3">
         <button
           onClick={() => setОткрыта(true)}
           className="w-full rounded-2xl py-3.5 text-sm font-bold"
@@ -87,20 +106,21 @@ export default function BookingForm({
     border: `1px solid ${BORDER}`,
     color: TEXT,
   };
+  const датаВыезда = выезд();
 
   return (
     <form
       id="заявка"
       onSubmit={отправить}
-      className="mx-4 mb-3 flex flex-col gap-2.5 rounded-2xl p-4"
+      className="mb-3 flex flex-col gap-2.5 rounded-2xl p-4"
       style={{ background: SURFACE, border: `1px solid ${BORDER}` }}
     >
-      <p className="text-sm font-bold" style={{ color: TEXT, fontFamily:"var(--font-heading)" }}>
+      <p className="text-sm font-bold" style={{ color: TEXT, fontFamily: "var(--font-heading)" }}>
         {подпись}
       </p>
 
       <label className="text-xs" style={{ color: MUTED }}>
-        {t("bk_date")}
+        {kind === "hotel" ? t("bk_checkin_date") : t("bk_date")}
         <input
           required
           type="date"
@@ -112,19 +132,27 @@ export default function BookingForm({
         />
       </label>
 
-      <label className="text-xs" style={{ color: MUTED }}>
-        {t("bk_guests")}
-        <input
-          required
-          type="number"
-          min={1}
-          max={30}
-          value={guests}
-          onChange={(e) => setGuests(Number(e.target.value))}
-          className="mt-1 w-full rounded-xl px-3 py-2.5 text-sm outline-none"
-          style={поле}
-        />
-      </label>
+      {изКарточки ? (
+        <p className="text-xs" style={{ color: MUTED }}>
+          {ночей ? `${t("d_nights")}: ${ночей} · ` : ""}
+          {t("d_guests")}: {сколькоГостей}
+          {датаВыезда ? ` · ${t("d_checkout")}: ${датаВыезда}` : ""}
+        </p>
+      ) : (
+        <label className="text-xs" style={{ color: MUTED }}>
+          {t("bk_guests")}
+          <input
+            required
+            type="number"
+            min={1}
+            max={30}
+            value={guests}
+            onChange={(e) => setGuests(Number(e.target.value))}
+            className="mt-1 w-full rounded-xl px-3 py-2.5 text-sm outline-none"
+            style={поле}
+          />
+        </label>
+      )}
 
       <label className="text-xs" style={{ color: MUTED }}>
         {t("bk_note")}
