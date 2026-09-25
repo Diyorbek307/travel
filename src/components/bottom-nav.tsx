@@ -6,6 +6,14 @@ import type { TKey } from "@/lib/i18n";
 import type { Tab } from "@/lib/types";
 import { LogoMark, Wordmark } from "@/components/ui";
 
+/**
+ * Вкладка посередине панели. Это «Исследовать» — вход во все разделы
+ * (города, места, отели, рестораны…), поэтому на телефоне она стоит в
+ * центре, приподнята и подписана знаком HelloUZ, как главная кнопка
+ * приложения.
+ */
+const ЦЕНТР: Tab = "explore";
+
 /** Иконки нижней панели: контур в покое, заливка у активной вкладки. */
 const ITEMS: { key: Tab; ключ: TKey; icon: (active: boolean) => React.ReactNode }[] = [
   {
@@ -27,6 +35,25 @@ const ITEMS: { key: Tab; ключ: TKey; icon: (active: boolean) => React.ReactN
     ),
   },
   {
+    key: "map",
+    ключ: "nav_map",
+    icon: (a) => (
+      <svg
+        width="21"
+        height="21"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke={a ? GREEN : MUTED}
+        strokeWidth="2"
+        strokeLinecap="round"
+      >
+        <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21" />
+        <line x1="9" y1="3" x2="9" y2="18" />
+        <line x1="15" y1="6" x2="15" y2="21" />
+      </svg>
+    ),
+  },
+  {
     key: "explore",
     ключ: "nav_explore",
     icon: (a) => (
@@ -41,27 +68,6 @@ const ITEMS: { key: Tab; ключ: TKey; icon: (active: boolean) => React.ReactN
       >
         <circle cx="11" cy="11" r="8" />
         <line x1="21" y1="21" x2="16.65" y2="16.65" />
-      </svg>
-    ),
-  },
-  {
-    // Карта всегда белая: она лежит в приподнятом зелёном кружке и
-    // подсвечивается им, а не цветом штриха.
-    key: "map",
-    ключ: "nav_map",
-    icon: () => (
-      <svg
-        width="21"
-        height="21"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="white"
-        strokeWidth="2"
-        strokeLinecap="round"
-      >
-        <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21" />
-        <line x1="9" y1="3" x2="9" y2="18" />
-        <line x1="15" y1="6" x2="15" y2="21" />
       </svg>
     ),
   },
@@ -127,18 +133,18 @@ export default function BottomNav({ tab, onTab }: { tab: Tab; onTab: (t: Tab) =>
                 aria-current={active ? "page" : undefined}
                 className="flex flex-1 flex-col items-center justify-center gap-1 py-2 transition-all active:scale-95"
               >
-                {key === "map" ? (
+                {key === ЦЕНТР ? (
                   <span
                     className="-mt-6 mb-0.5 flex h-12 w-12 items-center justify-center rounded-2xl shadow-md"
                     style={{ background: ACCENT_FILL }}
                   >
-                    {icon(true)}
+                    <LogoMark size={28} tone="white" />
                   </span>
                 ) : (
                   icon(active)
                 )}
                 <span className="text-[9px] font-semibold" style={{ color: active ? GREEN : MUTED }}>
-                  {t(ключ)}
+                  {key === ЦЕНТР ? "HelloUZ" : t(ключ)}
                 </span>
               </button>
             );
@@ -150,9 +156,10 @@ export default function BottomNav({ tab, onTab }: { tab: Tab; onTab: (t: Tab) =>
         Ноутбук: меню слева колонкой.
 
         Пять кнопок, растянутых по нижнему краю широкого экрана, выглядят
-        потерянными и далеки от курсора. Приподнятый кружок у «Карты»
-        здесь тоже ни к чему: он придуман для большого пальца, а мышь
-        попадает и в обычную строку.
+        потерянными и далеки от курсора. Приподнятая кнопка HelloUZ здесь
+        тоже ни к чему: она придумана для большого пальца, а мышь попадает
+        и в обычную строку. Знак HelloUZ и так стоит над меню, поэтому
+        раздел подписан своим словом — «Исследовать».
       */}
       <nav className="device-rail hidden shrink-0 flex-col gap-1 p-3 lg:flex" style={{ order: -1 }}>
         <div className="mb-4 flex items-center gap-2.5 px-3 pt-3">
@@ -173,33 +180,12 @@ export default function BottomNav({ tab, onTab }: { tab: Tab; onTab: (t: Tab) =>
                 color: active ? GREEN : MUTED,
               }}
             >
-              <span className="flex h-5 w-5 shrink-0 items-center justify-center">
-                {key === "map" ? иконкаКарты(active) : icon(active)}
-              </span>
+              <span className="flex h-5 w-5 shrink-0 items-center justify-center">{icon(active)}</span>
               <span className="text-sm font-semibold">{t(ключ)}</span>
             </button>
           );
         })}
       </nav>
     </>
-  );
-}
-
-/** Та же карта, но цветом строки: зелёного кружка на боковом меню нет. */
-function иконкаКарты(active: boolean) {
-  return (
-    <svg
-      width="21"
-      height="21"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke={active ? GREEN : MUTED}
-      strokeWidth="2"
-      strokeLinecap="round"
-    >
-      <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21" />
-      <line x1="9" y1="3" x2="9" y2="18" />
-      <line x1="15" y1="6" x2="15" y2="21" />
-    </svg>
   );
 }
