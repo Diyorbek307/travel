@@ -362,11 +362,6 @@ export const СЛОВАРЬ = {
   s_theme_system: row("System", "Системная", "Tizim", "跟随系统", "시스템", "System", "Système", "システム", "Sistem", "النظام"),
   s_theme_light: row("Light", "Светлая", "Yorug'", "浅色", "라이트", "Hell", "Clair", "ライト", "Açık", "فاتح"),
   s_theme_dark: row("Dark", "Тёмная", "Tungi", "深色", "다크", "Dunkel", "Sombre", "ダーク", "Koyu", "داكن"),
-  /* Экран-«вау» после регистрации. */
-  wow_tap: row("Tap to switch on", "Нажми, чтобы включить", "Yoqish uchun bosing", "点击开启", "탭하여 켜기", "Zum Einschalten tippen", "Appuyez pour activer", "タップしてオン", "Açmak için dokun", "اضغط للتشغيل"),
-  wow_welcome: row("Welcome", "Добро пожаловать", "Xush kelibsiz", "欢迎", "환영합니다", "Willkommen", "Bienvenue", "ようこそ", "Hoş geldiniz", "أهلاً بك"),
-  wow_sub: row("Uzbekistan is waiting for you", "Узбекистан уже ждёт тебя", "O'zbekiston sizni kutmoqda", "乌兹别克斯坦在等你", "우즈베키스탄이 기다립니다", "Usbekistan wartet auf dich", "L'Ouzbékistan vous attend", "ウズベキスタンが待っています", "Özbekistan seni bekliyor", "أوزبكستان بانتظارك"),
-  wow_go: row("Start the journey", "Начать путешествие", "Sayohatni boshlash", "开始旅程", "여행 시작", "Reise beginnen", "Commencer le voyage", "旅を始める", "Yolculuğa başla", "ابدأ الرحلة"),
   /* Партнёрские блоки. Слово «Партнёр» обязано быть видно: закон о
      рекламе требует помечать рекламу, как бы красиво она ни выглядела. */
   ad_partner: row("Partner", "Партнёр", "Hamkor", "合作伙伴", "파트너", "Partner", "Partenaire", "パートナー", "Ortak", "شريك"),

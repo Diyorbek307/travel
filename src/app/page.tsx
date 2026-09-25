@@ -28,7 +28,6 @@ import NativeBack from "@/components/native-back";
 import { отметитьВизит, отметитьМесто } from "@/lib/visits";
 import { инитТему } from "@/lib/settings";
 import type { Hotel, Place, PublicUser, Restaurant, Route, Tab } from "@/lib/types";
-import WelcomeWow from "@/components/welcome-wow";
 import TripScreen from "@/components/screens/trip";
 import IntroCinematic from "@/components/intro-cinematic";
 
@@ -58,7 +57,7 @@ type Detail =
  * мигало бы экраном входа тому, кто уже вошёл: сессия живёт в куке, и
  * узнать о ней можно только запросом.
  */
-type Phase = "checking" | "splash" | "register" | "login" | "lang" | "interests" | "welcome" | "app";
+type Phase = "checking" | "splash" | "register" | "login" | "lang" | "interests" | "app";
 
 export default function Page() {
   return (
@@ -346,15 +345,7 @@ function App() {
 
         {phase === "interests" && (
           <div className="overlay-screen device-safe-top absolute inset-0 z-40">
-            <OnboardingInterests onDone={() => setPhase("welcome")} />
-          </div>
-        )}
-
-        {/* Между онбордингом и приложением — экран-«вау». Он только у тех,
-            кто прошёл регистрацию целиком: при обычном входе не мешает. */}
-        {phase === "welcome" && (
-          <div className="absolute inset-0 z-40">
-            <WelcomeWow name={user?.firstName} onDone={() => setPhase("app")} />
+            <OnboardingInterests onDone={() => setPhase("app")} />
           </div>
         )}
 

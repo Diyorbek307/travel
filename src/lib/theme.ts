@@ -19,7 +19,7 @@ export const ACCENT_FILL = "var(--accent-fill)";
  *  с переменной так нельзя — держим отдельными токенами. */
 export const ACCENT_SOFT = "var(--accent-soft)";
 export const ACCENT_BORDER = "var(--accent-border)";
-/** Свечение для «вау»-экранов. */
+/** Мягкое свечение акцентом под кнопками. */
 export const GLOW = "var(--glow)";
 /** Второй акцент — золото логотипа, точечно: чтобы что-то выделялось из ряда. */
 export const ACCENT_2 = "var(--accent-2)";
