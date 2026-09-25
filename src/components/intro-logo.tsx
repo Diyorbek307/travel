@@ -11,6 +11,9 @@ import { маска, посадкаНаШапку } from "./intro-cinematic";
  * приложение по делу, поэтому ему — пара секунд: на чёрном фоне знак
  * прорисовывается контуром, наливается фирменным цветом и светится,
  * по нему пробегает блик, и он садится на логотип в шапке главной.
+ *
+ * Пропуска касанием нет: три секунды не успевают надоесть, а так знак
+ * всегда долетает до шапки.
  */
 
 /** Реперы времени, мс. */
@@ -34,9 +37,10 @@ export default function IntroLogo({ onDone }: { onDone: () => void }) {
   финиш.current = () => {
     if (завершено.current) return;
     завершено.current = true;
-    // Садимся, только если знак успел проявиться; при раннем нажатии
-    // просто растворяемся. Смотрим на часы, а не на ход анимации: её
-    // браузер может начать чуть позже таймера.
+    // Садимся, только если знак успел проявиться; при «уменьшить
+    // движение» заставка короче — тогда просто растворяемся. Смотрим на
+    // часы, а не на ход анимации: её браузер может начать чуть позже
+    // таймера.
     const проявился = performance.now() - старт.current >= БЛИК;
     const путь = проявился && белыйRef.current ? посадкаНаШапку(белыйRef.current) : null;
     if (путь) setПосадка(путь);
@@ -79,12 +83,7 @@ export default function IntroLogo({ onDone }: { onDone: () => void }) {
   const сек = (мс: number) => `${мс / 1000}s`;
 
   return (
-    <div
-      onClick={() => финиш.current()}
-      className="fixed inset-0 z-[100] overflow-hidden"
-      style={{ cursor: "pointer" }}
-      aria-label="HelloUZ"
-    >
+    <div className="fixed inset-0 z-[100] overflow-hidden" aria-label="HelloUZ">
       <div
         className="absolute inset-0"
         style={{ background: "#000", opacity: уходит ? 0 : 1, transition: `opacity ${плавно}` }}
