@@ -1,15 +1,19 @@
 import type { Metadata, Viewport } from "next";
+import { Rubik } from "next/font/google";
 import "./globals.css";
 import SmoothScroll from "@/components/smooth-scroll";
 
+// Тот же шрифт, что в приложении и на логотипе.
+const rubik = Rubik({ subsets: ["latin", "cyrillic"], variable: "--font-sans" });
+
 export const metadata: Metadata = {
-  title: "Uzbekistan Travel — цифровая туристическая платформа",
+  title: "HelloUZ — Узбекистан в одном приложении",
   description:
-    "Маршруты, QR-аудиогиды, музеи и достопримечательности Узбекистана в одном приложении. Работающая платформа: 4 города, 48 объектов, 11 маршрутов.",
+    "Места, отели, рестораны, план дня и AI-гид по Узбекистану в одном приложении. 13 городов, 10 языков.",
   openGraph: {
-    title: "Uzbekistan Travel — цифровая туристическая платформа",
+    title: "HelloUZ — Узбекистан в одном приложении",
     description:
-      "Узбекистан без гида: маршруты под ваше время, QR-аудиогиды на объектах, офлайн-режим.",
+      "План дня под ваше время, отели и рестораны, AI-гид на вашем языке, офлайн-режим.",
     type: "website",
   },
 };
@@ -22,7 +26,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ru">
+    <html lang="ru" className={rubik.variable}>
       <body>
         <SmoothScroll />
         {children}

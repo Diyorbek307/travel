@@ -42,3 +42,13 @@ services:
         sync: false
       - key: MAIL_FROM
         sync: false
+
+      # AI-гид в профиле. Без ключа гид отвечает только на быстрые
+      # вопросы-подсказки. Ключ — на console.anthropic.com.
+      - key: ANTHROPIC_API_KEY
+        sync: false
+
+      # Адрес лендинга (например https://hellouz.uz): ему разрешено
+      # показывать приложение в рамке «живого демо». Админку — никогда.
+      - key: LANDING_ORIGIN
+        sync: false

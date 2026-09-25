@@ -7,13 +7,13 @@
  * почти всегда строится на глубоком фоне и одном ярком акценте.
  */
 @theme {
-  --color-tile-300: #71dcd9;
-  --color-tile-400: #35c2c2;
-  --color-tile-500: #1aa5a8;
-  --color-tile-600: #158488;
-  --color-gold-300: #dcbb8e;
-  --color-gold-400: #cd9a60;
-  --color-gold-500: #c38243;
+  --color-tile-300: #8ae9e0;
+  --color-tile-400: #34dccf;
+  --color-tile-500: #0ea69f;
+  --color-tile-600: #0b8a83;
+  --color-gold-300: #f2ce6e;
+  --color-gold-400: #e9c46a;
+  --color-gold-500: #d4a841;
   --color-void-900: #070d12;
   --color-void-950: #04080b;
 }
@@ -24,8 +24,8 @@
   --line: #16242f;
   --text: #e9f1f5;
   --text-soft: #8ba3b3;
-  --accent: #35c2c2;
-  --gold: #cd9a60;
+  --accent: #34dccf;
+  --gold: #e9c46a;
 }
 
 html {
@@ -37,7 +37,7 @@ html {
 
 body {
   margin: 0;
-  font-family: ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif;
+  font-family: var(--font-sans), ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }

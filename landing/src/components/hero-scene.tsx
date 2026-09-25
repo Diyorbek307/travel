@@ -41,7 +41,7 @@ function Dust({ count = 900 }: { count?: number }) {
     <points ref={points} geometry={geometry}>
       <pointsMaterial
         size={0.035}
-        color="#71dcd9"
+        color="#8ae9e0"
         transparent
         opacity={0.55}
         sizeAttenuation
@@ -85,10 +85,10 @@ export default function HeroScene() {
       <directionalLight position={[4, 6, 3]} intensity={2.4} color="#ffd9a8" />
 
       {/* Контровой бирюзовый — обводит силуэт купола и отделяет от фона */}
-      <pointLight position={[-5, 2, -4]} intensity={38} color="#35c2c2" distance={20} />
+      <pointLight position={[-5, 2, -4]} intensity={38} color="#34dccf" distance={20} />
 
       {/* Нижняя подсветка золотом — рефлекс от «земли» */}
-      <pointLight position={[0, -2.5, 2]} intensity={14} color="#cd9a60" distance={12} />
+      <pointLight position={[0, -2.5, 2]} intensity={14} color="#e9c46a" distance={12} />
 
       <Suspense fallback={null}>
         <Dome />

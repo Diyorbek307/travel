@@ -76,7 +76,7 @@ export default function Dome() {
       {/* Купол */}
       <mesh geometry={geometry} castShadow position={[0, 0.55, 0]}>
         <meshPhysicalMaterial
-          color="#1aa5a8"
+          color="#0ea69f"
           metalness={0.35}
           roughness={0.22}
           clearcoat={1}
@@ -100,7 +100,7 @@ export default function Dome() {
       <mesh position={[0, 0.3, 0]}>
         <cylinderGeometry args={[1.015, 1.015, 0.22, 128, 1, true]} />
         <meshStandardMaterial
-          color="#cd9a60"
+          color="#e9c46a"
           metalness={0.85}
           roughness={0.3}
           side={THREE.DoubleSide}

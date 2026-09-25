@@ -442,29 +442,42 @@ export function ProfileScreen({ onLogout, user, isPremium, startView }:{ onLogou
   // в AI_REPLIES. На экране показываем перевод (трК), а по клику отправляем
   // русский ключ — так один и тот же ответ находится на любом языке.
   const QUICK=["Что рядом?","История Регистана","Лучшие рестораны?","Что бесплатно?","Как добраться до Бухары?","Где переночевать?","Курс валюты?","Транспорт в Самарканде?"];
-  const sendMsg=useCallback((вопрос:string)=>{
-    const now=new Date().toLocaleTimeString(lang,{hour:"2-digit",minute:"2-digit"});
+  const sendMsg=useCallback(async(вопрос:string)=>{
+    const сейчас=()=>new Date().toLocaleTimeString(lang,{hour:"2-digit",minute:"2-digit"});
     // Известный вопрос трК переведёт; свободный текст на любом языке вернётся
     // как есть — и в пузыре пользователь видит именно то, что спросил.
-    setMessages(p=>[...p,{role:"user",text:трК(вопрос),time:now}]);
+    const моё:ChatMessage={role:"user",text:трК(вопрос),time:сейчас()};
+    setMessages(p=>[...p,моё]);
     setInput("");setTyping(true);
-    setTimeout(()=>{
-      const рус=AI_REPLIES[вопрос];
-      // Курс в заготовленном ответе вписан навсегда и уже устарел.
-      // Подставляем живой из того же источника, что и конвертер.
-      // На незнакомый вопрос гид честно говорит, что умеет, — раньше он
-      // на всё отвечал «рекомендую посещать рано утром».
-      const текст = вопрос === "Курс валюты?" && курсUZS
-        ? `💱 ${t("cur_title")}:
-
-$1 ≈ ${курсUZS.toLocaleString(lang, { maximumFractionDigits: 0 })} UZS
-
-${t("cur_live_hint")}`
-        : рус ? трК(рус) : t("ai_unknown");
-      setMessages(p=>[...p,{role:"ai",text:текст,time:new Date().toLocaleTimeString(lang,{hour:"2-digit",minute:"2-digit"})}]);
+    const ответить=(текст:string)=>{
+      setMessages(p=>[...p,{role:"ai",text:текст,time:сейчас()}]);
       setTyping(false);
-    },1400);
-  },[трК,lang,t,курсUZS]);
+    };
+
+    // Курс в заготовленном ответе вписан навсегда и уже устарел.
+    // Подставляем живой из того же источника, что и конвертер.
+    if(вопрос==="Курс валюты?"&&курсUZS){
+      ответить(`💱 ${t("cur_title")}:\n\n$1 ≈ ${курсUZS.toLocaleString(lang,{maximumFractionDigits:0})} UZS\n\n${t("cur_live_hint")}`);
+      return;
+    }
+    // Быстрые кнопки отвечают заготовкой: мгновенно и без запроса к модели.
+    const рус=AI_REPLIES[вопрос];
+    if(рус){ответить(трК(рус));return;}
+
+    // Свободный вопрос — настоящему гиду. Если он не подключён или
+    // недоступен, честно говорим, что умеем, а не делаем вид.
+    try{
+      const res=await fetch("/api/guide",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({messages:[...messages,моё].map(({role,text})=>({role,text}))}),
+      });
+      const data=res.ok?await res.json() as {text?:string}:null;
+      ответить(data?.text||t("ai_unknown"));
+    }catch{
+      ответить(t("ai_unknown"));
+    }
+  },[трК,lang,t,курсUZS,messages]);
   useEffect(()=>{bottomRef.current?.scrollIntoView({behavior:"smooth"});},[messages,typing]);
 
   const TABS: [typeof view, string, TKey][] = [

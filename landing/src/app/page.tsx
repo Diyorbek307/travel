@@ -1,59 +1,64 @@
 import HeroCanvas from "@/components/hero-canvas";
+import Logo from "@/components/logo";
 import Reveal from "@/components/reveal";
 import SilkRoad from "@/components/silk-road";
 
 const APP_URL = "https://uzbekistan-travel.onrender.com";
 
-/** Цифры берутся из работающей платформы — их видно в базе, они не выдуманы. */
+/**
+ * Цифры — фактическое наполнение приложения (то, что видно туристу).
+ * Панель пополняет данные, поэтому при заметных изменениях их стоит
+ * сверить с /api/content.
+ */
 const NUMBERS = [
-  { value: "4", label: "города" },
-  { value: "48", label: "объектов" },
-  { value: "11", label: "маршрутов" },
-  { value: "3", label: "языка" },
+  { value: "13", label: "городов" },
+  { value: "20", label: "мест" },
+  { value: "15", label: "ресторанов" },
+  { value: "10", label: "языков" },
 ];
 
 const FEATURES = [
   {
     icon: "🧭",
-    title: "Маршрут под ваше время",
+    title: "План дня под ваше время",
     text:
-      "«У меня 6 часов в Самарканде» — платформа собирает маршрут с учётом часов " +
-      "работы, цен и способа передвижения. Главные объекты города ставятся первыми.",
+      "«У меня 6 часов в Самарканде, люблю историю» — приложение расставит места " +
+      "по порядку, посчитает дорогу и цены входа и вставит обед по пути.",
   },
   {
-    icon: "📷",
-    title: "QR-аудиогид",
+    icon: "🏨",
+    title: "Отели и рестораны",
     text:
-      "Табличка на объекте, сканирование — и открывается рассказ. Работает и без " +
-      "установленного приложения, в обычном браузере телефона.",
-  },
-  {
-    icon: "🏛",
-    title: "Музеи по экспонатам",
-    text:
-      "У каждой витрины свой код. Турист проходит зал сам, слушая рассказ именно " +
-      "о том предмете, перед которым стоит.",
+      "Номера, кухни, цены и отзывы. Заявка на бронь уходит команде, и статус " +
+      "меняется прямо в приложении — без звонков и переписки.",
   },
   {
     icon: "💬",
-    title: "Помощник на своём языке",
+    title: "AI-гид на вашем языке",
     text:
-      "«Что рядом?», «Расскажи историю Регистана», «Где поесть?» — понимает " +
-      "естественную речь. Маршруты и цены берёт из базы, а не выдумывает.",
+      "Спросите что угодно: где поесть плов, чем заняться вечером. Гид советует " +
+      "то, что есть в приложении, а не выдуманные адреса.",
   },
   {
     icon: "⬇️",
     title: "Работает офлайн",
     text:
-      "Город скачивается перед поездкой: карта, маршруты, описания и аудиогиды " +
-      "остаются доступны без интернета и роуминга.",
+      "Город скачивается перед поездкой: описания и фотографии остаются под рукой " +
+      "без интернета и роуминга.",
   },
   {
     icon: "🛂",
-    title: "Туристический паспорт",
+    title: "Цифровой паспорт",
     text:
-      "За посещение объектов турист собирает штампы и достижения. Простая механика, " +
-      "которая заметно поднимает возвращаемость.",
+      "За каждое открытое место — штамп, за серии — достижения. Приятно собрать " +
+      "весь Самарканд до конца поездки.",
+  },
+  {
+    icon: "🆘",
+    title: "SOS и живая поддержка",
+    text:
+      "Кнопка SOS отправляет команде вашу геолокацию, а в чате поддержки отвечает " +
+      "человек, а не автоответчик.",
   },
 ];
 
@@ -76,13 +81,19 @@ export default function Home() {
         />
 
         <div className="relative mx-auto w-full max-w-6xl px-6">
-          <p className="eyebrow mb-6">Цифровая туристическая платформа</p>
+          <div className="mb-10 flex items-center gap-3">
+            <Logo size={44} />
+            <span className="text-2xl font-semibold tracking-tight">
+              Hello<span className="shine">UZ</span>
+            </span>
+          </div>
+          <p className="eyebrow mb-6">Путеводитель по Узбекистану</p>
           <h1 className="display mb-6 max-w-4xl">
             Узбекистан <span className="shine">без гида</span>
           </h1>
           <p className="mb-10 max-w-xl text-lg leading-relaxed soft">
-            Маршруты под ваше время, аудиогиды по QR прямо на объектах, музеи
-            по экспонатам и офлайн-режим. Ваш персональный гид всегда с вами.
+            План дня под ваше время, отели и рестораны, AI-гид на вашем языке
+            и офлайн-режим. Всё, что нужно в поездке, — в одном приложении.
           </p>
 
           <div className="flex flex-wrap gap-4">
@@ -91,13 +102,13 @@ export default function Home() {
               target="_blank"
               rel="noreferrer"
               className="rounded-full px-7 py-3.5 font-medium text-[#04080b] transition-transform hover:scale-[1.03]"
-              style={{ background: "linear-gradient(100deg,#35c2c2,#71dcd9)" }}
+              style={{ background: "linear-gradient(100deg,#34dccf,#8ae9e0)" }}
             >
               Открыть платформу
             </a>
             <a
               href="#how"
-              className="glass rounded-full px-7 py-3.5 font-medium transition-colors hover:border-[#35c2c2]"
+              className="glass rounded-full px-7 py-3.5 font-medium transition-colors hover:border-[#34dccf]"
             >
               Как это работает
             </a>
@@ -125,8 +136,8 @@ export default function Home() {
           ))}
         </ul>
         <p className="mt-10 max-w-2xl text-sm soft">
-          Это не макет: платформа развёрнута и работает. Цифры — фактическое
-          наполнение базы на сегодня, а не план.
+          Это не макет: приложение развёрнуто и работает. Цифры — фактическое
+          наполнение на сегодня, а не план.
         </p>
       </section>
 
@@ -181,7 +192,7 @@ export default function Home() {
             >
               <iframe
                 src={APP_URL}
-                title="Демонстрация платформы"
+                title="HelloUZ — живое демо"
                 loading="lazy"
                 className="h-[720px] w-full rounded-[2rem]"
                 style={{ border: "none", background: "#fff" }}
@@ -205,7 +216,7 @@ export default function Home() {
               target="_blank"
               rel="noreferrer"
               className="inline-block rounded-full px-8 py-4 font-medium text-[#04080b] transition-transform hover:scale-[1.03]"
-              style={{ background: "linear-gradient(100deg,#35c2c2,#71dcd9)" }}
+              style={{ background: "linear-gradient(100deg,#34dccf,#8ae9e0)" }}
             >
               Открыть платформу
             </a>
@@ -213,10 +224,9 @@ export default function Home() {
         </Reveal>
 
         <p className="mx-auto mt-12 max-w-2xl text-center text-xs leading-relaxed soft">
-          Демонстрационная версия. Тексты об объектах — черновые, составлены
-          по общедоступным сведениям и требуют проверки историком. Профессиональная
-          озвучка не записана: до её появления приложение читает тексты синтезом речи
-          и прямо сообщает об этом в интерфейсе.
+          Тексты о местах составлены по общедоступным сведениям и проходят
+          проверку. Аудиогиды появятся по мере записи — до тех пор раздел честно
+          пуст, а не заполнен синтезом.
         </p>
       </section>
     </main>
