@@ -7,7 +7,7 @@ import { HotelDetail, PlaceDetail, RestaurantDetail, RouteDetail } from "@/compo
 import { NotifsPanel, PremiumModal, SearchModal } from "@/components/modals";
 import { OnboardingInterests, OnboardingLang, SplashScreen } from "@/components/onboarding";
 import HomeScreen from "@/components/screens/home";
-import ExploreScreen, { type ФильтрОбзора } from "@/components/screens/explore";
+import ExploreScreen, { type РазделОбзора } from "@/components/screens/explore";
 import MapScreen from "@/components/screens/map";
 import AudioScreen from "@/components/screens/audio";
 import ProfileScreen from "@/components/screens/profile";
@@ -103,8 +103,15 @@ function App() {
   const [showTrip, setShowTrip] = useState(false);
   // С какого раздела открыть профиль, когда в него ведут из меню.
   const [profileView, setProfileView] = useState<"stats" | "bookings" | "support" | undefined>(undefined);
-  // С какого фильтра открыть «Исследовать», когда ведут с главной.
-  const [фильтрОбзора, setФильтрОбзора] = useState<ФильтрОбзора | undefined>(undefined);
+  /*
+   * Открытый раздел «Исследовать» и выбранный город живут здесь, а не в
+   * самом экране: карточка места перекрывает вкладку и размонтирует её,
+   * и без этого после «назад» человек оказывался бы снова на плитках, а
+   * не в списке, из которого пришёл. Город переживает и смену вкладок —
+   * это выбор человека, а не состояние одного экрана.
+   */
+  const [разделОбзора, setРазделОбзора] = useState<РазделОбзора | undefined>(undefined);
+  const [городОбзора, setГородОбзора] = useState<string | null>(null);
 
   // Premium включает владелец в панели, увидев оплату, — приложение
   // только читает срок из аккаунта.
@@ -224,7 +231,7 @@ function App() {
     setShowFavorites(false);
     setShowTrip(false);
     setProfileView(undefined);
-    setФильтрОбзора(undefined);
+    setРазделОбзора(undefined);
     setDetail(null);
     // Смена вкладки — тоже переход: так полноэкранная реклама выходит и
     // при обычном перелистывании разделов, а не только при открытии
@@ -234,10 +241,10 @@ function App() {
     setTabKey((k) => k + 1);
   };
 
-  const openExplore = (фильтр?: ФильтрОбзора) => {
+  const openExplore = (раздел?: РазделОбзора) => {
     switchTab("explore");
-    // После switchTab: он сбрасывает фильтр, а нам нужен выбранный.
-    setФильтрОбзора(фильтр);
+    // После switchTab: он сбрасывает раздел, а нам нужен выбранный.
+    setРазделОбзора(раздел);
   };
 
   const logout = async () => {
@@ -267,6 +274,7 @@ function App() {
     if (showFavorites) return setShowFavorites(false), true;
     if (showTrip) return setShowTrip(false), true;
     if (detail) return setDetail(null), true;
+    if (tab === "explore" && разделОбзора) return setРазделОбзора(undefined), true;
     if (phase === "register" || phase === "login") return setPhase("splash"), true;
     if (phase === "interests") return setPhase("lang"), true;
     if (phase === "app" && tab !== "home") return switchTab("home"), true;
@@ -281,6 +289,7 @@ function App() {
     showFavorites,
     showTrip,
     detail,
+    разделОбзора,
     phase,
     tab,
   ]);
@@ -462,7 +471,10 @@ function App() {
                   onRestaurant={openRestaurant}
                   onПуть={openПуть}
                   profileView={profileView}
-                  фильтрОбзора={фильтрОбзора}
+                  разделОбзора={разделОбзора}
+                  onРазделОбзора={setРазделОбзора}
+                  городОбзора={городОбзора}
+                  onГородОбзора={setГородОбзора}
                   onExplore={openExplore}
                   кодЗаписи={кодЗаписи}
                   onTab={switchTab}
@@ -507,8 +519,11 @@ interface ScreenProps {
   onRestaurant: (r: Restaurant) => void;
   onПуть: (название: string, город: string) => void;
   profileView?: "stats" | "bookings" | "support";
-  фильтрОбзора?: ФильтрОбзора;
-  onExplore: (f?: ФильтрОбзора) => void;
+  разделОбзора?: РазделОбзора;
+  onРазделОбзора: (р?: РазделОбзора) => void;
+  городОбзора: string | null;
+  onГородОбзора: (г: string | null) => void;
+  onExplore: (р?: РазделОбзора) => void;
   кодЗаписи: string | null;
   onTab: (t: Tab) => void;
   onToast: (msg: string) => void;
@@ -573,7 +588,13 @@ function Screen({ tab, detail, ...p }: ScreenProps) {
           onHotel={p.onHotel}
           onRestaurant={p.onRestaurant}
           isPremium={p.isPremium}
-          начальныйФильтр={p.фильтрОбзора}
+          раздел={p.разделОбзора}
+          onРаздел={p.onРазделОбзора}
+          город={p.городОбзора}
+          onГород={p.onГородОбзора}
+          onTab={p.onTab}
+          onTransport={p.onTransport}
+          onPractical={p.onPractical}
         />
       );
     case "map":

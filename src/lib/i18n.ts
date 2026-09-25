@@ -432,6 +432,12 @@ export const СЛОВАРЬ = {
   bk_empty_hint: row("A room, a table or a tour can be requested on its own page.", "Забронировать номер, столик или тур можно на их страницах.", "Xona, stol yoki turni ularning sahifasida band qilish mumkin.", "房间、餐位或旅行团可在各自页面预订。", "객실·테이블·투어는 각 페이지에서 신청할 수 있어요.", "Zimmer, Tisch oder Tour lassen sich auf der jeweiligen Seite anfragen.", "Chambre, table ou circuit se réservent sur leur page.", "部屋・席・ツアーは各ページから申し込めます。", "Oda, masa veya tur kendi sayfasından istenebilir.", "يمكن طلب غرفة أو طاولة أو جولة من صفحتها."),
   tr_seats: row("seats", "мест", "o'rin", "座", "석", "Plätze", "places", "席", "koltuk", "مقعد"),
   dist_center: row("in the centre", "в центре", "markazda", "在市中心", "도심", "im Zentrum", "au centre", "中心部", "merkezde", "في المركز"),
+  ex_cities: row("Cities", "Города", "Shaharlar", "城市", "도시", "Städte", "Villes", "都市", "Şehirler", "المدن"),
+  ex_all_cities: row("All cities", "Все города", "Barcha shaharlar", "所有城市", "모든 도시", "Alle Städte", "Toutes les villes", "すべての都市", "Tüm şehirler", "كل المدن"),
+  ex_audio: row("Audio guides", "Аудиогиды", "Audiogidlar", "语音导览", "오디오 가이드", "Audioguides", "Audioguides", "音声ガイド", "Sesli rehberler", "أدلة صوتية"),
+  ex_tips: row("Good to know", "Полезное", "Foydali", "实用信息", "알아두면 좋은", "Gut zu wissen", "Bon à savoir", "お役立ち", "Faydalı bilgiler", "معلومات مفيدة"),
+  ex_sections: row("What are you looking for?", "Что ищете?", "Nima qidiryapsiz?", "你想找什么？", "무엇을 찾으세요?", "Was suchst du?", "Que cherchez-vous ?", "何をお探しですか？", "Ne arıyorsunuz?", "عمّ تبحث؟"),
+  ex_near: row("Near you", "Рядом с вами", "Yaqiningizda", "在你附近", "내 주변", "In deiner Nähe", "Près de vous", "近く", "Yakınınızda", "بالقرب منك"),
   explore_empty: row("Nothing in this category yet", "В этой категории пока пусто", "Bu turkumda hozircha bo'sh", "该分类暂时没有内容", "이 분류는 아직 비어 있어요", "In dieser Kategorie ist noch nichts", "Rien dans cette catégorie", "このカテゴリはまだ空です", "Bu kategoride henüz bir şey yok", "لا شيء في هذه الفئة بعد"),
   /* Действия в настройках: обновления, поделиться, оценка, удаление. */
   upd_checking: row("Checking…", "Проверяем…", "Tekshiryapmiz…", "检查中…", "확인 중…", "Prüfe…", "Vérification…", "確認中…", "Kontrol ediliyor…", "جارٍ التحقق…"),

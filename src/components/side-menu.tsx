@@ -30,8 +30,8 @@ export function SideMenu({
   const { t } = useT();
   const NAV: [Tab, string, TKey][] = [
     ["home", "🏠", "nav_home"],
-    ["explore", "🔍", "nav_explore"],
     ["map", "🗺️", "nav_map"],
+    ["explore", "🔍", "nav_explore"],
     ["audio", "🎧", "nav_audio"],
     ["profile", "👤", "nav_profile"],
   ];

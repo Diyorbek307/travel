@@ -1,5 +1,5 @@
 import type { Hotel, Place, Restaurant, Tab } from "@/lib/types";
-import type { ФильтрОбзора } from "./explore";
+import type { РазделОбзора } from "./explore";
 import type { TKey } from "@/lib/i18n";
 import { датаСловами } from "@/lib/i18n";
 import {
@@ -60,7 +60,7 @@ export function HomeScreen({
   onRestaurant: (r: Restaurant) => void;
   onMenu: () => void;
   onTab: (t: Tab) => void;
-  onExplore: (f?: ФильтрОбзора) => void;
+  onExplore: (р?: РазделОбзора) => void;
   onTransport: () => void;
   onToast: (m: string) => void;
   isPremium: boolean;
@@ -232,14 +232,14 @@ export function HomeScreen({
           {/* Под плиткой — сколько записей и правда есть в базе, а не
               круглое число из макета. */}
           {[
-            { e: "🏛️", l: t("home_places"), sub: String(PLACES.length), go: () => onExplore() },
+            { e: "🏛️", l: t("home_places"), sub: String(PLACES.length), go: () => onExplore("places") },
             { e: "🗺️", l: t("home_routes"), sub: t("map_tab_ai"), go: () => onTab("map") },
-            { e: "🏨", l: t("home_hotels"), sub: String(HOTELS.length), go: () => onExplore("Отели") },
+            { e: "🏨", l: t("home_hotels"), sub: String(HOTELS.length), go: () => onExplore("hotels") },
             {
               e: "🍽️",
               l: t("home_restaurants"),
               sub: String(RESTAURANTS.length),
-              go: () => onExplore("Рестораны"),
+              go: () => onExplore("restaurants"),
             },
           ].map((c) => (
             <button
@@ -482,7 +482,7 @@ export function HomeScreen({
             {t("home_best_rest")}
           </p>
           <button
-            onClick={() => onExplore("Рестораны")}
+            onClick={() => onExplore("restaurants")}
             className="text-xs font-medium"
             style={{ color: GREEN }}
           >
