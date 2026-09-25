@@ -1,3 +1,4 @@
+import { мягко } from "@/lib/theme";
 import { useState } from "react";
 import { PageHeader, Badge, Btn, SectionTitle, ДемоРаздел } from "./shared";
 
@@ -107,7 +108,7 @@ export default function NotifCenter({ onNavigate }: { onNavigate?: (page: string
               {/* Icon */}
               <div
                 className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-base"
-                style={{ background: TYPE_COLORS[n.type] + "22", color: TYPE_COLORS[n.type] }}
+                style={{ background: мягко(TYPE_COLORS[n.type], 13), color: TYPE_COLORS[n.type] }}
               >
                 {TYPE_ICONS[n.type]}
               </div>
@@ -133,7 +134,7 @@ export default function NotifCenter({ onNavigate }: { onNavigate?: (page: string
             <div className="rounded-2xl p-5 sticky top-0" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }}>
               <div
                 className="w-12 h-12 rounded-full flex items-center justify-center text-xl mb-4"
-                style={{ background: TYPE_COLORS[selected.type] + "22", color: TYPE_COLORS[selected.type] }}
+                style={{ background: мягко(TYPE_COLORS[selected.type], 13), color: TYPE_COLORS[selected.type] }}
               >
                 {TYPE_ICONS[selected.type]}
               </div>

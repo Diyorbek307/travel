@@ -19,7 +19,7 @@ const PORT = Number(process.env.SMTP_PORT ?? 587);
 const USER = process.env.SMTP_USER;
 const PASS = process.env.SMTP_PASSWORD;
 
-const FROM = process.env.MAIL_FROM ?? `UzRoam <${USER ?? "noreply@uzroam.com"}>`;
+const FROM = process.env.MAIL_FROM ?? `HelloUZ <${USER ?? "noreply@hellouz.uz"}>`;
 
 /**
  * Настроен ли хоть какой-то способ отправки.
@@ -281,7 +281,7 @@ export async function проверитьПочту(): Promise<{
 export async function пробноеПисьмо(to: string): Promise<boolean> {
   return sendMail({
     to,
-    subject: "Проверка почты UzRoam",
+    subject: "Проверка почты HelloUZ",
     text: "Если вы это читаете, отправка писем настроена верно.",
     html: каркас(
       "Почта настроена",
@@ -297,17 +297,17 @@ export async function пробноеПисьмо(to: string): Promise<boolean> {
 /** Общая рамка письма — в цветах приложения, без внешних картинок. */
 function каркас(заголовок: string, тело: string): string {
   return `<!doctype html>
-<html lang="ru"><body style="margin:0;padding:24px;background:#f5f1e6;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;color:#2b2b2b">
+<html lang="ru"><body style="margin:0;padding:24px;background:#f4f7f7;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;color:#2b2b2b">
   <table role="presentation" style="max-width:480px;margin:0 auto;background:#ffffff;border-radius:16px;overflow:hidden">
-    <tr><td style="background:#2e7d5a;padding:24px 28px">
-      <div style="color:#ffffff;font-size:20px;font-weight:700">UzRoam</div>
+    <tr><td style="background:#07685f;padding:24px 28px">
+      <div style="color:#ffffff;font-size:20px;font-weight:700">Hello<span style="color:#f2ce6e">UZ</span></div>
       <div style="color:rgba(255,255,255,0.7);font-size:13px;margin-top:2px">Открой Узбекистан</div>
     </td></tr>
     <tr><td style="padding:28px">
       <h1 style="margin:0 0 12px;font-size:19px">${заголовок}</h1>
       ${тело}
     </td></tr>
-    <tr><td style="padding:0 28px 24px;color:#7a6e5f;font-size:12px;line-height:1.5">
+    <tr><td style="padding:0 28px 24px;color:#67807b;font-size:12px;line-height:1.5">
       Если вы этого не запрашивали, просто не отвечайте на письмо — ничего не произойдёт.
     </td></tr>
   </table>
@@ -316,27 +316,27 @@ function каркас(заголовок: string, тело: string): string {
 
 export function письмоСКодом(code: string): Omit<Letter, "to"> {
   return {
-    subject: `${code} — код подтверждения UzRoam`,
+    subject: `${code} — код подтверждения HelloUZ`,
     text: `Ваш код подтверждения: ${code}\n\nОн действует 15 минут.\n\nЕсли вы этого не запрашивали, ничего делать не нужно.`,
     html: каркас(
       "Подтвердите почту",
       `<p style="margin:0 0 18px;font-size:14px;line-height:1.6">Введите этот код в приложении:</p>
-       <div style="font-size:32px;font-weight:700;letter-spacing:8px;color:#2e7d5a;background:#f5f1e6;border-radius:12px;padding:16px;text-align:center">${code}</div>
-       <p style="margin:18px 0 0;font-size:13px;color:#7a6e5f">Код действует 15 минут.</p>`,
+       <div style="font-size:32px;font-weight:700;letter-spacing:8px;color:#07685f;background:#eef6f5;border-radius:12px;padding:16px;text-align:center">${code}</div>
+       <p style="margin:18px 0 0;font-size:13px;color:#67807b">Код действует 15 минут.</p>`,
     ),
   };
 }
 
 export function письмоСоСсылкой(link: string): Omit<Letter, "to"> {
   return {
-    subject: "Смена пароля UzRoam",
+    subject: "Смена пароля HelloUZ",
     text: `Чтобы задать новый пароль, откройте ссылку:\n${link}\n\nОна действует один час и сработает только один раз.`,
     html: каркас(
       "Смена пароля",
       `<p style="margin:0 0 18px;font-size:14px;line-height:1.6">Нажмите кнопку, чтобы задать новый пароль:</p>
        <a href="${link}" style="display:inline-block;background:#e9c46a;color:#2b2b2b;text-decoration:none;font-weight:700;padding:14px 22px;border-radius:12px">Задать новый пароль</a>
-       <p style="margin:18px 0 0;font-size:13px;color:#7a6e5f">Ссылка действует один час и сработает только один раз.</p>
-       <p style="margin:10px 0 0;font-size:12px;color:#7a6e5f;word-break:break-all">${link}</p>`,
+       <p style="margin:18px 0 0;font-size:13px;color:#67807b">Ссылка действует один час и сработает только один раз.</p>
+       <p style="margin:10px 0 0;font-size:12px;color:#67807b;word-break:break-all">${link}</p>`,
     ),
   };
 }

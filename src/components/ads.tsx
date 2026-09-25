@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ADS } from "@/data/content";
 import { useAppContent } from "./content-provider";
 import { useT } from "@/components/lang-provider";
-import { BORDER, LIME, MUTED, SURFACE, TEXT, WHITE, контрастныйТекст, мягко } from "@/lib/theme";
+import { ACCENT_2, BORDER, MUTED, SURFACE, TEXT, WHITE, контрастныйТекст, мягко } from "@/lib/theme";
 import type { AdPolicy } from "@/lib/types";
 
 /**
@@ -141,7 +141,7 @@ export function AdSpotlight({ isPremium, cities }: { isPremium: boolean; cities?
   return (
     <div className="px-4 pt-5">
       <div className="mb-2.5 flex items-center justify-between">
-        <p className="text-base font-bold" style={{ color: TEXT, fontFamily: "'Fraunces',serif" }}>
+        <p className="text-base font-bold" style={{ color: TEXT, fontFamily:"var(--font-heading)" }}>
           ✨ {t("ad_offer_title")}
         </p>
         <button onClick={() => setСкрыт(true)} className="text-[10px] transition-all active:scale-95" style={{ color: MUTED }}>
@@ -194,7 +194,7 @@ export function AdSpotlight({ isPremium, cities }: { isPremium: boolean; cities?
                   </span>
                 )}
               </div>
-              <p className="font-bold leading-tight" style={{ color: текст, fontSize: 17, fontFamily: "'Fraunces',serif" }}>
+              <p className="font-bold leading-tight" style={{ color: текст, fontSize: 17, fontFamily:"var(--font-heading)" }}>
                 {трК(ad.title)}
               </p>
               <p className="mt-1 text-[11px] leading-snug" style={{ color: текст, opacity: 0.82 }}>
@@ -237,7 +237,7 @@ export function AdShelf({ isPremium }: { isPremium: boolean }) {
   return (
     <div className="pt-5">
       <div className="mb-3 flex items-center gap-2 px-4">
-        <p className="text-base font-bold" style={{ color: TEXT, fontFamily: "'Fraunces',serif" }}>
+        <p className="text-base font-bold" style={{ color: TEXT, fontFamily:"var(--font-heading)" }}>
           🎒 {t("ad_shelf_title")}
         </p>
         <Пометка тёмный={false} />
@@ -482,7 +482,7 @@ export function AdInterstitial({
         <p className="mb-0.5 text-[11px] font-bold uppercase" style={{ letterSpacing: "0.1em", color: "rgba(255,255,255,0.7)" }}>
           {трК(ad.label)}
         </p>
-        <p className="mb-2 text-xl font-bold leading-tight" style={{ color: "#fff", fontFamily: "'Fraunces',serif" }}>
+        <p className="mb-2 text-xl font-bold leading-tight" style={{ color: "#fff", fontFamily:"var(--font-heading)" }}>
           {трК(ad.title)}
         </p>
         <button
@@ -516,7 +516,7 @@ export function AdInline({ isPremium, cities }: { isPremium: boolean; cities?: s
     <div className="mx-4 mb-3">
       <div
         className="flex items-center gap-3 rounded-2xl border px-3 py-2.5"
-        style={{ background: SURFACE, borderColor: BORDER, borderLeft: `3px solid ${LIME}` }}
+        style={{ background: SURFACE, borderColor: BORDER, borderLeft: `3px solid ${ACCENT_2}` }}
       >
         <button
           onClick={() => перейти(ad)}

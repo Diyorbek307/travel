@@ -59,9 +59,9 @@ export function напомнитьОСобытии(событие: {
   const ics = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//UzRoam//RU",
+    "PRODID:-//HelloUZ//RU",
     "BEGIN:VEVENT",
-    `UID:${Date.now()}@uzroam`,
+    `UID:${Date.now()}@hellouz`,
     `DTSTAMP:${деньICS(new Date())}T000000Z`,
     `DTSTART;VALUE=DATE:${деньICS(начало)}`,
     `DTEND;VALUE=DATE:${деньICS(конец)}`,

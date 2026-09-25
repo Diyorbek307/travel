@@ -1,6 +1,6 @@
 {
-  "name": "UzRoam — ваш персональный гид по Узбекистану",
-  "short_name": "UzRoam",
+  "name": "HelloUZ — ваш персональный гид по Узбекистану",
+  "short_name": "HelloUZ",
   "description": "Маршруты, аудиогиды, музеи и достопримечательности Узбекистана. Работает офлайн.",
   "lang": "ru",
   "dir": "ltr",
@@ -9,7 +9,7 @@
   "id": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#F4F7F7",
+  "background_color": "#000000",
   "theme_color": "#07685F",
   "categories": [
     "travel",

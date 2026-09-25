@@ -88,7 +88,7 @@ export function CurrencyConverter() {
 
       <div className="rounded-xl p-3 text-center" style={{ background: ACCENT_SOFT }}>
         {результат !== null ? (
-          <p className="text-lg font-bold" style={{ color: GREEN, fontFamily: "'Fraunces',serif" }}>
+          <p className="text-lg font-bold" style={{ color: GREEN, fontFamily:"var(--font-heading)" }}>
             {результат.toLocaleString(lang, { maximumFractionDigits: 2 })} {СИМВОЛЫ[to] ?? to}
           </p>
         ) : (
@@ -127,7 +127,7 @@ export function PracticalScreen({ onBack }:{ onBack:()=>void }) {
       <div className="bg-white px-4 pt-14 pb-4 border-b" style={{borderColor:BORDER}}>
         <div className="flex items-center gap-3">
           <button onClick={onBack} className="w-9 h-9 rounded-xl flex items-center justify-center" style={{background:CREAM}}><svg className="rtl-flip" width="16" height="16" fill="none" stroke={TEXT} strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
-          <div><p className="text-xs font-medium" style={{color:GREEN,letterSpacing:"0.1em"}}>{t("pr_kicker")}</p><h1 className="text-xl font-bold" style={{color:TEXT,fontFamily:"'Fraunces',serif"}}>{t("pr_title")}</h1></div>
+          <div><p className="text-xs font-medium" style={{color:GREEN,letterSpacing:"0.1em"}}>{t("pr_kicker")}</p><h1 className="text-xl font-bold" style={{color:TEXT,fontFamily:"var(--font-heading)"}}>{t("pr_title")}</h1></div>
         </div>
       </div>
       <div className="flex-1 overflow-y-auto hide-scroll p-4 space-y-2.5">

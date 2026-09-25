@@ -6,7 +6,7 @@ import { ADS } from "@/data/content";
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Hotel, Place } from "@/lib/types";
-import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE, ACCENT_SOFT } from "@/lib/theme";
+import { ACCENT_FILL, BORDER, CREAM, GOLD, GREEN, GREEN_LIGHT, MUTED, TEXT, WHITE, SURFACE, ACCENT_SOFT, ON_GOLD } from "@/lib/theme";
 
 export function MiniPlayer({ place, onClose }:{ place:Place; onClose:()=>void }) {
   const { t } = useT();
@@ -20,14 +20,14 @@ export function MiniPlayer({ place, onClose }:{ place:Place; onClose:()=>void })
   },[playing]);
   return (
     <div className="absolute bottom-16 left-0 right-0 z-20 px-3 pb-1">
-      <div className="rounded-2xl overflow-hidden shadow-lg border" style={{background:GREEN,borderColor:ACCENT_SOFT}}>
+      <div className="rounded-2xl overflow-hidden shadow-lg border" style={{background:ACCENT_FILL,borderColor:ACCENT_SOFT}}>
         <div className="h-0.5 w-full" style={{background:"rgba(255,255,255,0.2)"}}><div className="h-0.5" style={{background:GOLD,width:`${progress}%`,transition:"width 0.2s linear"}}/></div>
         <div className="flex items-center gap-3 px-3 py-2.5">
           <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0"><img src={place.img} alt={place.name} className="w-full h-full object-cover"/></div>
           <div className="flex-1 min-w-0"><p className="text-white font-semibold text-xs truncate">{place.name}</p><p className="text-white/60 text-[10px]">{t("d_audioguide")} · {Math.floor(progress*8.42/100/60)}:{String(Math.floor(progress*8.42/100%60)).padStart(2,"0")} / 8:42</p></div>
           <div className="flex items-center gap-2">
             <button onClick={()=>setPlaying(!playing)} className="w-8 h-8 rounded-xl flex items-center justify-center" style={{background:GOLD}}>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill={TEXT}>{playing?<><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></>:<polygon points="5 3 19 12 5 21 5 3"/>}</svg>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill={ON_GOLD}>{playing?<><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></>:<polygon points="5 3 19 12 5 21 5 3"/>}</svg>
             </button>
             <button onClick={onClose} className="w-7 h-7 rounded-xl flex items-center justify-center" style={{background:"rgba(255,255,255,0.15)"}}><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
           </div>
@@ -80,7 +80,7 @@ export function OfflinePacks() {
                   <p className="font-semibold text-sm" style={{color:TEXT}}>{трК(pack.name)}</p>
                   <p className="text-xs" style={{color:MUTED}}>{pack.count} {t("off_guides")} · {pack.size.toLocaleString(lang)} {t("unit_gb")}</p>
                 </div>
-                {!pack.done&&!downloading&&<button onClick={()=>startDownload(pack.name)} className="px-3 py-1.5 rounded-lg text-xs font-bold" style={{background:GREEN,color:WHITE}}>{t("off_download")}</button>}
+                {!pack.done&&!downloading&&<button onClick={()=>startDownload(pack.name)} className="px-3 py-1.5 rounded-lg text-xs font-bold" style={{background:ACCENT_FILL,color:WHITE}}>{t("off_download")}</button>}
                 {pack.done&&<span className="text-xs font-semibold px-2 py-1 rounded-lg" style={{background:ACCENT_SOFT,color:GREEN}}>{t("off_done")}</span>}
               </div>
               {downloading&&(
@@ -90,7 +90,7 @@ export function OfflinePacks() {
                     <span className="text-xs font-semibold" style={{color:GREEN}}>{Math.round(pct??0)}%</span>
                   </div>
                   <div className="rounded-full h-1.5 overflow-hidden" style={{background:BORDER}}>
-                    <div className="h-full rounded-full transition-all duration-200" style={{width:`${pct??0}%`,background:`linear-gradient(90deg,${GREEN},#5BB88A)`}}/>
+                    <div className="h-full rounded-full transition-all duration-200" style={{width:`${pct??0}%`,background:`linear-gradient(90deg,${GREEN},${GREEN_LIGHT})`}}/>
                   </div>
                 </div>
               )}

@@ -1,6 +1,6 @@
 "use client";
 
-import { BORDER, CREAM, GREEN, MUTED, TEXT } from "@/lib/theme";
+import { ACCENT_FILL, BORDER, CREAM, GREEN, MUTED, TEXT } from "@/lib/theme";
 import type { Place } from "@/lib/types";
 import { useAppContent } from "@/components/content-provider";
 import { useT } from "@/components/lang-provider";
@@ -39,7 +39,7 @@ export default function TripScreen({
           </button>
           <div className="min-w-0 flex-1">
             <p className="text-xs font-medium" style={{ color: GREEN, letterSpacing: "0.1em" }}>📋 {маршрут.length}</p>
-            <h1 className="truncate text-xl font-bold" style={{ color: TEXT, fontFamily: "'Fraunces',serif" }}>{t("trip_title")}</h1>
+            <h1 className="truncate text-xl font-bold" style={{ color: TEXT, fontFamily:"var(--font-heading)" }}>{t("trip_title")}</h1>
           </div>
           {маршрут.length > 0 && (
             <button onClick={очиститьМаршрут} className="flex-shrink-0 text-xs font-semibold transition-all active:scale-95" style={{ color: MUTED }}>
@@ -64,7 +64,7 @@ export default function TripScreen({
               {/* Номер по порядку: это план поездки, и порядок в нём — смысл. */}
               <span
                 className="absolute left-1.5 top-1.5 flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold text-white"
-                style={{ background: GREEN }}
+                style={{ background: ACCENT_FILL }}
               >
                 {i + 1}
               </span>

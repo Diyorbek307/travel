@@ -1,14 +1,14 @@
 import type { Hotel, Place, Restaurant, Tab } from "@/lib/types";
 import type { TKey } from "@/lib/i18n";
 import { датаСловами } from "@/lib/i18n";
-import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE, ACCENT_SOFT, ACCENT_DEEP, GLOW, контрастныйТекст } from "@/lib/theme";
+import { ACCENT_FILL, BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE, ACCENT_SOFT, ACCENT_DEEP, GLOW, контрастныйТекст, ON_GOLD } from "@/lib/theme";
 import { ГОРОДА } from "@/data/geo";
 import { useAppContent } from "@/components/content-provider";
 import { useT } from "@/components/lang-provider";
 import { useWeather } from "@/components/weather-provider";
 import { useGeo } from "@/components/geo-provider";
 import { ближайшийГород } from "@/data/geo";
-import { GeomPattern, LogoMark } from "../ui";
+import { GeomPattern, LogoMark, Wordmark } from "../ui";
 import { AnimatedBg } from "@/components/animated-bg";
 import { CardDeck, CityDeck } from "@/components/card-deck";
 import { напомнитьОСобытии } from "@/lib/calendar";
@@ -71,7 +71,7 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
             }}
           >
             <span data-brand-logo className="inline-flex shrink-0"><LogoMark size={22} tone="#ffffff"/></span>
-            <span className="text-white text-sm font-bold" style={{fontFamily:"'Fraunces',serif",textShadow:"0 1px 6px rgba(0,0,0,0.5)"}}>UzRoam</span>
+            <Wordmark size={15} light style={{textShadow:"0 1px 6px rgba(0,0,0,0.5)"}}/>
           </div>
           <button onClick={onNotifs} className="w-9 h-9 rounded-xl flex items-center justify-center relative" style={{...glass}}>
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
@@ -85,7 +85,7 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
           <div className="flex items-center gap-2">
             <span className="text-3xl">{самарканд?.icon ?? "🌡️"}</span>
             <div>
-              <p className="text-2xl font-bold leading-none" style={{color:TEXT,fontFamily:"'Fraunces',serif"}}>{самарканд ? `${самарканд.temp}°C` : "—"}</p>
+              <p className="text-2xl font-bold leading-none" style={{color:TEXT,fontFamily:"var(--font-heading)"}}>{самарканд ? `${самарканд.temp}°C` : "—"}</p>
               <p className="text-[9px] mt-0.5" style={{color:MUTED}}>{самарканд ? t(самарканд.condKey) : ""}</p>
               <p className="text-[9px]" style={{color:MUTED}}>{самарканд ? `💨 ${самарканд.windKmh} ${t("w_wind")}` : ""}</p>
             </div>
@@ -98,13 +98,13 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
             <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"/>
             <p className="text-white/65 text-xs">{t("home_welcome")} · {датаСловами(new Date(), lang)}</p>
           </div>
-          <h1 className="text-white font-bold leading-tight mb-1" style={{fontSize:34,fontFamily:"'Fraunces',serif"}}>{трК("Самарканд")}</h1>
+          <h1 className="text-white font-bold leading-tight mb-1" style={{fontSize:34,fontFamily:"var(--font-heading)"}}>{трК("Самарканд")}</h1>
           <p className="text-white/65 text-xs mb-3">{t("home_city_tagline")}</p>
           {/* Glassmorphism search bar */}
           <button onClick={()=>onSearch()} className="w-full flex items-center gap-3 rounded-2xl px-4 py-3.5" style={{background:"rgba(255,255,255,0.2)",backdropFilter:"blur(20px)",border:"1px solid rgba(255,255,255,0.38)"}}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" strokeWidth="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             <span className="flex-1 text-left text-sm" style={{color:"rgba(255,255,255,0.72)"}}>{t("home_search_ph")}</span>
-            <div className="px-2.5 py-1 rounded-lg text-[10px] font-bold" style={{background:GOLD,color:TEXT}}>{t("common_search")}</div>
+            <div className="px-2.5 py-1 rounded-lg text-[10px] font-bold" style={{background:GOLD,color:ON_GOLD}}>{t("common_search")}</div>
           </button>
         </div>
       </div>
@@ -126,7 +126,7 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
           ))}
         </div>
         {/* Transport wide button */}
-        <button onClick={onTransport} className="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl active:scale-[0.98] transition-all" style={{background:`linear-gradient(135deg,${ACCENT_DEEP},${GREEN})`,boxShadow:`0 4px 16px ${GLOW}`}}>
+        <button onClick={onTransport} className="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl active:scale-[0.98] transition-all" style={{background:`linear-gradient(135deg,${ACCENT_DEEP},${ACCENT_FILL})`,boxShadow:`0 4px 16px ${GLOW}`}}>
           <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{background:"rgba(255,255,255,0.18)"}}>🚇</div>
           <div className="flex-1 text-left">
             <p className="text-white font-bold text-sm">{t("home_transport")}</p>
@@ -141,7 +141,7 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
 
       {/* ── Weather horizontal scroll ── */}
       <div className="pt-5">
-        <p className="font-bold text-base mb-3 px-4" style={{color:TEXT,fontFamily:"'Fraunces',serif"}}>🌤️ {t("home_weather")}</p>
+        <p className="font-bold text-base mb-3 px-4" style={{color:TEXT,fontFamily:"var(--font-heading)"}}>🌤️ {t("home_weather")}</p>
         <div className="flex gap-3 overflow-x-auto hide-scroll px-4 pb-1">
           {Object.keys(ГОРОДА).map((city)=>{
             const w = погода.get(city);
@@ -149,7 +149,7 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
               <div key={city} className="flex-shrink-0 bg-white rounded-2xl p-3 shadow-sm border text-center" style={{borderColor:BORDER,minWidth:96}}>
                 <p className="text-[10px] font-bold mb-1 truncate" style={{color:TEXT}}>{трК(city)}</p>
                 <div className="flex items-center justify-center gap-1">
-                  <p className="font-bold" style={{color:TEXT,fontSize:28,fontFamily:"'Fraunces',serif",lineHeight:1}}>{w ? `${w.temp}°` : "—"}</p>
+                  <p className="font-bold" style={{color:TEXT,fontSize:28,fontFamily:"var(--font-heading)",lineHeight:1}}>{w ? `${w.temp}°` : "—"}</p>
                   <span style={{fontSize:30,lineHeight:1}}>{w?.icon ?? "🌡️"}</span>
                 </div>
                 <p className="text-[9px] leading-tight mt-1" style={{color:MUTED}}>{w ? t(w.condKey) : ""}</p>
@@ -169,7 +169,7 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
       {/* ── Events ── */}
       <div className="pt-5">
         <div className="flex items-center justify-between mb-3 px-4">
-          <p className="font-bold text-base" style={{color:TEXT,fontFamily:"'Fraunces',serif"}}>🎉 {t("home_events")}</p>
+          <p className="font-bold text-base" style={{color:TEXT,fontFamily:"var(--font-heading)"}}>🎉 {t("home_events")}</p>
         </div>
         <div className="flex gap-3 overflow-x-auto hide-scroll px-4 pb-1">
           {EVENTS.map(ev=>(
@@ -188,7 +188,7 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
       {/* ── Flash Deals Hotels — dark image-23 cards ── */}
       <div className="pt-5">
         <div className="flex items-center justify-between mb-3 px-4">
-          <p className="font-bold text-base" style={{color:TEXT,fontFamily:"'Fraunces',serif"}}>{t("home_flash_hotels")}</p>
+          <p className="font-bold text-base" style={{color:TEXT,fontFamily:"var(--font-heading)"}}>{t("home_flash_hotels")}</p>
           <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"/><span className="text-xs font-bold text-red-500">LIVE</span></div>
         </div>
         <div className="flex gap-3 overflow-x-auto hide-scroll px-4 pb-1">
@@ -203,7 +203,7 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
               {/* Info */}
               <div className="absolute bottom-0 left-0 right-0 p-3">
                 <p className="text-[8px] mb-0.5" style={{color:"rgba(255,255,255,0.45)"}}>📍 {трК(h.city)}</p>
-                <p className="text-white font-bold leading-tight mb-1.5" style={{fontSize:13,fontFamily:"'Fraunces',serif"}}>{h.name}</p>
+                <p className="text-white font-bold leading-tight mb-1.5" style={{fontSize:13,fontFamily:"var(--font-heading)"}}>{h.name}</p>
                 <div className="flex gap-3 pb-2 mb-2 border-b" style={{borderColor:"rgba(255,255,255,0.1)"}}>
                   <div><p className="text-white font-bold text-[10px]">{h.rating}★</p><p className="text-[7px]" style={{color:"rgba(255,255,255,0.4)"}}>{t("card_rating")}</p></div>
                   <div><p className="text-white font-bold text-[10px]">{h.reviews}</p><p className="text-[7px]" style={{color:"rgba(255,255,255,0.4)"}}>{t("d_reviews_word")}</p></div>
@@ -211,7 +211,7 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
                 </div>
                 <div className="flex items-center justify-between">
                   <div><p className="text-[7px]" style={{color:"rgba(255,255,255,0.4)"}}>{t("home_per_night")}</p><p className="text-white font-bold text-sm">{дг.цена(h.price)}</p></div>
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{background:GOLD}}><svg className="rtl-flip" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={TEXT} strokeWidth="2.5"><polyline points="9 18 15 12 9 6"/></svg></div>
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{background:GOLD}}><svg className="rtl-flip" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={ON_GOLD} strokeWidth="2.5"><polyline points="9 18 15 12 9 6"/></svg></div>
                 </div>
               </div>
             </button>
@@ -222,7 +222,7 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
       {/* ── Top Restaurants — dark image-23 cards ── */}
       <div className="pt-5">
         <div className="flex items-center justify-between mb-3 px-4">
-          <p className="font-bold text-base" style={{color:TEXT,fontFamily:"'Fraunces',serif"}}>{t("home_best_rest")}</p>
+          <p className="font-bold text-base" style={{color:TEXT,fontFamily:"var(--font-heading)"}}>{t("home_best_rest")}</p>
           <button onClick={()=>onTab("explore")} className="text-xs font-medium" style={{color:GREEN}}>{t("home_all")}</button>
         </div>
         <div className="flex gap-3 overflow-x-auto hide-scroll px-4 pb-1">
@@ -234,7 +234,7 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
               {(()=>{const w=погода.get(r.city);return w?<div className="absolute top-3 right-3"><span className="text-[8px] font-bold px-2 py-0.5 rounded-full" style={{background:"rgba(0,0,0,0.5)",backdropFilter:"blur(6px)",color:"white"}}>{w.icon}{w.temp}°</span></div>:null;})()}
               <div className="absolute bottom-0 left-0 right-0 p-3">
                 <p className="text-[8px] mb-0.5" style={{color:"rgba(255,255,255,0.45)"}}>📍 {трК(r.city)}</p>
-                <p className="text-white font-bold leading-tight mb-1.5" style={{fontSize:12,fontFamily:"'Fraunces',serif"}}>{r.name}</p>
+                <p className="text-white font-bold leading-tight mb-1.5" style={{fontSize:12,fontFamily:"var(--font-heading)"}}>{r.name}</p>
                 <div className="flex gap-3 pb-1.5 mb-1.5 border-b" style={{borderColor:"rgba(255,255,255,0.1)"}}>
                   <div><p className="text-white font-bold text-[10px]">{r.rating}★</p><p className="text-[7px]" style={{color:"rgba(255,255,255,0.4)"}}>{t("card_rating")}</p></div>
                   <div><p className="text-white font-bold text-[10px]">{r.open.split("–")[0]}</p><p className="text-[7px]" style={{color:"rgba(255,255,255,0.4)"}}>{t("home_open_word")}</p></div>
@@ -252,15 +252,15 @@ export function HomeScreen({ onPlace, onSearch, onHotel, onNotifs, onPractical, 
       {/* ── Practical info teaser ── */}
       <div className="px-4 pt-4">
         <button onClick={onPractical} className="w-full rounded-2xl p-4 flex items-center gap-3 text-left active:scale-[0.98] transition-all" style={{background:ACCENT_SOFT}}>
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0" style={{background:GREEN}}>💡</div>
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0" style={{background:ACCENT_FILL}}>💡</div>
           <div className="flex-1"><p className="text-sm font-bold" style={{color:TEXT}}>{t("pr_title")}</p><p className="text-[10px]" style={{color:MUTED}}>{t("home_practical_sub")}</p></div>
           <svg className="rtl-flip" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={GREEN} strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
       </div>
 
-      {/* ── Why UzRoam ── */}
+      {/* ── Why HelloUZ ── */}
       <div className="px-4 pt-5 pb-8">
-        <p className="font-bold text-base mb-4" style={{color:TEXT,fontFamily:"'Fraunces',serif"}}>{t("home_why")}</p>
+        <p className="font-bold text-base mb-4" style={{color:TEXT,fontFamily:"var(--font-heading)"}}>{t("home_why")}</p>
         <div className="grid grid-cols-4 gap-2">
           {[{icon:"✅",label:t("why_reliable"),sub:t("why_reliable_sub")},{icon:"🗺️",label:t("why_handy"),sub:t("why_handy_sub")},{icon:"🎧",label:"24/7",sub:t("why_support_sub")},{icon:"🇺🇿",label:t("why_made"),sub:t("why_made_sub")}].map(f=>(
             <div key={f.label} className="flex flex-col items-center text-center"><div className="w-11 h-11 rounded-2xl flex items-center justify-center text-lg mb-1.5 bg-white shadow-sm border" style={{borderColor:BORDER}}>{f.icon}</div><p className="font-semibold leading-tight" style={{color:TEXT,fontSize:9}}>{f.label}</p><p className="mt-0.5 leading-tight" style={{color:MUTED,fontSize:8}}>{f.sub}</p></div>

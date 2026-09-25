@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { Hotel, Place, Restaurant } from "@/lib/types";
-import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE } from "@/lib/theme";
+import { ACCENT_FILL, BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE, ON_GOLD } from "@/lib/theme";
 import { FILTER_TABS } from "@/data/content";
 import type { TKey } from "@/lib/i18n";
 import { useAppContent } from "@/components/content-provider";
@@ -51,11 +51,11 @@ export function ExploreScreen({ onPlace, onHotel, onRestaurant, isPremium }:{ on
   const filtered = PLACES.filter(p=> filter==="Всё" || (типыФильтра[filter] ?? []).includes(p.typeRu ?? p.type));
   return (
     <div className="flex flex-col h-full" style={{background:CREAM}}>
-      <div className="relative pt-14 pb-3 overflow-hidden border-b" style={{borderColor:BORDER,background:GREEN}}>
+      <div className="relative pt-14 pb-3 overflow-hidden border-b" style={{borderColor:BORDER,background:ACCENT_FILL}}>
         <div className="absolute inset-0 opacity-20"><AnimatedBg/></div>
         <div className="relative z-10 px-4">
         <p className="text-[9px] font-bold mb-0.5 uppercase tracking-widest" style={{color:"rgba(255,255,255,0.6)"}}>{t("explore_kicker")}</p>
-        <h1 className="text-xl font-bold mb-3 text-white" style={{fontFamily:"'Fraunces',serif"}}>{t("explore_title")}</h1>
+        <h1 className="text-xl font-bold mb-3 text-white" style={{fontFamily:"var(--font-heading)"}}>{t("explore_title")}</h1>
         <div className="flex gap-2 overflow-x-auto hide-scroll">
           {FILTER_TABS.map(f=><button key={f} onClick={()=>setFilter(f)} className="flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-semibold" style={filter===f?{background:SURFACE,color:GREEN}:{background:"rgba(255,255,255,0.18)",color:"rgba(255,255,255,0.75)"}}>{подписьФильтра[f] ? t(подписьФильтра[f]) : f}</button>)}
         </div>
@@ -72,7 +72,7 @@ export function ExploreScreen({ onPlace, onHotel, onRestaurant, isPremium }:{ on
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         {showHotels&&HOTELS.map(h=>(
           <button key={h.id} onClick={()=>onHotel(h)} className="w-full bg-white rounded-2xl overflow-hidden shadow-sm border text-left active:scale-[0.98] transition-all" style={{borderColor:BORDER}}>
-            <div className="relative h-40"><img src={h.img} alt={h.name} className="w-full h-full object-cover"/><div className="absolute inset-0" style={{background:"linear-gradient(to top,rgba(0,0,0,0.65) 0%,transparent 55%)"}}/><div className="absolute top-3 left-3"><span className="text-[9px] font-bold px-2 py-0.5 rounded-full" style={{background:GOLD,color:TEXT}}>{h.tag}</span></div><div className="absolute bottom-0 left-0 right-0 p-3"><p className="text-white font-bold text-sm" style={{fontFamily:"'Fraunces',serif"}}>{h.name}</p><div className="flex items-center gap-2 mt-0.5"><StarRow rating={h.rating}/><span className="text-white/70 text-xs">{трК(h.city)}</span></div></div></div>
+            <div className="relative h-40"><img src={h.img} alt={h.name} className="w-full h-full object-cover"/><div className="absolute inset-0" style={{background:"linear-gradient(to top,rgba(0,0,0,0.65) 0%,transparent 55%)"}}/><div className="absolute top-3 left-3"><span className="text-[9px] font-bold px-2 py-0.5 rounded-full" style={{background:GOLD,color:ON_GOLD}}>{h.tag}</span></div><div className="absolute bottom-0 left-0 right-0 p-3"><p className="text-white font-bold text-sm" style={{fontFamily:"var(--font-heading)"}}>{h.name}</p><div className="flex items-center gap-2 mt-0.5"><StarRow rating={h.rating} onPhoto/><span className="text-white/70 text-xs">{трК(h.city)}</span></div></div></div>
             <div className="px-3 py-2.5 flex items-center justify-between"><div className="flex gap-1.5 flex-wrap">{h.facilities.slice(0,3).map(f=><span key={f} className="text-[9px] font-medium px-2 py-0.5 rounded-full" style={{background:CREAM,color:MUTED}}>{подписьФильтра[f] ? t(подписьФильтра[f]) : f}</span>)}</div><div className="text-right flex-shrink-0"><p className="font-bold text-base" style={{color:GREEN}}>{дг.цена(h.price)}</p><p className="text-[9px]" style={{color:MUTED}}>{t("home_per_night")}</p></div></div>
           </button>
         ))}
@@ -88,8 +88,8 @@ export function ExploreScreen({ onPlace, onHotel, onRestaurant, isPremium }:{ on
               <button onClick={()=>onPlace(PLACES[0])} className="w-full relative rounded-2xl overflow-hidden shadow-sm text-left active:scale-[0.98] sm:col-span-2 xl:col-span-3" style={{height:180}}>
                 <img src={PLACES[0].img} alt={PLACES[0].name} className="w-full h-full object-cover"/>
                 <div className="absolute inset-0" style={{background:"linear-gradient(to top,rgba(0,0,0,0.7) 0%,transparent 55%)"}}/>
-                <div className="absolute top-3 left-3"><span className="text-[9px] font-bold px-2 py-0.5 rounded-full" style={{background:GOLD,color:TEXT}}>⭐ {t("feat_badge")}</span></div>
-                <div className="absolute bottom-0 left-0 right-0 p-4"><p className="text-white font-bold text-base" style={{fontFamily:"'Fraunces',serif"}}>{PLACES[0].name}</p><div className="flex items-center gap-3 mt-1"><StarRow rating={PLACES[0].rating}/><span className="text-white/70 text-xs">{трК(PLACES[0].city)}</span><span className="text-white/70 text-xs">{дг.цена(PLACES[0].entry)}</span>{PLACES[0].audio&&<span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md" style={{background:GREEN,color:WHITE}}>🎧</span>}{(()=>{const w=погода.get(PLACES[0].city);return w?<span className="text-[9px] font-bold px-2 py-0.5 rounded-full" style={{background:"rgba(255,255,255,0.18)",backdropFilter:"blur(8px)",color:WHITE}}>{w.icon} {w.temp}°C</span>:null;})()}</div></div>
+                <div className="absolute top-3 left-3"><span className="text-[9px] font-bold px-2 py-0.5 rounded-full" style={{background:GOLD,color:ON_GOLD}}>⭐ {t("feat_badge")}</span></div>
+                <div className="absolute bottom-0 left-0 right-0 p-4"><p className="text-white font-bold text-base" style={{fontFamily:"var(--font-heading)"}}>{PLACES[0].name}</p><div className="flex items-center gap-3 mt-1"><StarRow rating={PLACES[0].rating} onPhoto/><span className="text-white/70 text-xs">{трК(PLACES[0].city)}</span><span className="text-white/70 text-xs">{дг.цена(PLACES[0].entry)}</span>{PLACES[0].audio&&<span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md" style={{background:ACCENT_FILL,color:WHITE}}>🎧</span>}{(()=>{const w=погода.get(PLACES[0].city);return w?<span className="text-[9px] font-bold px-2 py-0.5 rounded-full" style={{background:"rgba(255,255,255,0.18)",backdropFilter:"blur(8px)",color:WHITE}}>{w.icon} {w.temp}°C</span>:null;})()}</div></div>
               </button>
             )}
             {filter!=="Всё"&&filtered.length===0&&(

@@ -71,7 +71,7 @@ export default function AppPreview() {
             key={`${ключ}-${тема}`}
             ref={рамка}
             src={`/?preview=${тема === "тёмная" ? "dark" : "light"}`}
-            title="Приложение UzRoam"
+            title="Приложение HelloUZ"
             className="block rounded-[26px] border-0"
             style={{
               width: ЭКРАН.ш,

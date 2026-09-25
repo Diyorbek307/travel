@@ -1,57 +1,46 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Manrope, Outfit } from "next/font/google";
+import { Rubik } from "next/font/google";
 import ServiceWorker from "@/components/service-worker";
 import "./globals.css";
 
 /*
- * Outfit — шрифт макета, но кириллицы в нём нет. Без пары браузер
- * подставил бы под русский текст системный шрифт, и половина интерфейса
- * поехала бы по начертанию. Manrope стоит следующим в стеке: близкий
- * геометрический гротеск, который кириллицу умеет.
+ * Rubik подобран под буквы логотипа: плотный геометрический гротеск со
+ * скруглёнными углами. В нём есть кириллица, поэтому латиница и русский
+ * набираются одной гарнитурой — раньше латиница шла одним шрифтом, а
+ * кириллица подменялась другим, и в строке «HelloUZ Premium активен»
+ * буквы были из разных семейств. Шрифт переменный: все насыщенности
+ * в одном файле.
  */
-const outfit = Outfit({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-sans",
-});
-
-const manrope = Manrope({
+const rubik = Rubik({
   subsets: ["latin", "cyrillic"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-sans-cyrillic",
-});
-
-const fraunces = Fraunces({
-  subsets: ["latin"],
-  weight: ["400", "600", "700"],
-  variable: "--font-display",
+  variable: "--font-sans",
 });
 
 export const metadata: Metadata = {
   // База для абсолютных ссылок в og/twitter — иначе картинка шеринга
   // подставилась бы относительным путём, и превью в мессенджерах пустое.
   metadataBase: new URL("https://uzbekistan-travel.onrender.com"),
-  title: "UzRoam — открой Узбекистан",
+  title: "HelloUZ — открой Узбекистан",
   description:
     "Маршруты, аудиогиды, отели и рестораны Узбекистана в одном приложении.",
   manifest: "/manifest.webmanifest",
-  applicationName: "UzRoam",
+  applicationName: "HelloUZ",
   // Карточка, которую видят, когда ссылку кидают в Telegram/WhatsApp/соцсети.
   openGraph: {
     type: "website",
-    siteName: "UzRoam",
+    siteName: "HelloUZ",
     locale: "ru_RU",
-    title: "UzRoam — открой красоту Узбекистана",
+    title: "HelloUZ — открой красоту Узбекистана",
     description:
       "Маршруты, аудиогиды, AI-гид и всё об Узбекистане. 10 языков, работает офлайн.",
-    images: [{ url: "/og.png", width: 1200, height: 630, alt: "UzRoam" }],
+    images: [{ url: "/og.jpg", width: 1200, height: 630, alt: "HelloUZ" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "UzRoam — открой красоту Узбекистана",
+    title: "HelloUZ — открой красоту Узбекистана",
     description:
       "Маршруты, аудиогиды, AI-гид и всё об Узбекистане. 10 языков, работает офлайн.",
-    images: ["/og.png"],
+    images: ["/og.jpg"],
   },
   /*
    * iOS не читает web-манифест: и значок на домашнем экране, и запуск без
@@ -61,7 +50,7 @@ export const metadata: Metadata = {
    */
   appleWebApp: {
     capable: true,
-    title: "UzRoam",
+    title: "HelloUZ",
     statusBarStyle: "default",
   },
   icons: {
@@ -96,10 +85,10 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ru" className={`${outfit.variable} ${manrope.variable} ${fraunces.variable}`}>
+    <html lang="ru" className={rubik.variable}>
       <body
         style={{
-          fontFamily: "var(--font-sans), var(--font-sans-cyrillic), system-ui, sans-serif",
+          fontFamily: "var(--font-sans), system-ui, sans-serif",
         }}
       >
         {children}

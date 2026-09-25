@@ -1,3 +1,4 @@
+import { мягко } from "@/lib/theme";
 import { useCallback, useEffect, useState } from "react";
 import { PageHeader, Badge, Btn, SectionTitle } from "./shared";
 import { ROLE_META, ВСЕ_РОЛИ, type AdminRole } from "@/lib/admin-roles";
@@ -209,7 +210,7 @@ export default function Staff() {
             >
               <div
                 className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shrink-0"
-                style={{ background: ROLE_META[a.role].color + "33", color: ROLE_META[a.role].color }}
+                style={{ background: мягко(ROLE_META[a.role].color, 20), color: ROLE_META[a.role].color }}
               >
                 {инициалы(a.name)}
               </div>
@@ -235,7 +236,7 @@ export default function Staff() {
               <div className="flex items-center gap-3 mb-4">
                 <div
                   className="w-12 h-12 rounded-full flex items-center justify-center text-base font-bold shrink-0"
-                  style={{ background: ROLE_META[выбранный.role].color + "33", color: ROLE_META[выбранный.role].color }}
+                  style={{ background: мягко(ROLE_META[выбранный.role].color, 20), color: ROLE_META[выбранный.role].color }}
                 >
                   {инициалы(выбранный.name)}
                 </div>

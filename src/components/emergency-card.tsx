@@ -53,7 +53,7 @@ export default function EmergencyCard() {
           <a key={s.l} href={`tel:${s.n}`} className="block rounded-xl p-3 text-left active:scale-[0.98]" style={{ background: CREAM }}>
             <span className="text-xl">{s.e}</span>
             <p className="mt-1 text-xs font-semibold" style={{ color: TEXT }}>{s.l}</p>
-            <p className="font-mono text-sm font-bold" style={{ color: GOLD }}>{s.n}</p>
+            <p className="font-mono text-sm font-bold" style={{ color: "var(--gold-ink)" }}>{s.n}</p>
           </a>
         ))}
       </div>

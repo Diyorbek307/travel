@@ -50,7 +50,7 @@ export default function FavoritesScreen({
           </button>
           <div>
             <p className="text-xs font-medium" style={{ color: GREEN, letterSpacing: "0.1em" }}>❤ {избранное.length}</p>
-            <h1 className="text-xl font-bold" style={{ color: TEXT, fontFamily: "'Fraunces',serif" }}>{t("menu_favorites")}</h1>
+            <h1 className="text-xl font-bold" style={{ color: TEXT, fontFamily:"var(--font-heading)" }}>{t("menu_favorites")}</h1>
           </div>
         </div>
       </div>
@@ -71,7 +71,7 @@ export default function FavoritesScreen({
             <button onClick={() => открыть(f)} className="min-w-0 flex-1 p-3 text-left">
               <p className="text-[10px] font-semibold" style={{ color: MUTED }}>{ЗНАЧОК[f.kind]} {трК(f.city)}</p>
               <p className="mt-0.5 truncate font-bold text-sm" style={{ color: TEXT }}>{трК(f.name)}</p>
-              <p className="mt-1 text-xs font-semibold" style={{ color: GOLD }}>★ {f.rating}</p>
+              <p className="mt-1 text-xs font-semibold" style={{ color: "var(--gold-ink)" }}>★ {f.rating}</p>
             </button>
             <button
               onClick={() => переключитьИзбранное({ id: f.id, kind: f.kind, name: f.name, city: f.city, img: f.img, rating: f.rating })}

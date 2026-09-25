@@ -16,22 +16,35 @@
  * data-theme="light|dark" и перебивает систему; режим «Системная» просто
  * снимает атрибут.
  *
- * Акцент — бирюза куполов Самарканда. На тёмном берём неоновую, на
- * светлом — глубже, иначе она не читается на белом.
+ * Цвета взяты из логотипа: бирюза куполов и золото на кончике крыла.
+ * На тёмной теме бирюза светлее, на светлой — глубже, иначе она не
+ * читается на белом.
  */
 :root {
   /* Объявляем схему браузеру: без неё он рисует системные полосы
      прокрутки, поля ввода и выпадающие списки светлыми поверх тёмной
      темы — справа оставалась белая полоса. */
   color-scheme: light;
+  /* Шрифт заголовков. Своё имя, а не --font-display: админ-панель
+     вешает --font-display на <html>, и при переходе из неё в приложение
+     заголовки подхватили бы шрифт панели. */
+  --font-heading: var(--font-sans), system-ui, sans-serif;
   --gold: #e9c46a;
+  /* Золото и тёмная бирюза для текста. Сам #e9c46a на белом почти не
+     читается (контраст 1.8), поэтому надписи берут более тёмный тон. */
+  --gold-ink: #8a6814;
+  --brand-ink: #07685f;
   --accent: #0fb3ac;
+  /* Заливка кнопок и плашек под белый текст. Отдельно от --accent: тот
+     идёт и на текст по тёмному фону, где нужен светлым, а белые буквы
+     на светлой бирюзе не читаются. */
+  --accent-fill: #0ea69f;
   --accent-soft: rgba(15, 179, 172, 0.12);
   --accent-border: rgba(15, 179, 172, 0.3);
-  /* Второй акцент референса — лайм. Нужен редко и точечно: подсветить
-     то, что должно кричать (реклама-услуга, «вау»-экран, бейджи). */
-  --accent-2: #a8d90b;
-  --accent-2-soft: rgba(168, 217, 11, 0.14);
+  /* Второй акцент — золото логотипа. Точечно: главные кнопки (переход
+     бирюзы в золото, как крыло знака), рамка партнёрских блоков. */
+  --accent-2: #e9c46a;
+  --accent-2-soft: rgba(233, 196, 106, 0.18);
   /* Тёмный конец акцентных градиентов. */
   --accent-deep: #07685f;
   --accent-light: #2fd0c6;
@@ -53,13 +66,16 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
-    --accent: #3fe0dc;
-    --accent-soft: rgba(63, 224, 220, 0.14);
-    --accent-border: rgba(63, 224, 220, 0.32);
-    --accent-2: #d4ff4f;
-    --accent-2-soft: rgba(212, 255, 79, 0.16);
-    --accent-deep: #0a4f52;
-    --accent-light: #7ff3ef;
+    --accent: #34dccf;
+    --accent-fill: #0f9c94;
+    --accent-soft: rgba(52, 220, 207, 0.14);
+    --accent-border: rgba(52, 220, 207, 0.32);
+    --accent-2: #f2ce6e;
+    --accent-2-soft: rgba(242, 206, 110, 0.16);
+    --accent-deep: #0b4f4a;
+    --accent-light: #86f0e6;
+    --gold-ink: #f2ce6e;
+    --brand-ink: #e8f1ef;
     --glass: rgba(16, 24, 22, 0.82);
     --glass-border: rgba(255, 255, 255, 0.14);
     --cream: #0a0f0e;
@@ -67,18 +83,21 @@
     --text: #e8f1ef;
     --muted: #8a9b96;
     --border: #202b28;
-    --glow: rgba(63, 224, 220, 0.45);
+    --glow: rgba(52, 220, 207, 0.45);
   }
 }
 html[data-theme="dark"] {
   color-scheme: dark;
-  --accent: #3fe0dc;
-  --accent-soft: rgba(63, 224, 220, 0.14);
-  --accent-border: rgba(63, 224, 220, 0.32);
-  --accent-2: #d4ff4f;
-  --accent-2-soft: rgba(212, 255, 79, 0.16);
-  --accent-deep: #0a4f52;
-  --accent-light: #7ff3ef;
+  --accent: #34dccf;
+  --accent-fill: #0f9c94;
+  --accent-soft: rgba(52, 220, 207, 0.14);
+  --accent-border: rgba(52, 220, 207, 0.32);
+  --accent-2: #f2ce6e;
+  --accent-2-soft: rgba(242, 206, 110, 0.16);
+  --accent-deep: #0b4f4a;
+  --accent-light: #86f0e6;
+  --gold-ink: #f2ce6e;
+  --brand-ink: #e8f1ef;
   --glass: rgba(16, 24, 22, 0.82);
   --glass-border: rgba(255, 255, 255, 0.14);
   --cream: #0a0f0e;
@@ -86,7 +105,7 @@ html[data-theme="dark"] {
   --text: #e8f1ef;
   --muted: #8a9b96;
   --border: #202b28;
-  --glow: rgba(63, 224, 220, 0.45);
+  --glow: rgba(52, 220, 207, 0.45);
 }
 
 /* Классы фона Tailwind тоже переводим на поверхность темы, чтобы карточки
@@ -302,7 +321,7 @@ body {
   50% {
     box-shadow:
       0 0 40px rgb(233 196 106 / 0.6),
-      0 0 60px rgb(46 125 90 / 0.3);
+      0 0 60px rgb(15 179 172 / 0.3);
   }
 }
 
@@ -336,20 +355,6 @@ body {
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
-  }
-}
-
-/* Блеск золотой звезды: пульсирует масштабом и золотым свечением. Масштаб
-   считаем от центра самой звезды (fill-box), иначе SVG крутил бы её от угла. */
-@keyframes logo-star-glow {
-  0%,
-  100% {
-    transform: scale(1);
-    filter: drop-shadow(0 0 0 rgb(233 196 106 / 0));
-  }
-  50% {
-    transform: scale(1.14);
-    filter: drop-shadow(0 0 3px rgb(242 206 110 / 0.85));
   }
 }
 
@@ -391,12 +396,6 @@ body {
 }
 .logo-rise {
   animation: logo-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-.logo-star {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: logo-star-glow 2.8s ease-in-out infinite;
-  animation-delay: 0.7s;
 }
 
 .shimmer-bg {
@@ -556,7 +555,7 @@ button[aria-disabled="true"] {
     width: 15rem;
     flex-shrink: 0;
     border-right: 1px solid var(--border);
-    background: #ffffff;
+    background: var(--surface);
   }
 
   /* Содержимое не растягиваем во всю ширину: приложение написано под
@@ -601,30 +600,6 @@ button[aria-disabled="true"] {
 }
 
 
-/* Неон «вау»-экрана: перебираем оттенки, а не вращаем элемент — под
-   ореолом лежит текст, и поворот увёл бы его вместе с собой. У каждого
-   слоя своё размытие, и его нужно сохранить по кадрам, иначе на старте
-   анимации свечение дёргается. */
-@keyframes wow-glow {
-  to {
-    filter: hue-rotate(360deg) blur(64px);
-  }
-}
-@keyframes wow-glow-rev {
-  to {
-    filter: hue-rotate(-360deg) blur(34px);
-  }
-}
-@keyframes wow-ring {
-  to {
-    filter: hue-rotate(360deg);
-  }
-}
-@keyframes wow-reflect {
-  to {
-    filter: hue-rotate(360deg) blur(38px);
-  }
-}
 /* Дыхание внешнего ореола — лёгкая пульсация размера. */
 @keyframes wow-breathe {
   0%, 100% { transform: scale(1); }

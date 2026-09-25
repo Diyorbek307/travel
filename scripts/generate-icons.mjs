@@ -20,7 +20,7 @@
  * заливает чёрным, поэтому для apple-touch-icon фон подкладываем сами.
  */
 import sharp from "sharp";
-import { mkdir } from "node:fs/promises";
+import { mkdir, readFile } from "node:fs/promises";
 import path from "node:path";
 
 const OUT = path.resolve("public/icons");
@@ -49,4 +49,36 @@ for (const { из, размер, имя, плоско } of работы) {
   if (плоско) конвейер = конвейер.flatten({ background: ФОН });
   const инфо = await конвейер.png({ compressionLevel: 9 }).toFile(path.join(OUT, имя));
   console.log(`${имя.padEnd(24)} ${инфо.width}×${инфо.height}  ${(инфо.size / 1024).toFixed(1)} КБ`);
+}
+
+/*
+ * Исходники для нативных приложений. Из них `npx capacitor-assets
+ * generate --android` собирает иконки лаунчера и экран запуска в
+ * android/. Берём те же SVG, что и для сайта, — знак один на всех.
+ *
+ *  - icon-only: плитка целиком (старые лаунчеры и iOS);
+ *  - icon-foreground / icon-background: слои адаптивной иконки Android,
+ *    лаунчер сам кладёт знак на фон и обрезает под свою форму;
+ *  - logo: один знак на прозрачном — для экрана запуска на чёрном.
+ */
+const ASSETS = path.resolve("assets");
+await mkdir(ASSETS, { recursive: true });
+
+const исходник = await readFile(maskable, "utf8");
+const безФона = исходник.replace(/<rect[^>]*\/>/, "");
+const безЗнака = исходник.replace(/<g transform[\s\S]*?<\/g>/, "");
+
+const нативные = [
+  { svg: исходник, имя: "icon-only.png" },
+  { svg: безФона, имя: "icon-foreground.png" },
+  { svg: безЗнака, имя: "icon-background.png" },
+  { svg: безФона, имя: "logo.png" },
+];
+
+for (const { svg, имя } of нативные) {
+  const инфо = await sharp(Buffer.from(svg), { density: 384 })
+    .resize(1024, 1024)
+    .png({ compressionLevel: 9 })
+    .toFile(path.join(ASSETS, имя));
+  console.log(`assets/${имя.padEnd(17)} ${инфо.width}×${инфо.height}  ${(инфо.size / 1024).toFixed(1)} КБ`);
 }

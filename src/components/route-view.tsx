@@ -6,7 +6,7 @@ import { useT } from "@/components/lang-provider";
 import { useДистанция } from "@/lib/distance";
 import GoogleMap, { googleКлюч } from "@/components/google-map";
 import { ГОРОДА, МЕСТА, расстояниеКм, точка } from "@/data/geo";
-import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE } from "@/lib/theme";
+import { ACCENT_FILL, BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE } from "@/lib/theme";
 import type { Geo } from "@/lib/types";
 
 type Способ = "авто" | "пешком";
@@ -202,7 +202,7 @@ export default function RouteView({
           <p className="text-xs font-medium" style={{ color: GREEN, letterSpacing: "0.1em" }}>
             МАРШРУТ
           </p>
-          <h1 className="truncate text-lg font-bold" style={{ color: TEXT, fontFamily: "'Fraunces',serif" }}>
+          <h1 className="truncate text-lg font-bold" style={{ color: TEXT, fontFamily:"var(--font-heading)" }}>
             {название}
           </h1>
         </div>
@@ -345,7 +345,7 @@ export default function RouteView({
                 target="_blank"
                 rel="noopener noreferrer"
                 className="rounded-2xl py-3.5 text-center text-sm font-bold text-white"
-                style={{ background: GREEN }}
+                style={{ background: ACCENT_FILL }}
               >
                 Открыть в навигаторе
               </a>

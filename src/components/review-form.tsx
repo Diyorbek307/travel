@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BORDER, GOLD, MUTED, TEXT, WHITE, SURFACE } from "@/lib/theme";
+import { BORDER, GOLD, MUTED, TEXT, WHITE, SURFACE, ON_GOLD } from "@/lib/theme";
 import { useT } from "@/components/lang-provider";
 
 /**
@@ -82,7 +82,7 @@ export default function ReviewForm({ placeId, placeName }: { placeId: string; pl
   return (
     <section className="mx-4 mb-4 rounded-2xl p-4" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <p className="text-sm font-bold" style={{ color: TEXT, fontFamily: "'Fraunces',serif" }}>
+        <p className="text-sm font-bold" style={{ color: TEXT, fontFamily:"var(--font-heading)" }}>
           {t("rev_title")}
         </p>
         {среднее && (
@@ -133,7 +133,7 @@ export default function ReviewForm({ placeId, placeName }: { placeId: string; pl
           type="submit"
           disabled={идёт}
           className="rounded-xl py-2.5 text-sm font-bold disabled:opacity-60"
-          style={{ background: GOLD, color: TEXT }}
+          style={{ background: GOLD, color: ON_GOLD }}
         >
           {идёт ? t("rev_sending") : t("rev_submit")}
         </button>

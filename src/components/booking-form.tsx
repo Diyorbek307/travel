@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { BORDER, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE } from "@/lib/theme";
+import { BORDER, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE, ON_GOLD } from "@/lib/theme";
 import { useT } from "@/components/lang-provider";
 import type { BookingKind } from "@/lib/types";
 
@@ -74,7 +74,7 @@ export default function BookingForm({
         <button
           onClick={() => setОткрыта(true)}
           className="w-full rounded-2xl py-3.5 text-sm font-bold"
-          style={{ background: GOLD, color: TEXT }}
+          style={{ background: GOLD, color: ON_GOLD }}
         >
           {подпись}
         </button>
@@ -95,7 +95,7 @@ export default function BookingForm({
       className="mx-4 mb-3 flex flex-col gap-2.5 rounded-2xl p-4"
       style={{ background: SURFACE, border: `1px solid ${BORDER}` }}
     >
-      <p className="text-sm font-bold" style={{ color: TEXT, fontFamily: "'Fraunces',serif" }}>
+      <p className="text-sm font-bold" style={{ color: TEXT, fontFamily:"var(--font-heading)" }}>
         {подпись}
       </p>
 
@@ -162,7 +162,7 @@ export default function BookingForm({
           type="submit"
           disabled={идёт}
           className="min-w-0 flex-1 rounded-xl py-2.5 text-sm font-bold disabled:opacity-60"
-          style={{ background: GOLD, color: TEXT }}
+          style={{ background: GOLD, color: ON_GOLD }}
         >
           {идёт ? t("rev_sending") : t("bk_send")}
         </button>

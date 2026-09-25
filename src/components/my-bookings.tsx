@@ -89,7 +89,7 @@ export default function MyBookings() {
                 {t(СТАТУС[b.status].ключ)}
               </span>
             </div>
-            <p className="text-sm font-bold" style={{ color: TEXT, fontFamily: "'Fraunces',serif" }}>
+            <p className="text-sm font-bold" style={{ color: TEXT, fontFamily:"var(--font-heading)" }}>
               {b.itemName}
             </p>
             <p className="mt-1 text-xs" style={{ color: MUTED }}>

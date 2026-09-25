@@ -1,3 +1,4 @@
+import { мягко } from "@/lib/theme";
 import { useState, useEffect, useRef } from "react";
 import { useNotifs } from "../context/NotifContext";
 import { logout } from "@/app/admin/actions";
@@ -217,7 +218,7 @@ export default function Header({ active, onNavigate, sidebarCollapsed, onToggleS
                   >
                     <div
                       className="w-7 h-7 rounded-full flex items-center justify-center text-sm shrink-0 mt-0.5"
-                      style={{ background: ICON_COLOR[n.type] + "20", color: ICON_COLOR[n.type] }}
+                      style={{ background: мягко(ICON_COLOR[n.type], 12), color: ICON_COLOR[n.type] }}
                     >
                       {ICON[n.type]}
                     </div>

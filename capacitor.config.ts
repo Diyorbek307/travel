@@ -16,7 +16,7 @@ import type { CapacitorConfig } from "@capacitor/cli";
  */
 const config: CapacitorConfig = {
   appId: "uz.uzup.app",
-  appName: "UzRoam",
+  appName: "HelloUZ",
   // Обязателен, даже при server.url: сюда кладётся запасная оболочка.
   webDir: "public",
   server: {
@@ -26,12 +26,12 @@ const config: CapacitorConfig = {
     cleartext: false,
   },
   android: {
-    // Тот же тёмно-зелёный фон бренда за webview, чтобы при загрузке не
-    // мелькал белый лист.
-    backgroundColor: "#163C2A",
+    // Чёрный, как первый кадр заставки: пока грузится страница, не
+    // мелькает белый лист, и заставка начинается без шва.
+    backgroundColor: "#000000",
   },
   ios: {
-    backgroundColor: "#163C2A",
+    backgroundColor: "#000000",
     // Жёсткий контент-инсет: карта и колода карточек сами управляют
     // прокруткой, автоматический сдвиг webview им мешает.
     contentInset: "never",

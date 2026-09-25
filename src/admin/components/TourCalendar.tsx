@@ -1,3 +1,4 @@
+import { мягко } from "@/lib/theme";
 import { useState } from "react";
 import { PageHeader, Badge, Btn, ДемоРаздел } from "./shared";
 
@@ -136,7 +137,7 @@ export default function TourCalendar() {
                               key={ev.id}
                               onClick={() => setSelected(ev)}
                               className="rounded text-left px-1.5 py-0.5 text-xs w-full overflow-hidden cursor-pointer truncate transition-all"
-                              style={{ background: ev.color + "22", color: ev.color, border: `1px solid ${ev.color}33`, fontFamily: "var(--font-mono)", fontSize: "10px" }}
+                              style={{ background: мягко(ev.color, 13), color: ev.color, border: `1px solid ${мягко(ev.color, 20)}`, fontFamily: "var(--font-mono)", fontSize: "10px" }}
                             >
                               {ev.title}
                             </button>

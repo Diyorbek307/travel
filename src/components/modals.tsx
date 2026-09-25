@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useT } from "@/components/lang-provider";
 import { useПрочитанные, отметитьПрочитанным } from "@/lib/notifs-read";
 import type { Place } from "@/lib/types";
-import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE, ACCENT_SOFT } from "@/lib/theme";
+import { ACCENT_FILL, BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE, ACCENT_SOFT, ON_GOLD } from "@/lib/theme";
 import { NOTIFS, SEARCH_POPULAR } from "@/data/content";
 import { useAppContent } from "./content-provider";
 import { GeomPattern, LogoMark, StarRow } from "./ui";
@@ -26,7 +26,7 @@ export function NotifsPanel({ onClose }:{ onClose:()=>void }) {
     <div className="overlay-screen absolute inset-0 z-50 flex flex-col animate-slide-up" style={{background:CREAM}}>
       <div className="bg-white px-4 pt-14 pb-3 border-b" style={{borderColor:BORDER}}>
         <div className="flex items-center justify-between">
-          <div><h2 className="font-bold text-xl" style={{color:TEXT,fontFamily:"'Fraunces',serif"}}>{t("prof_notifications")}</h2>{unread>0&&<p className="text-xs mt-0.5" style={{color:GREEN}}>{unread} непрочитанных</p>}</div>
+          <div><h2 className="font-bold text-xl" style={{color:TEXT,fontFamily:"var(--font-heading)"}}>{t("prof_notifications")}</h2>{unread>0&&<p className="text-xs mt-0.5" style={{color:GREEN}}>{unread} непрочитанных</p>}</div>
           <div className="flex items-center gap-3">
             {unread>0&&<button onClick={()=>отметитьПрочитанным(NOTIFS.map(n=>n.title))} className="text-xs font-semibold" style={{color:GREEN}}>{t("notif_read_all")}</button>}
             <button onClick={onClose} className="w-9 h-9 rounded-xl flex items-center justify-center" style={{background:CREAM}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={TEXT} strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
@@ -38,7 +38,7 @@ export function NotifsPanel({ onClose }:{ onClose:()=>void }) {
           <button key={i} onClick={()=>отметитьПрочитанным([n.title])} className="w-full bg-white rounded-2xl p-4 border text-left flex items-start gap-3 shadow-sm" style={{borderColor:n.unread?GREEN:BORDER,borderWidth:n.unread?"1.5px":"1px"}}>
             <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{background:n.unread?ACCENT_SOFT:CREAM}}>{n.emoji}</div>
             <div className="flex-1 min-w-0">
-              <div className="flex items-center justify-between gap-2"><p className="font-bold text-sm" style={{color:TEXT}}>{трК(n.title)}</p>{n.unread&&<div className="w-2 h-2 rounded-full flex-shrink-0" style={{background:GREEN}}/>}</div>
+              <div className="flex items-center justify-between gap-2"><p className="font-bold text-sm" style={{color:TEXT}}>{трК(n.title)}</p>{n.unread&&<div className="w-2 h-2 rounded-full flex-shrink-0" style={{background:ACCENT_FILL}}/>}</div>
               <p className="text-xs mt-0.5 leading-relaxed" style={{color:MUTED}}>{трК(n.body)}</p>
               <p className="text-[10px] mt-1.5" style={{color:n.unread?GREEN:MUTED}}>{трК(n.time)}</p>
             </div>
@@ -95,7 +95,7 @@ export function SearchModal({ onClose, onPlace, initialQuery = "" }:{ onClose:()
                 <button key={c.name} onClick={()=>setQuery(c.name)} className="relative rounded-2xl overflow-hidden text-left" style={{height:90}}>
                   <img src={c.img} alt={c.name} className="w-full h-full object-cover"/>
                   <div className="absolute inset-0" style={{background:"linear-gradient(to top,rgba(0,0,0,0.65) 0%,transparent 65%)"}}/>
-                  <div className="absolute bottom-0 left-0 right-0 p-2.5"><p className="text-white font-bold text-sm">{трК(c.name)}</p><StarRow rating={c.rating}/></div>
+                  <div className="absolute bottom-0 left-0 right-0 p-2.5"><p className="text-white font-bold text-sm">{трК(c.name)}</p><StarRow rating={c.rating} onPhoto/></div>
                 </button>
               ))}
             </div>
@@ -181,15 +181,15 @@ export function PremiumModal({ onClose, onActivate }:{ onClose:()=>void; onActiv
         <div className="relative z-10">
           <div className="flex items-center gap-2 mb-3">
             <div className="w-10 h-10 rounded-2xl flex items-center justify-center text-xl" style={{background:GOLD}}>👑</div>
-            <div><p className="text-white text-xl font-bold" style={{fontFamily:"'Fraunces',serif"}}>UzRoam Premium</p><p className="text-white/60 text-xs">{t("prem_sub_incl")}</p></div>
+            <div><p className="text-white text-xl font-bold" style={{fontFamily:"var(--font-heading)"}}>HelloUZ Premium</p><p className="text-white/60 text-xs">{t("prem_sub_incl")}</p></div>
           </div>
           {/* Plan toggle */}
           <div className="flex rounded-2xl overflow-hidden border" style={{borderColor:"rgba(255,255,255,0.15)"}}>
             {(["month","year"] as const).map(p=>(
               <button key={p} onClick={()=>setPlan(p)} className="flex-1 py-3 text-center relative" style={plan===p?{background:GOLD}:{background:"rgba(255,255,255,0.06)"}}>
                 {p==="year"&&<span className="absolute -top-1 left-1/2 -translate-x-1/2 text-[8px] font-bold px-1.5 py-0.5 rounded-full" style={{background:"#E74C3C",color:WHITE}}>-40%</span>}
-                <p className="font-bold text-sm" style={{color:plan===p?TEXT:WHITE}}>{p==="month"?t("prem_month"):t("prem_year")}</p>
-                <p className="text-[10px] mt-0.5" style={{color:plan===p?TEXT+"99":"rgba(255,255,255,0.5)"}}>{p==="month"?`39 000 ${t("cur_uzs_word")}${t("prem_per_month")}`:`349 000 ${t("cur_uzs_word")}${t("prem_per_year")}`}</p>
+                <p className="font-bold text-sm" style={{color:plan===p?ON_GOLD:WHITE}}>{p==="month"?t("prem_month"):t("prem_year")}</p>
+                <p className="text-[10px] mt-0.5" style={{color:plan===p?"rgba(28,22,6,0.65)":"rgba(255,255,255,0.5)"}}>{p==="month"?`39 000 ${t("cur_uzs_word")}${t("prem_per_month")}`:`349 000 ${t("cur_uzs_word")}${t("prem_per_year")}`}</p>
               </button>
             ))}
           </div>
@@ -211,7 +211,7 @@ export function PremiumModal({ onClose, onActivate }:{ onClose:()=>void; onActiv
         <div className="rounded-2xl p-4 mb-4 border" style={{background:"#FFF9EE",borderColor:GOLD+"44"}}>
           <p className="text-xs font-semibold text-center" style={{color:MUTED}}>{t("prem_guarantee")}</p>
         </div>
-        <button onClick={оплатить} disabled={идёт} className="w-full py-4 rounded-2xl font-bold text-base mb-2 disabled:opacity-60" style={{background:GOLD,color:TEXT}}>
+        <button onClick={оплатить} disabled={идёт} className="w-full py-4 rounded-2xl font-bold text-base mb-2 disabled:opacity-60" style={{background:GOLD,color:ON_GOLD}}>
           {идёт ? t("prem_opening") : `💳 ${t("pay_pay")} · ${plan==="month"?"39 000":"349 000"} ${t("cur_uzs_word")}`}
         </button>
         {нетОплаты&&(

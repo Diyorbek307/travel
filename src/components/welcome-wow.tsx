@@ -109,7 +109,7 @@ export default function WelcomeWow({ name, onDone }: { name?: string; onDone: ()
           className="pointer-events-none absolute inset-0"
           style={{
             background:
-              "radial-gradient(60% 40% at 30% 25%, rgba(63,224,220,0.22), transparent 60%), radial-gradient(50% 40% at 75% 30%, rgba(212,255,79,0.16), transparent 60%), radial-gradient(60% 50% at 50% 90%, rgba(255,45,155,0.14), transparent 65%)",
+              "radial-gradient(60% 40% at 30% 25%, rgba(52,220,207,0.22), transparent 60%), radial-gradient(50% 40% at 75% 30%, rgba(242,206,110,0.16), transparent 60%), radial-gradient(60% 50% at 50% 90%, rgba(15,179,172,0.16), transparent 65%)",
             opacity: вкл ? 1 : 0,
             transition: "opacity 3.4s ease",
             animation: вкл ? "wow-aurora 22s ease-in-out infinite" : undefined,
@@ -127,10 +127,10 @@ export default function WelcomeWow({ name, onDone }: { name?: string; onDone: ()
        * только из центра. Появляются по очереди, чтобы читалось как волна.
        */}
       {([
-        { цвет: "rgba(63,224,220,0.5)", поз: "left top", off: { left: "-30%", top: "-20%" }, from: "translate(-40%,-40%)", d: "0.2s", a: "wow-side-a" },
-        { цвет: "rgba(212,255,79,0.42)", поз: "right top", off: { right: "-30%", top: "-15%" }, from: "translate(40%,-40%)", d: "0.7s", a: "wow-side-b" },
-        { цвет: "rgba(255,45,155,0.4)", поз: "left bottom", off: { left: "-25%", bottom: "-25%" }, from: "translate(-40%,40%)", d: "1.2s", a: "wow-side-a" },
-        { цвет: "rgba(79,139,255,0.42)", поз: "right bottom", off: { right: "-28%", bottom: "-20%" }, from: "translate(40%,40%)", d: "1.7s", a: "wow-side-b" },
+        { цвет: "rgba(52,220,207,0.5)", поз: "left top", off: { left: "-30%", top: "-20%" }, from: "translate(-40%,-40%)", d: "0.2s", a: "wow-side-a" },
+        { цвет: "rgba(242,206,110,0.4)", поз: "right top", off: { right: "-30%", top: "-15%" }, from: "translate(40%,-40%)", d: "0.7s", a: "wow-side-b" },
+        { цвет: "rgba(15,179,172,0.42)", поз: "left bottom", off: { left: "-25%", bottom: "-25%" }, from: "translate(-40%,40%)", d: "1.2s", a: "wow-side-a" },
+        { цвет: "rgba(233,196,106,0.34)", поз: "right bottom", off: { right: "-28%", bottom: "-20%" }, from: "translate(40%,40%)", d: "1.7s", a: "wow-side-b" },
       ] as const).map((л, n) => (
         <div
           key={n}
@@ -164,7 +164,7 @@ export default function WelcomeWow({ name, onDone }: { name?: string; onDone: ()
           marginLeft: -170,
           marginTop: -170,
           borderRadius: "50%",
-          background: "conic-gradient(from 0deg,#ff2d9b,#ffb03a,#d4ff4f,#3fe0dc,#4f8bff,#ff2d9b)",
+          background: "conic-gradient(from 0deg,#0fb3ac,#34dccf,#f2ce6e,#e9c46a,#2fd0c6,#0fb3ac)",
           filter: "blur(64px)",
           opacity: вкл ? 0.55 : 0,
           transform: вкл ? "scale(1)" : "scale(0.3)",
@@ -187,7 +187,7 @@ export default function WelcomeWow({ name, onDone }: { name?: string; onDone: ()
           marginLeft: -95,
           marginTop: -95,
           borderRadius: "50%",
-          background: "conic-gradient(from 180deg,#3fe0dc,#d4ff4f,#ffb03a,#ff2d9b,#4f8bff,#3fe0dc)",
+          background: "conic-gradient(from 180deg,#34dccf,#f2ce6e,#2fd0c6,#0fb3ac,#86f0e6,#34dccf)",
           filter: "blur(34px)",
           opacity: вкл ? 0.75 : 0,
           transform: вкл ? "scale(1)" : "scale(0.4)",
@@ -208,7 +208,7 @@ export default function WelcomeWow({ name, onDone }: { name?: string; onDone: ()
           height: 96,
           marginLeft: -140,
           borderRadius: "50%",
-          background: "conic-gradient(from 180deg,#3fe0dc,#d4ff4f,#ffb03a,#ff2d9b,#3fe0dc)",
+          background: "conic-gradient(from 180deg,#34dccf,#f2ce6e,#2fd0c6,#0fb3ac,#34dccf)",
           filter: "blur(38px)",
           opacity: вкл ? 0.32 : 0,
           transition: "opacity 2.6s ease .5s",
@@ -228,7 +228,7 @@ export default function WelcomeWow({ name, onDone }: { name?: string; onDone: ()
             width: 4,
             height: 4,
             background: "rgba(255,255,255,0.9)",
-            boxShadow: "0 0 8px 2px rgba(63,224,220,0.7)",
+            boxShadow: "0 0 8px 2px rgba(52,220,207,0.7)",
             opacity: вкл ? 0.8 : 0,
             transition: "opacity 2.6s ease",
             animation: вкл ? `wow-float ${и.s}s ease-in-out ${и.d}s infinite` : undefined,
@@ -259,13 +259,16 @@ export default function WelcomeWow({ name, onDone }: { name?: string; onDone: ()
           <span
             className="absolute inset-0 rounded-full"
             style={{
+              // Бирюза перетекает в золото, как на крыле логотипа, и
+              // медленно бежит по кругу.
               background: вкл
-                ? "conic-gradient(from 0deg,#ff2d9b,#ffb03a,#d4ff4f,#3fe0dc,#4f8bff,#ff2d9b)"
+                ? "linear-gradient(90deg,#0fb3ac,#34dccf,#f2ce6e,#34dccf,#0fb3ac)"
                 : "rgba(255,255,255,0.06)",
+              backgroundSize: "200% 100%",
               border: вкл ? "none" : "1.5px solid rgba(255,255,255,0.22)",
-              boxShadow: вкл ? "0 0 56px 8px rgba(212,255,79,0.5)" : "none",
+              boxShadow: вкл ? "0 0 56px 8px rgba(52,220,207,0.45)" : "none",
               transition: "background 1s ease, box-shadow 1.1s ease",
-              animation: вкл ? "wow-ring 7s linear infinite" : undefined,
+              animation: вкл ? "ad-edge 6s linear infinite" : undefined,
             }}
           />
           <span
@@ -290,7 +293,7 @@ export default function WelcomeWow({ name, onDone }: { name?: string; onDone: ()
           className="text-[10px] font-bold uppercase"
           style={{ letterSpacing: "0.34em", color: вкл ? "rgba(255,255,255,0.8)" : "rgba(255,255,255,0.35)", transition: "color 1.1s ease" }}
         >
-          UZROAM MODE
+          HELLOUZ MODE
         </p>
 
         {/* Текст и кнопка появляются только после включения. */}
@@ -303,7 +306,7 @@ export default function WelcomeWow({ name, onDone }: { name?: string; onDone: ()
           }}
           className="mt-10 w-full max-w-sm"
         >
-          <h1 className="text-white" style={{ fontFamily: "'Fraunces',serif", fontSize: 32, lineHeight: 1.15 }}>
+          <h1 className="text-white" style={{ fontFamily:"var(--font-heading)", fontSize: 32, lineHeight: 1.15 }}>
             {t("wow_welcome")}
             {name ? "," : ""}
             {name ? <><br /><span style={{ color: GOLD }}>{name}</span></> : null}
@@ -314,8 +317,8 @@ export default function WelcomeWow({ name, onDone }: { name?: string; onDone: ()
             className="mt-8 w-full rounded-2xl py-4 text-sm font-bold transition-all active:scale-[0.97]"
             style={{
               color: "#05070a",
-              background: "linear-gradient(120deg,#d4ff4f,#3fe0dc)",
-              boxShadow: "0 10px 40px rgba(63,224,220,0.4)",
+              background: "linear-gradient(120deg,#f2ce6e,#34dccf)",
+              boxShadow: "0 10px 40px rgba(52,220,207,0.4)",
             }}
           >
             {t("wow_go")} <span className="rtl-flip inline-block">→</span>

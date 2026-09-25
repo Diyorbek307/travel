@@ -67,7 +67,7 @@ export default function Sos() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="rounded-lg px-3 py-2 text-sm font-semibold"
-                  style={{ background: "var(--color-accent, #2E7D5A)", color: "#fff" }}
+                  style={{ background: "var(--color-amber)", color: "var(--color-on-accent)" }}
                 >
                   📍 На карте
                 </a>

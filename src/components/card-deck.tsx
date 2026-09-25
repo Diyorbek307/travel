@@ -84,7 +84,7 @@ function CardFace({ it, active }: { it: DeckItem; active: boolean }) {
 
         <p
           className="mb-1 font-bold leading-tight text-white"
-          style={{ fontSize: 15, fontFamily: "'Fraunces',serif" }}
+          style={{ fontSize: 15, fontFamily:"var(--font-heading)" }}
         >
           {it.title}
         </p>
@@ -146,7 +146,7 @@ export function CardDeckBase({
   return (
     <div className="pt-5">
       <div className="mb-3 flex items-center justify-between px-4">
-        <p className="text-base font-bold" style={{ color: TEXT, fontFamily: "'Fraunces',serif" }}>
+        <p className="text-base font-bold" style={{ color: TEXT, fontFamily:"var(--font-heading)" }}>
           {title}
         </p>
       </div>

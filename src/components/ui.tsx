@@ -1,5 +1,5 @@
-import { useId } from "react";
-import { GOLD, GREEN } from "@/lib/theme";
+import { useId, type CSSProperties } from "react";
+import { GOLD, GREEN, мягко } from "@/lib/theme";
 
 /** Мелкие элементы, которые встречаются на каждом втором экране. */
 
@@ -7,20 +7,24 @@ export function Badge({ text, color = GREEN }: { text: string; color?: string })
   return (
     <span
       className="rounded-full px-2 py-0.5 text-[9px] font-bold"
-      // Хвост «18» — это альфа в hex: та же краска, что у текста, но
-      // разбавленная до фона.
-      style={{ background: `${color}18`, color }}
+      // Та же краска, что у текста, но разбавленная до фона. Через
+      // color-mix, а не hex-хвостом: цвет бывает и CSS-переменной.
+      style={{ background: мягко(color, 10), color }}
     >
       {text}
     </span>
   );
 }
 
-export function StarRow({ rating }: { rating: number }) {
+/**
+ * Рейтинг звездой. На фотографии — яркое золото; на карточке — тёмное
+ * золото, потому что светлое на белом почти не читается.
+ */
+export function StarRow({ rating, onPhoto = false }: { rating: number; onPhoto?: boolean }) {
   return (
     <span
       className="flex items-center gap-0.5 text-xs font-semibold"
-      style={{ color: GOLD }}
+      style={{ color: onPhoto ? GOLD : "var(--gold-ink)" }}
     >
       ★ {rating}
     </span>
@@ -88,6 +92,50 @@ export function LogoMark({
       <path d={LOGO_H} fill={tone ?? `url(#${id}h)`} />
       <path d={LOGO_SWOOSH} fill={tone ?? `url(#${id}s)`} />
     </svg>
+  );
+}
+
+/**
+ * Название HelloUZ — как на логотипе: «Hello» тёмной бирюзой, «UZ»
+ * переходом бирюзы в золото. На тёмных шапках и фотографиях — целиком
+ * белое (light), иначе градиент потерялся бы на пёстром фоне.
+ */
+export function Wordmark({
+  size = 18,
+  light = false,
+  style,
+}: {
+  size?: number;
+  light?: boolean;
+  style?: CSSProperties;
+}) {
+  return (
+    <span
+      className="whitespace-nowrap font-bold leading-none"
+      style={{
+        fontSize: size,
+        fontFamily: "var(--font-heading)",
+        letterSpacing: "-0.01em",
+        color: light ? "#ffffff" : "var(--brand-ink)",
+        ...style,
+      }}
+    >
+      Hello
+      <span
+        style={
+          light
+            ? undefined
+            : {
+                background: `linear-gradient(90deg, var(--accent) 10%, ${LOGO_GOLD})`,
+                WebkitBackgroundClip: "text",
+                backgroundClip: "text",
+                color: "transparent",
+              }
+        }
+      >
+        UZ
+      </span>
+    </span>
   );
 }
 

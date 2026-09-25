@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { GOLD, GREEN, TEXT, WHITE } from "@/lib/theme";
+import { ACCENT_FILL, GOLD, GREEN, TEXT, WHITE, ON_GOLD } from "@/lib/theme";
 
 /**
  * Смена пароля по одноразовой ссылке.
@@ -58,10 +58,10 @@ export default function ResetForm({ token }: { token: string }) {
   return (
     <main
       className="flex min-h-dvh flex-col items-center justify-center px-6"
-      style={{ background: `linear-gradient(160deg, ${GREEN} 0%, #14402c 100%)` }}
+      style={{ background: `linear-gradient(160deg, ${ACCENT_FILL} 0%, #04302c 100%)` }}
     >
       <div className="w-full max-w-sm">
-        <h1 className="mb-1 text-2xl font-bold text-white" style={{ fontFamily: "'Fraunces',serif" }}>
+        <h1 className="mb-1 text-2xl font-bold text-white" style={{ fontFamily:"var(--font-heading)" }}>
           Новый пароль
         </h1>
 
@@ -73,7 +73,7 @@ export default function ResetForm({ token }: { token: string }) {
             <a
               href="/"
               className="block rounded-2xl py-4 text-center text-base font-bold"
-              style={{ background: GOLD, color: TEXT }}
+              style={{ background: GOLD, color: ON_GOLD }}
             >
               Открыть приложение
             </a>
@@ -116,7 +116,7 @@ export default function ResetForm({ token }: { token: string }) {
                 type="submit"
                 disabled={идёт || !token}
                 className="mt-2 rounded-2xl py-4 text-base font-bold disabled:opacity-60"
-                style={{ background: GOLD, color: TEXT }}
+                style={{ background: GOLD, color: ON_GOLD }}
               >
                 {идёт ? "Меняем…" : "Сменить пароль"}
               </button>

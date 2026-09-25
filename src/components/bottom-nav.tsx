@@ -1,9 +1,10 @@
 "use client";
 
-import { GREEN, MUTED, ACCENT_SOFT } from "@/lib/theme";
+import { ACCENT_FILL, GREEN, MUTED, ACCENT_SOFT } from "@/lib/theme";
 import { useT } from "@/components/lang-provider";
 import type { TKey } from "@/lib/i18n";
 import type { Tab } from "@/lib/types";
+import { LogoMark, Wordmark } from "@/components/ui";
 
 /** Иконки нижней панели: контур в покое, заливка у активной вкладки. */
 const ITEMS: { key: Tab; ключ: TKey; icon: (active: boolean) => React.ReactNode }[] = [
@@ -95,7 +96,7 @@ export default function BottomNav({
               {key === "map" ? (
                 <span
                   className="-mt-6 mb-0.5 flex h-12 w-12 items-center justify-center rounded-2xl shadow-md"
-                  style={{ background: GREEN }}
+                  style={{ background: ACCENT_FILL }}
                 >
                   {icon(true)}
                 </span>
@@ -124,15 +125,8 @@ export default function BottomNav({
         style={{ order: -1 }}
       >
         <div className="mb-4 flex items-center gap-2.5 px-3 pt-3">
-          <span
-            className="flex h-9 w-9 items-center justify-center rounded-xl text-sm font-bold text-white"
-            style={{ background: GREEN }}
-          >
-            Uz
-          </span>
-          <span className="text-lg font-bold" style={{ color: "var(--text)", fontFamily: "'Fraunces',serif" }}>
-            UzRoam
-          </span>
+          <LogoMark size={34} />
+          <Wordmark size={19} />
         </div>
 
         {ITEMS.map(({ key, ключ, icon }) => {

@@ -87,7 +87,7 @@ function Обёртка({
 
       <h1
         className="mb-1 text-2xl font-bold text-white"
-        style={{ fontFamily: "'Fraunces',serif" }}
+        style={{ fontFamily:"var(--font-heading)" }}
       >
         {заголовок}
       </h1>

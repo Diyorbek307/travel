@@ -1,3 +1,4 @@
+import { мягко } from "@/lib/theme";
 import { useState } from "react";
 import { PageHeader, Badge, Btn } from "./shared";
 import { useEntity } from "../context/useEntity";
@@ -82,7 +83,7 @@ export default function Events() {
                 <img src={e.img} alt={e.name} className="w-full h-full object-cover" />
                 <div className="absolute inset-0" style={{ background: "linear-gradient(to top, color-mix(in srgb, var(--color-bg) 85%, transparent) 0%, transparent 50%)" }} />
                 <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
-                  <span className="text-xs px-2 py-0.5 rounded font-medium" style={{ background: catColors[e.category] + "22", color: catColors[e.category], border: `1px solid ${catColors[e.category]}44`, fontFamily: "var(--font-mono)" }}>
+                  <span className="text-xs px-2 py-0.5 rounded font-medium" style={{ background: мягко(catColors[e.category], 13), color: catColors[e.category], border: `1px solid ${мягко(catColors[e.category], 27)}`, fontFamily: "var(--font-mono)" }}>
                     {catLabels[e.category] ?? e.category}
                   </span>
                   {e.featured && <span className="text-xs px-2 py-0.5 rounded font-medium" style={{ background: "var(--color-amber)", color: "var(--color-on-accent)", fontFamily: "var(--font-mono)" }}>★ Рекомендуемое</span>}

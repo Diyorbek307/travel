@@ -1,8 +1,8 @@
 import type { PublicUser, Tab } from "@/lib/types";
 import { useT } from "@/components/lang-provider";
 import type { TKey } from "@/lib/i18n";
-import { GOLD, GREEN, SURFACE, CREAM, TEXT, MUTED, BORDER, ACCENT_BORDER } from "@/lib/theme";
-import { LogoMark } from "./ui";
+import { ACCENT_FILL, GOLD, GREEN, SURFACE, CREAM, TEXT, MUTED, BORDER, ACCENT_BORDER } from "@/lib/theme";
+import { LogoMark, Wordmark } from "./ui";
 
 export function SideMenu({ onClose, onTab, currentTab, isPremium, onPremium, onLogout, onFavorites,
   onTrip,
@@ -40,8 +40,8 @@ export function SideMenu({ onClose, onTab, currentTab, isPremium, onPremium, onL
             <div className="flex items-center gap-2.5">
               <LogoMark size={36}/>
               <div>
-                <p className="font-bold text-lg" style={{fontFamily:"'Fraunces',serif",color:TEXT}}>UzRoam</p>
-                <p className="text-[10px]" style={{color:GOLD}}>{t("splash_tagline")}</p>
+                <p className="leading-none"><Wordmark size={19}/></p>
+                <p className="text-[10px] mt-1" style={{color:"var(--gold-ink)"}}>{t("splash_tagline")}</p>
               </div>
             </div>
             <button onClick={onClose} className="w-8 h-8 rounded-xl flex items-center justify-center" style={{background:CREAM}}>
@@ -50,7 +50,7 @@ export function SideMenu({ onClose, onTab, currentTab, isPremium, onPremium, onL
           </div>
           {/* User */}
           <div className="flex items-center gap-3 p-3 rounded-2xl" style={{background:CREAM}}>
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl" style={{background:`linear-gradient(135deg,${GREEN},#66B38E)`}}>👤</div>
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl" style={{background:"linear-gradient(135deg,var(--accent-light),var(--accent-deep))"}}>👤</div>
             <div className="flex-1">
               <p className="font-semibold text-sm truncate" style={{color:TEXT}}>{имя}</p>
               {откуда&&<p className="text-[10px] truncate" style={{color:MUTED}}>{откуда}</p>}
@@ -65,7 +65,7 @@ export function SideMenu({ onClose, onTab, currentTab, isPremium, onPremium, onL
             <button key={таб} onClick={()=>{onTab(таб);onClose();}} className="w-full flex items-center gap-3 px-5 py-3 text-left transition-all" style={currentTab===таб?{background:`${ACCENT_BORDER}`,borderRight:`3px solid ${GREEN}`}:{borderRight:"3px solid transparent"}}>
               <span className="text-lg w-6">{e}</span>
               <span className="font-semibold text-sm" style={{color:currentTab===таб?GREEN:TEXT}}>{t(k)}</span>
-              {currentTab===таб&&<div className="ml-auto w-1.5 h-1.5 rounded-full" style={{background:GREEN}}/>}
+              {currentTab===таб&&<div className="ml-auto w-1.5 h-1.5 rounded-full" style={{background:ACCENT_FILL}}/>}
             </button>
           ))}
           <div className="mx-5 my-3 border-t" style={{borderColor:BORDER}}/>
@@ -80,10 +80,10 @@ export function SideMenu({ onClose, onTab, currentTab, isPremium, onPremium, onL
           <div className="mx-5 my-3 border-t" style={{borderColor:BORDER}}/>
           {/* Premium */}
           {!isPremium&&(
-            <button onClick={()=>{onPremium();onClose();}} className="mx-4 w-[calc(100%-32px)] rounded-2xl p-4 flex items-center gap-3 glow-pulse" style={{background:`linear-gradient(135deg,#0a1f20,#2C1810)`}}>
+            <button onClick={()=>{onPremium();onClose();}} className="mx-4 w-[calc(100%-32px)] rounded-2xl p-4 flex items-center gap-3 glow-pulse" style={{background:"linear-gradient(135deg,#0a1f20,#0e3b38)"}}>
               <span className="text-2xl">👑</span>
               <div className="text-left flex-1">
-                <p className="font-bold text-sm" style={{color:GOLD}}>UzRoam Premium</p>
+                <p className="font-bold text-sm" style={{color:GOLD}}>HelloUZ Premium</p>
                 <p className="text-[9px]" style={{color:MUTED}}>{t("pay_no_ads")} · $4.99/{t("pay_month")}</p>
               </div>
               <svg className="rtl-flip" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={GOLD} strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>
@@ -102,7 +102,7 @@ export function SideMenu({ onClose, onTab, currentTab, isPremium, onPremium, onL
             <p className="text-[8px] leading-tight" style={{color:MUTED}}>{t("brand_uz")}</p>
           </div>
           <div className="flex items-center justify-between">
-            <p className="text-[10px]" style={{color:MUTED}}>UzRoam v2.4.1 · 🇺🇿 {t("menu_made")}</p>
+            <p className="text-[10px]" style={{color:MUTED}}>HelloUZ v2.4.1 · 🇺🇿 {t("menu_made")}</p>
             <button onClick={()=>{onClose();onLogout();}} className="text-[10px] font-semibold" style={{color:MUTED}}>🚪 {t("prof_logout")}</button>
           </div>
         </div>

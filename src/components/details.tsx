@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import BookingForm from "./booking-form";
 import ReviewForm from "./review-form";
 import type { Hotel, Place, Restaurant, Route } from "@/lib/types";
-import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE, ACCENT_SOFT, мягко } from "@/lib/theme";
+import { ACCENT_FILL, BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE, ACCENT_SOFT, мягко, ON_GOLD } from "@/lib/theme";
 import { LOCALES, LOCALE_META, датаСловами } from "@/lib/i18n";
 import { Badge, GeomPattern, StarRow } from "./ui";
 import { useT } from "@/components/lang-provider";
@@ -55,7 +55,7 @@ export function PlaceDetail({ place, onBack, onPlay, onToast, onПуть }:{ pla
         <button onClick={()=>переключитьИзбранное({id:place.id,kind:"place",name:place.name,city:трК(place.city),img:place.img,rating:place.rating})} className="absolute top-12 right-4 w-9 h-9 rounded-xl flex items-center justify-center backdrop-blur-sm" style={{...glass}}><svg width="16" height="16" viewBox="0 0 24 24" fill={fav?GOLD:"none"} stroke={fav?GOLD:"white"} strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
         <div className="absolute bottom-0 left-0 right-0 p-4">
           <div className="flex items-center gap-1.5 mb-1.5"><Badge text={place.type} color={GREEN}/>{place.audio&&<Badge text={"🎧 "+t("d_audioguide")} color={MUTED}/>}{place.qr&&<Badge text="QR" color={MUTED}/>}</div>
-          <h2 className="text-white text-xl font-bold" style={{fontFamily:"'Fraunces',serif"}}>{place.name}</h2>
+          <h2 className="text-white text-xl font-bold" style={{fontFamily:"var(--font-heading)"}}>{place.name}</h2>
           <p className="text-white/70 text-xs mt-0.5">{трК(place.city)} · ★ {place.rating} ({place.reviews.toLocaleString()} {t("d_reviews_word")})</p>
         </div>
       </div>
@@ -70,9 +70,9 @@ export function PlaceDetail({ place, onBack, onPlay, onToast, onПуть }:{ pla
           <p className="text-sm leading-relaxed" style={{color:MUTED}}>{place.desc}</p>
         </div>
         {place.audio&&(
-          <div className="rounded-2xl p-4 mb-3" style={{background:GREEN}}>
+          <div className="rounded-2xl p-4 mb-3" style={{background:ACCENT_FILL}}>
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{background:GOLD}}><svg width="13" height="13" viewBox="0 0 24 24" fill={TEXT}><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{background:GOLD}}><svg width="13" height="13" viewBox="0 0 24 24" fill={ON_GOLD}><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
               <div className="flex-1"><p className="text-white font-semibold text-sm">{t("d_audioguide")}</p><p className="text-white/60 text-xs">{LOCALE_META[озвучка[activeLang]].label} · 8:42</p></div>
               <span className="text-white/50 text-xs">{Math.floor(progress*8.42/100/60)}:{String(Math.floor(progress*8.42/100%60)).padStart(2,"0")} / 8:42</span>
             </div>
@@ -81,18 +81,18 @@ export function PlaceDetail({ place, onBack, onPlay, onToast, onПуть }:{ pla
             </div>
             <div className="flex justify-between text-white/40 text-[9px] mb-3"><span>0:00</span><span>8:42</span></div>
             <div className="flex gap-2 mb-3">
-              <button onClick={()=>{setPlaying(!playing);if(!playing)onPlay(place);}} className="flex-1 py-2.5 rounded-xl text-sm font-bold" style={{background:GOLD,color:TEXT}}>{playing?"⏸ "+t("d_pause"):"▶ "+t("d_listen")}</button>
+              <button onClick={()=>{setPlaying(!playing);if(!playing)onPlay(place);}} className="flex-1 py-2.5 rounded-xl text-sm font-bold" style={{background:GOLD,color:ON_GOLD}}>{playing?"⏸ "+t("d_pause"):"▶ "+t("d_listen")}</button>
               
             </div>
             <div className="flex gap-1.5 overflow-x-auto hide-scroll">
               {озвучка.map((код,i)=>(
-                <button key={код} onClick={()=>setActiveLang(i)} className="flex-shrink-0 px-2.5 py-1 rounded-lg text-[10px] font-bold" style={activeLang===i?{background:GOLD,color:TEXT}:{background:"rgba(255,255,255,0.12)",color:"rgba(255,255,255,0.7)"}}>{LOCALE_META[код].label}</button>
+                <button key={код} onClick={()=>setActiveLang(i)} className="flex-shrink-0 px-2.5 py-1 rounded-lg text-[10px] font-bold" style={activeLang===i?{background:GOLD,color:ON_GOLD}:{background:"rgba(255,255,255,0.12)",color:"rgba(255,255,255,0.7)"}}>{LOCALE_META[код].label}</button>
               ))}
             </div>
           </div>
         )}
         <div className="flex gap-3 mb-3">
-          <button onClick={()=>onПуть(place.name, place.city)} className="flex-1 py-3.5 rounded-2xl text-white text-sm font-bold active:scale-[0.98] transition-all" style={{background:GREEN}}>📍 {t("d_route")}</button>
+          <button onClick={()=>onПуть(place.name, place.city)} className="flex-1 py-3.5 rounded-2xl text-white text-sm font-bold active:scale-[0.98] transition-all" style={{background:ACCENT_FILL}}>📍 {t("d_route")}</button>
           <button
             onClick={()=>{ const стало = переключитьВМаршруте({id:place.id,name:place.name,city:place.city,img:place.img}); onToast(стало?`✅ «${place.name}» — ${t("trip_added")}`:`✕ «${place.name}» — ${t("trip_removed")}`); }}
             className="flex-1 py-3.5 rounded-2xl text-sm font-bold border active:scale-[0.98] transition-all"
@@ -144,8 +144,8 @@ export function HotelDetail({ hotel, onBack, onToast }:{ hotel:Hotel; onBack:()=
         </div>
         <div className="absolute bottom-0 left-0 right-0 p-4">
           <div className="flex items-center gap-2 mb-1"><Badge text={hotel.tag} color={GOLD}/><Badge text={трК(hotel.city)} color={GREEN}/></div>
-          <p className="text-white text-lg font-bold" style={{fontFamily:"'Fraunces',serif"}}>{hotel.name}</p>
-          <div className="flex items-center gap-3"><StarRow rating={hotel.rating}/><span className="text-white/60 text-xs">{hotel.reviews} {t("d_reviews_word")}</span></div>
+          <p className="text-white text-lg font-bold" style={{fontFamily:"var(--font-heading)"}}>{hotel.name}</p>
+          <div className="flex items-center gap-3"><StarRow rating={hotel.rating} onPhoto/><span className="text-white/60 text-xs">{hotel.reviews} {t("d_reviews_word")}</span></div>
         </div>
       </div>
       <div className="flex-1 overflow-y-auto hide-scroll px-4 pt-4">
@@ -168,11 +168,11 @@ export function HotelDetail({ hotel, onBack, onToast }:{ hotel:Hotel; onBack:()=
                 <div className="flex items-center gap-3">
                   <button onClick={()=>c.set((n:number)=>Math.max(c.min,n-1))} className="w-8 h-8 rounded-xl flex items-center justify-center border" style={{borderColor:BORDER}}><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={TEXT} strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
                   <span className="font-bold text-base" style={{color:TEXT}}>{c.v}</span>
-                  <button onClick={()=>c.set((n:number)=>n+1)} className="w-8 h-8 rounded-xl flex items-center justify-center" style={{background:GREEN}}><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+                  <button onClick={()=>c.set((n:number)=>n+1)} className="w-8 h-8 rounded-xl flex items-center justify-center" style={{background:ACCENT_FILL}}><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
                 </div>
               </div>
             ))}
-            <div className="text-right"><p className="text-[10px] font-semibold" style={{color:MUTED}}>{t("d_total")}</p><p className="text-xl font-bold mt-1" style={{color:GREEN,fontFamily:"'Fraunces',serif"}}>{дг.одна(total)}</p><p className="text-[9px]" style={{color:MUTED}}>{дг.цена(hotel.price)}{t("d_per_night")} × {nights}</p></div>
+            <div className="text-right"><p className="text-[10px] font-semibold" style={{color:MUTED}}>{t("d_total")}</p><p className="text-xl font-bold mt-1" style={{color:GREEN,fontFamily:"var(--font-heading)"}}>{дг.одна(total)}</p><p className="text-[9px]" style={{color:MUTED}}>{дг.цена(hotel.price)}{t("d_per_night")} × {nights}</p></div>
           </div>
           {/*
             Раньше эта кнопка сама показывала «🎉 Бронь подтверждена»,
@@ -184,7 +184,7 @@ export function HotelDetail({ hotel, onBack, onToast }:{ hotel:Hotel; onBack:()=
           <button
             onClick={()=>document.getElementById("заявка")?.scrollIntoView({behavior:"smooth",block:"center"})}
             className="w-full py-4 rounded-2xl text-white font-bold text-sm active:scale-[0.98] transition-all"
-            style={{background:GREEN}}
+            style={{background:ACCENT_FILL}}
           >{t("d_book")} — {дг.одна(total)}</button>
           <p className="text-center text-[10px] mt-2" style={{color:MUTED}}>{t("d_book_terms")}</p>
         </div>
@@ -212,8 +212,8 @@ export function RestaurantDetail({ r, onBack, onToast, onПуть }:{ r:Restaura
         <button onClick={()=>переключитьИзбранное({id:r.id,kind:"restaurant",name:r.name,city:трК(r.city),img:r.img,rating:r.rating})} className="absolute top-12 right-4 w-9 h-9 rounded-xl flex items-center justify-center backdrop-blur-sm" style={{...glass}}><svg width="16" height="16" viewBox="0 0 24 24" fill={fav?GOLD:"none"} stroke={fav?GOLD:"white"} strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
         <div className="absolute bottom-0 left-0 right-0 p-4">
           <div className="flex items-center gap-1.5 mb-1"><Badge text={r.cuisine} color={"#C1603A"}/><Badge text={трК(r.city)} color={GREEN}/></div>
-          <p className="text-white text-xl font-bold" style={{fontFamily:"'Fraunces',serif"}}>{r.name}</p>
-          <div className="flex items-center gap-3 mt-0.5"><StarRow rating={r.rating}/><span className="text-white/70 text-xs">{r.reviews} {t("d_reviews_word")}</span><span className="text-white/70 text-xs">{r.price}</span></div>
+          <p className="text-white text-xl font-bold" style={{fontFamily:"var(--font-heading)"}}>{r.name}</p>
+          <div className="flex items-center gap-3 mt-0.5"><StarRow rating={r.rating} onPhoto/><span className="text-white/70 text-xs">{r.reviews} {t("d_reviews_word")}</span><span className="text-white/70 text-xs">{r.price}</span></div>
         </div>
       </div>
       <div className="flex-1 overflow-y-auto hide-scroll px-4 pt-4">
@@ -263,7 +263,7 @@ export function RouteDetail({ route, onBack, onПуть, onToast }:{ route:Route
         <button onClick={onBack} className="mb-3 w-9 h-9 rounded-xl flex items-center justify-center relative z-10" style={{background:"rgba(255,255,255,0.2)"}}><svg className="rtl-flip" width="16" height="16" fill="none" stroke="white" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
         <div className="relative z-10">
           <Badge text={трК(route.badge)} color="rgba(255,255,255,0.9)"/>
-          <h2 className="text-white text-xl font-bold mt-1 leading-tight" style={{fontFamily:"'Fraunces',serif"}}>{route.icon} {трК(route.title)}</h2>
+          <h2 className="text-white text-xl font-bold mt-1 leading-tight" style={{fontFamily:"var(--font-heading)"}}>{route.icon} {трК(route.title)}</h2>
           <p className="text-white/70 text-xs mt-1">{трК(route.sub)}</p>
           <div className="flex gap-4 mt-3">{[["⏱",route.duration],["📍",`${route.stops.length} ${t("d_stops_short")}`]].map(([e,v])=><div key={String(v)} className="flex items-center gap-1"><span className="text-sm">{e}</span><span className="text-white text-xs font-semibold">{v}</span></div>)}</div>
         </div>

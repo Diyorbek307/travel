@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Place } from "@/lib/types";
-import { BORDER, CREAM, GREEN, MUTED, TEXT, WHITE, ACCENT_SOFT } from "@/lib/theme";
+import { ACCENT_FILL, BORDER, CREAM, GREEN, MUTED, TEXT, WHITE, ACCENT_SOFT } from "@/lib/theme";
 import { PRACTICAL } from "@/data/content";
 import { useAppContent } from "@/components/content-provider";
 import { useT } from "@/components/lang-provider";
@@ -156,7 +156,7 @@ export function AudioScreen({
         <p className="mb-0.5 text-xs font-medium" style={{ color: GREEN, letterSpacing: "0.1em" }}>
           {t("audio_kicker")}
         </p>
-        <h1 className="mb-3 text-xl font-bold" style={{ color: TEXT, fontFamily: "'Fraunces',serif" }}>
+        <h1 className="mb-3 text-xl font-bold" style={{ color: TEXT, fontFamily:"var(--font-heading)" }}>
           {t("audio_listen")}
         </h1>
 
@@ -169,7 +169,7 @@ export function AudioScreen({
               <button
                 onClick={() => setЯзык(null)}
                 className="flex-shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold"
-                style={язык === null ? { background: GREEN, color: WHITE } : { background: CREAM, color: MUTED }}
+                style={язык === null ? { background: ACCENT_FILL, color: WHITE } : { background: CREAM, color: MUTED }}
               >
                 {t("audio_all")}
               </button>
@@ -178,7 +178,7 @@ export function AudioScreen({
                   key={я}
                   onClick={() => setЯзык(я)}
                   className="flex-shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold"
-                  style={язык === я ? { background: GREEN, color: WHITE } : { background: CREAM, color: MUTED }}
+                  style={язык === я ? { background: ACCENT_FILL, color: WHITE } : { background: CREAM, color: MUTED }}
                 >
                   {трК(я)}
                 </button>

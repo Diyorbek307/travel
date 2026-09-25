@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { BORDER, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE } from "@/lib/theme";
+import { ACCENT_FILL, BORDER, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE, ON_GOLD } from "@/lib/theme";
 import { useT } from "@/components/lang-provider";
 
 /**
@@ -83,7 +83,7 @@ export default function SupportChat({ onBack }: { onBack: () => void }) {
           ← {t("common_back")}
         </button>
         <div className="min-w-0">
-          <p className="text-sm font-bold" style={{ color: TEXT, fontFamily: "'Fraunces',serif" }}>
+          <p className="text-sm font-bold" style={{ color: TEXT, fontFamily:"var(--font-heading)" }}>
             {t("prof_support")}
           </p>
           <p className="text-[11px]" style={{ color: MUTED }}>
@@ -115,7 +115,7 @@ export default function SupportChat({ onBack }: { onBack: () => void }) {
                 className="max-w-[80%] rounded-2xl px-3.5 py-2.5 text-sm"
                 style={
                   свой
-                    ? { background: GREEN, color: WHITE }
+                    ? { background: ACCENT_FILL, color: WHITE }
                     : { background: SURFACE, color: TEXT, border: `1px solid ${BORDER}` }
                 }
               >
@@ -145,7 +145,7 @@ export default function SupportChat({ onBack }: { onBack: () => void }) {
           type="submit"
           disabled={отправка || !text.trim()}
           className="grid h-10 w-10 shrink-0 place-items-center rounded-full disabled:opacity-50"
-          style={{ background: GOLD, color: TEXT }}
+          style={{ background: GOLD, color: ON_GOLD }}
           aria-label={t("a11y_send")}
         >
           <svg className="rtl-flip" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">

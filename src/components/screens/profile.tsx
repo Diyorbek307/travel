@@ -5,7 +5,7 @@ import type { ChatMessage, PublicUser } from "@/lib/types";
 import { PremiumModal } from "@/components/modals";
 import SupportChat from "@/components/support-chat";
 import MyBookings from "@/components/my-bookings";
-import { BORDER, CREAM, GOLD, GREEN, GREEN_LIGHT, MUTED, TEXT, WHITE, SURFACE, ACCENT_SOFT, ACCENT_DEEP } from "@/lib/theme";
+import { ACCENT_FILL, BORDER, CREAM, GOLD, GREEN, GREEN_LIGHT, MUTED, TEXT, WHITE, SURFACE, ACCENT_SOFT, ACCENT_DEEP, ON_GOLD } from "@/lib/theme";
 import { ACHIEVEMENTS, AI_REPLIES, STAMPS } from "@/data/content";
 import { useVisits } from "@/lib/visits";
 import { useCurrency } from "@/components/currency-provider";
@@ -63,7 +63,7 @@ export function SettingsView({ isPremium, user, onUpgrade, onLogout, onSupport }
   const поделиться = async () => {
     const url = typeof location !== "undefined" ? location.origin : "https://uzbekistan-travel.onrender.com";
     try {
-      if (navigator.share) { await navigator.share({ title: "UzRoam", url }); return; }
+      if (navigator.share) { await navigator.share({ title: "HelloUZ", url }); return; }
       await navigator.clipboard.writeText(url);
       тост(t("share_copied"));
     } catch { /* человек закрыл окно «Поделиться» — это не ошибка */ }
@@ -92,7 +92,7 @@ export function SettingsView({ isPremium, user, onUpgrade, onLogout, onSupport }
       посещения: (() => { try { return JSON.parse(localStorage.getItem("uzup.visits") || "{}"); } catch { return {}; } })(),
     };
     const url = URL.createObjectURL(new Blob([JSON.stringify(данные, null, 2)], { type: "application/json" }));
-    const a = document.createElement("a"); a.href = url; a.download = "uzroam-my-data.json";
+    const a = document.createElement("a"); a.href = url; a.download = "hellouz-my-data.json";
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 4000);
   };
@@ -166,8 +166,8 @@ export function SettingsView({ isPremium, user, onUpgrade, onLogout, onSupport }
       {!isPremium&&(
         <button onClick={onUpgrade} className="w-full rounded-2xl p-4 flex items-center gap-3 text-left active:scale-[0.98] transition-all" style={{background:`linear-gradient(135deg,#0a1f20,#0e3b38)`}}>
           <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0" style={{background:GOLD}}>👑</div>
-          <div className="flex-1"><p className="text-white font-bold text-sm">UzRoam Premium</p><p className="text-white/60 text-xs">{t("pay_no_ads")} · UzRoam Pro</p></div>
-          <div className="px-3 py-1.5 rounded-xl text-xs font-bold" style={{background:GOLD,color:TEXT}}>$4.99</div>
+          <div className="flex-1"><p className="text-white font-bold text-sm">HelloUZ Premium</p><p className="text-white/60 text-xs">{t("pay_no_ads")} · HelloUZ Pro</p></div>
+          <div className="px-3 py-1.5 rounded-xl text-xs font-bold" style={{background:GOLD,color:ON_GOLD}}>$4.99</div>
         </button>
       )}
       {isPremium&&(
@@ -210,14 +210,14 @@ export function SettingsView({ isPremium, user, onUpgrade, onLogout, onSupport }
         <p className="font-bold text-xs pt-3 pb-1 uppercase tracking-widest" style={{color:MUTED}}>{t("prof_map_nav")}</p>
         <Row icon="🗺️" label={t("s_map_style")} right={
           <div className="flex rounded-lg overflow-hidden border" style={{borderColor:BORDER}}>
-            {([["standard",t("nav_map")],["sat",t("s_satellite")]] as const).map(([s,ярлык])=><button key={s} onClick={()=>задатьНастройку("mapStyle",s)} className="px-2.5 py-1 text-[10px] font-bold" style={нст.mapStyle===s?{background:GREEN,color:WHITE}:{background:CREAM,color:MUTED}}>{ярлык}</button>)}
+            {([["standard",t("nav_map")],["sat",t("s_satellite")]] as const).map(([s,ярлык])=><button key={s} onClick={()=>задатьНастройку("mapStyle",s)} className="px-2.5 py-1 text-[10px] font-bold" style={нст.mapStyle===s?{background:ACCENT_FILL,color:WHITE}:{background:CREAM,color:MUTED}}>{ярлык}</button>)}
           </div>
         }/>
         <Row icon="📡" label={t("s_gps_audio")} sub={t("s_nearby_sub")} right={<Toggle on={нст.gps} set={v=>задатьНастройку("gps",v)}/>}/>
         <Row icon="⬇️" label={t("s_offline_maps")} sub={t("s_offline_sub")} right={<Toggle on={нст.offline} set={v=>задатьНастройку("offline",v)}/>}/>
         <Row icon="📏" label={t("s_units")} right={
           <div className="flex rounded-lg overflow-hidden border" style={{borderColor:BORDER}}>
-            {(["metric","imperial"] as const).map(u=><button key={u} onClick={()=>задатьНастройку("units",u)} className="px-2.5 py-1 text-[10px] font-bold" style={нст.units===u?{background:GREEN,color:WHITE}:{background:CREAM,color:MUTED}}>{u==="metric"?t("unit_km"):t("unit_mi")}</button>)}
+            {(["metric","imperial"] as const).map(u=><button key={u} onClick={()=>задатьНастройку("units",u)} className="px-2.5 py-1 text-[10px] font-bold" style={нст.units===u?{background:ACCENT_FILL,color:WHITE}:{background:CREAM,color:MUTED}}>{u==="metric"?t("unit_km"):t("unit_mi")}</button>)}
           </div>
         }/>
       </div>
@@ -228,7 +228,7 @@ export function SettingsView({ isPremium, user, onUpgrade, onLogout, onSupport }
         <Row icon="🌙" label={t("s_theme")} sub={t("s_dark_sub")} right={
           <div className="flex rounded-lg overflow-hidden border" style={{borderColor:BORDER}}>
             {([["system",t("s_theme_system")],["light",t("s_theme_light")],["dark",t("s_theme_dark")]] as const).map(([v,ярлык])=>(
-              <button key={v} onClick={()=>задатьНастройку("theme",v)} className="px-2 py-1 text-[10px] font-bold" style={нст.theme===v?{background:GREEN,color:WHITE}:{background:CREAM,color:MUTED}}>{ярлык}</button>
+              <button key={v} onClick={()=>задатьНастройку("theme",v)} className="px-2 py-1 text-[10px] font-bold" style={нст.theme===v?{background:ACCENT_FILL,color:WHITE}:{background:CREAM,color:MUTED}}>{ярлык}</button>
             ))}
           </div>
         }/>
@@ -270,7 +270,7 @@ export function SettingsView({ isPremium, user, onUpgrade, onLogout, onSupport }
             {обновление==="checking"?t("upd_checking"):обновление==="available"?t("upd_reload"):обновление==="current"?t("upd_current"):t("prof_updated")}
           </span>
         }/>
-        <Row icon="🌍" label="UzRoam — Made in Uzbekistan" right={<span className="text-base">🇺🇿</span>}/>
+        <Row icon="🌍" label="HelloUZ — Made in Uzbekistan" right={<span className="text-base">🇺🇿</span>}/>
       </div>
 
       <button onClick={onLogout} className="w-full py-3.5 rounded-2xl text-sm font-bold border mb-1 active:scale-[0.98] transition-all" style={{color:"#E7574C",borderColor:"color-mix(in srgb,#E7574C 35%,transparent)",background:"color-mix(in srgb,#E7574C 12%,transparent)"}}>
@@ -291,7 +291,7 @@ export function SettingsView({ isPremium, user, onUpgrade, onLogout, onSupport }
         <div className="fixed inset-0 z-[65] flex items-end sm:items-center justify-center" style={{background:"rgba(0,0,0,0.55)"}} onClick={()=>setПанель(null)}>
           <div className="w-full sm:max-w-md max-h-[85dvh] overflow-y-auto rounded-t-3xl sm:rounded-3xl p-5" style={{background:SURFACE,border:`1px solid ${BORDER}`}} onClick={e=>e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold" style={{color:TEXT,fontFamily:"'Fraunces',serif"}}>
+              <h3 className="text-lg font-bold" style={{color:TEXT,fontFamily:"var(--font-heading)"}}>
                 {панель==="faq"?t("s_help"):панель==="terms"?t("s_terms"):панель==="privacy"?t("s_privacy_policy"):панель==="edit"?t("s_edit_profile"):панель==="linked"?t("s_linked"):панель==="rate"?t("rate_title"):t("del_title")}
               </h3>
               <button onClick={()=>setПанель(null)} className="text-xl opacity-50 active:opacity-100" style={{color:TEXT}}>×</button>
@@ -338,7 +338,7 @@ export function SettingsView({ isPremium, user, onUpgrade, onLogout, onSupport }
                     <input value={(форма as Record<string,string>)[k]} onChange={e=>setФорма(f=>({...f,[k]:e.target.value}))} className="w-full rounded-xl px-3 py-2.5 text-sm outline-none border" style={{background:CREAM,borderColor:BORDER,color:TEXT}}/>
                   </div>
                 ))}
-                <button onClick={сохранитьПрофиль} className="w-full py-3 rounded-xl text-sm font-bold text-white active:scale-[0.98] transition-all" style={{background:GREEN}}>{t("prof_save")}</button>
+                <button onClick={сохранитьПрофиль} className="w-full py-3 rounded-xl text-sm font-bold text-white active:scale-[0.98] transition-all" style={{background:ACCENT_FILL}}>{t("prof_save")}</button>
               </div>
             )}
 
@@ -468,13 +468,13 @@ ${t("cur_live_hint")}`
       <div className="px-4 pt-14 pb-3 bg-white border-b" style={{borderColor:BORDER}}>
         <div className="flex items-center gap-3 mb-3">
           <div className="relative">
-            <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0 overflow-hidden" style={{background:`linear-gradient(135deg,${GREEN},#66B38E)`}}>
+            <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0 overflow-hidden" style={{background:"linear-gradient(135deg,var(--accent-light),var(--accent-deep))"}}>
               {snimok(снимок) ?? "👤"}
             </div>
             {isPremium&&<div className="absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-[10px]" style={{background:GOLD}}>👑</div>}
           </div>
           <div className="flex-1">
-            <p className="font-bold text-base truncate" style={{color:TEXT,fontFamily:"'Fraunces',serif"}}>{имя}</p>
+            <p className="font-bold text-base truncate" style={{color:TEXT,fontFamily:"var(--font-heading)"}}>{имя}</p>
             <p className="text-xs truncate" style={{color:MUTED}}>{откуда}</p>
             <div className="flex gap-1.5 mt-1">
               <Badge text="EXPLORER" color={GREEN}/>
@@ -485,7 +485,7 @@ ${t("cur_live_hint")}`
           {!isPremium&&<button onClick={()=>setShowPremium(true)} className="px-3 py-1.5 rounded-xl text-[10px] font-bold" style={{background:`linear-gradient(135deg,#0a1f20,#0e3b38)`,color:GOLD}}>👑 Pro</button>}
         </div>
         <div className="flex gap-1.5">
-          {TABS.map(([v,e,l])=><button key={v} onClick={()=>setView(v)} className="flex-1 py-2 rounded-xl text-[10px] font-semibold flex flex-col items-center gap-0.5" style={view===v?{background:GREEN,color:WHITE}:{background:CREAM,color:MUTED}}><span>{e}</span><span>{t(l)}</span></button>)}
+          {TABS.map(([v,e,l])=><button key={v} onClick={()=>setView(v)} className="flex-1 py-2 rounded-xl text-[10px] font-semibold flex flex-col items-center gap-0.5" style={view===v?{background:ACCENT_FILL,color:WHITE}:{background:CREAM,color:MUTED}}><span>{e}</span><span>{t(l)}</span></button>)}
         </div>
       </div>
 
@@ -493,9 +493,9 @@ ${t("cur_live_hint")}`
         <div className="flex-1 overflow-y-auto hide-scroll animate-fade-in">
           <AdInline isPremium={isPremium}/>
           <div className="px-4">
-            <div className="rounded-3xl overflow-hidden mb-4 shadow-lg" style={{background:`linear-gradient(135deg,${ACCENT_DEEP} 0%,${GREEN} 55%,${GREEN_LIGHT} 100%)`}}>
+            <div className="rounded-3xl overflow-hidden mb-4 shadow-lg" style={{background:`linear-gradient(135deg,${ACCENT_DEEP} 0%,${ACCENT_FILL} 100%)`}}>
               <div className="p-5">
-                <div className="flex items-start justify-between mb-4"><div><p className="text-[9px] font-bold tracking-widest uppercase" style={{color:GOLD}}>UzRoam · Uzbekistan Travel</p><p className="text-white text-xl mt-0.5" style={{fontFamily:"'Fraunces',serif",fontWeight:600}}>{t("prof_digital_passport")}</p></div><div className="text-right"><p className="text-white/40 text-[9px]">{t("prof_passport_no")}</p><p className="text-[10px] font-mono font-bold" style={{color:GOLD}}>UZT-2026-0841</p></div></div>
+                <div className="flex items-start justify-between mb-4"><div><p className="text-[9px] font-bold tracking-widest uppercase" style={{color:GOLD}}>HelloUZ · Uzbekistan Travel</p><p className="text-white text-xl mt-0.5" style={{fontFamily:"var(--font-heading)",fontWeight:600}}>{t("prof_digital_passport")}</p></div><div className="text-right"><p className="text-white/40 text-[9px]">{t("prof_passport_no")}</p><p className="text-[10px] font-mono font-bold" style={{color:GOLD}}>UZT-2026-0841</p></div></div>
                 <div className="flex items-center gap-3 rounded-2xl p-3" style={{background:"rgba(255,255,255,0.12)"}}>
                   <div className="w-11 h-11 rounded-xl flex items-center justify-center text-2xl flex-shrink-0 overflow-hidden" style={{background:"rgba(255,255,255,0.15)"}}>
                     {snimok(снимок) ?? "👤"}
@@ -507,9 +507,9 @@ ${t("cur_live_hint")}`
               <div className="h-6 flex border-t" style={{borderColor:"rgba(255,255,255,0.1)"}}>{Array.from({length:20}).map((_,i)=><div key={i} className="flex-1 flex items-center justify-center" style={{opacity:0.22}}><div className="w-1.5 h-1.5 rotate-45" style={{background:GOLD}}/></div>)}</div>
             </div>
             <p className="font-bold text-sm mb-3" style={{color:TEXT}}>{t("prof_stamps")}</p>
-            <div className="grid grid-cols-3 gap-2.5 mb-4">{штампы.map((s,i)=><div key={i} className="rounded-2xl p-3 aspect-square flex flex-col items-center justify-center text-center shadow-sm" style={s.earned?{background:GREEN}:{background:SURFACE,border:`2px dashed ${BORDER}`}}><span className="text-2xl mb-1">{s.icon}</span><p className="font-bold text-[9px] leading-tight" style={{color:s.earned?WHITE:MUTED}}>{трК(s.name)}</p><p className="text-[8px] mt-0.5" style={{color:s.earned?GOLD:"#C0B0A0"}}>{s.earned?s.date:трК("Не посещено")}</p></div>)}</div>
-            <div className="bg-white rounded-2xl p-4 mb-3 shadow-sm border" style={{borderColor:BORDER}}><div className="flex items-center justify-between mb-2"><p className="font-semibold text-sm" style={{color:TEXT}}>{t("prof_progress")}</p><p className="text-sm font-bold" style={{color:GREEN}}>{заработано}/{всегоШтампов}</p></div><div className="rounded-full h-2" style={{background:CREAM}}><div className="h-2 rounded-full" style={{background:GREEN,width:`${процентШтампов}%`,transition:"width 0.4s"}}/></div><p className="text-xs mt-2" style={{color:MUTED}}>{t("prof_stamps_more")}</p></div>
-            <div className="rounded-2xl p-4 mb-4" style={{background:`linear-gradient(135deg,${GOLD},#C17B2F)`}}><p className="font-bold text-sm" style={{color:TEXT}}>🎁 {t("prof_stamps_reward")}</p><p className="text-xs mt-1" style={{color:TEXT+"99"}}>{t("prof_stamps_partners")}</p></div>
+            <div className="grid grid-cols-3 gap-2.5 mb-4">{штампы.map((s,i)=><div key={i} className="rounded-2xl p-3 aspect-square flex flex-col items-center justify-center text-center shadow-sm" style={s.earned?{background:ACCENT_FILL}:{background:SURFACE,border:`2px dashed ${BORDER}`}}><span className="text-2xl mb-1">{s.icon}</span><p className="font-bold text-[9px] leading-tight" style={{color:s.earned?WHITE:MUTED}}>{трК(s.name)}</p><p className="text-[8px] mt-0.5" style={{color:s.earned?GOLD:"#C0B0A0"}}>{s.earned?s.date:трК("Не посещено")}</p></div>)}</div>
+            <div className="bg-white rounded-2xl p-4 mb-3 shadow-sm border" style={{borderColor:BORDER}}><div className="flex items-center justify-between mb-2"><p className="font-semibold text-sm" style={{color:TEXT}}>{t("prof_progress")}</p><p className="text-sm font-bold" style={{color:GREEN}}>{заработано}/{всегоШтампов}</p></div><div className="rounded-full h-2" style={{background:CREAM}}><div className="h-2 rounded-full" style={{background:ACCENT_FILL,width:`${процентШтампов}%`,transition:"width 0.4s"}}/></div><p className="text-xs mt-2" style={{color:MUTED}}>{t("prof_stamps_more")}</p></div>
+            <div className="rounded-2xl p-4 mb-4" style={{background:`linear-gradient(135deg,${GOLD},#C17B2F)`}}><p className="font-bold text-sm" style={{color:ON_GOLD}}>🎁 {t("prof_stamps_reward")}</p><p className="text-xs mt-1" style={{color:"rgba(28,22,6,0.7)"}}>{t("prof_stamps_partners")}</p></div>
             <p className="font-bold text-sm mb-3" style={{color:TEXT}}>{t("prof_achievements")}</p>
             <div className="grid grid-cols-3 gap-2.5 pb-4">{ACHIEVEMENTS.map((a,i)=><div key={i} className="bg-white rounded-2xl p-3 text-center shadow-sm border" style={{borderColor:BORDER,opacity:a.earned?1:0.55}}><div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl mb-1.5 mx-auto" style={{background:a.color+"18"}}>{a.emoji}</div><p className="text-[9px] font-semibold leading-tight" style={{color:TEXT}}>{трК(a.title)}</p><p className="text-[8px] mt-0.5" style={{color:a.earned?GREEN:MUTED}}>{a.earned?`✓ ${t("ach_earned")}`:t("ach_progress")}</p></div>)}</div>
           </div>
@@ -520,25 +520,25 @@ ${t("cur_live_hint")}`
           <div className="flex-1 overflow-y-auto hide-scroll px-4 py-3 space-y-3">
             {messages.map((m,i)=>(
               <div key={i} className={`flex ${m.role==="user"?"justify-end":"justify-start"}`}>
-                {m.role==="ai"&&<div className="w-7 h-7 rounded-lg flex items-center justify-center mr-2 mt-1 flex-shrink-0 text-white text-[10px] font-bold" style={{background:GREEN}}>AI</div>}
-                <div className="max-w-[78%] rounded-2xl px-4 py-3 shadow-sm" style={m.role==="user"?{background:GREEN,color:WHITE,borderTopRightRadius:4}:{background:SURFACE,color:TEXT,border:`1px solid ${BORDER}`,borderTopLeftRadius:4}}>
+                {m.role==="ai"&&<div className="w-7 h-7 rounded-lg flex items-center justify-center mr-2 mt-1 flex-shrink-0 text-white text-[10px] font-bold" style={{background:ACCENT_FILL}}>AI</div>}
+                <div className="max-w-[78%] rounded-2xl px-4 py-3 shadow-sm" style={m.role==="user"?{background:ACCENT_FILL,color:WHITE,borderTopRightRadius:4}:{background:SURFACE,color:TEXT,border:`1px solid ${BORDER}`,borderTopLeftRadius:4}}>
                   <p className="text-sm leading-relaxed whitespace-pre-line">{m.text}</p>
                   <p className="text-[10px] mt-1.5" style={{color:m.role==="user"?"rgba(255,255,255,0.5)":MUTED}}>{m.time}</p>
                 </div>
               </div>
             ))}
-            {typing&&<div className="flex"><div className="w-7 h-7 rounded-lg flex items-center justify-center mr-2 text-white text-[10px] font-bold" style={{background:GREEN}}>AI</div><div className="bg-white rounded-2xl rounded-tl px-4 py-3 shadow-sm border" style={{borderColor:BORDER,borderTopLeftRadius:4}}><div className="flex gap-1.5 items-center h-4">{[0,150,300].map(d=><span key={d} className="w-2 h-2 rounded-full bounce-dot" style={{background:GREEN,animationDelay:`${d}ms`}}/>)}</div></div></div>}
+            {typing&&<div className="flex"><div className="w-7 h-7 rounded-lg flex items-center justify-center mr-2 text-white text-[10px] font-bold" style={{background:ACCENT_FILL}}>AI</div><div className="bg-white rounded-2xl rounded-tl px-4 py-3 shadow-sm border" style={{borderColor:BORDER,borderTopLeftRadius:4}}><div className="flex gap-1.5 items-center h-4">{[0,150,300].map(d=><span key={d} className="w-2 h-2 rounded-full bounce-dot" style={{background:ACCENT_FILL,animationDelay:`${d}ms`}}/>)}</div></div></div>}
             <div ref={bottomRef}/>
           </div>
           <div className="px-4 pb-2"><div className="flex gap-2 overflow-x-auto hide-scroll">{QUICK.map((q,i)=><button key={i} onClick={()=>sendMsg(q)} className="flex-shrink-0 px-3 py-2 rounded-full text-xs font-medium bg-white border" style={{color:TEXT,borderColor:BORDER}}>{трК(q)}</button>)}</div></div>
-          <div className="px-4 pb-5 pt-2"><div className="flex items-center gap-2 bg-white rounded-2xl px-4 py-2.5 border" style={{borderColor:BORDER}}><input value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&input.trim()&&sendMsg(input.trim())} placeholder={трК("Спросите что угодно…")} className="flex-1 text-sm bg-transparent outline-none" style={{color:TEXT}}/><button onClick={()=>input.trim()&&sendMsg(input.trim())} className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0" style={{background:GREEN}}><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button></div></div>
+          <div className="px-4 pb-5 pt-2"><div className="flex items-center gap-2 bg-white rounded-2xl px-4 py-2.5 border" style={{borderColor:BORDER}}><input value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&input.trim()&&sendMsg(input.trim())} placeholder={трК("Спросите что угодно…")} className="flex-1 text-sm bg-transparent outline-none" style={{color:TEXT}}/><button onClick={()=>input.trim()&&sendMsg(input.trim())} className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0" style={{background:ACCENT_FILL}}><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button></div></div>
         </div>
       )}
       {view==="stats"&&(
         <div className="flex-1 overflow-y-auto hide-scroll animate-fade-in">
           <AdInline isPremium={isPremium}/>
           <div className="px-4 space-y-4 pb-4">
-            <div className="grid grid-cols-2 gap-3">{[{e:"🏙️",v:String(Object.keys(визиты).length),l:t("prof_cnt_cities")},{e:"🏅",v:`${заработано}/${всегоШтампов}`,l:t("prof_cnt_stamps")},{e:"❤️",v:String(избранноеСписок.length),l:t("prof_cnt_fav")},{e:"📋",v:String(маршрутСписок.length),l:t("prof_cnt_trip")}].map(s=><div key={s.l} className="bg-white rounded-2xl p-4 shadow-sm border text-center" style={{borderColor:BORDER}}><p className="text-3xl mb-1">{s.e}</p><p className="text-2xl font-bold" style={{color:GREEN,fontFamily:"'Fraunces',serif"}}>{s.v}</p><p className="text-xs mt-0.5" style={{color:MUTED}}>{s.l}</p></div>)}</div>
+            <div className="grid grid-cols-2 gap-3">{[{e:"🏙️",v:String(Object.keys(визиты).length),l:t("prof_cnt_cities")},{e:"🏅",v:`${заработано}/${всегоШтампов}`,l:t("prof_cnt_stamps")},{e:"❤️",v:String(избранноеСписок.length),l:t("prof_cnt_fav")},{e:"📋",v:String(маршрутСписок.length),l:t("prof_cnt_trip")}].map(s=><div key={s.l} className="bg-white rounded-2xl p-4 shadow-sm border text-center" style={{borderColor:BORDER}}><p className="text-3xl mb-1">{s.e}</p><p className="text-2xl font-bold" style={{color:GREEN,fontFamily:"var(--font-heading)"}}>{s.v}</p><p className="text-xs mt-0.5" style={{color:MUTED}}>{s.l}</p></div>)}</div>
             <CurrencyConverter/>
             <div className="bg-white rounded-2xl p-4 shadow-sm border" style={{borderColor:BORDER}}><p className="font-bold text-sm mb-3" style={{color:TEXT}}>{t("prof_activity")}</p>{[{e:"🕌",a:"Посетил",p:"Площадь Регистан",t:"Сегодня, 09:30"},{e:"🎧",a:"Слушал",p:"Гид Шахи-Зинда",t:"Сегодня, 11:15"},{e:"✅",a:"Завершил",p:"Самарканд за 1 день",t:"12 авг"}].map((a,i)=><div key={i} className="flex items-center gap-3 py-2.5 border-b last:border-0" style={{borderColor:BORDER}}><span className="text-lg">{a.e}</span><div className="flex-1"><p className="text-sm" style={{color:TEXT}}><span style={{color:MUTED}}>{a.a}</span> {a.p}</p><p className="text-xs" style={{color:MUTED}}>{a.t}</p></div></div>)}</div>
             <EmergencyCard/>

@@ -51,6 +51,6 @@ jobs:
       - name: Выложить APK
         uses: actions/upload-artifact@v4
         with:
-          name: uzup-debug-apk
+          name: hellouz-debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error

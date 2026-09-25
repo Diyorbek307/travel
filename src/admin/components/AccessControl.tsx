@@ -1,3 +1,4 @@
+import { мягко } from "@/lib/theme";
 import { useState } from "react";
 import { PageHeader, Badge, Btn, SectionTitle, ДемоРаздел } from "./shared";
 
@@ -143,7 +144,7 @@ export default function AccessControl() {
                         <td className="px-4 py-2.5 text-center">
                           <span
                             className="inline-block rounded px-2.5 py-0.5 text-xs font-medium"
-                            style={{ background: PERM_COLORS[perm] + "22", color: PERM_COLORS[perm], fontFamily: "var(--font-mono)" }}
+                            style={{ background: мягко(PERM_COLORS[perm], 13), color: PERM_COLORS[perm], fontFamily: "var(--font-mono)" }}
                           >
                             {PERM_LABELS[perm]}
                           </span>
@@ -172,14 +173,14 @@ export default function AccessControl() {
             <div key={u.id} className="rounded-xl p-4 flex flex-wrap items-center gap-4" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)", opacity: u.status === "suspended" ? 0.6 : 1 }}>
               <div
                 className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shrink-0"
-                style={{ background: roleColor(u.role) + "33", color: roleColor(u.role) }}
+                style={{ background: мягко(roleColor(u.role), 20), color: roleColor(u.role) }}
               >
                 {u.avatar}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-0.5 flex-wrap">
                   <span className="font-medium text-sm" style={{ color: "var(--color-text)" }}>{u.name}</span>
-                  <span className="text-xs rounded px-2 py-0.5" style={{ background: roleColor(u.role) + "22", color: roleColor(u.role), fontFamily: "var(--font-mono)" }}>{u.role}</span>
+                  <span className="text-xs rounded px-2 py-0.5" style={{ background: мягко(roleColor(u.role), 13), color: roleColor(u.role), fontFamily: "var(--font-mono)" }}>{u.role}</span>
                   {u.twofa && <span className="text-xs rounded px-2 py-0.5" style={{ background: "color-mix(in srgb, var(--color-teal) 15%, transparent)", color: "var(--color-teal)", fontFamily: "var(--font-mono)" }}>2FA ✓</span>}
                   {!u.twofa && <span className="text-xs rounded px-2 py-0.5" style={{ background: "color-mix(in srgb, var(--color-rose) 10%, transparent)", color: "var(--color-rose)", fontFamily: "var(--font-mono)" }}>Без 2FA</span>}
                 </div>
@@ -220,7 +221,7 @@ export default function AccessControl() {
                   {ROLES.map(r => (
                     <button key={r.name} onClick={() => setInviteForm(p => ({ ...p, role: r.name }))}
                       className="rounded-lg px-3 py-2.5 text-left cursor-pointer transition-all"
-                      style={{ background: inviteForm.role === r.name ? r.color + "22" : "var(--color-surface)", border: `1px solid ${inviteForm.role === r.name ? r.color : "var(--color-border)"}` }}
+                      style={{ background: inviteForm.role === r.name ? мягко(r.color, 13) : "var(--color-surface)", border: `1px solid ${inviteForm.role === r.name ? r.color : "var(--color-border)"}` }}
                     >
                       <div className="flex items-center gap-2 flex-wrap">
                         <div className="w-2 h-2 rounded-full shrink-0" style={{ background: r.color }} />
