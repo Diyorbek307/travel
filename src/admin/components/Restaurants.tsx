@@ -174,12 +174,12 @@ export default function Restaurants() {
               <Btn onClick={() => {
                 if (!newRest.name) return;
                 setItems(prev => [...prev, {
-                  id: `new-${Date.now()}`, name: newRest.name, city: newRest.city || "Tashkent",
-                  cuisine: newRest.cuisine || "Uzbek", rating: 0, priceRange: "$$" as const,
+                  id: `new-${Date.now()}`, name: newRest.name, city: newRest.city || "Ташкент",
+                  cuisine: newRest.cuisine || "Узбекская", rating: 0, priceRange: "$$" as const,
                   seats: Number(newRest.seats) || 0, status: "pending" as const, promoted: false,
                   phone: newRest.phone || "", address: newRest.address || "",
                   open: newRest.open || "", monthlyViews: 0,
-                  img: "https://images.unsplash.com/photo-1664602078796-68ee76b3fc59?w=80&h=60&fit=crop&auto=format",
+                  img: "https://images.unsplash.com/photo-1664602078796-68ee76b3fc59?w=800&h=600&fit=crop&auto=format",
                   desc: newRest.desc || "", reviews: 0,
                   price: "$$",
                 }]);

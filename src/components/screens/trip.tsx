@@ -57,10 +57,15 @@ export default function TripScreen({
           </div>
         )}
 
-        {маршрут.map((точка, i) => (
+        {маршрут.map((точка, i) => {
+          // Имя показываем из живого содержимого — на текущем языке; в
+          // маршрут отдаём исходное, по нему ищутся координаты.
+          const место = PLACES.find((p) => p.id === точка.id);
+          const имя = место?.name ?? трК(точка.name);
+          return (
           <div key={точка.id} className="flex overflow-hidden rounded-2xl border bg-white shadow-sm" style={{ borderColor: BORDER }}>
             <button onClick={() => открыть(точка.id)} className="relative h-24 w-24 flex-shrink-0">
-              <img src={точка.img} alt={точка.name} className="h-full w-full object-cover" />
+              <img src={место?.img ?? точка.img} alt={имя} className="h-full w-full object-cover" />
               {/* Номер по порядку: это план поездки, и порядок в нём — смысл. */}
               <span
                 className="absolute left-1.5 top-1.5 flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold text-white"
@@ -74,10 +79,10 @@ export default function TripScreen({
             <div className="min-w-0 flex-1 p-3">
               <button onClick={() => открыть(точка.id)} className="block w-full text-left">
                 <p className="text-[10px] font-semibold" style={{ color: MUTED }}>📍 {трК(точка.city)}</p>
-                <p className="mt-0.5 truncate text-sm font-bold" style={{ color: TEXT }}>{трК(точка.name)}</p>
+                <p className="mt-0.5 truncate text-sm font-bold" style={{ color: TEXT }}>{имя}</p>
               </button>
               <button
-                onClick={() => onПуть(точка.name, точка.city)}
+                onClick={() => onПуть(место?.nameRu ?? точка.name, точка.city)}
                 className="mt-1.5 text-xs font-semibold transition-all active:scale-95"
                 style={{ color: GREEN }}
               >
@@ -93,7 +98,8 @@ export default function TripScreen({
               ✕
             </button>
           </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

@@ -87,7 +87,7 @@ export function SearchModal({ onClose, onPlace, initialQuery = "" }:{ onClose:()
             <p className="font-bold text-sm mb-3" style={{color:TEXT}}>{t("srch_directions")}</p>
             <div className="grid grid-cols-2 gap-2.5 mb-5">
               {POPULAR_CITIES.map(c=>(
-                <button key={c.name} onClick={()=>setQuery(c.name)} className="relative rounded-2xl overflow-hidden text-left" style={{height:90}}>
+                <button key={c.name} onClick={()=>setQuery(трК(c.name))} className="relative rounded-2xl overflow-hidden text-left" style={{height:90}}>
                   <img src={c.img} alt={c.name} className="w-full h-full object-cover"/>
                   <div className="absolute inset-0" style={{background:"linear-gradient(to top,rgba(0,0,0,0.65) 0%,transparent 65%)"}}/>
                   <div className="absolute bottom-0 left-0 right-0 p-2.5"><p className="text-white font-bold text-sm">{трК(c.name)}</p><StarRow rating={c.rating} onPhoto/></div>

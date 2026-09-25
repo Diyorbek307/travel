@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { BORDER, CREAM, GOLD, SURFACE, TEXT } from "@/lib/theme";
+import { BORDER, CREAM, SURFACE, TEXT } from "@/lib/theme";
 import { useT } from "@/components/lang-provider";
 
 /**

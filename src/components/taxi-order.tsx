@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ACCENT_FILL, BORDER, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE, ACCENT_SOFT } from "@/lib/theme";
-import { ГОРОДА, МЕСТА, расстояниеКм, точка } from "@/data/geo";
+import { ACCENT_FILL, BORDER, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE, ACCENT_SOFT, ON_GOLD } from "@/lib/theme";
+import { ГОРОДА, МЕСТА, расстояниеКм } from "@/data/geo";
 import type { Geo } from "@/lib/types";
 import RealMap from "@/components/real-map";
 import { useT } from "@/components/lang-provider";
@@ -40,10 +40,9 @@ export default function TaxiOrder({
   /** Если экран открыт со страницы места — оно уже выбрано. */
   сразуКуда?: { название: string; geo: Geo | null };
 }) {
-  const { t, трК } = useT();
+  const { t, трК, lang } = useT();
   const [город, setГород] = useState(городСразу);
   const [откуда, setОткуда] = useState<Geo | null>(null);
-  const [подписьОткуда, setПодписьОткуда] = useState(t("taxi_my_location"));
   const [геоОшибка, setГеоОшибка] = useState<string | null>(null);
   const [куда, setКуда] = useState<{ название: string; geo: Geo; своя?: boolean; текст?: boolean } | null>(() => {
     if (сразуКуда?.geo) return { название: сразуКуда.название, geo: сразуКуда.geo };
@@ -78,16 +77,13 @@ export default function TaxiOrder({
 
   function определитьГде() {
     if (!navigator.geolocation) {
-      setГеоОшибка("Устройство не умеет определять местоположение");
+      setГеоОшибка(t("taxi_geo_unsupported"));
       return;
     }
     setГеоОшибка(null);
     navigator.geolocation.getCurrentPosition(
-      (p) => {
-        setОткуда({ lat: p.coords.latitude, lon: p.coords.longitude });
-        setПодписьОткуда("Моё местоположение");
-      },
-      () => setГеоОшибка("Не удалось определить — поедем от центра города"),
+      (p) => setОткуда({ lat: p.coords.latitude, lon: p.coords.longitude }),
+      () => setГеоОшибка(t("taxi_geo_failed")),
       { enableHighAccuracy: true, timeout: 8000 },
     );
   }
@@ -183,8 +179,8 @@ export default function TaxiOrder({
               onClick={() => сменитьГород(г)}
               className="shrink-0 rounded-full border px-3 py-1.5 text-[11px] font-semibold"
               style={{
-                borderColor: г === город ? GREEN : BORDER,
-                background: г === город ? GREEN : SURFACE,
+                borderColor: г === город ? ACCENT_FILL : BORDER,
+                background: г === город ? ACCENT_FILL : SURFACE,
                 color: г === город ? WHITE : MUTED,
               }}
             >
@@ -197,7 +193,7 @@ export default function TaxiOrder({
         <div className="mb-2 flex flex-wrap items-center gap-3 rounded-xl px-3 py-2.5" style={{ background: ACCENT_SOFT }}>
           <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: ACCENT_FILL }} />
           <span className="min-w-0 flex-1 truncate text-sm" style={{ color: TEXT }}>
-            {откуда ? подписьОткуда : `${t("taxi_from_city")} · ${трК(город)}`}
+            {откуда ? t("taxi_my_location") : `${t("taxi_from_city")} · ${трК(город)}`}
           </span>
           <button
             onClick={определитьГде}
@@ -286,8 +282,8 @@ export default function TaxiOrder({
               <li key={o.тариф} className="flex flex-wrap items-center justify-between gap-2 text-sm">
                 <span style={{ color: MUTED }}>{o.тариф}</span>
                 <span style={{ color: TEXT }}>
-                  {o.цена.toLocaleString("ru")} {o.валюта}
-                  {o.минут ? ` · ${o.минут} мин` : ""}
+                  {o.цена.toLocaleString(lang)} {o.валюта}
+                  {o.минут ? ` · ${o.минут} ${t("common_min")}` : ""}
                 </span>
               </li>
             ))}
@@ -311,7 +307,7 @@ export default function TaxiOrder({
           className="block rounded-xl py-3.5 text-center text-sm font-bold"
           style={{
             background: адрес ? GOLD : BORDER,
-            color: адрес ? TEXT : MUTED,
+            color: адрес ? ON_GOLD : MUTED,
             pointerEvents: адрес ? undefined : "none",
           }}
         >

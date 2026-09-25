@@ -66,11 +66,11 @@ const РАДИУС_КМ = 6371;
  * что ближе, что дальше.
  */
 export function расстояниеКм(a: Geo, b: Geo): number {
-  return Math.round(_км(a, b));
+  return Math.round(расстояниеТочноКм(a, b));
 }
 
-/** То же расстояние, но без округления — для «от меня» с десятыми. */
-function _км(a: Geo, b: Geo): number {
+/** То же расстояние, но без округления — для «от меня» и сумм по маршруту. */
+export function расстояниеТочноКм(a: Geo, b: Geo): number {
   const рад = (г: number) => (г * Math.PI) / 180;
   const dф = рад(b.lat - a.lat);
   const dл = рад(b.lon - a.lon);
@@ -87,10 +87,8 @@ function _км(a: Geo, b: Geo): number {
 export function дистанцияКм(pos: Geo | null, название: string, город: string): number | null {
   if (!pos) return null;
   const т = точка(название, город);
-  return т ? _км(pos, т) : null;
+  return т ? расстояниеТочноКм(pos, т) : null;
 }
-
-
 
 /** Ближайший к позиции город из списка — чтобы понять, где сейчас турист. */
 export function ближайшийГород(pos: Geo | null): string | null {
@@ -98,7 +96,7 @@ export function ближайшийГород(pos: Geo | null): string | null {
   let лучший: string | null = null;
   let минимум = Infinity;
   for (const [имя, geo] of Object.entries(ГОРОДА)) {
-    const d = _км(pos, geo);
+    const d = расстояниеТочноКм(pos, geo);
     if (d < минимум) {
       минимум = d;
       лучший = имя;
@@ -106,8 +104,6 @@ export function ближайшийГород(pos: Geo | null): string | null {
   }
   return лучший;
 }
-
-
 
 /** Знаем ли мы координаты места или города по названию. */
 export function точкаИзвестна(название: string): boolean {

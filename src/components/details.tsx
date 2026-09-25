@@ -70,7 +70,7 @@ export function PlaceDetail({ place, onBack, onToast, onПуть }:{ place:Place
         <button onClick={onBack} className="absolute top-12 left-4 w-9 h-9 rounded-xl flex items-center justify-center backdrop-blur-sm" style={{...glass}}><svg className="rtl-flip" width="16" height="16" fill="none" stroke="white" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
         <button onClick={()=>переключитьИзбранное({id:place.id,kind:"place",name:place.name,city:трК(place.city),img:place.img,rating:place.rating})} className="absolute top-12 right-4 w-9 h-9 rounded-xl flex items-center justify-center backdrop-blur-sm" style={{...glass}}><svg width="16" height="16" viewBox="0 0 24 24" fill={fav?GOLD:"none"} stroke={fav?GOLD:"white"} strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
         <div className="absolute bottom-0 left-0 right-0 p-4">
-          <div className="flex items-center gap-1.5 mb-1.5"><Badge text={place.type} color={GREEN}/>{записи.length>0&&<Badge text={"🎧 "+t("d_audioguide")} color={MUTED}/>}{place.qr&&<Badge text="QR" color={MUTED}/>}</div>
+          <div className="flex items-center gap-1.5 mb-1.5"><Badge text={place.type} onPhoto/>{записи.length>0&&<Badge text={"🎧 "+t("d_audioguide")} onPhoto/>}{place.qr&&<Badge text="QR" onPhoto/>}</div>
           <h2 className="text-white text-xl font-bold" style={{fontFamily:"var(--font-heading)"}}>{place.name}</h2>
           <p className="text-white/70 text-xs mt-0.5">{трК(place.city)} · ★ {place.rating} ({(place.reviews ?? 0).toLocaleString()} {t("d_reviews_word")})</p>
         </div>
@@ -108,9 +108,11 @@ export function PlaceDetail({ place, onBack, onToast, onПуть }:{ place:Place
           </div>
         )}
         <div className="flex gap-3 mb-3">
-          <button onClick={()=>onПуть(place.name, place.city)} className="flex-1 py-3.5 rounded-2xl text-white text-sm font-bold active:scale-[0.98] transition-all" style={{background:ACCENT_FILL}}>📍 {t("d_route")}</button>
+          {/* В маршрут уходит исходное название: по нему ищутся координаты,
+              а переведённое («Registan Square») там не найдётся. */}
+          <button onClick={()=>onПуть(place.nameRu ?? place.name, place.city)} className="flex-1 py-3.5 rounded-2xl text-white text-sm font-bold active:scale-[0.98] transition-all" style={{background:ACCENT_FILL}}>📍 {t("d_route")}</button>
           <button
-            onClick={()=>{ const стало = переключитьВМаршруте({id:place.id,name:place.name,city:place.city,img:place.img}); onToast(стало?`✅ «${place.name}» — ${t("trip_added")}`:`✕ «${place.name}» — ${t("trip_removed")}`); }}
+            onClick={()=>{ const стало = переключитьВМаршруте({id:place.id,name:place.nameRu ?? place.name,city:place.city,img:place.img}); onToast(стало?`✅ «${place.name}» — ${t("trip_added")}`:`✕ «${place.name}» — ${t("trip_removed")}`); }}
             className="flex-1 py-3.5 rounded-2xl text-sm font-bold border active:scale-[0.98] transition-all"
             style={{color:GREEN,borderColor:GREEN,background:вМаршруте?ACCENT_SOFT:SURFACE}}
           >{вМаршруте?`✓ ${t("trip_in")}`:`🗺️ ${t("d_add_route")}`}</button>
@@ -148,7 +150,7 @@ export function HotelDetail({ hotel, onBack }:{ hotel:Hotel; onBack:()=>void }) 
           {hotel.imgs.map((_,i)=><button key={i} onClick={()=>setImgIdx(i)} className="rounded-full transition-all" style={{width:i===imgIdx?18:6,height:6,background:i===imgIdx?WHITE:"rgba(255,255,255,0.5)"}}/>)}
         </div>
         <div className="absolute bottom-0 left-0 right-0 p-4">
-          <div className="flex items-center gap-2 mb-1"><Badge text={hotel.tag} color={GOLD}/><Badge text={трК(hotel.city)} color={GREEN}/></div>
+          <div className="flex items-center gap-2 mb-1"><Badge text={hotel.tag} onPhoto/><Badge text={трК(hotel.city)} onPhoto/></div>
           <p className="text-white text-lg font-bold" style={{fontFamily:"var(--font-heading)"}}>{hotel.name}</p>
           <div className="flex items-center gap-3"><StarRow rating={hotel.rating} onPhoto/><span className="text-white/60 text-xs">{hotel.reviews} {t("d_reviews_word")}</span></div>
         </div>
@@ -203,7 +205,7 @@ export function RestaurantDetail({ r, onBack, onПуть }:{ r:Restaurant; onBac
         <button onClick={onBack} className="absolute top-12 left-4 w-9 h-9 rounded-xl flex items-center justify-center backdrop-blur-sm" style={{...glass}}><svg className="rtl-flip" width="16" height="16" fill="none" stroke="white" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
         <button onClick={()=>переключитьИзбранное({id:r.id,kind:"restaurant",name:r.name,city:трК(r.city),img:r.img,rating:r.rating})} className="absolute top-12 right-4 w-9 h-9 rounded-xl flex items-center justify-center backdrop-blur-sm" style={{...glass}}><svg width="16" height="16" viewBox="0 0 24 24" fill={fav?GOLD:"none"} stroke={fav?GOLD:"white"} strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
         <div className="absolute bottom-0 left-0 right-0 p-4">
-          <div className="flex items-center gap-1.5 mb-1"><Badge text={r.cuisine} color={"#C1603A"}/><Badge text={трК(r.city)} color={GREEN}/></div>
+          <div className="flex items-center gap-1.5 mb-1"><Badge text={r.cuisine} onPhoto/><Badge text={трК(r.city)} onPhoto/></div>
           <p className="text-white text-xl font-bold" style={{fontFamily:"var(--font-heading)"}}>{r.name}</p>
           <div className="flex items-center gap-3 mt-0.5"><StarRow rating={r.rating} onPhoto/><span className="text-white/70 text-xs">{r.reviews} {t("d_reviews_word")}</span><span className="text-white/70 text-xs">{r.price}</span></div>
         </div>

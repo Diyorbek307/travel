@@ -19,10 +19,11 @@ export function SideMenu({ onClose, onTab, currentTab, isPremium, onPremium, onL
     ["audio",  "🎧","nav_audio"],
     ["profile","👤","nav_profile"],
   ];
-  // Счётчиков у пунктов больше нет: «12 избранных» при пустом списке —
-  // выдумка, а раздел избранного ещё не ведётся.
+  // Третье поле — вкладка, куда ведёт пункт. Избранное и маршрут поездки
+  // открываются своими экранами, валюта и экстренная помощь живут в
+  // статистике профиля — их разбирает обработчик ниже.
   const EXTRAS:[string,TKey,Tab|null][] = [
-    ["❤️","menu_favorites","explore"],
+    ["❤️","menu_favorites",null     ],
     ["📋","trip_title",     null     ],
     ["⬇️","menu_downloads","audio"  ],
     ["💱","cur_title",     "profile"],

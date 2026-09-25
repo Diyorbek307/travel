@@ -6,6 +6,7 @@ import { useT } from "@/components/lang-provider";
 import { useДистанция } from "@/lib/distance";
 import GoogleMap, { googleКлюч } from "@/components/google-map";
 import { ГОРОДА, МЕСТА, расстояниеКм, точка } from "@/data/geo";
+import { ссылкаНаЗаказ } from "@/lib/taxi";
 import { ACCENT_FILL, BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE } from "@/lib/theme";
 import type { Geo } from "@/lib/types";
 
@@ -34,24 +35,27 @@ interface Дорога {
  * Яндекс Карты для пешком и за рулём, Яндекс Go для такси.
  */
 
+/** Подписи единиц времени приходят из словаря — «мин» есть не в каждом языке. */
+type Единицы = { ч: string; мин: string };
+
 /** Пешком считаем по пяти километрам в час. */
 const ПЕШКОМ_КМЧ = 5;
 /** Дорога всегда длиннее прямой — поправка на городскую сетку. */
 const ИЗВИЛИСТОСТЬ = 1.3;
 
-function времяПешком(км: number): string {
-  const минут = Math.round(((км * ИЗВИЛИСТОСТЬ) / ПЕШКОМ_КМЧ) * 60);
-  if (минут < 60) return `${минут} мин`;
-  const ч = Math.floor(минут / 60);
-  return `${ч} ч ${минут % 60} мин`;
-}
-
-function времяВПути(секунды: number): string {
-  const минут = Math.max(1, Math.round(секунды / 60));
-  if (минут < 60) return `${минут} мин`;
+function минутыСловами(минут: number, е: Единицы): string {
+  if (минут < 60) return `${минут} ${е.мин}`;
   const ч = Math.floor(минут / 60);
   const м = минут % 60;
-  return м ? `${ч} ч ${м} мин` : `${ч} ч`;
+  return м ? `${ч} ${е.ч} ${м} ${е.мин}` : `${ч} ${е.ч}`;
+}
+
+function времяПешком(км: number, е: Единицы): string {
+  return минутыСловами(Math.round(((км * ИЗВИЛИСТОСТЬ) / ПЕШКОМ_КМЧ) * 60), е);
+}
+
+function времяВПути(секунды: number, е: Единицы): string {
+  return минутыСловами(Math.max(1, Math.round(секунды / 60)), е);
 }
 
 export default function RouteView({
@@ -59,16 +63,15 @@ export default function RouteView({
   город,
   geo,
   onBack,
-  onТакси,
 }: {
   название: string;
   город: string;
   /** Если координаты известны точнее, чем по справочнику. */
   geo?: Geo | null;
   onBack: () => void;
-  onТакси?: () => void;
 }) {
-  const { t } = useT();
+  const { t, трК } = useT();
+  const единицы: Единицы = { ч: t("common_h"), мин: t("common_min") };
   const дист = useДистанция();
   const цель = geo ?? точка(название, город);
   const [откуда, setОткуда] = useState<Geo | null>(null);
@@ -194,16 +197,16 @@ export default function RouteView({
           style={{ background: CREAM }}
           aria-label={t("common_back")}
         >
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={TEXT} strokeWidth="2.5">
+          <svg className="rtl-flip" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={TEXT} strokeWidth="2.5">
             <path d="M15 18l-6-6 6-6" />
           </svg>
         </button>
         <div className="min-w-0 flex-1">
           <p className="text-xs font-medium" style={{ color: GREEN, letterSpacing: "0.1em" }}>
-            МАРШРУТ
+            {t("route_kicker")}
           </p>
           <h1 className="truncate text-lg font-bold" style={{ color: TEXT, fontFamily:"var(--font-heading)" }}>
-            {название}
+            {трК(название)}
           </h1>
         </div>
       </div>
@@ -212,7 +215,7 @@ export default function RouteView({
         {!цель ? (
           <div className="rounded-2xl border p-4" style={{ background: SURFACE, borderColor: BORDER }}>
             <p className="text-sm" style={{ color: MUTED }}>
-              Координат этого места у нас нет — маршрут построить не от чего.
+              {t("route_no_coords")}
             </p>
           </div>
         ) : (
@@ -252,7 +255,7 @@ export default function RouteView({
                     onClick={() => setСпособ(в)}
                     className="flex-1 rounded-xl border py-2 text-xs font-bold"
                     style={{
-                      background: способ === в ? GREEN : SURFACE,
+                      background: способ === в ? ACCENT_FILL : SURFACE,
                       color: способ === в ? WHITE : MUTED,
                       borderColor: способ === в ? GREEN : BORDER,
                     }}
@@ -278,7 +281,7 @@ export default function RouteView({
               <div className="flex items-center gap-3">
                 <span className="h-2.5 w-2.5 shrink-0 rounded-sm" style={{ background: GOLD }} />
                 <span className="min-w-0 flex-1 truncate text-sm font-semibold" style={{ color: TEXT }}>
-                  {название}
+                  {трК(название)}
                 </span>
               </div>
 
@@ -297,7 +300,7 @@ export default function RouteView({
                       {способ === "пешком" ? t("route_mode_walk") : t("route_mode_car")}
                     </p>
                     <p className="text-base font-bold" style={{ color: TEXT }}>
-                      {времяВПути(дорога.секунды)}
+                      {времяВПути(дорога.секунды, единицы)}
                     </p>
                   </div>
                 </div>
@@ -318,7 +321,7 @@ export default function RouteView({
                           {t("route_walk_about")}
                         </p>
                         <p className="text-base font-bold" style={{ color: TEXT }}>
-                          {времяПешком(км)}
+                          {времяПешком(км, единицы)}
                         </p>
                       </div>
                     )}
@@ -347,17 +350,18 @@ export default function RouteView({
                 className="rounded-2xl py-3.5 text-center text-sm font-bold text-white"
                 style={{ background: ACCENT_FILL }}
               >
-                Открыть в навигаторе
+                {t("route_open_nav")}
               </a>
-              {onТакси && (
-                <button
-                  onClick={onТакси}
-                  className="rounded-2xl border py-3.5 text-sm font-bold"
-                  style={{ color: GREEN, borderColor: GREEN }}
-                >
-                  Вызвать такси сюда
-                </button>
-              )}
+              {/* Такси — сразу в Яндекс Go с этой точкой назначения. */}
+              <a
+                href={ссылкаНаЗаказ(откуда, цель, название)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-2xl border py-3.5 text-center text-sm font-bold"
+                style={{ color: GREEN, borderColor: GREEN }}
+              >
+                {t("route_taxi_here")}
+              </a>
             </div>
           </>
         )}

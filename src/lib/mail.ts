@@ -58,8 +58,13 @@ export function mailWorking(): boolean {
 
 let transport: nodemailer.Transporter | null = null;
 
+/** Заданы ли переменные SMTP — отдельно от почты по HTTPS. */
+function smtpНастроен(): boolean {
+  return Boolean(HOST && USER && PASS);
+}
+
 function getTransport(): nodemailer.Transporter | null {
-  if (!mailConfigured()) return null;
+  if (!smtpНастроен()) return null;
   if (transport) return transport;
   transport = nodemailer.createTransport({
     host: HOST,
@@ -129,6 +134,10 @@ export async function sendMail(letter: Letter): Promise<boolean> {
 
   const t = getTransport();
   if (!t) {
+    // HTTPS не дошёл, а SMTP запасным путём не настроен — значит, письма
+    // сейчас не ходят. Запоминаем это, иначе регистрация продолжала бы
+    // требовать код, который некому доставить.
+    if (httpПровайдер() !== "нет") последняяОтправка = false;
     console.info(
       `[почта не настроена] «${letter.subject}» для ${letter.to}\n${letter.text}`,
     );

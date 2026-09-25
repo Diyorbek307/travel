@@ -140,7 +140,7 @@ const events: ManagedEvent[] = EVENTS.map((e, i) => ({
   status: "active",
 }));
 
-const ads: ManagedAd[] = ADS.map((a, i) => ({
+const ads: ManagedAd[] = ADS.map((a) => ({
   ...a,
   advertiser: a.title,
   type: "banner",

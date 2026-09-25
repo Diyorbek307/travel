@@ -1,6 +1,6 @@
 import { мягко } from "@/lib/theme";
 import { useState } from "react";
-import { PageHeader, Badge, Btn, SectionTitle, ДемоРаздел } from "./shared";
+import { PageHeader, Badge, Btn, ДемоРаздел } from "./shared";
 
 type Role = {
   id: number;

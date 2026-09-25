@@ -25,7 +25,7 @@ import { faqТексты, условияТекст, политикаТекст }
 /** Переключатель настройки. */
 function Toggle({ on, set }: { on: boolean; set: (v: boolean) => void }) {
   return (
-    <button onClick={()=>set(!on)} role="switch" aria-checked={on} className="relative w-11 h-6 rounded-full transition-colors flex-shrink-0" style={{background:on?GREEN:BORDER}}>
+    <button onClick={()=>set(!on)} role="switch" aria-checked={on} className="relative w-11 h-6 rounded-full transition-colors flex-shrink-0" style={{background:on?ACCENT_FILL:BORDER}}>
       <div className="absolute top-0.5 w-5 h-5 rounded-full shadow transition-all" style={{left:on?"22px":"2px",background:"#fff"}}/>
     </button>
   );
@@ -399,7 +399,8 @@ export function ProfileScreen({ onLogout, user, isPremium, startView }:{ onLogou
   const избранноеСписок = useFavorites();
   const маршрутСписок = useTrip();
   const штампы = STAMPS.map((s) => {
-    const iso = открытые[s.placeId];
+    const место = PLACES.find((p) => (p.nameRu ?? p.name) === s.место);
+    const iso = место ? открытые[место.id] : undefined;
     return { ...s, earned: !!iso, date: iso ? датаСловами(new Date(iso), lang, "short") : "—" };
   });
   const открытоМест = (подходит: (p: (typeof PLACES)[number]) => boolean) =>

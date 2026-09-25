@@ -7,22 +7,26 @@ import type { Content, ContentKey } from "@/lib/types";
 /**
  * Содержимое платформы в панели.
  *
- * Раньше каждый экран держал свой `useState(СЕМЕНА)`: правки жили до
- * ухода с экрана и никуда не уезжали. Теперь список один на всю панель,
- * и он же лежит на сервере — приложение читает ровно эти записи.
+ * Список один на всю панель, и он же лежит на сервере — приложение
+ * читает ровно эти записи.
  *
  * Сохранение отложенное: редактор правит поля подряд, и слать запрос на
- * каждое нажатие незачем. Полсекунды тишины — и уходит одна запись.
+ * каждое нажатие незачем. Полсекунды тишины — и уходит одна запись. На
+ * сервер уходят только изменённые разделы: сервер сливает их с
+ * остальным, поэтому два редактора, правящие разное, не затирают друг
+ * друга.
  */
 
 const SAVE_DELAY_MS = 600;
 
 type SaveState = "idle" | "saving" | "saved" | "error";
 
+type Обновление<K extends ContentKey> = Content[K] | ((prev: Content[K]) => Content[K]);
+
 interface ContentContextType {
   content: Content;
-  /** Заменить раздел целиком — так же, как это делал setState экрана. */
-  update: <K extends ContentKey>(key: K, items: Content[K]) => void;
+  /** Заменить раздел целиком или обновить его функцией от текущего. */
+  update: <K extends ContentKey>(key: K, next: Обновление<K>) => void;
   loading: boolean;
   saveState: SaveState;
 }
@@ -40,8 +44,11 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
   const [saveState, setSaveState] = useState<SaveState>("idle");
 
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  // Пока не загрузились, сохранять нечего: иначе первый же рендер
-  // затёр бы серверные данные семенами.
+  /** Разделы, изменённые с последнего сохранения. */
+  const ждут = useRef<Partial<Content>>({});
+  // Сохранять можно, только увидев настоящие данные сервера. Не
+  // загрузились — на экране семена, и запись поверх затёрла бы то,
+  // чего редактор не видел.
   const ready = useRef(false);
 
   useEffect(() => {
@@ -51,44 +58,53 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
       .then((data: Content) => {
         if (cancelled) return;
         setContent(data);
+        ready.current = true;
       })
       .catch(() => {
-        // Сеть отвалилась — работаем на семенах, но не сохраняем:
-        // иначе перезаписали бы то, чего не видели.
+        if (!cancelled) setSaveState("error");
       })
       .finally(() => {
-        if (cancelled) return;
-        setLoading(false);
-        ready.current = true;
+        if (!cancelled) setLoading(false);
       });
     return () => {
       cancelled = true;
     };
   }, []);
 
-  const save = useCallback((next: Content) => {
+  const save = useCallback(() => {
     if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(async () => {
+      const разделы = ждут.current;
+      ждут.current = {};
       setSaveState("saving");
       try {
         const res = await fetch("/api/content", {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(next),
+          body: JSON.stringify(разделы),
         });
-        setSaveState(res.ok ? "saved" : "error");
+        if (!res.ok) throw new Error(String(res.status));
+        setSaveState("saved");
       } catch {
+        // Не ушло — возвращаем разделы в очередь: следующая правка
+        // отправит их вместе со своими.
+        ждут.current = { ...разделы, ...ждут.current };
         setSaveState("error");
       }
     }, SAVE_DELAY_MS);
   }, []);
 
   const update = useCallback<ContentContextType["update"]>(
-    (key, items) => {
+    (key, next) => {
       setContent((prev) => {
-        const next = { ...prev, [key]: items };
-        if (ready.current) save(next);
-        return next;
+        const items = typeof next === "function" ? next(prev[key]) : next;
+        if (ready.current) {
+          ждут.current = { ...ждут.current, [key]: items };
+          save();
+        } else {
+          setSaveState("error");
+        }
+        return { ...prev, [key]: items };
       });
     },
     [save],

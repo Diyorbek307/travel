@@ -2,6 +2,7 @@ import { мягко } from "@/lib/theme";
 import { useState, useEffect, useRef } from "react";
 import { useУведомления, type Notif } from "../context/NotifContext";
 import { useМеня } from "../context/MeContext";
+import { useContent } from "../context/ContentContext";
 import { ROLE_META } from "@/lib/admin-roles";
 import { logout } from "@/app/admin/actions";
 
@@ -30,6 +31,7 @@ type Props = {
 
 export default function Header({ active, разделы, onNavigate, sidebarCollapsed, onToggleSidebar }: Props) {
   const меня = useМеня();
+  const { saveState } = useContent();
   const { notifs, markRead, markAllRead, unreadCount } = useУведомления();
   const [showNotifs, setShowNotifs] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
@@ -114,6 +116,18 @@ export default function Header({ active, разделы, onNavigate, sidebarColl
           <span className="font-medium truncate" style={{ color: "var(--color-text)" }}>
             {activePage?.label ?? active}
           </span>
+          {/* Правки содержимого сохраняются сами — здесь видно, дошли ли. */}
+          {saveState !== "idle" && (
+            <span
+              className="text-xs"
+              style={{
+                color: saveState === "error" ? "var(--color-rose)" : "var(--color-muted)",
+                fontFamily: "var(--font-mono)",
+              }}
+            >
+              {saveState === "saving" ? "· сохраняем…" : saveState === "saved" ? "· сохранено ✓" : "· не сохранено — проверьте связь"}
+            </span>
+          )}
         </div>
 
         <div className="min-w-0 flex-1" />

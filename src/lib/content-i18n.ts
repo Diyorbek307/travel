@@ -298,7 +298,6 @@ const ЗАПИСИ: [string, Строка][] = [
   с("Еда", { en: "Food", uz: "Taom", zh: "美食", ko: "음식", de: "Essen", fr: "Cuisine", ja: "グルメ", tr: "Yemek", ar: "طعام" }),
   с("Культура", { en: "Culture", uz: "Madaniyat", zh: "文化", ko: "문화", de: "Kultur", fr: "Culture", ja: "文化", tr: "Kültür", ar: "ثقافة" }),
   с("Полный", { en: "Full", uz: "Toʻliq", zh: "全程", ko: "완전판", de: "Komplett", fr: "Complet", ja: "フル", tr: "Tam", ar: "شامل" }),
-  с("5 мест · 12 км · ~$26", { en: "5 places · 12 km · ~$26", uz: "5 joy · 12 km · ~$26", zh: "5 处 · 12 公里 · ~$26", ko: "5곳 · 12 km · ~$26", de: "5 Orte · 12 km · ~26 $", fr: "5 lieux · 12 km · ~26 $", ja: "5か所 · 12 km · ~$26", tr: "5 yer · 12 km · ~$26", ar: "5 أماكن · 12 كم · ~$26" }),
   с("22 остановки · 1400 км", { en: "22 stops · 1,400 km", uz: "22 bekat · 1400 km", zh: "22 站 · 1400 公里", ko: "22개 정차 · 1,400 km", de: "22 Stopps · 1.400 km", fr: "22 étapes · 1 400 km", ja: "22か所 · 1,400 km", tr: "22 durak · 1.400 km", ar: "22 محطة · 1400 كم" }),
   с("14 остановок · 820 км", { en: "14 stops · 820 km", uz: "14 bekat · 820 km", zh: "14 站 · 820 公里", ko: "14개 정차 · 820 km", de: "14 Stopps · 820 km", fr: "14 étapes · 820 km", ja: "14か所 · 820 km", tr: "14 durak · 820 km", ar: "14 محطة · 820 كم" }),
   с("18 остановок · 980 км", { en: "18 stops · 980 km", uz: "18 bekat · 980 km", zh: "18 站 · 980 公里", ko: "18개 정차 · 980 km", de: "18 Stopps · 980 km", fr: "18 étapes · 980 km", ja: "18か所 · 980 km", tr: "18 durak · 980 km", ar: "18 محطة · 980 كم" }),
@@ -314,11 +313,6 @@ const ЗАПИСИ: [string, Строка][] = [
   с("Буз-кашши", { en: "Buzkashi", uz: "Uloq (koʻpkari)", zh: "叼羊", ko: "부즈카시", de: "Buzkaschi", fr: "Bouzkachi", ja: "ブズカシ", tr: "Buzkaşi (Kökbörü)", ar: "بوزكاشي" }),
   с("Традиционная конная игра — зрелищный народный спорт.", { en: "A traditional horseback game — a spectacular folk sport.", uz: "Anʼanaviy ot oʻyini — koʻrkam xalq sporti.", zh: "传统马上竞技——精彩的民间运动。", ko: "전통 기마 경기 — 박진감 넘치는 민속 스포츠.", de: "Ein traditionelles Reiterspiel — ein spektakulärer Volkssport.", fr: "Un jeu équestre traditionnel — un sport populaire spectaculaire.", ja: "伝統的な馬上競技——迫力ある民衆スポーツ。", tr: "Geleneksel atlı oyun — görkemli bir halk sporu.", ar: "لعبة تقليدية على ظهور الخيل — رياضة شعبية مثيرة." }),
   // ── Маршруты: заметки к остановкам ───────────────────────────────
-  с("Лучший свет для фото", { en: "Best light for photos", uz: "Surat uchun eng yaxshi yorugʻlik", zh: "最佳拍照光线", ko: "사진 찍기 좋은 빛", de: "Bestes Licht für Fotos", fr: "Meilleure lumière pour les photos", ja: "写真に最適な光", tr: "Fotoğraf için en iyi ışık", ar: "أفضل إضاءة للصور" }),
-  с("5 мин пешком", { en: "5 min on foot", uz: "5 daqiqa piyoda", zh: "步行5分钟", ko: "도보 5분", de: "5 Min. zu Fuß", fr: "5 min à pied", ja: "徒歩5分", tr: "5 dk yürüyüş", ar: "5 دقائق سيراً" }),
-  с("Нон и сухофрукты", { en: "Non bread and dried fruit", uz: "Non va quruq meva", zh: "馕与果干", ko: "논빵과 말린 과일", de: "Non-Brot und Trockenobst", fr: "Pain non et fruits secs", ja: "ノンとドライフルーツ", tr: "Non ekmeği ve kuru meyve", ar: "خبز نون وفواكه مجفّفة" }),
-  с("Послеполуденный свет", { en: "Afternoon light", uz: "Tushdan keyingi yorugʻlik", zh: "午后光线", ko: "오후의 빛", de: "Nachmittagslicht", fr: "Lumière de l'après-midi", ja: "午後の光", tr: "Öğleden sonra ışığı", ar: "ضوء ما بعد الظهر" }),
-  с("Такси 15 мин", { en: "15 min by taxi", uz: "Taksida 15 daqiqa", zh: "打车15分钟", ko: "택시 15분", de: "15 Min. mit dem Taxi", fr: "15 min en taxi", ja: "タクシーで15分", tr: "Taksiyle 15 dk", ar: "15 دقيقة بالتاكسي" }),
   с("Поезд Афросиаб 2 ч", { en: "Afrosiyob train, 2 h", uz: "Afrosiyob poyezdi, 2 soat", zh: "阿夫罗夏布号火车 2 小时", ko: "아프로시욥 기차 2시간", de: "Afrosiyob-Zug, 2 Std.", fr: "Train Afrosiyob, 2 h", ja: "アフロシヨブ号 2時間", tr: "Afrosiyob treni, 2 saat", ar: "قطار أفروسياب، ساعتان" }),
   с("Сердце Шёлкового пути", { en: "Heart of the Silk Road", uz: "Ipak yoʻlining yuragi", zh: "丝绸之路的心脏", ko: "실크로드의 심장", de: "Herz der Seidenstraße", fr: "Cœur de la Route de la soie", ja: "シルクロードの心臓部", tr: "İpek Yolu'nun kalbi", ar: "قلب طريق الحرير" }),
   с("Поезд 1.5 ч", { en: "Train, 1.5 h", uz: "Poyezd, 1.5 soat", zh: "火车 1.5 小时", ko: "기차 1.5시간", de: "Zug, 1,5 Std.", fr: "Train, 1,5 h", ja: "列車 1.5時間", tr: "Tren, 1,5 saat", ar: "قطار، 1.5 ساعة" }),
@@ -388,7 +382,6 @@ const ЗАПИСИ: [string, Строка][] = [
   с("6 ч", { en: "6 h", uz: "6 soat", zh: "6 小时", ko: "6시간", de: "6 Std.", fr: "6 h", ja: "6時間", tr: "6 sa", ar: "6 ساعات" }),
   с("8 ч", { en: "8 h", uz: "8 soat", zh: "8 小时", ko: "8시간", de: "8 Std.", fr: "8 h", ja: "8時間", tr: "8 sa", ar: "8 ساعات" }),
   с("Весь день", { en: "All day", uz: "Kun boʻyi", zh: "全天", ko: "하루 종일", de: "Ganztags", fr: "Toute la journée", ja: "終日", tr: "Tüm gün", ar: "طوال اليوم" }),
-  с("История + Архитектура + Кухня", { en: "History + Architecture + Cuisine", uz: "Tarix + Meʼmorchilik + Oshxona", zh: "历史 + 建筑 + 美食", ko: "역사 + 건축 + 미식", de: "Geschichte + Architektur + Küche", fr: "Histoire + Architecture + Cuisine", ja: "歴史 + 建築 + 料理", tr: "Tarih + Mimari + Mutfak", ar: "تاريخ + عمارة + مطبخ" }),
   с("Бесплатно", { en: "Free", uz: "Bepul", zh: "免费", ko: "무료", de: "Kostenlos", fr: "Gratuit", ja: "無料", tr: "Ücretsiz", ar: "مجاناً" }),
   // ── Даты событий ─────────────────────────────────────────────────
   с("21 марта", { en: "21 March", uz: "21-mart", zh: "3月21日", ko: "3월 21일", de: "21. März", fr: "21 mars", ja: "3月21日", tr: "21 Mart", ar: "21 مارس" }),

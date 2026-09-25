@@ -1,15 +1,17 @@
 import { useId, type CSSProperties } from "react";
 import { GOLD, GREEN, мягко } from "@/lib/theme";
+import { useT } from "@/components/lang-provider";
 
 /** Мелкие элементы, которые встречаются на каждом втором экране. */
 
-export function Badge({ text, color = GREEN }: { text: string; color?: string }) {
+export function Badge({ text, color = GREEN, onPhoto = false }: { text: string; color?: string; onPhoto?: boolean }) {
   return (
     <span
-      className="rounded-full px-2 py-0.5 text-[9px] font-bold"
+      className={`rounded-full px-2 py-0.5 text-[9px] font-bold ${onPhoto ? "backdrop-blur-sm" : ""}`}
       // Та же краска, что у текста, но разбавленная до фона. Через
       // color-mix, а не hex-хвостом: цвет бывает и CSS-переменной.
-      style={{ background: мягко(color, 10), color }}
+      // На фотографии бледная подложка теряется — там тёмное стекло.
+      style={onPhoto ? { background: "rgba(0,0,0,0.45)", color: "#fff" } : { background: мягко(color, 10), color }}
     >
       {text}
     </span>
@@ -156,11 +158,12 @@ export function GeomPattern({ opacity = 0.18 }: { opacity?: number }) {
 }
 
 export function EmptyRoute({ icon }: { icon: string }) {
+  const { t } = useT();
   return (
     <div className="flex flex-col items-center justify-center py-16 text-center">
       <div className="mb-3 text-5xl opacity-30">{icon}</div>
       <p className="text-sm" style={{ color: "var(--muted)" }}>
-        Ничего не найдено
+        {t("srch_none")}
       </p>
     </div>
   );

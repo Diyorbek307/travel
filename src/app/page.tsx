@@ -533,12 +533,7 @@ function Screen({ tab, detail, ...p }: ScreenProps) {
         return <RouteDetail route={detail.value} onBack={p.onCloseDetail} onПуть={p.onПуть} onToast={p.onToast} />;
       case "путь":
         return (
-          <RouteView
-            название={detail.название}
-            город={detail.город}
-            onBack={p.onCloseDetail}
-            onТакси={p.onTransport}
-          />
+          <RouteView название={detail.название} город={detail.город} onBack={p.onCloseDetail} />
         );
     }
   }
@@ -572,7 +567,7 @@ function Screen({ tab, detail, ...p }: ScreenProps) {
         />
       );
     case "map":
-      return <MapScreen onRoute={p.onRoute} onAudio={() => p.onTab("audio")} />;
+      return <MapScreen onRoute={p.onRoute} onAudio={() => p.onTab("audio")} onPlace={p.onPlace} />;
     case "audio":
       return <AudioScreen isPremium={p.isPremium} сразуИграть={p.кодЗаписи} />;
     case "profile":

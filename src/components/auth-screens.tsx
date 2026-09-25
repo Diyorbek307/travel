@@ -1,10 +1,9 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { useT } from "@/components/lang-provider";
 import type { TKey } from "@/lib/i18n";
-
-import { useEffect, useRef, useState } from "react";
-import { CREAM, GOLD, GREEN, MUTED, TEXT, WHITE } from "@/lib/theme";
+import { CREAM, WHITE } from "@/lib/theme";
 import type { PublicUser } from "@/lib/types";
 
 /**
@@ -31,6 +30,7 @@ const ОШИБКИ: Record<string, TKey> = {
   code_wrong: "e_code_wrong",
   code_expired: "e_code_expired",
   code_none: "e_code_none",
+  too_many: "e_too_many",
 };
 
 function поле(): React.CSSProperties {
@@ -40,6 +40,13 @@ function поле(): React.CSSProperties {
     color: WHITE,
   };
 }
+
+/** Главная кнопка экранов входа: золото перетекает в бирюзу, как крыло знака. */
+const ГЛАВНАЯ_КНОПКА: React.CSSProperties = {
+  background: "linear-gradient(120deg,var(--accent-2),var(--accent))",
+  color: "#05100f",
+  boxShadow: "0 8px 26px var(--accent-soft)",
+};
 
 function Обёртка({
   заголовок,
@@ -70,37 +77,31 @@ function Обёртка({
         className="pointer-events-none absolute -right-20 top-40 h-56 w-56 rounded-full"
         style={{ background: "var(--accent-2)", filter: "blur(100px)", opacity: 0.18 }}
       />
-      <div className="relative">
       {/*
         Колонка ограниченной ширины. Поле ввода во весь ноутбук выглядит
         не как форма, а как ошибка вёрстки: глаз не связывает подпись
         слева с полем, уехавшим на метр вправо.
       */}
-      <div className="mx-auto flex w-full max-w-md flex-col">
-      <button
-        onClick={onBack}
-        className="mb-6 self-start text-sm"
-        style={{ color: "rgba(255,255,255,0.7)" }}
-      >
-        ← {t("common_back")}
-      </button>
+      <div className="relative mx-auto flex w-full max-w-md flex-col">
+        <button
+          onClick={onBack}
+          className="mb-6 self-start text-sm"
+          style={{ color: "rgba(255,255,255,0.7)" }}
+        >
+          ← {t("common_back")}
+        </button>
 
-      <h1
-        className="mb-1 text-2xl font-bold text-white"
-        style={{ fontFamily:"var(--font-heading)" }}
-      >
-        {заголовок}
-      </h1>
-      <p className="mb-7 text-sm" style={{ color: "rgba(255,255,255,0.6)" }}>
-        {подпись}
-      </p>
+        <h1 className="mb-1 text-2xl font-bold text-white" style={{ fontFamily: "var(--font-heading)" }}>
+          {заголовок}
+        </h1>
+        <p className="mb-7 text-sm" style={{ color: "rgba(255,255,255,0.6)" }}>
+          {подпись}
+        </p>
 
-      {children}
-      </div>
+        {children}
       </div>
     </div>
   );
-
 }
 
 /* ------------------------------------------------------------------ */
@@ -290,7 +291,7 @@ export function RegisterScreen({
           type="submit"
           disabled={идёт}
           className="mt-2 rounded-2xl py-4 text-base font-bold disabled:opacity-60"
-          style={{ background: "linear-gradient(120deg,var(--accent-2),var(--accent))", color: "#05100f", boxShadow: "0 8px 26px var(--accent-soft)" }}
+          style={ГЛАВНАЯ_КНОПКА}
         >
           {идёт ? t("reg_submitting") : t("reg_title")}
         </button>
@@ -416,7 +417,7 @@ export function VerifyScreen({
           type="submit"
           disabled={идёт || code.length !== 6}
           className="mt-2 rounded-2xl py-4 text-base font-bold disabled:opacity-60"
-          style={{ background: "linear-gradient(120deg,var(--accent-2),var(--accent))", color: "#05100f", boxShadow: "0 8px 26px var(--accent-soft)" }}
+          style={ГЛАВНАЯ_КНОПКА}
         >
           {идёт ? t("verify_checking") : t("verify_submit")}
         </button>
@@ -535,7 +536,7 @@ export function LoginScreen({
           type="submit"
           disabled={идёт}
           className="mt-2 rounded-2xl py-4 text-base font-bold disabled:opacity-60"
-          style={{ background: "linear-gradient(120deg,var(--accent-2),var(--accent))", color: "#05100f", boxShadow: "0 8px 26px var(--accent-soft)" }}
+          style={ГЛАВНАЯ_КНОПКА}
         >
           {идёт ? t("login_submitting") : t("login_submit")}
         </button>
@@ -627,7 +628,7 @@ function ForgotScreen({ onBack, email: начальный }: { onBack: () => voi
           type="submit"
           disabled={идёт}
           className="mt-2 rounded-2xl py-4 text-base font-bold disabled:opacity-60"
-          style={{ background: "linear-gradient(120deg,var(--accent-2),var(--accent))", color: "#05100f", boxShadow: "0 8px 26px var(--accent-soft)" }}
+          style={ГЛАВНАЯ_КНОПКА}
         >
           {идёт ? t("reset_submitting") : t("reset_submit")}
         </button>
@@ -641,4 +642,3 @@ export function AuthSplash() {
   return <div className="h-full w-full" style={{ background: CREAM }} aria-hidden />;
 }
 
-export const AUTH_MUTED = MUTED;

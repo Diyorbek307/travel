@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { PageHeader, Badge, Btn, Card, SectionTitle, ДемоРаздел } from "./shared";
+import { PageHeader, Badge, Btn, ДемоРаздел } from "./shared";
 
 type Promo = {
   id: number;

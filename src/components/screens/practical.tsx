@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { BORDER, CREAM, GREEN, MUTED, TEXT, ACCENT_SOFT } from "@/lib/theme";
+import { BORDER, CREAM, GREEN, MUTED, TEXT, ACCENT_SOFT, мягко } from "@/lib/theme";
 import { useCurrency, СИМВОЛЫ, ГЛАВНЫЕ } from "@/components/currency-provider";
 import { useT } from "@/components/lang-provider";
 
@@ -72,7 +72,7 @@ export function CurrencyConverter() {
             setFrom(to);
             setTo(from);
           }}
-          aria-label="↔"
+          aria-label={t("tr_swap")}
           className="mb-0.5 flex h-10 w-10 items-center justify-center rounded-xl border"
           style={{ borderColor: BORDER, color: GREEN }}
         >
@@ -135,9 +135,9 @@ export function PracticalScreen({ onBack }:{ onBack:()=>void }) {
         {SECTIONS.map((s,i)=>(
           <div key={i} className="bg-white rounded-2xl overflow-hidden shadow-sm border" style={{borderColor:BORDER}}>
             <button onClick={()=>setOpen(open===i?null:i)} className="w-full flex items-center gap-3 p-4 text-left">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{background:s.color+"15"}}>{s.icon}</div>
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{background:мягко(s.color, 9)}}>{s.icon}</div>
               <div className="flex-1"><p className="font-bold text-sm" style={{color:TEXT}}>{t(s.tk)}</p></div>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={MUTED} strokeWidth="2" className="rtl-flip flex-shrink-0" style={{transform:open===i?"rotate(90deg)":"none",transition:"transform 0.2s"}}><polyline points="9 18 15 12 9 6"/></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={MUTED} strokeWidth="2" className="rtl-flip flex-shrink-0" style={{transform:open===i?"rotate(90deg)":undefined,transition:"transform 0.2s"}}><polyline points="9 18 15 12 9 6"/></svg>
             </button>
             {open===i&&<div className="px-4 pb-4 border-t" style={{borderColor:BORDER}}><ul className="space-y-2 mt-3">{s.items.map((item,j)=><li key={j} className="flex items-start gap-2.5"><div className="w-1.5 h-1.5 rounded-full flex-shrink-0 mt-1.5" style={{background:s.color}}/><p className="text-xs leading-relaxed" style={{color:MUTED}}>{трК(item)}</p></li>)}</ul></div>}
           </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import type { Geo } from "@/lib/types";
+import { useT } from "@/components/lang-provider";
 
 /**
  * Карта Google внутри приложения.
@@ -42,6 +43,7 @@ export default function GoogleMap({
   высота?: number | string;
   пешком?: boolean;
 }) {
+  const { t } = useT();
   const ключ = googleКлюч();
   if (!ключ) return null;
 
@@ -55,7 +57,7 @@ export default function GoogleMap({
   return (
     <iframe
       src={адрес}
-      title={подпись ? `Карта: ${подпись}` : "Карта"}
+      title={подпись ? `${t("nav_map")}: ${подпись}` : t("nav_map")}
       width="100%"
       height={высота}
       style={{ border: 0, display: "block" }}

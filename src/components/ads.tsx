@@ -23,7 +23,7 @@ function ютубId(u: string): string | null {
  * Это основной заработок приложения, поэтому блок не должен выглядеть
  * баннером, который взгляд привычно перепрыгивает. Он сделан как ещё
  * одна услуга приложения — «предложение рядом с вами»: тот же язык
- * карточек, что у мест и отелей, живая рамка акцентом-лаймом, польза
+ * карточек, что у мест и отелей, живая рамка золотом и бирюзой, польза
  * в первой строке.
  *
  * При этом пометка «Партнёр» видна всегда: по закону о рекламе скрывать
@@ -117,7 +117,7 @@ function МедиаРекламы({ ad }: { ad: Креатив }) {
 /**
  * Главный формат: крупная карточка-предложение.
  *
- * Живая рамка лаймом — то, ради чего блок вообще замечают. Она не
+ * Живая рамка — то, ради чего блок вообще замечают. Она не
  * мигает и не прыгает: медленный перелив по краю, который видно боковым
  * зрением, но который не мешает читать.
  */
@@ -165,7 +165,7 @@ export function AdSpotlight({ isPremium, cities }: { isPremium: boolean; cities?
         <button
           onClick={() => перейти(ad)}
           className="relative w-full overflow-hidden rounded-[22px] text-left transition-all active:scale-[0.985]"
-          style={{ background: `linear-gradient(135deg,${ad.color} 0%,${ad.color}cc 100%)` }}
+          style={{ background: `linear-gradient(135deg,${ad.color} 0%,${мягко(ad.color, 80)} 100%)` }}
         >
           {/* Мягкое свечение в углу — объём без картинки, которой у
               рекламодателя может и не быть. */}
@@ -412,7 +412,6 @@ export function AdInterstitial({
       <video
         ref={видеоRef}
         src={ad.videoUrl}
-        poster={undefined}
         loop
         playsInline
         autoPlay
@@ -461,7 +460,7 @@ export function AdInterstitial({
             className="flex items-center gap-1.5 rounded-full px-3.5 py-2 text-xs font-bold transition-all active:scale-95"
             style={{ background: "rgba(255,255,255,0.95)", color: "#14201d" }}
           >
-            {t("ad_skip")} <span className="rtl-flip inline-block">✕</span>
+            {t("ad_skip")} <span>✕</span>
           </button>
         )}
       </div>

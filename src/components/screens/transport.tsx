@@ -6,8 +6,7 @@ import { useДеньги } from "@/lib/money";
 import { ссылкаНаЗаказ } from "@/lib/taxi";
 import { useT } from "@/components/lang-provider";
 import type { TKey } from "@/lib/i18n";
-import TaxiOrder from "@/components/taxi-order";
-import { ACCENT_FILL, BORDER, CREAM, GREEN, MUTED, TEXT, WHITE, SURFACE, ACCENT_SOFT } from "@/lib/theme";
+import { ACCENT_FILL, BORDER, CREAM, GREEN, MUTED, TEXT, SURFACE, ACCENT_SOFT } from "@/lib/theme";
 import { FLIGHTS, INTERCITY, TRAINS, UZ_CITIES } from "@/data/content";
 import { EmptyRoute } from "../ui";
 import { AnimatedBg } from "@/components/animated-bg";
@@ -38,7 +37,7 @@ export function CityPicker({ value, onChange, label, icon }:{ value:string; onCh
             </div>
             <div className="overflow-y-auto" style={{maxHeight:"calc(65vh - 60px)"}}>
               {UZ_CITIES.map(city=>(
-                <button key={city} onClick={()=>{onChange(city);setOpen(false);}} className="w-full flex items-center gap-3 px-4 py-3.5 border-b text-left active:opacity-60" style={{borderColor:BORDER,background:value===city?ACCENT_SOFT:WHITE}}>
+                <button key={city} onClick={()=>{onChange(city);setOpen(false);}} className="w-full flex items-center gap-3 px-4 py-3.5 border-b text-left active:opacity-60" style={{borderColor:BORDER,background:value===city?ACCENT_SOFT:SURFACE}}>
                   <span className="text-lg">📍</span>
                   <span className="flex-1 font-semibold text-sm" style={{color:value===city?GREEN:TEXT}}>{трК(city)}</span>
                   {value===city&&<span style={{color:GREEN}}>✓</span>}
@@ -51,7 +50,6 @@ export function CityPicker({ value, onChange, label, icon }:{ value:string; onCh
     </>
   );
 }
-
 
 // ── Transport Screen ───────────────────────────────────────────────────────────
 
@@ -97,7 +95,6 @@ export function TransportScreen({ onBack, isPremium }:{ onBack:()=>void; isPremi
     </div>
   );
 
-  const modeIcon = mode==="trains"?"🚄":mode==="flights"?"✈️":"🚌";
   const trains  = TRAINS.filter(п=>(!fromCity||п.from===fromCity)&&(!toCity||п.to===toCity));
   const flights = FLIGHTS.filter(f=>(!fromCity||f.from===fromCity)&&(!toCity||f.to===toCity));
   const taxis   = INTERCITY.filter(i=>(!fromCity||i.from===fromCity)&&(!toCity||i.to===toCity));
@@ -170,7 +167,6 @@ export function TransportScreen({ onBack, isPremium }:{ onBack:()=>void; isPremi
                 <div className="flex flex-col items-center gap-1 flex-shrink-0">
                   <p className="text-[9px]" style={{color:MUTED}}>{трК(п.dur)}</p>
                   <div className="flex items-center gap-1"><div className="w-10 h-px" style={{background:BORDER}}/><span className="text-base">🚄</span><div className="w-10 h-px" style={{background:BORDER}}/></div>
-                  <p className="text-[9px]" style={{color:GREEN}}>{п.seats} {t("tr_seats")}</p>
                 </div>
                 <div className="flex-1 text-right">
                   <p className="text-2xl font-bold" style={{color:TEXT,fontFamily:"var(--font-heading)"}}>{п.arr}</p>
@@ -196,7 +192,6 @@ export function TransportScreen({ onBack, isPremium }:{ onBack:()=>void; isPremi
                 </div>
                 <div className="flex flex-col items-center gap-1 flex-shrink-0">
                   <div className="flex items-center gap-1"><div className="w-8 h-px" style={{background:BORDER}}/><span className="text-lg">✈️</span><div className="w-8 h-px" style={{background:BORDER}}/></div>
-                  <p className="text-[9px]" style={{color:GREEN}}>{f.seats} мест</p>
                 </div>
                 <div className="flex-1 text-right">
                   <p className="text-2xl font-bold" style={{color:TEXT,fontFamily:"var(--font-heading)"}}>{f.arr}</p>
@@ -239,6 +234,5 @@ export function TransportScreen({ onBack, isPremium }:{ onBack:()=>void; isPremi
   );
 }
 
-// ── Login Modal ────────────────────────────────────────────────────────────────
 
 export default TransportScreen;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ACCENT_FILL, GOLD, GREEN, TEXT, WHITE, ON_GOLD } from "@/lib/theme";
+import { ACCENT_FILL, GOLD, WHITE, ON_GOLD } from "@/lib/theme";
 
 /**
  * Смена пароля по одноразовой ссылке.

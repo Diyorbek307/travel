@@ -206,7 +206,7 @@ export function AudioScreen({
                       }}
                       aria-label={это ? t("d_pause") : t("d_listen")}
                       className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl"
-                      style={{ background: это ? GREEN : ACCENT_SOFT }}
+                      style={{ background: это ? ACCENT_FILL : ACCENT_SOFT }}
                     >
                       <svg width="13" height="13" viewBox="0 0 24 24" fill={это ? WHITE : GREEN}>
                         {это ? (

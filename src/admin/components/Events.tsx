@@ -37,12 +37,13 @@ export default function Events() {
 
   const addEvent = () => {
     setEvents(prev => [{
-      id: `new-${Date.now()}`, emoji: "🎫", color: "var(--color-teal)",
-      name: newEvent.name || "New Event", city: newEvent.city || "Tashkent",
-      category: newEvent.category as Event["category"], date: newEvent.date || "TBD", endDate: newEvent.date || "TBD",
-      venue: newEvent.venue || "TBD", capacity: Number(newEvent.capacity) || 500, ticketsSold: 0,
+      // Цвет — настоящий hex: переменные панели приложение не знает.
+      id: `new-${Date.now()}`, emoji: "🎫", color: "#0E6F66",
+      name: newEvent.name || "Новое событие", city: newEvent.city || "Ташкент",
+      category: newEvent.category as Event["category"], date: newEvent.date, endDate: newEvent.date,
+      venue: newEvent.venue || newEvent.city, capacity: Number(newEvent.capacity) || 500, ticketsSold: 0,
       price: Number(newEvent.price) || 0, status: "upcoming", featured: false,
-      desc: "New event description.", img: "https://images.unsplash.com/photo-1664602078796-68ee76b3fc59?w=400&h=220&fit=crop&auto=format",
+      desc: "", img: "https://images.unsplash.com/photo-1664602078796-68ee76b3fc59?w=400&h=220&fit=crop&auto=format",
     }, ...prev]);
     setShowForm(false);
     setNewEvent({ name: "", city: "", category: "Festival", date: "", venue: "", price: "", capacity: "" });
@@ -188,8 +189,8 @@ export default function Events() {
             <div className="flex flex-col gap-3 mb-4">
               {[
                 { key: "title", label: "Название события", ph: "Navruz Festival 2027" },
-                { key: "city", label: "Город", ph: "Tashkent" },
-                { key: "date", label: "Дата", ph: "Mar 21, 2027" },
+                { key: "city", label: "Город", ph: "Ташкент" },
+                { key: "date", label: "Дата (например, «21 марта»)", ph: "21 марта" },
                 { key: "venue", label: "Место", ph: "Mustakillik Square" },
                 { key: "capacity", label: "Вместимость", ph: "5000" },
                 { key: "price", label: "Цена билета ($, 0 = бесплатно)", ph: "0" },

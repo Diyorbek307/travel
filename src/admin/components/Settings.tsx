@@ -11,17 +11,19 @@ export default function Settings({ onNavigate }: { onNavigate?: (page: string) =
 
   // Цифры стартового экрана — настоящие, читаются приложением.
   const [цифры, setЦифры] = useState({ statPlaces: "", statLangs: "", statRating: "" });
-  const [цифрыState, setЦифрыState] = useState<"idle" | "saving" | "saved">("idle");
+  const [цифрыState, setЦифрыState] = useState<"idle" | "saving" | "saved" | "error">("idle");
   useEffect(() => {
     fetch("/api/site-config").then(r => r.ok ? r.json() : null).then(c => c && setЦифры(c)).catch(() => {});
   }, []);
   const сохранитьЦифры = async () => {
     setЦифрыState("saving");
     try {
-      await fetch("/api/site-config", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(цифры) });
+      const r = await fetch("/api/site-config", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(цифры) });
+      // «Сохранено» — только если сервер принял: у поддержки прав на это нет.
+      if (!r.ok) { setЦифрыState("error"); return; }
       setЦифрыState("saved");
       setTimeout(() => setЦифрыState("idle"), 1500);
-    } catch { setЦифрыState("idle"); }
+    } catch { setЦифрыState("error"); }
   };
 
   /**
@@ -97,8 +99,8 @@ export default function Settings({ onNavigate }: { onNavigate?: (page: string) =
         <div className="flex items-center justify-between mb-4">
           <SectionTitle>Цифры на стартовом экране</SectionTitle>
           {цифрыState !== "idle" && (
-            <span className="text-xs" style={{ color: цифрыState === "saved" ? "var(--color-teal)" : "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
-              {цифрыState === "saving" ? "Сохраняю…" : "✓ Сохранено"}
+            <span className="text-xs" style={{ color: цифрыState === "saved" ? "var(--color-teal)" : цифрыState === "error" ? "var(--color-rose)" : "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
+              {цифрыState === "saving" ? "Сохраняю…" : цифрыState === "error" ? "Не сохранено — нет прав или связи" : "✓ Сохранено"}
             </span>
           )}
         </div>

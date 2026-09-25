@@ -50,11 +50,13 @@ export default function Reviews() {
 
   async function сменить(id: string, status: Review["status"]) {
     setОтзывы((p) => p.map((r) => (r.id === id ? { ...r, status } : r)));
-    await fetch("/api/admin/reviews", {
+    const res = await fetch("/api/admin/reviews", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id, status }),
-    }).catch(() => подтянуть());
+    }).catch(() => null);
+    // Не приняли — перечитываем, чтобы не показывать статус, которого нет.
+    if (!res?.ok) подтянуть();
   }
 
   const список = фильтр === "all" ? отзывы : отзывы.filter((r) => r.status === фильтр);

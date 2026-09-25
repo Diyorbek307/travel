@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { PageHeader, Badge, Btn, Card, SectionTitle, ДемоРаздел } from "./shared";
+import { LogoMark } from "@/components/ui";
 
 type Campaign = {
   id: number;
@@ -237,7 +238,7 @@ export default function PushCampaigns() {
                 {/* Notification bubble */}
                 <div className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.12)", backdropFilter: "blur(12px)" }}>
                   <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                    <div className="w-5 h-5 rounded-md flex items-center justify-center text-xs" style={{ background: "var(--color-amber)", color: "var(--color-on-accent)" }}>UZ</div>
+                    <LogoMark size={20} />
                     <span className="text-xs font-medium text-white">Uzbekistan Travel</span>
                     <span className="text-xs ml-auto" style={{ color: "rgba(255,255,255,0.5)" }}>сейчас</span>
                   </div>

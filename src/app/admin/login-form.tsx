@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { LogoMark } from "@/components/ui";
 import { login } from "./actions";
 
 /**
@@ -19,18 +20,13 @@ export default function LoginForm({ defaultPassword }: { defaultPassword: boolea
     >
       <form action={action} className="w-full max-w-sm">
         <div className="mb-6 flex items-center gap-3">
-          <span
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-sm font-bold"
-            style={{ background: "var(--color-amber)", color: "#0d0c0a" }}
-          >
-            UZ
-          </span>
+          <LogoMark size={36} />
           <span>
             <span
               className="block text-base font-semibold leading-none"
               style={{ fontFamily: "var(--font-display)" }}
             >
-              Узбекистан
+              HelloUZ
             </span>
             <span className="mt-1 block text-xs" style={{ color: "var(--color-muted)" }}>
               Админ-панель

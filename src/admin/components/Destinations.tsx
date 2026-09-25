@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { PageHeader, Badge, Btn, Table, Card } from "./shared";
+import { PageHeader, Badge, Btn, Table } from "./shared";
 import { useEntity } from "../context/useEntity";
 import type { ManagedPlace as Dest } from "@/lib/types";
 

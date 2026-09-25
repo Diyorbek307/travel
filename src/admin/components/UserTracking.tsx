@@ -33,7 +33,6 @@ const USER_COLORS = [
 export default function UserTracking() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [showAll, setShowAll] = useState(true);
-  const [hoverCity, setHoverCity] = useState<string | null>(null);
 
   const activeUsers = USERS.filter((u) => u.status === "active" || u.status === "unverified");
 
@@ -117,7 +116,7 @@ export default function UserTracking() {
                 <circle
                   cx={pos.x}
                   cy={pos.y}
-                  r={hoverCity === name ? 5 : 3.5}
+                  r={3.5}
                   fill="var(--color-dim)"
                   stroke="var(--color-border)"
                   strokeWidth="1"

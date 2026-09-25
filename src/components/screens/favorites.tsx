@@ -1,6 +1,6 @@
 "use client";
 
-import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE } from "@/lib/theme";
+import { BORDER, CREAM, GOLD, GREEN, MUTED, TEXT } from "@/lib/theme";
 import type { Hotel, Place, Restaurant, Route } from "@/lib/types";
 import { useAppContent } from "@/components/content-provider";
 import { useT } from "@/components/lang-provider";
@@ -63,15 +63,27 @@ export default function FavoritesScreen({
           </div>
         )}
 
-        {избранное.map((f) => (
+        {избранное.map((f) => {
+          // Название — из живого содержимого, на текущем языке: в записи
+          // оно на том языке, что был включён при добавлении.
+          const живое =
+            f.kind === "place" ? PLACES.find((x) => x.id === f.id)
+            : f.kind === "hotel" ? HOTELS.find((x) => x.id === f.id)
+            : f.kind === "restaurant" ? RESTAURANTS.find((x) => x.id === f.id)
+            : null;
+          const маршрут = f.kind === "route" ? ROUTES.find((x) => x.id === f.id) : null;
+          const имя = живое?.name ?? (маршрут ? трК(маршрут.title) : трК(f.name));
+          const фото = живое?.img ?? f.img;
+          return (
           <div key={f.key} className="flex overflow-hidden rounded-2xl border bg-white shadow-sm" style={{ borderColor: BORDER }}>
-            <button onClick={() => открыть(f)} className="h-24 w-24 flex-shrink-0">
-              <img src={f.img} alt={f.name} className="h-full w-full object-cover" />
+            <button onClick={() => открыть(f)} className="flex h-24 w-24 flex-shrink-0 items-center justify-center text-3xl" style={{ background: CREAM }}>
+              {/* У маршрута своей фотографии нет — вместо пустой картинки его значок. */}
+              {фото ? <img src={фото} alt={имя} className="h-full w-full object-cover" /> : (маршрут?.icon ?? ЗНАЧОК[f.kind])}
             </button>
             <button onClick={() => открыть(f)} className="min-w-0 flex-1 p-3 text-left">
               <p className="text-[10px] font-semibold" style={{ color: MUTED }}>{ЗНАЧОК[f.kind]} {трК(f.city)}</p>
-              <p className="mt-0.5 truncate font-bold text-sm" style={{ color: TEXT }}>{трК(f.name)}</p>
-              <p className="mt-1 text-xs font-semibold" style={{ color: "var(--gold-ink)" }}>★ {f.rating}</p>
+              <p className="mt-0.5 truncate font-bold text-sm" style={{ color: TEXT }}>{имя}</p>
+              {f.rating > 0 && <p className="mt-1 text-xs font-semibold" style={{ color: "var(--gold-ink)" }}>★ {f.rating}</p>}
             </button>
             <button
               onClick={() => переключитьИзбранное({ id: f.id, kind: f.kind, name: f.name, city: f.city, img: f.img, rating: f.rating })}
@@ -81,7 +93,8 @@ export default function FavoritesScreen({
               <svg width="20" height="20" viewBox="0 0 24 24" fill={GOLD} stroke={GOLD} strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" /></svg>
             </button>
           </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

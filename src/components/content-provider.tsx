@@ -31,6 +31,15 @@ const МЕДИА_РЕКЛАМЫ = new Map(
 
 const ContentContext = createContext<Content>(SEED);
 
+/**
+ * Видно ли запись туристу. Статус ставят в панели: отключённый отель или
+ * отменённое событие должны исчезать из приложения, а не только менять
+ * значок в таблице. Запись без статуса (старые данные) — видна.
+ */
+function видно(status: string | undefined, можно: string[]): boolean {
+  return !status || можно.includes(status);
+}
+
 export function ContentProvider({ children }: { children: React.ReactNode }) {
   const [content, setContent] = useState<Content>(SEED);
 
@@ -95,15 +104,16 @@ export function useAppContent() {
   const мЦвет = (цвет: string) => (СТАРАЯ_ЗЕЛЕНЬ.has(цвет) ? "#0E6F66" : цвет);
 
   return {
-    PLACES: content.places.map(мПлейс),
-    HOTELS: content.hotels.map(мОтель),
-    RESTAURANTS: content.restaurants.map(мРест),
-    ROUTES: content.routes.map((r) => ({ ...r, color: мЦвет(r.color) })),
-    EVENTS: content.events.map((e) => ({ ...e, color: мЦвет(e.color) })),
+    // Сезонное место — тоже место: оно открыто в свой сезон.
+    PLACES: content.places.filter((p) => видно(p.status, ["active", "seasonal"])).map(мПлейс),
+    HOTELS: content.hotels.filter((h) => видно(h.status, ["active"])).map(мОтель),
+    RESTAURANTS: content.restaurants.filter((r) => видно(r.status, ["active"])).map(мРест),
+    ROUTES: content.routes.filter((r) => видно(r.status, ["active"])).map((r) => ({ ...r, color: мЦвет(r.color) })),
+    EVENTS: content.events.filter((e) => видно(e.status, ["active", "upcoming"])).map((e) => ({ ...e, color: мЦвет(e.color) })),
     // На главной показываются только отмеченные города; порядок задаёт
     // редактор в панели.
-    POPULAR_CITIES: content.cities.filter((c) => c.featured),
-    CITIES: content.cities,
+    POPULAR_CITIES: content.cities.filter((c) => c.featured && видно(c.status, ["active"])),
+    CITIES: content.cities.filter((c) => видно(c.status, ["active"])),
     // Скрытый в панели аудиогид сразу пропадает у туристов.
     AUDIO: (content.audio ?? []).filter((a) => a.active),
     // Приостановленная в панели кампания сразу исчезает из приложения.

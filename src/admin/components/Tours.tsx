@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { PageHeader, Badge, Btn, Table, Card, SectionTitle } from "./shared";
+import { PageHeader, Badge, Btn, Table } from "./shared";
 import { useEntity } from "../context/useEntity";
 import type { ManagedRoute as Tour } from "@/lib/types";
 
@@ -11,14 +11,14 @@ export default function Tours() {
   const [catFilter, setCatFilter] = useState("all");
   const [editing, setEditing] = useState<Tour | null>(null);
   const [showAdd, setShowAdd] = useState(false);
-  const [newTour, setNewTour] = useState({ title: "", duration: "", price: "", category: "Cultural", guide: "", maxGroup: "" });
+  const [newTour, setNewTour] = useState({ title: "", duration: "", price: "", category: "Культура", guide: "", maxGroup: "" });
 
   const categories = ["all", ...Array.from(new Set(tours.map((t) => t.category)))];
   const statusFilter = filter === "all" ? tours : tours.filter((t) => t.status === filter);
   const filtered = catFilter === "all" ? statusFilter : statusFilter.filter((t) => t.category === catFilter);
 
   const diffColor = (d: string) =>
-    d === "Easy" ? "teal" : d === "Moderate" ? "amber" : "rose";
+    d === "Лёгкий" ? "teal" : d === "Средний" ? "amber" : "rose";
 
   const statusColor = (s: string) =>
     s === "active" ? "teal" : s === "draft" ? "dim" : "rose";
@@ -134,7 +134,7 @@ export default function Tours() {
               <div>
                 <label className="text-xs block mb-1.5" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>КАТЕГОРИЯ</label>
                 <div className="flex gap-1.5 flex-wrap">
-                  {["Cultural","Adventure","Craft","Expedition","Food & Wine","Urban"].map(c => (
+                  {["Культура","Приключения","Ремёсла","Экспедиция","Еда","Город"].map(c => (
                     <button key={c} onClick={() => setNewTour(p => ({ ...p, category: c }))}
                       className="px-2.5 py-1 rounded text-xs cursor-pointer"
                       style={{ background: newTour.category === c ? "var(--color-amber)" : "var(--color-surface)", color: newTour.category === c ? "var(--color-on-accent)" : "var(--color-muted)", border: "1px solid var(--color-border)" }}
@@ -148,15 +148,16 @@ export default function Tours() {
               <Btn onClick={() => {
                 if (!newTour.title) return;
                 setTours(prev => [...prev, {
-                  id: `new-${Date.now()}`, title: newTour.title, duration: newTour.duration || "1 day",
-                  price: Number(newTour.price) || 100, difficulty: "Easy" as const, category: newTour.category,
+                  id: `new-${Date.now()}`, title: newTour.title, duration: newTour.duration || "1 день",
+                  price: Number(newTour.price) || 100, difficulty: "Лёгкий", category: newTour.category,
                   bookings: 0, maxGroup: Number(newTour.maxGroup) || 12, status: "draft" as const,
-                  nextDep: "TBD", guide: newTour.guide || "Не назначен", rating: 0,
-                  sub: newTour.category, icon: "🗺️", color: "var(--color-teal)",
+                  nextDep: "", guide: newTour.guide || "Не назначен", rating: 0,
+                  // Цвет — настоящий hex: переменные панели приложение не знает.
+                  sub: newTour.category, icon: "🗺️", color: "#0E6F66",
                   badge: newTour.category, stops: [],
                 }]);
                 setShowAdd(false);
-                setNewTour({ title: "", duration: "", price: "", category: "Cultural", guide: "", maxGroup: "" });
+                setNewTour({ title: "", duration: "", price: "", category: "Культура", guide: "", maxGroup: "" });
               }}>Создать</Btn>
             </div>
           </div>

@@ -3,13 +3,37 @@ import { PageHeader, Badge, Btn, Table } from "./shared";
 import { useEntity } from "../context/useEntity";
 import type { ManagedHotel as Hotel } from "@/lib/types";
 
+/**
+ * Отели.
+ *
+ * Здесь была ещё «заполненность номеров» — числа из семян, которые ничто
+ * не обновляло: связи с системами бронирования отелей нет. Показывать их
+ * рядом с настоящими данными значило бы подсовывать выдумку, поэтому
+ * убраны. Цена хранится дважды — числом для таблицы и строкой для
+ * приложения, — и правится в обоих местах сразу.
+ */
 
+type HotelForm = { name: string; city: string; stars: string; rooms: string; priceFrom: string; img: string; desc: string };
+const EMPTY_FORM: HotelForm = { name: "", city: "", stars: "3", rooms: "", priceFrom: "", img: "", desc: "" };
 
-type HotelForm = { name: string; city: string; stars: string; rooms: string; priceFrom: string };
-const EMPTY_FORM: HotelForm = { name: "", city: "", stars: "3", rooms: "", priceFrom: "" };
+const СТАТУС: Record<string, string> = {
+  active: "работает",
+  suspended: "отключён",
+  maintenance: "ремонт",
+  draft: "черновик",
+};
+
+const ПОЛЯ: [keyof HotelForm, string, string][] = [
+  ["name", "Название", "text"],
+  ["stars", "Звёзды (1–5)", "number"],
+  ["rooms", "Номеров", "number"],
+  ["priceFrom", "Цена от ($ за ночь)", "number"],
+  ["img", "Фото — ссылка на картинку", "url"],
+];
 
 export default function Hotels() {
   const [hotels, setHotels] = useEntity("hotels");
+  const [cities] = useEntity("cities");
   const [filter, setFilter] = useState("all");
   const [view, setView] = useState<"cards" | "table">("cards");
   const [editing, setEditing] = useState<Hotel | null>(null);
@@ -18,75 +42,143 @@ export default function Hotels() {
 
   const openEdit = (h: Hotel) => {
     setEditing(h);
-    setForm({ name: h.name, city: h.city, stars: String(h.stars), rooms: String(h.rooms), priceFrom: String(h.priceFrom) });
+    setForm({
+      name: h.name,
+      city: h.city,
+      stars: String(h.stars),
+      rooms: String(h.rooms),
+      priceFrom: String(h.priceFrom),
+      img: h.img,
+      desc: h.desc,
+    });
   };
 
   const saveEdit = () => {
     if (!editing) return;
-    setHotels(prev => prev.map(h => h.id === editing.id ? {
-      ...h, name: form.name || h.name, city: form.city || h.city,
-      stars: Number(form.stars) || h.stars, rooms: Number(form.rooms) || h.rooms,
-      priceFrom: Number(form.priceFrom) || h.priceFrom,
-    } : h));
+    setHotels((prev) =>
+      prev.map((h) => {
+        if (h.id !== editing.id) return h;
+        const priceFrom = Number(form.priceFrom) || h.priceFrom;
+        return {
+          ...h,
+          name: form.name.trim() || h.name,
+          city: form.city || h.city,
+          stars: Math.min(5, Math.max(1, Number(form.stars) || h.stars)),
+          rooms: Number(form.rooms) || h.rooms,
+          priceFrom,
+          // Приложение показывает строку — без неё новая цена туда не дошла бы.
+          price: `$${priceFrom}`,
+          img: form.img.trim() || h.img,
+          desc: form.desc.trim(),
+        };
+      }),
+    );
     setEditing(null);
   };
 
   const saveNew = () => {
-    if (!form.name) return;
+    if (!form.name.trim() || !form.city) return;
+    const priceFrom = Number(form.priceFrom) || 80;
+    // Без фото карточка в приложении пустая — подставляем общий снимок.
+    const фото = form.img.trim() || "https://images.unsplash.com/photo-1664602078796-68ee76b3fc59?w=800&h=600&fit=crop&auto=format";
     const newHotel: Hotel = {
-      id: `new-${Date.now()}`, name: form.name, city: form.city || "Tashkent",
-      stars: Number(form.stars) || 3, rooms: Number(form.rooms) || 20,
-      occupied: 0, priceFrom: Number(form.priceFrom) || 80,
-      rating: 0, reviews: 0, status: "active", facilities: ["WiFi"],
-      price: `$${Number(form.priceFrom) || 80}`, tag: "Новый", desc: "", imgs: [],
-      img: "https://images.unsplash.com/photo-1664602078796-68ee76b3fc59?w=80&h=60&fit=crop&auto=format",
+      id: `h-${Date.now().toString(36)}`,
+      name: form.name.trim(),
+      city: form.city,
+      stars: Math.min(5, Math.max(1, Number(form.stars) || 3)),
+      rooms: Number(form.rooms) || 20,
+      occupied: 0,
+      priceFrom,
+      price: `$${priceFrom}`,
+      rating: 0,
+      reviews: 0,
+      status: "active",
+      facilities: ["Wi-Fi"],
+      tag: "Новый",
+      desc: form.desc.trim(),
+      img: фото,
+      imgs: фото ? [фото] : [],
     };
-    setHotels(prev => [...prev, newHotel]);
+    setHotels((prev) => [...prev, newHotel]);
     setShowAdd(false);
     setForm(EMPTY_FORM);
   };
 
-  const toggleSuspend = (id: string) => setHotels(prev => prev.map(h =>
-    h.id === id ? { ...h, status: h.status === "active" ? "suspended" as const : "active" as const } : h
-  ));
+  const toggleSuspend = (id: string) =>
+    setHotels((prev) =>
+      prev.map((h) =>
+        h.id === id ? { ...h, status: h.status === "active" ? ("suspended" as const) : ("active" as const) } : h,
+      ),
+    );
 
   const filtered = filter === "all" ? hotels : hotels.filter((h) => h.city === filter);
-  const cities = ["all", ...Array.from(new Set(hotels.map((h) => h.city)))];
-
-  const occupancy = (h: Hotel) => Math.round((h.occupied / h.rooms) * 100);
-  const statusColor = (s: string) =>
-    s === "active" ? "teal" : s === "maintenance" ? "amber" : "rose";
-
+  const filterCities = ["all", ...Array.from(new Set(hotels.map((h) => h.city)))];
+  const statusColor = (s: string) => (s === "active" ? "teal" : s === "maintenance" ? "amber" : "rose");
   const totalRooms = filtered.reduce((s, h) => s + h.rooms, 0);
-  const totalOccupied = filtered.reduce((s, h) => s + h.occupied, 0);
-  const avgOccupancy = Math.round((totalOccupied / totalRooms) * 100);
+  const активных = hotels.filter((h) => h.status === "active").length;
+
+  const поля = (
+    <div className="flex flex-col gap-3 mb-5">
+      {ПОЛЯ.map(([k, label, type]) => (
+        <label key={k} className="text-xs" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
+          {label.toUpperCase()}
+          <input
+            type={type}
+            value={form[k]}
+            onChange={(e) => setForm((p) => ({ ...p, [k]: e.target.value }))}
+            className="mt-1 w-full rounded px-3 py-2 text-sm outline-none"
+            style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", color: "var(--color-text)", fontFamily: "var(--font-body)" }}
+          />
+        </label>
+      ))}
+      {/* Город — из списка: приложение ищет погоду и фильтрует по точному
+          названию, «Tashkent» вместо «Ташкент» у него не найдётся. */}
+      <label className="text-xs" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
+        ГОРОД
+        <select
+          value={form.city}
+          onChange={(e) => setForm((p) => ({ ...p, city: e.target.value }))}
+          className="mt-1 w-full rounded px-3 py-2 text-sm outline-none"
+          style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", color: "var(--color-text)", fontFamily: "var(--font-body)" }}
+        >
+          <option value="">— выберите —</option>
+          {cities.map((c) => (
+            <option key={c.id} value={c.name}>
+              {c.name}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label className="text-xs" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
+        ОПИСАНИЕ
+        <textarea
+          rows={3}
+          value={form.desc}
+          onChange={(e) => setForm((p) => ({ ...p, desc: e.target.value }))}
+          className="mt-1 w-full rounded px-3 py-2 text-sm outline-none"
+          style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", color: "var(--color-text)", fontFamily: "var(--font-body)" }}
+        />
+      </label>
+    </div>
+  );
 
   return (
     <div className="p-4 sm:p-7">
       <PageHeader
         title="Отели"
-        subtitle={`${filtered.length} объектов · ${avgOccupancy}% средн. заполненность`}
+        subtitle={`${filtered.length} объектов · ${активных} работают`}
         action={<Btn onClick={() => { setForm(EMPTY_FORM); setShowAdd(true); }}>+ Добавить отель</Btn>}
       />
 
-      {/* Summary cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-7">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-7">
         {[
           { label: "ВСЕГО ОБЪЕКТОВ", val: String(hotels.length) },
+          { label: "РАБОТАЮТ", val: String(активных) },
           { label: "ВСЕГО НОМЕРОВ", val: String(totalRooms) },
-          { label: "ЗАНЯТО", val: String(totalOccupied) },
-          { label: "СРЕДН. ЗАПОЛНЕННОСТЬ", val: `${avgOccupancy}%` },
         ].map((s) => (
-          <div
-            key={s.label}
-            className="rounded-lg px-4 py-3"
-            style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }}
-          >
+          <div key={s.label} className="rounded-lg px-4 py-3" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }}>
             <div className="text-xs mb-1.5" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>{s.label}</div>
-            <div
-              className="text-2xl font-semibold"
-              style={{ fontFamily: "var(--font-display)", color: "var(--color-amber)" }}
-            >
+            <div className="text-2xl font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--color-amber)" }}>
               {s.val}
             </div>
           </div>
@@ -95,11 +187,11 @@ export default function Hotels() {
 
       <div className="flex flex-wrap items-center justify-between gap-2 mb-6">
         <div className="flex gap-1.5 flex-wrap">
-          {cities.map((c) => (
+          {filterCities.map((c) => (
             <button
               key={c}
               onClick={() => setFilter(c)}
-              className="px-3 py-1.5 rounded text-xs font-medium transition-all cursor-pointer capitalize"
+              className="px-3 py-1.5 rounded text-xs font-medium transition-all cursor-pointer"
               style={{
                 background: filter === c ? "var(--color-amber)" : "var(--color-panel)",
                 color: filter === c ? "var(--color-on-accent)" : "var(--color-muted)",
@@ -107,7 +199,7 @@ export default function Hotels() {
                 fontFamily: "var(--font-mono)",
               }}
             >
-              {c}
+              {c === "all" ? "Все" : c}
             </button>
           ))}
         </div>
@@ -116,6 +208,7 @@ export default function Hotels() {
             <button
               key={v}
               onClick={() => setView(v)}
+              title={v === "cards" ? "Карточки" : "Таблица"}
               className="px-3 py-1.5 rounded text-xs cursor-pointer transition-all"
               style={{
                 background: view === v ? "var(--color-dim)" : "transparent",
@@ -132,71 +225,45 @@ export default function Hotels() {
       {view === "cards" ? (
         <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(min(320px, 100%), 1fr))" }}>
           {filtered.map((h) => (
-            <div
-              key={h.id}
-              className="rounded-lg overflow-hidden"
-              style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }}
-            >
+            <div key={h.id} className="rounded-lg overflow-hidden" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }}>
               <div className="flex flex-wrap gap-0">
-                <img
-                  src={h.img}
-                  alt={h.name}
-                  className="w-24 h-24 object-cover shrink-0"
-                  style={{ background: "var(--color-dim)" }}
-                />
+                {h.img ? (
+                  <img src={h.img} alt={h.name} className="w-24 h-24 object-cover shrink-0" style={{ background: "var(--color-dim)" }} />
+                ) : (
+                  <div className="flex w-24 h-24 shrink-0 items-center justify-center text-2xl" style={{ background: "var(--color-dim)" }}>🏨</div>
+                )}
                 <div className="flex-1 p-3 min-w-0">
                   <div className="flex flex-wrap items-start justify-between gap-2">
                     <div className="min-w-0">
-                      <div className="font-medium text-sm truncate" style={{ color: "var(--color-text)" }}>
-                        {h.name}
-                      </div>
+                      <div className="font-medium text-sm truncate" style={{ color: "var(--color-text)" }}>{h.name}</div>
                       <div className="text-xs mt-0.5" style={{ color: "var(--color-muted)" }}>
                         {h.city} · {"★".repeat(h.stars)}
                       </div>
                     </div>
-                    <Badge label={h.status} color={statusColor(h.status) as any} />
+                    <Badge label={СТАТУС[h.status] ?? h.status} color={statusColor(h.status)} />
                   </div>
                   <div className="flex flex-wrap gap-4 mt-2 text-xs" style={{ fontFamily: "var(--font-mono)", color: "var(--color-muted)" }}>
-                    <span style={{ color: "var(--color-amber)" }}>★ {h.rating}</span>
+                    <span style={{ color: "var(--color-amber)" }}>★ {h.rating || "—"}</span>
                     <span>От ${h.priceFrom}/ночь</span>
+                    <span>{h.rooms} номеров</span>
                   </div>
-                  {/* Occupancy bar */}
-                  <div className="mt-2">
-                    <div className="flex flex-wrap justify-between gap-2 text-xs mb-1" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
-                      <span>Заполненность</span>
-                      <span style={{ color: occupancy(h) > 80 ? "var(--color-teal)" : occupancy(h) > 50 ? "var(--color-amber)" : "var(--color-rose)" }}>
-                        {occupancy(h)}% ({h.occupied}/{h.rooms})
-                      </span>
-                    </div>
-                    <div className="h-1 rounded-full overflow-hidden" style={{ background: "var(--color-dim)" }}>
-                      <div
-                        className="h-full rounded-full transition-all"
-                        style={{
-                          width: `${occupancy(h)}%`,
-                          background: occupancy(h) > 80 ? "var(--color-teal)" : occupancy(h) > 50 ? "var(--color-amber)" : "var(--color-rose)",
-                        }}
-                      />
-                    </div>
-                  </div>
+                  {!h.img && (
+                    <p className="mt-2 text-xs" style={{ color: "var(--color-rose)" }}>
+                      Нет фото — в приложении карточка будет пустой
+                    </p>
+                  )}
                 </div>
               </div>
-              <div
-                className="px-3 py-2.5 flex items-center gap-2 flex-wrap"
-                style={{ borderTop: "1px solid var(--color-border)" }}
-              >
+              <div className="px-3 py-2.5 flex items-center gap-2 flex-wrap" style={{ borderTop: "1px solid var(--color-border)" }}>
                 {h.facilities.map((a) => (
-                  <span
-                    key={a}
-                    className="text-xs px-1.5 py-0.5 rounded"
-                    style={{ background: "var(--color-dim)", color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
-                  >
+                  <span key={a} className="text-xs px-1.5 py-0.5 rounded" style={{ background: "var(--color-dim)", color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
                     {a}
                   </span>
                 ))}
                 <div className="ml-auto flex flex-wrap gap-2">
                   <Btn variant="ghost" small onClick={() => openEdit(h)}>Изменить</Btn>
                   <Btn variant={h.status === "active" ? "danger" : "ghost"} small onClick={() => toggleSuspend(h.id)}>
-                    {h.status === "active" ? "Откл." : "Вкл."}
+                    {h.status === "active" ? "Отключить" : "Включить"}
                   </Btn>
                 </div>
               </div>
@@ -205,87 +272,56 @@ export default function Hotels() {
         </div>
       ) : (
         <Table
-          cols={["ОТЕЛЬ", "ГОРОД", "ЗВ.", "НОМЕРОВ", "ЗАПОЛНЕННОСТЬ", "ОТ/НОЧЬ", "РЕЙТИНГ", "СТАТУС", ""]}
+          cols={["ОТЕЛЬ", "ГОРОД", "ЗВ.", "НОМЕРОВ", "ОТ/НОЧЬ", "РЕЙТИНГ", "СТАТУС", ""]}
           rows={filtered.map((h) => [
-            <span className="font-medium text-sm" style={{ color: "var(--color-text)" }}>{h.name}</span>,
-            <span style={{ color: "var(--color-muted)" }}>{h.city}</span>,
-            <span style={{ color: "var(--color-amber)" }}>{"★".repeat(h.stars)}</span>,
-            <span style={{ fontFamily: "var(--font-mono)" }}>{h.rooms}</span>,
-            <div className="flex items-center gap-2 flex-wrap">
-              <div className="w-20 h-1 rounded-full overflow-hidden" style={{ background: "var(--color-dim)" }}>
-                <div
-                  className="h-full rounded-full"
-                  style={{
-                    width: `${occupancy(h)}%`,
-                    background: occupancy(h) > 80 ? "var(--color-teal)" : "var(--color-amber)",
-                  }}
-                />
-              </div>
-              <span style={{ fontFamily: "var(--font-mono)", fontSize: "12px", color: "var(--color-muted)" }}>{occupancy(h)}%</span>
-            </div>,
-            <span style={{ fontFamily: "var(--font-mono)" }}>${h.priceFrom}</span>,
-            <span style={{ color: "var(--color-amber)", fontFamily: "var(--font-mono)" }}>★ {h.rating}</span>,
-            <Badge label={h.status} color={statusColor(h.status) as any} />,
-            <div className="flex flex-wrap gap-2">
+            <span key="n" className="font-medium text-sm" style={{ color: "var(--color-text)" }}>{h.name}</span>,
+            <span key="c" style={{ color: "var(--color-muted)" }}>{h.city}</span>,
+            <span key="s" style={{ color: "var(--color-amber)" }}>{"★".repeat(h.stars)}</span>,
+            <span key="r" style={{ fontFamily: "var(--font-mono)" }}>{h.rooms}</span>,
+            <span key="p" style={{ fontFamily: "var(--font-mono)" }}>${h.priceFrom}</span>,
+            <span key="t" style={{ color: "var(--color-amber)", fontFamily: "var(--font-mono)" }}>★ {h.rating || "—"}</span>,
+            <Badge key="st" label={СТАТУС[h.status] ?? h.status} color={statusColor(h.status)} />,
+            <div key="a" className="flex flex-wrap gap-2">
               <Btn variant="ghost" small onClick={() => openEdit(h)}>Изменить</Btn>
               <Btn variant={h.status === "active" ? "danger" : "ghost"} small onClick={() => toggleSuspend(h.id)}>
-                {h.status === "active" ? "Откл." : "Вкл."}
+                {h.status === "active" ? "Отключить" : "Включить"}
               </Btn>
             </div>,
           ])}
         />
       )}
-      {/* Edit modal */}
-      {editing && (
-        <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: "rgba(0,0,0,0.7)" }} onClick={() => setEditing(null)}>
-          <div className="rounded-2xl w-full max-w-md p-6" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }} onClick={e => e.stopPropagation()}>
-            <div className="flex flex-wrap items-center justify-between gap-2 mb-5">
-              <h3 className="text-lg font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}>Редактировать отель</h3>
-              <button onClick={() => setEditing(null)} className="opacity-50 hover:opacity-100 cursor-pointer text-xl" style={{ color: "var(--color-text)" }}>×</button>
-            </div>
-            <div className="flex flex-col gap-3 mb-5">
-              {([["name","Название","text"],["city","Город","text"],["stars","Звёзды (1–5)","number"],["rooms","Номеров","number"],["priceFrom","Цена от ($)","number"]] as [keyof HotelForm,string,string][]).map(([k, label, type]) => (
-                <div key={k}>
-                  <label className="text-xs block mb-1" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>{label.toUpperCase()}</label>
-                  <input type={type} value={form[k]} onChange={e => setForm(p => ({ ...p, [k]: e.target.value }))}
-                    className="w-full rounded px-3 py-2 text-sm outline-none"
-                    style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", color: "var(--color-text)", fontFamily: "var(--font-body)" }}
-                  />
-                </div>
-              ))}
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <Btn variant="ghost" onClick={() => setEditing(null)}>Отмена</Btn>
-              <Btn onClick={saveEdit}>Сохранить</Btn>
-            </div>
-          </div>
-        </div>
-      )}
 
-      {/* Add modal */}
-      {showAdd && (
-        <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: "rgba(0,0,0,0.7)" }} onClick={() => setShowAdd(false)}>
-          <div className="rounded-2xl w-full max-w-md p-6" style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }} onClick={e => e.stopPropagation()}>
+      {(editing || showAdd) && (
+        <div
+          className="fixed inset-0 flex items-center justify-center z-50 p-4"
+          style={{ background: "rgba(0,0,0,0.7)" }}
+          onClick={() => { setEditing(null); setShowAdd(false); }}
+        >
+          <div
+            className="rounded-2xl w-full max-w-md p-6 max-h-[90dvh] overflow-y-auto"
+            style={{ background: "var(--color-panel)", border: "1px solid var(--color-border)" }}
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex flex-wrap items-center justify-between gap-2 mb-5">
-              <h3 className="text-lg font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}>Добавить отель</h3>
-              <button onClick={() => setShowAdd(false)} className="opacity-50 hover:opacity-100 cursor-pointer text-xl" style={{ color: "var(--color-text)" }}>×</button>
+              <h3 className="text-lg font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}>
+                {editing ? "Редактировать отель" : "Добавить отель"}
+              </h3>
+              <button
+                onClick={() => { setEditing(null); setShowAdd(false); }}
+                className="opacity-50 hover:opacity-100 cursor-pointer text-xl"
+                style={{ color: "var(--color-text)" }}
+              >
+                ×
+              </button>
             </div>
-            <div className="flex flex-col gap-3 mb-5">
-              {([["name","Название","text"],["city","Город","text"],["stars","Звёзды (1–5)","number"],["rooms","Кол-во номеров","number"],["priceFrom","Цена от ($)","number"]] as [keyof HotelForm,string,string][]).map(([k, label, type]) => (
-                <div key={k}>
-                  <label className="text-xs block mb-1" style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>{label.toUpperCase()}</label>
-                  <input type={type} value={form[k]} onChange={e => setForm(p => ({ ...p, [k]: e.target.value }))}
-                    placeholder={k === "name" ? "Название отеля" : ""}
-                    className="w-full rounded px-3 py-2 text-sm outline-none"
-                    style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", color: "var(--color-text)", fontFamily: "var(--font-body)" }}
-                  />
-                </div>
-              ))}
-            </div>
+            {поля}
             <div className="flex flex-wrap gap-3">
-              <Btn variant="ghost" onClick={() => setShowAdd(false)}>Отмена</Btn>
-              <Btn onClick={saveNew}>Добавить</Btn>
+              <Btn variant="ghost" onClick={() => { setEditing(null); setShowAdd(false); }}>Отмена</Btn>
+              <Btn onClick={editing ? saveEdit : saveNew}>{editing ? "Сохранить" : "Добавить"}</Btn>
             </div>
+            {!editing && (!form.name.trim() || !form.city) && (
+              <p className="mt-3 text-xs" style={{ color: "var(--color-muted)" }}>Нужны название и город.</p>
+            )}
           </div>
         </div>
       )}

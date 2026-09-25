@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { LOGO_D } from "./ui";
+import { useT } from "./lang-provider";
 
 /**
  * Кинематографичная заставка запуска: «UZBEKISTAN — ONE JOURNEY».
@@ -55,6 +56,7 @@ const ЗНАК_Ш = 0.86;
 const ЗНАК_В = 0.787;
 
 export default function IntroCinematic({ onDone }: { onDone: () => void }) {
+  const { t } = useT();
   const [уходит, setУходит] = useState(false);
   const [посадка, setПосадка] = useState<{ origin: string; transform: string } | null>(null);
   // Размер знака и стартовый масштаб «во весь экран» — от размера экрана.
@@ -128,7 +130,7 @@ export default function IntroCinematic({ onDone }: { onDone: () => void }) {
   const плавно = `${УХОД}ms cubic-bezier(.5,.1,.25,1)`;
 
   return (
-    <div onClick={() => финиш.current()} className="fixed inset-0 z-[100] overflow-hidden" style={{ cursor: "pointer" }} aria-label="Заставка">
+    <div onClick={() => финиш.current()} className="fixed inset-0 z-[100] overflow-hidden" style={{ cursor: "pointer" }} aria-label="HelloUZ">
       {/* ── Подложка: чёрный фон, пролёт, подпись. Гаснет при посадке. ── */}
       <div className="absolute inset-0" style={{ background: "#000", opacity: уходит ? 0 : 1, transition: `opacity ${плавно}` }}>
         <video
@@ -153,7 +155,7 @@ export default function IntroCinematic({ onDone }: { onDone: () => void }) {
           <p className="text-[12px] font-bold uppercase" style={{ letterSpacing: "0.42em", color: "rgba(255,255,255,0.95)", textShadow: "0 0 16px #ffffff88" }}>
             Discover Uzbekistan
           </p>
-          <p className="mt-1.5 text-[11px]" style={{ color: "rgba(255,255,255,0.55)" }}>Открой красоту Узбекистана</p>
+          <p className="mt-1.5 text-[11px]" style={{ color: "rgba(255,255,255,0.55)" }}>{t("splash_tagline")}</p>
         </div>
 
         <span className="pointer-events-none absolute right-4 top-4 text-[10px] font-semibold uppercase tracking-widest"

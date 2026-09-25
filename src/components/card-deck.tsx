@@ -1,7 +1,7 @@
 "use client";
 
 import type { DeckItem, Place } from "@/lib/types";
-import { GOLD, TEXT, WHITE } from "@/lib/theme";
+import { GOLD, ON_GOLD, TEXT, WHITE } from "@/lib/theme";
 import { useAppContent } from "./content-provider";
 import { useT } from "@/components/lang-provider";
 import { useДистанция } from "@/lib/distance";
@@ -13,26 +13,18 @@ import { ВИДЕО, кадрыГорода } from "@/data/city-reels";
 import CityReel from "./city-reel";
 
 /**
- * Подборка карточек: колода на телефоне, лента на широком экране.
+ * Подборка крупных карточек лентой — как отели и рестораны на главной.
  *
- * В макете это колода — карточки лежат стопкой, соседние притушены и
- * уменьшены. На телефоне так и надо: экран узкий, показать одну крупно
- * правильнее, чем шесть мелких.
- *
- * На настольном экране колода превращалась в маленькую стопку посреди
- * пустого поля. Поэтому там те же карточки идут лентой во всю ширину —
- * как отели и рестораны ниже.
- *
- * Обе раскладки лежат в разметке и переключаются классами, а не
- * состоянием: измерять ширину в JS значило бы отрисовать сначала не ту
- * раскладку и мигнуть ею при загрузке.
+ * В макете это была колода: карточки стопкой, соседние притушены. На
+ * деле в стопке видна одна карточка, а остальные человек не находил,
+ * поэтому все карточки лежат лентой и листаются пальцем.
  */
 
 /** Размеры карточки из макета. */
 const CARD_W = 218;
 const CARD_H = 308;
 
-function CardFace({ it, active }: { it: DeckItem; active: boolean }) {
+function CardFace({ it }: { it: DeckItem }) {
   return (
     <>
       <div className="absolute inset-0">
@@ -55,7 +47,7 @@ function CardFace({ it, active }: { it: DeckItem; active: boolean }) {
       <div className="absolute left-4 right-4 top-4 flex items-center justify-between">
         <span
           className="rounded-full px-2 py-0.5 text-[8px] font-bold"
-          style={{ background: it.badgeColor, color: it.badgeTextColor ?? TEXT }}
+          style={{ background: it.badgeColor, color: it.badgeTextColor ?? ON_GOLD }}
         >
           {it.badge}
         </span>
@@ -120,11 +112,8 @@ function CardFace({ it, active }: { it: DeckItem; active: boolean }) {
             </p>
             <p className="text-sm font-bold text-white">{it.price}</p>
           </div>
-          <div
-            className="flex h-9 w-9 items-center justify-center rounded-full"
-            style={{ background: active ? GOLD : "rgba(255,255,255,0.15)" }}
-          >
-            <svg className="rtl-flip" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={active ? TEXT : "white"} strokeWidth="2.5">
+          <div className="flex h-9 w-9 items-center justify-center rounded-full" style={{ background: GOLD }}>
+            <svg className="rtl-flip" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={ON_GOLD} strokeWidth="2.5">
               <polyline points="9 18 15 12 9 6" />
             </svg>
           </div>
@@ -166,7 +155,7 @@ export function CardDeckBase({
               boxShadow: "0 10px 30px rgba(0,0,0,0.35)",
             }}
           >
-            <CardFace it={it} active />
+            <CardFace it={it} />
           </button>
         ))}
       </div>
@@ -245,7 +234,7 @@ export function CityDeck({ onSearch }: { onSearch: (city?: string) => void }) {
     <CardDeckBase
       items={items}
       title={t("deck_popular_cities")}
-      onSelect={(i) => onSearch(POPULAR_CITIES[i].name)}
+      onSelect={(i) => onSearch(трК(POPULAR_CITIES[i].name))}
     />
   );
 }
