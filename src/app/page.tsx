@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import BottomNav from "@/components/bottom-nav";
 import SideMenu from "@/components/side-menu";
 import { HotelDetail, PlaceDetail, RestaurantDetail, RouteDetail } from "@/components/details";
@@ -30,6 +30,7 @@ import { инитТему } from "@/lib/settings";
 import type { Hotel, Place, PublicUser, Restaurant, Route, Tab } from "@/lib/types";
 import TripScreen from "@/components/screens/trip";
 import IntroCinematic from "@/components/intro-cinematic";
+import IntroLogo from "@/components/intro-logo";
 
 /**
  * Оболочка приложения.
@@ -57,6 +58,25 @@ type Detail =
  * мигало бы экраном входа тому, кто уже вошёл: сессия живёт в куке, и
  * узнать о ней можно только запросом.
  */
+/** Отметка на устройстве: человек уже входил — ему короткая заставка. */
+const ВХОДИЛ = "uzup.returning";
+
+// Хранилище браузера бывает закрыто (приватный режим) — тогда отметки
+// просто нет, и человек видит полную заставку.
+function входил(): boolean {
+  try {
+    return Boolean(localStorage.getItem(ВХОДИЛ));
+  } catch {
+    return false;
+  }
+}
+function запомнитьВход(да: boolean): void {
+  try {
+    if (да) localStorage.setItem(ВХОДИЛ, "1");
+    else запомнитьВход(false);
+  } catch {}
+}
+
 type Phase = "checking" | "splash" | "register" | "login" | "lang" | "interests" | "app";
 
 export default function Page() {
@@ -117,10 +137,23 @@ function App() {
   const isPremium = Boolean(user?.premiumUntil && new Date(user.premiumUntil).getTime() > Date.now());
   const [toast, setToast] = useState<string | null>(null);
 
-  // Кинематографичная заставка при запуске — полная версия каждый раз
-  // (с пролётом сквозь города). Оверлей поверх всего; навигация и сессия
-  // под ней работают как обычно, к моменту перехода приложение готово.
+  // Заставка при запуске. Оверлей поверх всего; навигация и сессия под
+  // ним работают как обычно, к моменту перехода приложение готово.
+  //
+  // Полный пролёт над городами — для новых людей. Кто уже входил, видит
+  // короткую: светящийся знак на чёрном. Ответа сервера «кто вошёл» не
+  // ждём — он приходит позже, чем начинается заставка, — а смотрим
+  // отметку на устройстве. Решаем до первой отрисовки: до этого момента
+  // на экране просто чёрный фон, с которого начинаются обе заставки.
+  const [заставка, setЗаставка] = useState<"полная" | "короткая" | null>(null);
   const [introDone, setIntroDone] = useState(false);
+  useLayoutEffect(() => {
+    setЗаставка(входил() ? "короткая" : "полная");
+  }, []);
+  // Отметка «уже входил» живёт, пока человек в аккаунте.
+  useEffect(() => {
+    if (user) запомнитьВход(true);
+  }, [user]);
   // Счётчик переходов между экранами — по нему решается показ
   // полноэкранной рекламы. Растёт при открытии карточек.
   const [navCount, setNavCount] = useState(0);
@@ -248,6 +281,7 @@ function App() {
 
   const logout = async () => {
     await fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
+    localStorage.removeItem(ВХОДИЛ);
     setUser(null);
     setPhase("splash");
     setTab("home");
@@ -295,7 +329,9 @@ function App() {
 
   return (
     <div className="device-shell">
-      {!introDone && <IntroCinematic onDone={() => setIntroDone(true)} />}
+      {!introDone && заставка === null && <div className="fixed inset-0 z-[100] bg-black" />}
+      {!introDone && заставка === "полная" && <IntroCinematic onDone={() => setIntroDone(true)} />}
+      {!introDone && заставка === "короткая" && <IntroLogo onDone={() => setIntroDone(true)} />}
       <NativeBack onBack={назадНаШаг} />
       <div className="device">
         {phase === "checking" && (

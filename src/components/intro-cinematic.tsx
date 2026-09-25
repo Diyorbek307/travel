@@ -17,6 +17,9 @@ import { useT } from "./lang-provider";
  *   5. Знак садится точь-в-точь на логотип шапки (по его реальным
  *      координатам) и подменяется им — приложение открыто.
  *
+ * Её видят только те, кто ещё не входил, поэтому надписи «Пропустить»
+ * нет — она спорила бы с кадром. Пропустить всё равно можно касанием.
+ *
  * Центрирование — через margin, а не классы translate: в Tailwind v4 они
  * задают отдельное свойство `translate`, которое складывалось с
  * transform из кадров и уводило знак влево-вверх.
@@ -34,7 +37,7 @@ const ФЛЕШ = [
 /** Маска в форме знака — сквозь неё видно город «внутри логотипа». */
 const МАСКА_SVG = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='${LOGO_D}' fill='white'/></svg>`;
 const МАСКА = `url("data:image/svg+xml,${encodeURIComponent(МАСКА_SVG)}")`;
-const маска = {
+export const маска = {
   WebkitMaskImage: МАСКА,
   maskImage: МАСКА,
   WebkitMaskSize: "100% 100%",
@@ -54,6 +57,30 @@ const УХОД = 820;
 /** Доля знака внутри квадрата viewBox 100×100 (знак 86 × 78.7). */
 const ЗНАК_Ш = 0.86;
 const ЗНАК_В = 0.787;
+
+/**
+ * Куда лететь знаку заставки, чтобы сесть ровно на логотип шапки.
+ * Берём видимый логотип с `data-brand-logo` и считаем сдвиг и масштаб
+ * от центра к центру. Логотипа на экране нет — null, тогда заставка
+ * просто растворяется.
+ */
+export function посадкаНаШапку(знак: Element): { origin: string; transform: string } | null {
+  const цель = Array.from(document.querySelectorAll<HTMLElement>("[data-brand-logo]")).find((e) => {
+    const r = e.getBoundingClientRect();
+    return r.width > 0 && r.height > 0;
+  });
+  if (!цель) return null;
+  const a = знак.getBoundingClientRect();
+  const b = цель.getBoundingClientRect();
+  const ax = a.left + a.width / 2;
+  const ay = a.top + a.height / 2;
+  const bx = b.left + b.width / 2;
+  const by = b.top + b.height / 2;
+  return {
+    origin: `${ax}px ${ay}px`,
+    transform: `translate(${bx - ax}px, ${by - ay}px) scale(${b.width / a.width})`,
+  };
+}
 
 export default function IntroCinematic({ onDone }: { onDone: () => void }) {
   const { t } = useT();
@@ -76,23 +103,10 @@ export default function IntroCinematic({ onDone }: { onDone: () => void }) {
     // Садимся на логотип шапки, только если белый знак уже на экране;
     // при раннем пропуске просто растворяемся.
     const прошло = performance.now() - старт.current;
-    const цель = Array.from(document.querySelectorAll<HTMLElement>("[data-brand-logo]")).find((e) => {
-      const r = e.getBoundingClientRect();
-      return r.width > 0 && r.height > 0;
-    });
-    const svg = логоRef.current;
-    if (прошло >= БЕЛЫЙ && цель && svg) {
+    const путь = логоRef.current && прошло >= БЕЛЫЙ ? посадкаНаШапку(логоRef.current) : null;
+    if (путь) {
       if (группаRef.current) группаRef.current.style.animationPlayState = "paused";
-      const a = svg.getBoundingClientRect();
-      const b = цель.getBoundingClientRect();
-      const ax = a.left + a.width / 2;
-      const ay = a.top + a.height / 2;
-      const bx = b.left + b.width / 2;
-      const by = b.top + b.height / 2;
-      setПосадка({
-        origin: `${ax}px ${ay}px`,
-        transform: `translate(${bx - ax}px, ${by - ay}px) scale(${b.width / a.width})`,
-      });
+      setПосадка(путь);
     }
     setУходит(true);
     window.setTimeout(onDone, УХОД);
@@ -199,13 +213,6 @@ export default function IntroCinematic({ onDone }: { onDone: () => void }) {
             {t("splash_tagline")}
           </p>
         </div>
-
-        <span
-          className="pointer-events-none absolute right-4 top-4 text-[10px] font-semibold uppercase tracking-widest"
-          style={{ color: "rgba(255,255,255,0.5)", animation: "intro-fill .6s ease .8s both" }}
-        >
-          Пропустить ›
-        </span>
       </div>
 
       {/* ── Знак. Обёртка посадки: в конце летит в логотип шапки. ── */}
