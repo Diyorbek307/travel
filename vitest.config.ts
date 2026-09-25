@@ -5,6 +5,6 @@ import { defineConfig } from "vitest/config";
 // импортировать модули, которые сами ссылаются на «@/…» (семена, хранилище).
 export default defineConfig({
   resolve: {
-    alias: { "@": path.resolve(__dirname, "src") },
+    alias: { "@": path.resolve(import.meta.dirname, "src") },
   },
 });
