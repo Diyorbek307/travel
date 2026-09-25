@@ -14,6 +14,8 @@ import { useGeo } from "@/components/geo-provider";
 import { дистанцияКм, ближайшийГород } from "@/data/geo";
 import { Badge, StarRow } from "../ui";
 import { AnimatedBg } from "@/components/animated-bg";
+import CityReel from "@/components/city-reel";
+import { ВИДЕО, ФОН_ВИДЕО, кадрыГорода } from "@/data/city-reels";
 import { AdInline } from "@/components/ads";
 
 /**
@@ -71,10 +73,21 @@ export function ExploreScreen({
   onTransport: () => void;
   onPractical: () => void;
 }) {
-  const { AUDIO, CITIES, HOTELS, PLACES, RESTAURANTS } = useAppContent();
+  const { AUDIO, CITIES, HOTELS, PLACES, POPULAR_CITIES, RESTAURANTS } = useAppContent();
   const { t, трК } = useT();
   const { pos } = useGeo();
   const рядом = ближайшийГород(pos);
+  const выбран = город ? CITIES.find((c) => c.name === город) : undefined;
+
+  /*
+   * Фон шапки — живой, как на главной. Выбран город — его ролик, а если
+   * своего видео у города нет, кадры его достопримечательностей с
+   * наездом. Все города — общий ролик об Узбекистане: на главной уже
+   * играет Самарканд, и здесь повторять его было бы скучно.
+   */
+  const фон: Фон = выбран
+    ? { кадры: кадрыГорода(выбран.name, выбран.img, { PLACES }), видео: ВИДЕО[выбран.name], alt: выбран.name }
+    : { кадры: POPULAR_CITIES.slice(0, 4).map((c) => c.img), видео: ФОН_ВИДЕО, alt: "Uzbekistan" };
 
   const вГороде = <T extends { city: string }>(список: T[]) =>
     город ? список.filter((x) => x.city === город) : список;
@@ -106,7 +119,12 @@ export function ExploreScreen({
           style={
             город === имя
               ? { background: SURFACE, color: GREEN }
-              : { background: "rgba(255,255,255,0.18)", color: "rgba(255,255,255,0.75)" }
+              : {
+                  background: "rgba(255,255,255,0.2)",
+                  color: "rgba(255,255,255,0.9)",
+                  backdropFilter: "blur(12px)",
+                  border: "1px solid rgba(255,255,255,0.25)",
+                }
           }
         >
           {имя === null ? t("ex_all_cities") : `${имя === рядом ? "📍 " : ""}${трК(имя)}`}
@@ -184,38 +202,18 @@ export function ExploreScreen({
         go: onPractical,
       },
     ];
-    const выбран = город ? CITIES.find((c) => c.name === город) : undefined;
-
     return (
       <div className="flex flex-col h-full" style={{ background: CREAM }}>
-        <Шапка кикер="HelloUZ" заголовок={t("explore_title")}>
+        <Шапка
+          кикер="HelloUZ"
+          заголовок={выбран ? трК(выбран.name) : t("explore_title")}
+          подзаголовок={выбран ? трК(выбран.sub) : undefined}
+          фон={фон}
+          высокая
+        >
           {чипыГородов}
         </Шапка>
         <div className="flex-1 overflow-y-auto hide-scroll p-4">
-          {выбран && (
-            <div className="relative mb-4 h-24 overflow-hidden rounded-2xl">
-              <img src={выбран.img} alt={трК(выбран.name)} className="h-full w-full object-cover" />
-              <div
-                className="absolute inset-0"
-                style={{ background: "linear-gradient(to right,rgba(0,0,0,0.65) 0%,transparent 75%)" }}
-              />
-              <div className="absolute inset-y-0 left-0 flex flex-col justify-center px-4">
-                <p className="text-lg font-bold text-white" style={{ fontFamily: "var(--font-heading)" }}>
-                  {трК(выбран.name)}
-                </p>
-                <p className="text-[11px] text-white/75">{трК(выбран.sub)}</p>
-              </div>
-              <button
-                onClick={() => onГород(null)}
-                aria-label={t("ex_all_cities")}
-                className="absolute right-2.5 top-2.5 flex h-7 w-7 items-center justify-center rounded-full text-sm text-white"
-                style={{ background: "rgba(0,0,0,0.35)", backdropFilter: "blur(8px)" }}
-              >
-                ✕
-              </button>
-            </div>
-          )}
-
           <p className="mb-3 text-base font-bold" style={{ color: TEXT, fontFamily: "var(--font-heading)" }}>
             {t("ex_sections")}
           </p>
@@ -270,7 +268,7 @@ export function ExploreScreen({
 
   return (
     <div className="flex flex-col h-full" style={{ background: CREAM }}>
-      <Шапка кикер="HelloUZ" заголовок={t(заголовки[раздел])} onBack={() => onРаздел(undefined)}>
+      <Шапка кикер="HelloUZ" заголовок={t(заголовки[раздел])} фон={фон} onBack={() => onРаздел(undefined)}>
         {раздел !== "cities" && чипыГородов}
       </Шапка>
       <div className="flex-1 overflow-y-auto hide-scroll p-4">
@@ -300,27 +298,55 @@ export function ExploreScreen({
   );
 }
 
-/** Зелёная шапка экрана: подпись, заголовок и ряд чипов под ними. */
+type Фон = { кадры: string[]; видео?: string; alt: string };
+
+/**
+ * Шапка экрана: живой фон (ролик или кадры города), подпись, заголовок и
+ * ряд чипов. На плитках она выше — там фон и есть украшение экрана; в
+ * списке ниже, чтобы не отнимать место у карточек. Пока ролик грузится
+ * (или кадров нет вовсе), под ним фирменная бирюза.
+ */
 function Шапка({
   кикер,
   заголовок,
+  подзаголовок,
+  фон,
+  высокая = false,
   onBack,
   children,
 }: {
   кикер: string;
   заголовок: string;
+  подзаголовок?: string;
+  фон: Фон;
+  высокая?: boolean;
   onBack?: () => void;
   children?: React.ReactNode;
 }) {
   const { t } = useT();
+  const естьФон = фон.кадры.length > 0 || Boolean(фон.видео);
   return (
     <div
-      className="relative pt-14 pb-3 overflow-hidden border-b"
+      className={`relative overflow-hidden border-b ${высокая ? "pt-28 pb-4" : "pt-14 pb-3"}`}
       style={{ borderColor: BORDER, background: ACCENT_FILL }}
     >
-      <div className="absolute inset-0 opacity-20">
-        <AnimatedBg />
-      </div>
+      {естьФон ? (
+        <>
+          {/* key — чтобы при смене города ролик или кадры начинались с первого кадра. */}
+          <CityReel key={фон.alt} кадры={фон.кадры} видео={фон.видео} alt={фон.alt} />
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(to bottom,rgba(0,0,0,0.35) 0%,rgba(0,0,0,0.1) 40%,rgba(0,0,0,0.65) 100%)",
+            }}
+          />
+        </>
+      ) : (
+        <div className="absolute inset-0 opacity-20">
+          <AnimatedBg />
+        </div>
+      )}
       <div className="relative z-10 px-4">
         <div className="mb-3 flex items-center gap-3">
           {onBack && (
@@ -328,7 +354,7 @@ function Шапка({
               onClick={onBack}
               aria-label={t("common_back")}
               className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl active:scale-95"
-              style={{ background: "rgba(255,255,255,0.18)" }}
+              style={{ background: "rgba(255,255,255,0.2)", backdropFilter: "blur(12px)" }}
             >
               <svg
                 className="rtl-flip"
@@ -356,6 +382,7 @@ function Шапка({
             >
               {заголовок}
             </h1>
+            {подзаголовок && <p className="truncate text-[11px] text-white/75">{подзаголовок}</p>}
           </div>
         </div>
         {children}
