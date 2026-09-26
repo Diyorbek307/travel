@@ -1,8 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import type { Hotel, HotelKind, ManagedRoute, Place, Restaurant, Route, Tab } from "@/lib/types";
-import { ACCENT_FILL, BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE, ON_GOLD } from "@/lib/theme";
+import {
+  ACCENT_FILL,
+  ACCENT_SOFT,
+  BORDER,
+  CREAM,
+  GOLD,
+  GREEN,
+  MUTED,
+  TEXT,
+  WHITE,
+  SURFACE,
+  ON_GOLD,
+} from "@/lib/theme";
 import { ТИПЫ_МЕСТ } from "@/data/content";
 import type { TKey } from "@/lib/i18n";
 import { useAppContent } from "@/components/content-provider";
@@ -158,10 +170,6 @@ export function ExploreScreen({
     const число = (n: number) => ({ под: String(n), пусто: n === 0 });
     const плитки: ПлиткаДанные[] = [
       { ключ: "cities", заголовок: t("ex_cities"), под: String(CITIES.length), go: () => onРаздел("cities") },
-      // Заглушка на будущее: настоящей 3D/VR-реконструкции городов ещё нет,
-      // но место в сетке зарезервировано — когда она появится, здесь
-      // достаточно будет заменить скоро на go с настоящим разделом.
-      { ключ: "vr", заголовок: t("ex_vr"), под: t("ex_vr_sub"), скоро: true, go: () => {} },
       { ключ: "hotels", заголовок: t("ex_stay"), ...число(отели.length), go: () => onРаздел("hotels") },
       {
         ключ: "restaurants",
@@ -182,6 +190,10 @@ export function ExploreScreen({
       { ключ: "ai", заголовок: t("ex_ai"), под: t("ex_ai_sub"), go: () => onРаздел("ai") },
       { ключ: "routes", заголовок: t("home_routes"), под: t("map_tab_ai"), go: () => onTab("map") },
       { ключ: "tips", заголовок: t("ex_tips"), под: t("home_practical_sub"), go: onPractical },
+      // Заглушка на будущее: настоящей 3D/VR-реконструкции городов ещё нет,
+      // но место в конце сетки зарезервировано — когда она появится, здесь
+      // достаточно будет заменить скоро на go с настоящим разделом.
+      { ключ: "vr", заголовок: t("ex_vr"), под: t("ex_vr_sub"), скоро: true, go: () => {} },
     ];
     return (
       <div className="flex flex-col h-full" style={{ background: CREAM }}>
@@ -301,7 +313,9 @@ function Плитка({ плитка, номер, lang }: { плитка: Пли
       aria-disabled={плитка.скоро}
       className="tile-in group relative flex h-[130px] flex-col items-start justify-start overflow-hidden rounded-[20px] border p-3.5 text-left transition-transform duration-150 active:scale-[0.97]"
       style={{
-        background: SURFACE,
+        // Будущий раздел чуть подкрашен фирменной бирюзой в углу: видно,
+        // что он особенный, но не кричит поверх соседних плиток.
+        background: плитка.скоро ? `linear-gradient(150deg, ${SURFACE} 55%, ${ACCENT_SOFT})` : SURFACE,
         borderColor: BORDER,
         boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
         opacity: плитка.пусто ? 0.6 : 1,
@@ -309,14 +323,6 @@ function Плитка({ плитка, номер, lang }: { плитка: Пли
         animationDelay: `${номер * 45}ms`,
       }}
     >
-      {плитка.скоро && (
-        <span
-          className="absolute right-3 top-3 z-10 rounded-full px-2 py-0.5 text-[9px] font-bold"
-          style={{ background: GOLD, color: ON_GOLD }}
-        >
-          {t("ex_soon_badge")}
-        </span>
-      )}
       <p
         lang={lang}
         className="relative z-10 text-[15px] font-bold leading-tight"
@@ -335,24 +341,26 @@ function Плитка({ плитка, номер, lang }: { плитка: Пли
       >
         {плитка.под}
       </p>
-      {плитка.скоро ? (
-        // Пока нет готовой иллюстрации — контурный значок, а не фотография:
-        // так видно, что раздел ещё не наполнен, а не что картинка не загрузилась.
-        <svg
-          aria-hidden
-          viewBox="0 0 64 64"
-          className="pointer-events-none absolute -bottom-[6%] -right-[6%] w-[46%] select-none opacity-25"
-          fill="none"
-          stroke={MUTED}
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
+      {плитка.скоро && (
+        // Мягкая метка в цветах бренда вместо яркой жёлтой плашки в углу:
+        // читается как «готовим», а не как предупреждение. Прижата к низу
+        // слева — так её не перекрывает иллюстрация справа.
+        <span
+          className="absolute bottom-3 left-3.5 z-10 inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[10px] font-semibold"
+          style={{ background: ACCENT_SOFT, color: GREEN }}
         >
-          <rect x="4" y="20" width="56" height="28" rx="11" />
-          <circle cx="20" cy="34" r="7" />
-          <circle cx="44" cy="34" r="7" />
-          <path d="M27 34h10" />
-        </svg>
+          <span className="relative flex h-1.5 w-1.5">
+            <span
+              className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-60"
+              style={{ background: GREEN }}
+            />
+            <span className="relative inline-flex h-1.5 w-1.5 rounded-full" style={{ background: GREEN }} />
+          </span>
+          {t("ex_soon_badge")}
+        </span>
+      )}
+      {плитка.скоро ? (
+        <ИллюстрацияVR />
       ) : (
         <img
           src={`/tiles/${плитка.ключ}.webp`}
@@ -363,6 +371,91 @@ function Плитка({ плитка, номер, lang }: { плитка: Пли
         />
       )}
     </button>
+  );
+}
+
+/**
+ * Иллюстрация к плитке «VR города»: очки в фирменной бирюзе, а в стёклах —
+ * купол и минарет на закатном небе, то есть «город внутри очков». Рисуем
+ * SVG, а не берём картинку: так она одинаково чёткая на любом экране и сама
+ * по себе объясняет раздел. Угол тот же, что у иллюстраций соседних
+ * плиток, но она чуть меньше и приподнята: под ней метка «Скоро».
+ *
+ * id градиентов уникальны на экземпляр (useId): одинаковые id в SVG на
+ * одной странице перебивают друг друга.
+ */
+function ИллюстрацияVR() {
+  const id = useId().replace(/:/g, "");
+  const линза = (cx: number) => (
+    <g>
+      <circle cx={cx} cy="60" r="15" fill={`url(#${id}sky)`} />
+      <g clipPath={`url(#${id}c${cx})`}>
+        {/* Солнце, а под ним силуэт: мечеть с куполом и тонкий минарет. */}
+        <circle cx={cx - 7} cy="53" r="3" fill="#FFF4D6" />
+        <g fill="#0B4F49">
+          <rect x={cx - 15} y="70" width="30" height="6" />
+          <rect x={cx - 9} y="63" width="12" height="8" />
+          <path d={`M${cx - 8} 63.5 a5 5 0 0 1 10 0 Z`} />
+          <rect x={cx - 3.5} y="55.5" width="1" height="3.5" />
+          <rect x={cx + 6} y="55" width="3" height="16" />
+          <path d={`M${cx + 5.5} 55 l2 -3.5 l2 3.5 Z`} />
+        </g>
+      </g>
+      <circle cx={cx} cy="60" r="15" fill="none" stroke="#ffffff" strokeOpacity="0.45" strokeWidth="1.5" />
+      <path
+        d={`M${cx - 9} 52 a11 11 0 0 1 8 -5`}
+        stroke="#ffffff"
+        strokeOpacity="0.7"
+        strokeWidth="2"
+        strokeLinecap="round"
+        fill="none"
+      />
+    </g>
+  );
+  return (
+    <svg
+      aria-hidden
+      viewBox="0 6 120 86"
+      className="pointer-events-none absolute bottom-[22%] -right-[3%] w-[50%] select-none transition-transform duration-300 group-hover:scale-105"
+      style={{ filter: "drop-shadow(0 6px 8px rgba(7,104,95,0.25))", transform: "rotate(-8deg)" }}
+    >
+      <defs>
+        <linearGradient id={`${id}body`} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#2FD0C6" />
+          <stop offset="0.55" stopColor="#0FB3AC" />
+          <stop offset="1" stopColor="#07685F" />
+        </linearGradient>
+        <linearGradient id={`${id}sky`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#F6D58A" />
+          <stop offset="1" stopColor="#E9955A" />
+        </linearGradient>
+        <clipPath id={`${id}c40`}>
+          <circle cx="40" cy="60" r="15" />
+        </clipPath>
+        <clipPath id={`${id}c80`}>
+          <circle cx="80" cy="60" r="15" />
+        </clipPath>
+      </defs>
+      {/* Ремешок за корпусом. */}
+      <rect x="2" y="52" width="116" height="14" rx="7" fill="#0b4f49" />
+      {/* Корпус очков. */}
+      <rect x="14" y="36" width="92" height="48" rx="20" fill={`url(#${id}body)`} />
+      <path
+        d="M26 40 h68 a14 14 0 0 1 8 3"
+        stroke="#ffffff"
+        strokeOpacity="0.35"
+        strokeWidth="3"
+        strokeLinecap="round"
+        fill="none"
+      />
+      {/* Переносица. */}
+      <path d="M51 84 q9 -11 18 0 Z" fill="#07685F" />
+      {линза(40)}
+      {линза(80)}
+      {/* Искры — «что-то новое». */}
+      <path d="M100 20 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2 Z" fill={GOLD} />
+      <path d="M86 12 l1.2 3 3 1.2 -3 1.2 -1.2 3 -1.2 -3 -3 -1.2 3 -1.2 Z" fill={GOLD} opacity="0.8" />
+    </svg>
   );
 }
 
