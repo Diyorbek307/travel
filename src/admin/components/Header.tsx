@@ -308,9 +308,10 @@ export default function Header({ active, разделы, onNavigate, sidebarColl
             type="submit"
             title="Выйти из панели"
             className="w-8 h-8 rounded flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity shrink-0"
-            style={{ background: "transparent", color: "var(--color-muted)", fontSize: "15px" }}
+            aria-label="Выйти из панели"
+            style={{ background: "transparent", color: "var(--color-muted)" }}
           >
-            ⎋
+            <Иконка имя="logout" size={17} />
           </button>
         </form>
       </header>

@@ -36,7 +36,8 @@ export type ИмяИконки =
   | "sun"
   | "moon"
   | "payment"
-  | "system";
+  | "system"
+  | "logout";
 
 /** Содержимое значков: только контуры, заливку и цвет задаёт обёртка. */
 const ФИГУРЫ: Record<ИмяИконки, React.ReactNode> = {
@@ -188,6 +189,12 @@ const ФИГУРЫ: Record<ИмяИконки, React.ReactNode> = {
     <>
       <circle cx="12" cy="12" r="9" />
       <path d="M12 11v5.5M12 7.5h.01" />
+    </>
+  ),
+  logout: (
+    <>
+      <path d="M9.5 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4.5" />
+      <path d="m16 17 5-5-5-5M21 12H9.5" />
     </>
   ),
 };
