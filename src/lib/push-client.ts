@@ -70,8 +70,18 @@ function вБайты(base64: string): Uint8Array<ArrayBuffer> {
   return байты;
 }
 
+/**
+ * Регистрация сервис-воркера. Сразу после первой загрузки он может ещё
+ * устанавливаться — тогда ждём его несколько секунд, а не отвечаем
+ * «push недоступен» человеку, который нажал «Включить» на экране входа.
+ */
 async function регистрация(): Promise<ServiceWorkerRegistration | null> {
-  return (await navigator.serviceWorker.getRegistration()) ?? null;
+  const есть = await navigator.serviceWorker.getRegistration();
+  if (есть) return есть;
+  return Promise.race([
+    navigator.serviceWorker.ready,
+    new Promise<null>((готово) => setTimeout(() => готово(null), 4000)),
+  ]);
 }
 
 async function отправитьПодписку(sub: PushSubscription, city: string | null): Promise<boolean> {
