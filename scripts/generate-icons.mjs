@@ -82,3 +82,22 @@ for (const { svg, имя } of нативные) {
     .toFile(path.join(ASSETS, имя));
   console.log(`assets/${имя.padEnd(17)} ${инфо.width}×${инфо.height}  ${(инфо.size / 1024).toFixed(1)} КБ`);
 }
+
+/*
+ * Значок push-уведомления для строки состояния Android. Android рисует его
+ * одним цветом по альфа-каналу: цветная плитка превратилась бы в белый
+ * квадрат. Поэтому — только белый знак на прозрачном, без фона.
+ */
+{
+  const размер = 96;
+  const альфа = await sharp(Buffer.from(безФона), { density: 384 })
+    .resize(размер, размер)
+    .ensureAlpha()
+    .extractChannel("alpha")
+    .toBuffer();
+  const инфо = await sharp({ create: { width: размер, height: размер, channels: 3, background: "#ffffff" } })
+    .joinChannel(альфа)
+    .png({ compressionLevel: 9 })
+    .toFile(path.join(OUT, "badge-96.png"));
+  console.log(`${"badge-96.png".padEnd(24)} ${инфо.width}×${инфо.height}  ${(инфо.size / 1024).toFixed(1)} КБ`);
+}

@@ -22,6 +22,12 @@ export interface Кампания {
    * «place:<id>», «hotel:<id>», «restaurant:<id>». Пусто — никуда.
    */
   link: string;
+  /**
+   * Картинка: большое фото в push на Android и в колокольчике приложения.
+   * Пусто — берём фото записи, на которую ведёт ссылка (гостиница,
+   * место, ресторан). iPhone картинок в push сайтов не показывает.
+   */
+  image?: string;
   audience: Аудитория;
   /** Срок показа включительно, даты «ГГГГ-ММ-ДД» по Ташкенту. */
   from: string;
@@ -114,5 +120,31 @@ export function ошибкаКампании(к: Partial<Кампания>): str
   if (!а || !["all", "premium", "city"].includes(а.kind)) return "Не выбрано, кому показывать";
   if (а.kind === "city" && !а.city) return "Не выбран город";
   if (к.link && !разобратьСсылку(к.link)) return "Ссылка на раздел не распознана";
+  if (к.image && !адресКартинкиГодится(к.image)) return "Картинка — ссылка https:// или путь на сайте";
   return null;
+}
+
+/** Картинку берём только по https или со своего сайта: http в push браузер не покажет. */
+function адресКартинкиГодится(адрес: string): boolean {
+  return /^https:\/\/\S+$/.test(адрес) || /^\/[^/\s]\S*$/.test(адрес);
+}
+
+/** Записи, у которых можно взять фото для уведомления. */
+export interface ИсточникиФото {
+  places: { id: string; img: string }[];
+  hotels: { id: string; img: string }[];
+  restaurants: { id: string; img: string }[];
+}
+
+/**
+ * Какую картинку показать: заданную редактором, а если её нет — фото
+ * записи, на которую ведёт ссылка. Так уведомление о гостинице само
+ * приходит с её фотографией, и редактору не нужно искать ссылку.
+ */
+export function картинкаКампании(к: Pick<Кампания, "image" | "link">, из: ИсточникиФото): string | undefined {
+  if (к.image) return к.image;
+  const п = разобратьСсылку(к.link);
+  if (!п || !("id" in п)) return undefined;
+  const список = п.kind === "place" ? из.places : п.kind === "hotel" ? из.hotels : из.restaurants;
+  return список.find((x) => x.id === п.id)?.img || undefined;
 }

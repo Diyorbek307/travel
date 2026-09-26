@@ -23,7 +23,12 @@ export type СостояниеPush =
   | "выключено"
   | "включено"
   /** Человек запретил уведомления в браузере: включить можно только там. */
-  | "запрещено";
+  | "запрещено"
+  /**
+   * iPhone, открытый во вкладке Safari. Push там есть, но только у
+   * приложения, добавленного на экран «Домой», — подсказываем, как.
+   */
+  | "нужен-экран-домой";
 
 let ключСервера: Promise<string | null> | null = null;
 
@@ -33,6 +38,16 @@ function открытыйКлюч(): Promise<string | null> {
     .then((d: { publicKey?: string | null }) => d.publicKey ?? null)
     .catch(() => null);
   return ключСервера;
+}
+
+/** iPhone или iPad во вкладке браузера, а не запущенный с экрана «Домой». */
+function айфонВоВкладке(): boolean {
+  if (typeof window === "undefined") return false;
+  const ios = /iPhone|iPad|iPod/.test(navigator.userAgent);
+  const сЭкрана =
+    (navigator as Navigator & { standalone?: boolean }).standalone === true ||
+    matchMedia("(display-mode: standalone)").matches;
+  return ios && !сЭкрана;
 }
 
 function браузерУмеет(): boolean {
@@ -77,6 +92,7 @@ export function usePush(city: string | null) {
     let живо = true;
     (async () => {
       const ключ = await открытыйКлюч();
+      if (ключ && айфонВоВкладке()) return живо && setСостояние("нужен-экран-домой");
       if (!ключ || !браузерУмеет()) return живо && setСостояние("недоступно");
       if (Notification.permission === "denied") return живо && setСостояние("запрещено");
       const рег = await регистрация();

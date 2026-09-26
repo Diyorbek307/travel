@@ -45,7 +45,7 @@ export async function getCampaign(id: string): Promise<Кампания | null> 
 /** Поля, которые задаёт редактор; остальное хранилище ставит само. */
 export type ПоляКампании = Pick<
   Кампания,
-  "title" | "body" | "emoji" | "link" | "audience" | "from" | "to" | "active"
+  "title" | "body" | "emoji" | "link" | "image" | "audience" | "from" | "to" | "active"
 >;
 
 export async function createCampaign(поля: ПоляКампании): Promise<Кампания> {

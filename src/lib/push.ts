@@ -106,6 +106,8 @@ export interface ПолезнаяНагрузка {
   /** Куда открыть приложение по нажатию: «/?open=<ссылка кампании>». */
   url: string;
   tag: string;
+  /** Большое фото под текстом — только Android; iPhone его не покажет. */
+  image?: string;
 }
 
 type Отправщик = (sub: Pick<Подписка, "endpoint" | "keys">, данные: string) => Promise<void>;
@@ -142,7 +144,7 @@ function кодОтвета(e: unknown): number | undefined {
  * разрешение или удалил браузер. Такие адреса удаляем сразу — стучаться
  * в пустой ящик при каждой рассылке бессмысленно.
  */
-export async function sendCampaign(к: Кампания): Promise<number> {
+export async function sendCampaign(к: Кампания, картинка?: string): Promise<number> {
   if (!pushГотов() && отправщик === отправитьЧерезСлужбу) return 0;
 
   const все = await подписки.read();
@@ -164,6 +166,7 @@ export async function sendCampaign(к: Кампания): Promise<number> {
     body: к.body,
     url: к.link ? `/?open=${encodeURIComponent(к.link)}` : "/",
     tag: к.id,
+    image: картинка,
   } satisfies ПолезнаяНагрузка);
 
   const мёртвые: string[] = [];

@@ -34,6 +34,7 @@ import type { Hotel, Place, PublicUser, Restaurant, Route, Tab } from "@/lib/typ
 import TripScreen from "@/components/screens/trip";
 import IntroCinematic from "@/components/intro-cinematic";
 import IntroLogo from "@/components/intro-logo";
+import PushAsk from "@/components/push-ask";
 
 /**
  * Оболочка приложения.
@@ -616,6 +617,8 @@ function App() {
             <AdInterstitial isPremium={isPremium} navCount={navCount} />
 
             <BottomNav tab={tab} onTab={switchTab} />
+            {/* Предложение включить уведомления: само решает, пора ли. */}
+            {!user ? null : <PushAsk />}
           </>
         )}
       </div>

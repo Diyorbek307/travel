@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
 import { отказЕсли } from "@/lib/admin-auth";
-import { ошибкаКампании, type Аудитория, идётСегодня, сегодняВТашкенте } from "@/lib/campaign-rules";
+import {
+  ошибкаКампании,
+  картинкаКампании,
+  type Аудитория,
+  идётСегодня,
+  сегодняВТашкенте,
+} from "@/lib/campaign-rules";
 import {
   createCampaign,
   deleteCampaign,
@@ -11,6 +17,7 @@ import {
   type ПоляКампании,
 } from "@/lib/campaigns";
 import { countSubscriptions, pushГотов, sendCampaign } from "@/lib/push";
+import { readContent } from "@/lib/store";
 
 export const dynamic = "force-dynamic";
 
@@ -45,6 +52,8 @@ function поля(body: Record<string, unknown>): Partial<ПоляКампани
     body: строка("body"),
     emoji: строка("emoji"),
     link: строка("link"),
+    // Пустая строка — «картинки нет»: её тоже сохраняем, чтобы можно было стереть.
+    image: typeof body.image === "string" ? body.image.trim() : undefined,
     from: строка("from"),
     to: строка("to"),
     audience,
@@ -60,7 +69,7 @@ async function разослатьЕсли(id: string, надо: boolean): Promis
   // Выключенную или не начавшуюся кампанию рассылать нельзя: push пришёл
   // бы, а в колокольчике её нет.
   if (!к || !идётСегодня(к, сегодняВТашкенте())) return null;
-  const ушло = await sendCampaign(к);
+  const ушло = await sendCampaign(к, картинкаКампании(к, await readContent()));
   await markPushed(id, ушло);
   return ушло;
 }

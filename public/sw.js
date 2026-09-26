@@ -149,7 +149,14 @@ self.addEventListener("push", (event) => {
     self.registration.showNotification(title, {
       body: данные.body || "",
       icon: "/icons/icon-192.png",
-      badge: "/icons/icon-192.png",
+      // Значок в строке состояния Android: белый силуэт, цветную плитку
+      // Android превратил бы в белый квадрат.
+      badge: "/icons/badge-96.png",
+      // Большое фото под текстом — Android; iPhone и компьютеры его пропустят.
+      image: данные.image || undefined,
+      // Кнопка под уведомлением — Android. На остальных нажатие на само
+      // уведомление делает то же самое.
+      actions: данные.url && данные.url !== "/" ? [{ action: "open", title: "Открыть" }] : [],
       // Одна кампания — одно уведомление: повторная рассылка заменяет прежнее.
       tag: данные.tag || undefined,
       data: { url: данные.url || "/" },
