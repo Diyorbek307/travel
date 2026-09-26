@@ -5,6 +5,7 @@ import { usePush } from "@/lib/push-client";
 import { useGeo } from "@/components/geo-provider";
 import { ближайшийГород } from "@/data/geo";
 import { useT } from "@/components/lang-provider";
+import type { TKey } from "@/lib/i18n";
 import { ACCENT_FILL, BORDER, MUTED, SURFACE, TEXT, WHITE, CREAM } from "@/lib/theme";
 
 /**
@@ -17,8 +18,11 @@ import { ACCENT_FILL, BORDER, MUTED, SURFACE, TEXT, WHITE, CREAM } from "@/lib/t
  * карточка, объясняющая, зачем уведомления, и системный вопрос только
  * после «Включить».
  *
- * Не сразу: через полминуты в приложении, когда человек уже огляделся.
- * Не назойливо: не чаще раза в неделю и не больше трёх раз всего.
+ * Первый раз — отдельным экраном сразу при входе (ЭкранУведомлений ниже):
+ * человек только что зарегистрировался или вошёл и настроен разобраться
+ * с приложением. Отказался — позже напомним карточкой (PushAsk), когда
+ * он уже огляделся. Не назойливо: не чаще раза в неделю и не больше трёх
+ * раз всего, экран входа тоже считается.
  */
 
 const КЛЮЧ = "uzup.push-ask";
@@ -40,13 +44,13 @@ function прочитать(): Отметка {
   }
 }
 
-function пораСпросить(): boolean {
+export function пораСпросить(): boolean {
   const { раз, когда } = прочитать();
   if (раз >= МАКС_РАЗ) return false;
   return !когда || Date.now() - Date.parse(когда) > ПАУЗА_МС;
 }
 
-function отметитьПоказ() {
+export function отметитьПоказ() {
   try {
     const { раз } = прочитать();
     localStorage.setItem(КЛЮЧ, JSON.stringify({ раз: раз + 1, когда: new Date().toISOString() }));
@@ -124,6 +128,91 @@ export default function PushAsk() {
             {t("push_enable")}
           </button>
         )}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Экран при входе: «Включите уведомления». Стоит между входом и
+ * приложением. Если спрашивать нечего — push не настроен, уже включён,
+ * запрещён в браузере или спрашивали недавно, — экран сразу пропускает
+ * дальше, и человек его не видит.
+ */
+export function ЭкранУведомлений({ onDone }: { onDone: () => void }) {
+  const { t } = useT();
+  const { pos } = useGeo();
+  const { состояние, занято, включить } = usePush(ближайшийГород(pos));
+  const подходит = состояние === "выключено" || состояние === "нужен-экран-домой";
+  const [показан, setПоказан] = useState(false);
+
+  useEffect(() => {
+    if (состояние === "проверка") return;
+    if (!подходит || !пораСпросить()) return onDone();
+    setПоказан(true);
+    отметитьПоказ();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [состояние]);
+
+  // Пока выясняем состояние — пустой фон того же цвета: без мигания.
+  if (!показан) return <div className="h-full" style={{ background: CREAM }} />;
+  const айфон = состояние === "нужен-экран-домой";
+
+  const польза: [string, TKey][] = [
+    ["🏷️", "push_b_deals"],
+    ["🎉", "push_b_events"],
+    ["🧳", "push_b_trip"],
+  ];
+
+  return (
+    <div className="animate-slide-up flex h-full flex-col px-6 pt-20 pb-8" style={{ background: CREAM }}>
+      <div className="flex flex-1 flex-col items-center text-center">
+        <div
+          className="mb-6 flex h-28 w-28 items-center justify-center rounded-[32px] text-6xl shadow-lg"
+          style={{ background: ACCENT_FILL }}
+        >
+          🔔
+        </div>
+        <h2 className="text-2xl font-bold" style={{ color: TEXT, fontFamily: "var(--font-heading)" }}>
+          {t("push_ask_title")}
+        </h2>
+        <p className="mt-2 max-w-xs text-sm leading-relaxed" style={{ color: MUTED }}>
+          {айфон ? t("push_ios_home") : t("push_ask_body")}
+        </p>
+        {!айфон && (
+          <div className="mt-7 w-full max-w-xs space-y-2.5 text-left">
+            {польза.map(([э, ключ]) => (
+              <div
+                key={ключ}
+                className="flex items-center gap-3 rounded-2xl border px-4 py-3"
+                style={{ background: SURFACE, borderColor: BORDER }}
+              >
+                <span className="text-xl">{э}</span>
+                <span className="text-sm font-medium" style={{ color: TEXT }}>
+                  {t(ключ)}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+      <div className="mx-auto w-full max-w-xs">
+        {!айфон && (
+          <button
+            disabled={занято}
+            onClick={async () => {
+              await включить();
+              onDone();
+            }}
+            className="w-full rounded-2xl py-4 text-sm font-bold disabled:opacity-60"
+            style={{ background: ACCENT_FILL, color: WHITE }}
+          >
+            {t("push_enable_full")}
+          </button>
+        )}
+        <button onClick={onDone} className="mt-2 w-full py-3 text-sm font-semibold" style={{ color: MUTED }}>
+          {айфон ? t("push_ask_ok") : t("push_not_now")}
+        </button>
       </div>
     </div>
   );

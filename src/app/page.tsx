@@ -34,7 +34,7 @@ import type { Hotel, Place, PublicUser, Restaurant, Route, Tab } from "@/lib/typ
 import TripScreen from "@/components/screens/trip";
 import IntroCinematic from "@/components/intro-cinematic";
 import IntroLogo from "@/components/intro-logo";
-import PushAsk from "@/components/push-ask";
+import PushAsk, { ЭкранУведомлений } from "@/components/push-ask";
 
 /**
  * Оболочка приложения.
@@ -81,7 +81,11 @@ function запомнитьВход(да: boolean): void {
   } catch {}
 }
 
-type Phase = "checking" | "splash" | "register" | "login" | "lang" | "interests" | "app";
+/*
+ * «push» — экран «Включите уведомления» между входом и приложением. Он сам
+ * пропускает дальше, если спрашивать нечего (см. components/push-ask).
+ */
+type Phase = "checking" | "splash" | "register" | "login" | "lang" | "interests" | "push" | "app";
 
 /** Вкладка при входе и та, куда ведёт «назад» с остальных. */
 const СТАРТ: Tab = "explore";
@@ -397,6 +401,8 @@ function App() {
     if (tab === "explore" && разделОбзора) return setРазделОбзора(undefined), true;
     if (phase === "register" || phase === "login") return setPhase("splash"), true;
     if (phase === "interests") return setPhase("lang"), true;
+    // «Назад» на экране уведомлений — то же, что «Не сейчас».
+    if (phase === "push") return setPhase("app"), true;
     if (phase === "app" && tab !== СТАРТ) return switchTab(СТАРТ), true;
     return false;
   }, [
@@ -454,7 +460,7 @@ function App() {
               onRegister={() => setPhase("register")}
               onDone={(u) => {
                 setUser(u);
-                setPhase("app");
+                setPhase("push");
               }}
             />
           </div>
@@ -468,7 +474,13 @@ function App() {
 
         {phase === "interests" && (
           <div className="overlay-screen device-safe-top absolute inset-0 z-40">
-            <OnboardingInterests onDone={() => setPhase("app")} />
+            <OnboardingInterests onDone={() => setPhase("push")} />
+          </div>
+        )}
+
+        {phase === "push" && (
+          <div className="overlay-screen device-safe-top absolute inset-0 z-40">
+            <ЭкранУведомлений onDone={() => setPhase("app")} />
           </div>
         )}
 
