@@ -158,6 +158,10 @@ export function ExploreScreen({
     const число = (n: number) => ({ под: String(n), пусто: n === 0 });
     const плитки: ПлиткаДанные[] = [
       { ключ: "cities", заголовок: t("ex_cities"), под: String(CITIES.length), go: () => onРаздел("cities") },
+      // Заглушка на будущее: настоящей 3D/VR-реконструкции городов ещё нет,
+      // но место в сетке зарезервировано — когда она появится, здесь
+      // достаточно будет заменить скоро на go с настоящим разделом.
+      { ключ: "vr", заголовок: t("ex_vr"), под: t("ex_vr_sub"), скоро: true, go: () => {} },
       { ключ: "hotels", заголовок: t("ex_stay"), ...число(отели.length), go: () => onРаздел("hotels") },
       {
         ключ: "restaurants",
@@ -270,6 +274,8 @@ type ПлиткаДанные = {
   заголовок: string;
   под: string;
   пусто?: boolean;
+  /** Раздела ещё нет — плитка неактивна и помечена «В разработке». */
+  скоро?: boolean;
   go: () => void;
 };
 
@@ -286,18 +292,31 @@ type ПлиткаДанные = {
  * переносы (\u00AD) по слогам.
  */
 function Плитка({ плитка, номер, lang }: { плитка: ПлиткаДанные; номер: number; lang: string }) {
+  const { t } = useT();
   return (
     <button
-      onClick={плитка.go}
+      onClick={плитка.скоро ? undefined : плитка.go}
+      // aria-disabled, а не disabled: карточка остаётся видна и читаема
+      // экранным диктором как «скоро», а не пропадает из фокуса совсем.
+      aria-disabled={плитка.скоро}
       className="tile-in group relative flex h-[130px] flex-col items-start justify-start overflow-hidden rounded-[20px] border p-3.5 text-left transition-transform duration-150 active:scale-[0.97]"
       style={{
         background: SURFACE,
         borderColor: BORDER,
         boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
         opacity: плитка.пусто ? 0.6 : 1,
+        cursor: плитка.скоро ? "default" : "pointer",
         animationDelay: `${номер * 45}ms`,
       }}
     >
+      {плитка.скоро && (
+        <span
+          className="absolute right-3 top-3 z-10 rounded-full px-2 py-0.5 text-[9px] font-bold"
+          style={{ background: GOLD, color: ON_GOLD }}
+        >
+          {t("ex_soon_badge")}
+        </span>
+      )}
       <p
         lang={lang}
         className="relative z-10 text-[15px] font-bold leading-tight"
@@ -316,13 +335,33 @@ function Плитка({ плитка, номер, lang }: { плитка: Пли
       >
         {плитка.под}
       </p>
-      <img
-        src={`/tiles/${плитка.ключ}.webp`}
-        alt=""
-        loading="lazy"
-        draggable={false}
-        className="pointer-events-none absolute -bottom-[10%] -right-[8%] aspect-square w-[60%] select-none object-contain transition-transform duration-300 group-hover:scale-105"
-      />
+      {плитка.скоро ? (
+        // Пока нет готовой иллюстрации — контурный значок, а не фотография:
+        // так видно, что раздел ещё не наполнен, а не что картинка не загрузилась.
+        <svg
+          aria-hidden
+          viewBox="0 0 64 64"
+          className="pointer-events-none absolute -bottom-[6%] -right-[6%] w-[46%] select-none opacity-25"
+          fill="none"
+          stroke={MUTED}
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <rect x="4" y="20" width="56" height="28" rx="11" />
+          <circle cx="20" cy="34" r="7" />
+          <circle cx="44" cy="34" r="7" />
+          <path d="M27 34h10" />
+        </svg>
+      ) : (
+        <img
+          src={`/tiles/${плитка.ключ}.webp`}
+          alt=""
+          loading="lazy"
+          draggable={false}
+          className="pointer-events-none absolute -bottom-[10%] -right-[8%] aspect-square w-[60%] select-none object-contain transition-transform duration-300 group-hover:scale-105"
+        />
+      )}
     </button>
   );
 }
