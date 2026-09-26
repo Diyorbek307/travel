@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useT } from "@/components/lang-provider";
 import { отметитьПрочитанным } from "@/lib/notifs-read";
-import { useУведомления, когда } from "@/lib/notifications";
+import { useУведомления, когда, отметитьКампании } from "@/lib/notifications";
 import type { Place } from "@/lib/types";
 import {
   ACCENT_FILL,
@@ -26,15 +26,29 @@ import { GeomPattern, StarRow } from "./ui";
 export function NotifsPanel({
   onClose,
   onOpen,
+  onLink,
 }: {
   onClose: () => void;
   onOpen: (раздел: "bookings" | "support") => void;
+  /** Переход по ссылке кампании из панели. */
+  onLink: (ссылка: string) => void;
 }) {
   const { t, lang } = useT();
   // Прочитанное хранится на устройстве: точка на колокольчике гаснет
   // вместе с отметкой, а не живёт своей жизнью.
   const notifs = useУведомления();
   const unread = notifs.filter((n) => n.unread).length;
+  /*
+   * Для счётчика «прочитали» в панели кампания прочитана, когда её
+   * увидели в открытом колокольчике: большинство читают текст и никуда не
+   * нажимают. Сервер считает каждого человека один раз, поэтому
+   * повторное открытие ничего не накручивает. Точка «не прочитано» на
+   * устройстве при этом гаснет только по нажатию, как и раньше.
+   */
+  const показанные = notifs.map((n) => n.id).join(",");
+  useEffect(() => {
+    if (показанные) отметитьКампании(показанные.split(","));
+  }, [показанные]);
   return (
     <div
       className="overlay-screen absolute inset-0 z-50 flex flex-col animate-slide-up"
@@ -55,7 +69,10 @@ export function NotifsPanel({
           <div className="flex items-center gap-3">
             {unread > 0 && (
               <button
-                onClick={() => отметитьПрочитанным(notifs.map((n) => n.id))}
+                onClick={() => {
+                  отметитьПрочитанным(notifs.map((n) => n.id));
+                  отметитьКампании(notifs.filter((n) => n.unread).map((n) => n.id));
+                }}
                 className="text-xs font-semibold"
                 style={{ color: GREEN }}
               >
@@ -81,8 +98,11 @@ export function NotifsPanel({
             key={n.id}
             onClick={() => {
               отметитьПрочитанным([n.id]);
+              if (n.unread) отметитьКампании([n.id]);
               if (n.раздел) {
                 onOpen(n.раздел);
+              } else if (n.ссылка) {
+                onLink(n.ссылка);
               }
             }}
             className="w-full bg-white rounded-2xl p-4 border text-left flex items-start gap-3 shadow-sm"

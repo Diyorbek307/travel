@@ -41,8 +41,20 @@ function видно(status: string | undefined, можно: string[]): boolean {
   return !status || можно.includes(status);
 }
 
+/**
+ * Пришёл ли ответ сервера (или стало ясно, что его не будет). До этого в
+ * данных только семена: запись, заведённая в панели, в них ещё не
+ * появилась, и ссылку на неё рано считать битой.
+ */
+const ContentReadyContext = createContext(false);
+
+export function useContentReady(): boolean {
+  return useContext(ContentReadyContext);
+}
+
 export function ContentProvider({ children }: { children: React.ReactNode }) {
   const [content, setContent] = useState<Content>(SEED);
+  const [готово, setГотово] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -54,13 +66,20 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
       .catch(() => {
         // Сети нет — остаёмся на семенах. Это полноценный набор, а не
         // заглушка, поэтому показывать ошибку туристу незачем.
+      })
+      .finally(() => {
+        if (!cancelled) setГотово(true);
       });
     return () => {
       cancelled = true;
     };
   }, []);
 
-  return <ContentContext.Provider value={content}>{children}</ContentContext.Provider>;
+  return (
+    <ContentContext.Provider value={content}>
+      <ContentReadyContext.Provider value={готово}>{children}</ContentReadyContext.Provider>
+    </ContentContext.Provider>
+  );
 }
 
 /**

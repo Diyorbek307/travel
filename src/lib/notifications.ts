@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useT } from "@/components/lang-provider";
 import { датаСловами } from "./i18n";
 import { useПрочитанные } from "./notifs-read";
+import { useGeo } from "@/components/geo-provider";
+import { ближайшийГород } from "@/data/geo";
 
 /**
  * Уведомления туриста — из того, что правда произошло.
@@ -13,8 +15,8 @@ import { useПрочитанные } from "./notifs-read";
  * по коду, который нигде не работает. Точка на колокольчике горела у
  * всех.
  *
- * Теперь уведомление — это ответ поддержки или решение по заявке на
- * бронь, плюс одно приветствие. Опрашиваем сервер раз в минуту: срочного
+ * Теперь уведомление — это ответ поддержки, решение по заявке на бронь,
+ * кампания из панели (раздел «Уведомления») и одно приветствие. Опрашиваем сервер раз в минуту: срочного
  * здесь нет, а поддержка всё равно отвечает не мгновенно.
  */
 
@@ -23,6 +25,8 @@ export interface Уведомление {
   emoji: string;
   /** Куда ведёт нажатие: раздел профиля. */
   раздел: "bookings" | "support" | null;
+  /** Ссылка кампании из панели: «explore:hotels», «place:<id>»… (см. lib/campaign-rules). */
+  ссылка?: string;
   title: string;
   body: string;
   /** Когда случилось — для подписи «5 минут назад». */
@@ -44,6 +48,36 @@ interface Сообщение {
   createdAt: string;
 }
 
+interface КампанияТуриста {
+  id: string;
+  title: string;
+  body: string;
+  emoji: string;
+  link: string;
+  from: string;
+  createdAt: string;
+}
+
+/** У кампаний в id приставка — по ней панель уведомлений узнаёт, что отметить на сервере. */
+export const ПРИСТАВКА_КАМПАНИИ = "cmp:";
+
+/**
+ * Отметить кампании прочитанными на сервере — для счётчика в панели.
+ * На устройстве отметка ставится отдельно (notifs-read); без входа
+ * сервер отказывает, и это нормально.
+ */
+export function отметитьКампании(ids: string[]) {
+  const свои = ids
+    .filter((id) => id.startsWith(ПРИСТАВКА_КАМПАНИИ))
+    .map((id) => id.slice(ПРИСТАВКА_КАМПАНИИ.length));
+  if (свои.length === 0) return;
+  fetch("/api/campaigns/read", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ids: свои }),
+  }).catch(() => undefined);
+}
+
 const ОПРОС_МС = 60_000;
 
 export function useУведомления(): Уведомление[] {
@@ -51,10 +85,18 @@ export function useУведомления(): Уведомление[] {
   const прочитанные = useПрочитанные();
   const [брони, setБрони] = useState<Бронь[]>([]);
   const [ответы, setОтветы] = useState<Сообщение[]>([]);
+  const [кампании, setКампании] = useState<КампанияТуриста[]>([]);
+  // Кампании «по городу» — для тех, кто сейчас в этом городе.
+  const { pos } = useGeo();
+  const город = ближайшийГород(pos);
 
   useEffect(() => {
     let живо = true;
     const подтянуть = () => {
+      fetch(`/api/campaigns${город ? `?city=${encodeURIComponent(город)}` : ""}`)
+        .then((r) => (r.ok ? r.json() : { campaigns: [] }))
+        .then((d: { campaigns?: КампанияТуриста[] }) => живо && setКампании(d.campaigns ?? []))
+        .catch(() => undefined);
       fetch("/api/bookings")
         .then((r) => (r.ok ? r.json() : { bookings: [] }))
         .then((d: { bookings?: Бронь[] }) => живо && setБрони(d.bookings ?? []))
@@ -73,9 +115,22 @@ export function useУведомления(): Уведомление[] {
       живо = false;
       clearInterval(таймер);
     };
-  }, []);
+  }, [город]);
 
   const список: Omit<Уведомление, "unread">[] = [
+    ...кампании.map((к) => ({
+      id: `${ПРИСТАВКА_КАМПАНИИ}${к.id}`,
+      emoji: к.emoji || "🔔",
+      раздел: null,
+      ссылка: к.link || undefined,
+      title: к.title,
+      body: к.body,
+      // «Когда пришло» — начало показа, но не раньше создания: кампания,
+      // заведённая днём на сегодня, не должна выглядеть утренней.
+      время: new Date(
+        Math.max(Date.parse(`${к.from}T00:00:00+05:00`), Date.parse(к.createdAt)),
+      ).toISOString(),
+    })),
     ...ответы
       .slice()
       .reverse()

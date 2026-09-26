@@ -6,7 +6,9 @@ import { useSyncExternalStore } from "react";
  * Настройки приложения — на устройстве (localStorage), переживают перезапуск.
  *
  * Тема применяется к <html data-theme>, остальное просто сохраняется и
- * отражается в интерфейсе. По умолчанию тема — как в системе телефона.
+ * отражается в интерфейсе. По умолчанию тема светлая: фотографии городов
+ * и иллюстрации плиток рассчитаны на светлый фон. Тёмную или «как в
+ * системе» человек выбирает сам в настройках.
  */
 
 export interface Настройки {
@@ -19,14 +21,22 @@ export interface Настройки {
   currency: string;
   /** Интересы из онбординга — по ним на главной первыми идут подходящие места. */
   interests: string[];
+  /**
+   * Выбирал ли человек тему сам. Раньше настройки сохранялись целиком, с
+   * theme: "system" по умолчанию, даже когда меняли только валюту, — по
+   * одному значению темы не отличить выбор от умолчания. Без отметки
+   * тема светлая.
+   */
+  themeChosen: boolean;
 }
 
 const ПОУМОЛЧАНИЮ: Настройки = {
-  theme: "system",
+  theme: "light",
   autoplay: false,
   units: "metric",
   currency: "USD",
   interests: [],
+  themeChosen: false,
 };
 
 const КЛЮЧ = "uzup.settings";
@@ -34,7 +44,8 @@ const КЛЮЧ = "uzup.settings";
 function прочитать(): Настройки {
   if (typeof localStorage === "undefined") return ПОУМОЛЧАНИЮ;
   try {
-    return { ...ПОУМОЛЧАНИЮ, ...JSON.parse(localStorage.getItem(КЛЮЧ) || "{}") };
+    const сохранено: Настройки = { ...ПОУМОЛЧАНИЮ, ...JSON.parse(localStorage.getItem(КЛЮЧ) || "{}") };
+    return сохранено.themeChosen ? сохранено : { ...сохранено, theme: "light" };
   } catch {
     return ПОУМОЛЧАНИЮ;
   }
@@ -53,7 +64,7 @@ export function применитьТему(t: "system" | "light" | "dark") {
 
 export function задатьНастройку<K extends keyof Настройки>(k: K, v: Настройки[K]) {
   if (typeof localStorage === "undefined") return;
-  const s: Настройки = { ...прочитать(), [k]: v };
+  const s: Настройки = { ...прочитать(), [k]: v, ...(k === "theme" ? { themeChosen: true } : {}) };
   localStorage.setItem(КЛЮЧ, JSON.stringify(s));
   снимок = s;
   if (k === "theme") применитьТему(v as "system" | "light" | "dark");

@@ -80,9 +80,19 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
+/** Та же логика, что в инитТему (lib/settings), но до загрузки React. */
+const ТЕМА_ДО_ОТРИСОВКИ = `try{var s=JSON.parse(localStorage.getItem("uzup.settings")||"{}");var t=s.themeChosen?s.theme:"light";if(t==="system")document.documentElement.removeAttribute("data-theme");else if(t==="dark")document.documentElement.setAttribute("data-theme","dark")}catch(e){}`;
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ru" className={rubik.variable}>
+    // Светлая тема стоит в разметке сразу, а скрипт ниже до первой
+    // отрисовки ставит выбранную человеком: без него тот, кто выбрал
+    // тёмную, видел бы вспышку светлого экрана при каждом запуске.
+    // suppressHydrationWarning — атрибут меняет этот скрипт, а не React.
+    <html lang="ru" className={rubik.variable} data-theme="light" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: ТЕМА_ДО_ОТРИСОВКИ }} />
+      </head>
       <body
         style={{
           fontFamily: "var(--font-sans), system-ui, sans-serif",
