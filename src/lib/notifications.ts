@@ -27,6 +27,8 @@ export interface Уведомление {
   раздел: "bookings" | "support" | null;
   /** Ссылка кампании из панели: «explore:hotels», «place:<id>»… (см. lib/campaign-rules). */
   ссылка?: string;
+  /** Фото кампании — крупно под текстом. */
+  картинка?: string;
   title: string;
   body: string;
   /** Когда случилось — для подписи «5 минут назад». */
@@ -56,6 +58,7 @@ interface КампанияТуриста {
   link: string;
   from: string;
   createdAt: string;
+  image: string | null;
 }
 
 /** У кампаний в id приставка — по ней панель уведомлений узнаёт, что отметить на сервере. */
@@ -123,6 +126,7 @@ export function useУведомления(): Уведомление[] {
       emoji: к.emoji || "🔔",
       раздел: null,
       ссылка: к.link || undefined,
+      картинка: к.image ?? undefined,
       title: к.title,
       body: к.body,
       // «Когда пришло» — начало показа, но не раньше создания: кампания,

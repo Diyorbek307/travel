@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { PageHeader, Badge, Btn, Table, склонение } from "./shared";
 import { useEntity } from "../context/useEntity";
 import {
+  картинкаКампании,
   ошибкаКампании,
   разобратьСсылку,
   сегодняВТашкенте,
@@ -27,6 +28,7 @@ type Черновик = {
   body: string;
   emoji: string;
   link: string;
+  image: string;
   audience: Аудитория;
   from: string;
   to: string;
@@ -43,6 +45,7 @@ function черновикНовый(): Черновик {
     body: "",
     emoji: "🔔",
     link: "explore",
+    image: "",
     audience: { kind: "all" },
     from: сегодня,
     to: сегодняВТашкенте(через),
@@ -50,6 +53,56 @@ function черновикНовый(): Черновик {
     sendPush: false,
   };
 }
+
+/**
+ * Шаблоны — чтобы не начинать с пустого листа. Короткий заголовок с
+ * эмодзи по смыслу и конкретика в тексте: на экране блокировки iPhone
+ * видно строки две, и «ПРИВЕТ» там теряется.
+ */
+const ШАБЛОНЫ: { имя: string; emoji: string; title: string; body: string; link: string }[] = [
+  {
+    имя: "Скидка",
+    emoji: "🏷️",
+    title: "Хостелы в Бухаре −20%",
+    body: "Только до воскресенья. Выберите хостел у Ляби-Хауза →",
+    link: "explore:hotels",
+  },
+  {
+    имя: "Новое место",
+    emoji: "📍",
+    title: "Новое в Самарканде",
+    body: "Бумажная фабрика «Мейрос»: сделайте шёлковую бумагу своими руками →",
+    link: "explore:places",
+  },
+  {
+    имя: "Событие",
+    emoji: "🎉",
+    title: "Праздник Навруз в эти выходные",
+    body: "Сумаляк, концерты и ярмарка ремёсел. Где и когда — внутри →",
+    link: "explore",
+  },
+  {
+    имя: "Где поесть",
+    emoji: "🍽️",
+    title: "Лучший плов рядом с вами",
+    body: "Подборка чайхан, где плов готовят с утра в казане →",
+    link: "explore:restaurants",
+  },
+  {
+    имя: "Экскурсия",
+    emoji: "🧭",
+    title: "Ичан-Кала пешком за 5 часов",
+    body: "Маршрут с гидом: от Ота-Дарвозы до минарета Ислам-Ходжа →",
+    link: "explore:excursions",
+  },
+  {
+    имя: "ИИ-гид",
+    emoji: "🤖",
+    title: "Спросите ИИ-гида",
+    body: "Куда пойти вечером, как доехать, что попробовать — ответит за секунду →",
+    link: "explore:ai",
+  },
+];
 
 /** Куда ведёт уведомление — выбор в форме. Вид и, если нужно, что именно. */
 const ВИДЫ_ССЫЛОК: { значение: string; подпись: string }[] = [
@@ -147,6 +200,7 @@ export default function PushCampaigns() {
             body: к.body,
             emoji: к.emoji,
             link: к.link,
+            image: к.image ?? "",
             audience: к.audience,
             from: к.from,
             to: к.to,
@@ -369,6 +423,42 @@ export default function PushCampaigns() {
               </button>
             </div>
 
+            {!черновик.id && (
+              <div className="mb-4">
+                <div className="text-xs mb-1.5" style={подписьСтиль}>
+                  НАЧАТЬ С ШАБЛОНА
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {ШАБЛОНЫ.map((ш) => (
+                    <button
+                      key={ш.имя}
+                      onClick={() =>
+                        setЧерновик(
+                          (d) =>
+                            d && {
+                              ...d,
+                              emoji: ш.emoji,
+                              title: ш.title,
+                              body: ш.body,
+                              link: ш.link,
+                              image: "",
+                            },
+                        )
+                      }
+                      className="rounded-full px-3 py-1 text-xs cursor-pointer transition-colors"
+                      style={{
+                        background: "var(--color-surface)",
+                        border: "1px solid var(--color-border)",
+                        color: "var(--color-text)",
+                      }}
+                    >
+                      {ш.emoji} {ш.имя}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <div className="grid grid-cols-1 sm:grid-cols-[80px_1fr] gap-3 mb-3">
               <label className="text-xs" style={подписьСтиль}>
                 ЭМОДЗИ
@@ -401,6 +491,20 @@ export default function PushCampaigns() {
                 className="mt-1 w-full rounded px-3 py-2 text-sm outline-none resize-none"
                 style={полеСтиль}
               />
+            </label>
+            <label className="text-xs block mb-3" style={подписьСтиль}>
+              КАРТИНКА — ССЫЛКА (НЕОБЯЗАТЕЛЬНО)
+              <input
+                value={черновик.image}
+                placeholder="https://… — пусто: фото записи из ссылки"
+                onChange={(e) => setЧерновик((d) => d && { ...d, image: e.target.value })}
+                className="mt-1 w-full rounded px-3 py-2 text-sm outline-none"
+                style={полеСтиль}
+              />
+              <span className="mt-1 block normal-case" style={{ fontFamily: "var(--font-body)" }}>
+                Видна в колокольчике приложения и крупно в push на Android. iPhone картинки в push сайтов не
+                показывает.
+              </span>
             </label>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
@@ -539,21 +643,13 @@ export default function PushCampaigns() {
               </span>
             </label>
 
-            {/* Предпросмотр — как уведомление выглядит у туриста. */}
-            <div
-              className="mt-4 mb-4 flex items-start gap-3 rounded-xl p-3"
-              style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }}
-            >
-              <span className="text-2xl">{черновик.emoji || "🔔"}</span>
-              <div className="min-w-0">
-                <div className="text-sm font-semibold" style={{ color: "var(--color-text)" }}>
-                  {черновик.title || "Заголовок"}
-                </div>
-                <div className="text-xs mt-0.5" style={{ color: "var(--color-muted)" }}>
-                  {черновик.body || "Текст уведомления"}
-                </div>
-              </div>
-            </div>
+            <ПредпросмотрPush
+              emoji={черновик.emoji}
+              title={черновик.title}
+              body={черновик.body}
+              картинка={картинкаКампании(черновик, { places, hotels, restaurants })}
+              ссылка={Boolean(черновик.link)}
+            />
 
             {ошибкаФормы && (
               <p className="mb-3 text-sm" style={{ color: "var(--color-rose)" }}>
@@ -580,6 +676,162 @@ export default function PushCampaigns() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+/**
+ * Предпросмотр — как уведомление увидит турист: на экране блокировки
+ * iPhone, в шторке Android и в колокольчике приложения. Рисуем по
+ * образцу систем, а не своим стилем: редактору важно понять, сколько
+ * текста влезет и где будет фото, а не как выглядит наша панель.
+ */
+function ПредпросмотрPush({
+  emoji,
+  title,
+  body,
+  картинка,
+  ссылка,
+}: {
+  emoji: string;
+  title: string;
+  body: string;
+  картинка?: string;
+  ссылка: boolean;
+}) {
+  const [вид, setВид] = useState<"iphone" | "android" | "app">("iphone");
+  const заголовок = `${emoji || "🔔"} ${title || "Заголовок"}`.trim();
+  const текст = body || "Текст уведомления";
+  const иконка = "/icons/icon-192.png";
+
+  return (
+    <div className="mt-4 mb-4">
+      <div className="flex items-center justify-between gap-2 mb-2">
+        <span className="text-xs" style={подписьСтиль}>
+          ПРЕДПРОСМОТР
+        </span>
+        <div
+          className="flex rounded-full p-0.5 text-xs"
+          style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }}
+        >
+          {(
+            [
+              ["iphone", "iPhone"],
+              ["android", "Android"],
+              ["app", "В приложении"],
+            ] as const
+          ).map(([к, подпись]) => (
+            <button
+              key={к}
+              onClick={() => setВид(к)}
+              className="rounded-full px-2.5 py-1 cursor-pointer"
+              style={
+                вид === к
+                  ? { background: "var(--color-amber)", color: "var(--color-on-accent)" }
+                  : { color: "var(--color-muted)" }
+              }
+            >
+              {подпись}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Фон «экрана телефона» — одинаковый во всех темах панели: так
+          предпросмотр показывает телефон, а не нашу тему. */}
+      <div
+        className="rounded-2xl p-4"
+        style={{
+          background:
+            вид === "android"
+              ? "linear-gradient(160deg,#1f2a30,#0d1418)"
+              : вид === "app"
+              ? "#f3f6f5"
+              : "linear-gradient(160deg,#3b4a54,#15202a 70%)",
+        }}
+      >
+        {вид === "iphone" && (
+          <>
+            <div className="text-center text-4xl font-semibold text-white/85 mb-3 tracking-tight">12:47</div>
+            <div
+              className="flex items-start gap-2.5 rounded-2xl p-3"
+              style={{ background: "rgba(40,40,45,0.62)", backdropFilter: "blur(12px)" }}
+            >
+              <img src={иконка} alt="" className="h-9 w-9 rounded-lg flex-shrink-0" />
+              <div className="min-w-0 flex-1">
+                <div className="flex items-baseline justify-between gap-2">
+                  <span className="truncate text-[13px] font-semibold text-white">{заголовок}</span>
+                  <span className="flex-shrink-0 text-[11px] text-white/50">сейчас</span>
+                </div>
+                <div className="text-[12px] text-white/60">from HelloUZ</div>
+                <div className="line-clamp-4 text-[13px] leading-snug text-white">{текст}</div>
+              </div>
+            </div>
+            <p className="mt-2 text-center text-[11px] text-white/45">
+              iPhone не показывает картинку и кнопки — только заголовок и текст.
+            </p>
+          </>
+        )}
+
+        {вид === "android" && (
+          <div className="overflow-hidden rounded-2xl" style={{ background: "#f7f9f9" }}>
+            <div className="flex items-start gap-2.5 p-3">
+              <img src={иконка} alt="" className="h-8 w-8 rounded-full flex-shrink-0" />
+              <div className="min-w-0 flex-1">
+                <div className="text-[11px]" style={{ color: "#5f6b70" }}>
+                  Chrome · uzbekistan-travel.onrender.com · сейчас
+                </div>
+                <div className="truncate text-[14px] font-semibold" style={{ color: "#1b1f21" }}>
+                  {заголовок}
+                </div>
+                <div className="line-clamp-2 text-[13px] leading-snug" style={{ color: "#3c4447" }}>
+                  {текст}
+                </div>
+              </div>
+            </div>
+            {картинка ? (
+              <img src={картинка} alt="" className="h-36 w-full object-cover" />
+            ) : (
+              <div className="px-3 pb-2 text-[11px]" style={{ color: "#8a9599" }}>
+                Без картинки. Задайте ссылку на фото или выберите запись в «Куда ведёт».
+              </div>
+            )}
+            {ссылка && (
+              <div className="px-3 py-2.5 text-[13px] font-semibold" style={{ color: "#0e7a72" }}>
+                Открыть
+              </div>
+            )}
+          </div>
+        )}
+
+        {вид === "app" && (
+          <div
+            className="flex items-start gap-3 rounded-2xl bg-white p-3.5"
+            style={{ border: "1.5px solid #0fb3ac", boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}
+          >
+            <div
+              className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl text-xl"
+              style={{ background: "#e3f6f4" }}
+            >
+              {emoji || "🔔"}
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="text-[14px] font-bold" style={{ color: "#13201f" }}>
+                {title || "Заголовок"}
+              </div>
+              <div className="mt-0.5 text-[12px] leading-relaxed" style={{ color: "#5d6b6a" }}>
+                {текст}
+              </div>
+              {картинка && (
+                <img src={картинка} alt="" className="mt-2.5 h-32 w-full rounded-xl object-cover" />
+              )}
+              <div className="mt-1.5 text-[10px]" style={{ color: "#0e8f88" }}>
+                только что
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

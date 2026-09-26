@@ -5,8 +5,9 @@ import { useМеня } from "../context/MeContext";
 import { useContent } from "../context/ContentContext";
 import { ROLE_META } from "@/lib/admin-roles";
 import { logout } from "@/app/admin/actions";
+import { Иконка, type ИмяИконки } from "../icons";
 
-const ICON: Record<Notif["id"], string> = { sos: "🆘", booking: "◫", chat: "◈" };
+const ICON: Record<Notif["id"], ИмяИконки> = { sos: "sos", booking: "bookings", chat: "chat" };
 const ICON_COLOR: Record<Notif["id"], string> = {
   sos: "var(--color-rose)",
   booking: "var(--color-teal)",
@@ -150,7 +151,7 @@ export default function Header({ active, разделы, onNavigate, sidebarColl
             minWidth: "180px",
           }}
         >
-          <span style={{ fontSize: "12px" }}>⌕</span>
+          <Иконка имя="search" size={13} />
           <span className="min-w-0 flex-1 text-left text-xs">Поиск…</span>
           <kbd
             className="text-xs px-1.5 py-0.5 rounded"
@@ -174,7 +175,7 @@ export default function Header({ active, разделы, onNavigate, sidebarColl
               border: "1px solid transparent",
             }}
           >
-            <span style={{ color: "var(--color-muted)", fontSize: "14px" }}>◈</span>
+            <Иконка имя="push" size={17} style={{ color: "var(--color-muted)" }} />
             {unreadCount > 0 && (
               <span
                 className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 rounded-full flex items-center justify-center text-xs font-bold px-1"
@@ -256,7 +257,7 @@ export default function Header({ active, разделы, onNavigate, sidebarColl
                       className="w-7 h-7 rounded-full flex items-center justify-center text-sm shrink-0 mt-0.5"
                       style={{ background: мягко(ICON_COLOR[n.id], 12), color: ICON_COLOR[n.id] }}
                     >
-                      {ICON[n.id]}
+                      <Иконка имя={ICON[n.id]} size={15} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex flex-wrap items-start justify-between gap-2">
@@ -332,7 +333,7 @@ export default function Header({ active, разделы, onNavigate, sidebarColl
               className="flex flex-wrap items-center gap-3 px-4 py-3"
               style={{ borderBottom: "1px solid var(--color-border)" }}
             >
-              <span style={{ color: "var(--color-muted)", fontSize: "16px" }}>⌕</span>
+              <Иконка имя="search" size={17} style={{ color: "var(--color-muted)" }} />
               <input
                 ref={searchRef}
                 type="text"

@@ -35,6 +35,7 @@ import AccessControl from "./components/AccessControl";
 import Staff from "./components/Staff";
 import { можетРаздел, ROLE_META } from "@/lib/admin-roles";
 import { МеняКонтекст, type Меня } from "./context/MeContext";
+import { Иконка, type ИмяИконки } from "./icons";
 import { LogoMark } from "@/components/ui";
 
 /** Две буквы для кружка-аватара. Пусто — «AD». */
@@ -61,53 +62,56 @@ function инициалы(имя?: string): string {
  * коде (в `pages` ниже) — раздел вернётся в меню, как только за ним
  * появится реальный источник данных.
  */
-const NAV_GROUPS = [
+const NAV_GROUPS: {
+  label: string;
+  items: { id: string; label: string; icon: ИмяИконки; badge?: boolean }[];
+}[] = [
   {
     label: "Операции",
     items: [
-      { id: "dashboard", label: "Дашборд", icon: "⬡" },
-      { id: "sos", label: "SOS-сигналы", icon: "🆘" },
-      { id: "bookings", label: "Бронирования", icon: "◫" },
-      { id: "chat", label: "Чат поддержки", icon: "◈", badge: true },
-      { id: "analytics", label: "Аналитика", icon: "◎" },
+      { id: "dashboard", label: "Дашборд", icon: "dashboard" },
+      { id: "sos", label: "SOS-сигналы", icon: "sos" },
+      { id: "bookings", label: "Бронирования", icon: "bookings" },
+      { id: "chat", label: "Чат поддержки", icon: "chat", badge: true },
+      { id: "analytics", label: "Аналитика", icon: "analytics" },
     ],
   },
   {
     label: "Контент",
     items: [
-      { id: "destinations", label: "Места и музеи", icon: "◉" },
-      { id: "tours", label: "Туры и экскурсии", icon: "◎" },
-      { id: "hotels", label: "Гостиницы", icon: "▣" },
-      { id: "restaurants", label: "Рестораны и бары", icon: "◇" },
-      { id: "events", label: "События", icon: "◈" },
-      { id: "audio", label: "Аудиогиды", icon: "◉" },
-      { id: "cities", label: "Города", icon: "⬡" },
-      { id: "push", label: "Уведомления", icon: "◉" },
+      { id: "destinations", label: "Места и музеи", icon: "destinations" },
+      { id: "tours", label: "Туры и экскурсии", icon: "tours" },
+      { id: "hotels", label: "Гостиницы", icon: "hotels" },
+      { id: "restaurants", label: "Рестораны и бары", icon: "restaurants" },
+      { id: "events", label: "События", icon: "events" },
+      { id: "audio", label: "Аудиогиды", icon: "audio" },
+      { id: "cities", label: "Города", icon: "cities" },
+      { id: "push", label: "Уведомления", icon: "push" },
     ],
   },
   {
     label: "Пользователи",
     items: [
-      { id: "users", label: "Пользователи", icon: "◎" },
-      { id: "reviews", label: "Отзывы", icon: "◇" },
+      { id: "users", label: "Пользователи", icon: "users" },
+      { id: "reviews", label: "Отзывы", icon: "reviews" },
     ],
   },
   {
     label: "Монетизация",
-    items: [{ id: "ads", label: "Реклама", icon: "◈" }],
+    items: [{ id: "ads", label: "Реклама", icon: "ads" }],
   },
   {
     label: "Инструменты",
     items: [
-      { id: "preview", label: "Превью приложения", icon: "◎" },
-      { id: "theme", label: "Визуальный редактор", icon: "◈" },
+      { id: "preview", label: "Превью приложения", icon: "preview" },
+      { id: "theme", label: "Визуальный редактор", icon: "theme" },
     ],
   },
   {
     label: "Аккаунт",
     items: [
-      { id: "staff", label: "Сотрудники", icon: "◈" },
-      { id: "settings", label: "Настройки", icon: "▣" },
+      { id: "staff", label: "Сотрудники", icon: "staff" },
+      { id: "settings", label: "Настройки", icon: "settings" },
     ],
   },
 ];
@@ -283,7 +287,7 @@ export default function AdminShell() {
                     color: "var(--color-muted)",
                   }}
                 >
-                  {isDark ? "☀" : "☾"}
+                  <Иконка имя={isDark ? "sun" : "moon"} size={14} />
                 </button>
               )}
             </div>
@@ -320,7 +324,7 @@ export default function AdminShell() {
                         marginBottom: "1px",
                       }}
                     >
-                      <span className="text-sm w-4 text-center shrink-0">{item.icon}</span>
+                      <Иконка имя={item.icon} size={16} />
                       {!sidebarCollapsed && (
                         <>
                           <span className="flex-1 whitespace-nowrap overflow-hidden">{item.label}</span>

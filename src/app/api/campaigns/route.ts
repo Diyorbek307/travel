@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { campaignsFor } from "@/lib/campaigns";
+import { картинкаКампании } from "@/lib/campaign-rules";
+import { readContent } from "@/lib/store";
 import { currentUser } from "@/lib/session";
 import { premiumАктивен } from "@/lib/users";
 
@@ -15,17 +17,21 @@ export const dynamic = "force-dynamic";
 export async function GET(request: Request) {
   const city = new URL(request.url).searchParams.get("city")?.trim() || null;
   const user = await currentUser();
-  const campaigns = await campaignsFor({ premium: user ? premiumАктивен(user) : false, city });
+  const [campaigns, content] = await Promise.all([
+    campaignsFor({ premium: user ? premiumАктивен(user) : false, city }),
+    readContent(),
+  ]);
   return NextResponse.json(
     {
-      campaigns: campaigns.map(({ id, title, body, emoji, link, from, createdAt }) => ({
-        id,
-        title,
-        body,
-        emoji,
-        link,
-        from,
-        createdAt,
+      campaigns: campaigns.map((к) => ({
+        id: к.id,
+        title: к.title,
+        body: к.body,
+        emoji: к.emoji,
+        link: к.link,
+        from: к.from,
+        createdAt: к.createdAt,
+        image: картинкаКампании(к, content) ?? null,
       })),
     },
     { headers: { "Cache-Control": "no-store" } },

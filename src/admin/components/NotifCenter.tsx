@@ -1,4 +1,5 @@
 import { мягко } from "@/lib/theme";
+import { Иконка, type ИмяИконки } from "../icons";
 import { useState } from "react";
 import { PageHeader, Badge, Btn, ДемоРаздел } from "./shared";
 
@@ -136,13 +137,13 @@ const TYPE_COLORS: Record<string, string> = {
   chat: "#7a8fff",
 };
 
-const TYPE_ICONS: Record<string, string> = {
-  booking: "◫",
-  review: "◇",
-  payment: "▣",
-  system: "⬡",
-  alert: "◉",
-  chat: "◈",
+const TYPE_ICONS: Record<string, ИмяИконки> = {
+  booking: "bookings",
+  review: "reviews",
+  payment: "payment",
+  system: "system",
+  alert: "sos",
+  chat: "chat",
 };
 
 const ACTION_NAV: Record<string, string> = {
@@ -255,7 +256,7 @@ export default function NotifCenter({ onNavigate }: { onNavigate?: (page: string
                 className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-base"
                 style={{ background: мягко(TYPE_COLORS[n.type], 13), color: TYPE_COLORS[n.type] }}
               >
-                {TYPE_ICONS[n.type]}
+                <Иконка имя={TYPE_ICONS[n.type] ?? "system"} size={15} />
               </div>
 
               <div className="flex-1 min-w-0">
@@ -301,7 +302,7 @@ export default function NotifCenter({ onNavigate }: { onNavigate?: (page: string
                   color: TYPE_COLORS[selected.type],
                 }}
               >
-                {TYPE_ICONS[selected.type]}
+                <Иконка имя={TYPE_ICONS[selected.type] ?? "system"} size={18} />
               </div>
 
               <Badge

@@ -126,6 +126,16 @@ export function NotifsPanel({
               <p className="text-xs mt-0.5 leading-relaxed whitespace-pre-line" style={{ color: MUTED }}>
                 {n.body}
               </p>
+              {n.картинка && (
+                // Фото кампании — как в push на Android: крупно, во всю ширину.
+                <img
+                  src={n.картинка}
+                  alt=""
+                  loading="lazy"
+                  className="mt-2.5 h-32 w-full rounded-xl object-cover"
+                  style={{ background: CREAM }}
+                />
+              )}
               {n.время && (
                 <p className="text-[10px] mt-1.5" style={{ color: n.unread ? GREEN : MUTED }}>
                   {когда(n.время, lang)}
