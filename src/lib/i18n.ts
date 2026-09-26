@@ -446,6 +446,13 @@ export const СЛОВАРЬ = {
   hk_hotel: row("Hotel", "Отель", "Mehmonxona", "酒店", "호텔", "Hotel", "Hôtel", "ホテル", "Otel", "فندق"),
   hk_motel: row("Motel", "Мотель", "Motel", "汽车旅馆", "모텔", "Motel", "Motel", "モーテル", "Motel", "موتيل"),
   hk_hostel: row("Hostel", "Хостел", "Hostel", "青年旅舍", "호스텔", "Hostel", "Auberge", "ホステル", "Hostel", "نُزُل"),
+  push_title: row("Notifications", "Уведомления", "Bildirishnomalar", "通知", "알림", "Benachrichtigungen", "Notifications", "通知", "Bildirimler", "الإشعارات"),
+  push_sub: row("Deals and trip news", "Скидки и новости поездки", "Chegirmalar va sayohat yangiliklari", "优惠和行程消息", "할인 및 여행 소식", "Angebote und Reise-News", "Offres et actualités du voyage", "お得な情報と旅のお知らせ", "İndirimler ve gezi haberleri", "عروض وأخبار الرحلة"),
+  push_enable: row("Turn on", "Включить", "Yoqish", "开启", "켜기", "Einschalten", "Activer", "オンにする", "Aç", "تفعيل"),
+  push_disable: row("Turn off", "Выключить", "O'chirish", "关闭", "끄기", "Ausschalten", "Désactiver", "オフにする", "Kapat", "إيقاف"),
+  push_on: row("On — we'll let you know about news", "Включены — сообщим о новостях", "Yoqilgan — yangiliklar haqida xabar beramiz", "已开启——有消息会通知你", "켜짐 — 소식을 알려드려요", "An — wir melden uns bei Neuigkeiten", "Activées — nous vous tiendrons informé", "オン — お知らせします", "Açık — haberleri bildireceğiz", "مفعّلة — سنخبرك بالجديد"),
+  push_failed: row("Couldn't turn on — try again later", "Не удалось включить — попробуйте позже", "Yoqib bo'lmadi — keyinroq urinib ko'ring", "无法开启，请稍后再试", "켜지 못했어요. 나중에 다시 시도하세요", "Hat nicht geklappt — später erneut versuchen", "Échec — réessayez plus tard", "オンにできませんでした。後でもう一度お試しください", "Açılamadı — daha sonra tekrar deneyin", "تعذّر التفعيل — حاول لاحقًا"),
+  push_denied: row("Blocked in browser settings", "Запрещены в настройках браузера", "Brauzer sozlamalarida taqiqlangan", "已在浏览器设置中禁止", "브라우저 설정에서 차단됨", "In den Browsereinstellungen blockiert", "Bloquées dans les réglages du navigateur", "ブラウザの設定でブロックされています", "Tarayıcı ayarlarında engellendi", "محظورة في إعدادات المتصفح"),
   explore_empty: row("Nothing in this category yet", "В этой категории пока пусто", "Bu turkumda hozircha bo'sh", "该分类暂时没有内容", "이 분류는 아직 비어 있어요", "In dieser Kategorie ist noch nichts", "Rien dans cette catégorie", "このカテゴリはまだ空です", "Bu kategoride henüz bir şey yok", "لا شيء في هذه الفئة بعد"),
   /* Действия в настройках: обновления, поделиться, оценка, удаление. */
   upd_checking: row("Checking…", "Проверяем…", "Tekshiryapmiz…", "检查中…", "확인 중…", "Prüfe…", "Vérification…", "確認中…", "Kontrol ediliyor…", "جارٍ التحقق…"),

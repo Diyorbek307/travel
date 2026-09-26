@@ -33,6 +33,9 @@ import { Badge } from "../ui";
 import { CurrencyConverter } from "@/components/screens/practical";
 import { AdInline } from "@/components/ads";
 import { faqТексты, условияТекст, политикаТекст } from "@/data/legal";
+import { usePush } from "@/lib/push-client";
+import { useGeo } from "@/components/geo-provider";
+import { ближайшийГород } from "@/data/geo";
 
 /** Переключатель настройки. */
 function Toggle({ on, set }: { on: boolean; set: (v: boolean) => void }) {
@@ -94,6 +97,53 @@ function Row({
     <div className="flex items-center gap-3 py-3 border-b last:border-0" style={{ borderColor: BORDER }}>
       {внутри}
     </div>
+  );
+}
+
+/**
+ * Push-уведомления: разрешение спрашиваем только по этой кнопке, а не при
+ * входе (см. lib/push-client). Пока на сервере нет ключей или браузер не
+ * умеет push, строки нет вовсе — мёртвая кнопка хуже никакой.
+ */
+function СтрокаУведомлений() {
+  const { t } = useT();
+  const { pos } = useGeo();
+  const { состояние, занято, включить, выключить } = usePush(ближайшийГород(pos));
+  // Отказ службы браузера (нет сети, push выключен в системе) иначе
+  // выглядел бы как кнопка, которая ничего не делает.
+  const [неВышло, setНеВышло] = useState(false);
+  if (состояние === "проверка" || состояние === "недоступно") return null;
+  const кнопка = (подпись: string, действие: () => void, основная: boolean) => (
+    <button
+      onClick={действие}
+      disabled={занято}
+      className="flex-shrink-0 rounded-lg px-3 py-1.5 text-xs font-bold disabled:opacity-50"
+      style={основная ? { background: ACCENT_FILL, color: WHITE } : { background: CREAM, color: MUTED }}
+    >
+      {подпись}
+    </button>
+  );
+  return (
+    <Row
+      icon="🔔"
+      label={t("push_title")}
+      sub={
+        состояние === "включено"
+          ? t("push_on")
+          : состояние === "запрещено"
+          ? t("push_denied")
+          : неВышло
+          ? t("push_failed")
+          : t("push_sub")
+      }
+      right={
+        состояние === "включено"
+          ? кнопка(t("push_disable"), выключить, false)
+          : состояние === "выключено"
+          ? кнопка(t("push_enable"), () => void включить().then((ок) => setНеВышло(!ок)), true)
+          : null
+      }
+    />
   );
 }
 
@@ -485,6 +535,7 @@ export function SettingsView({
           sub={t("s_autoplay_sub")}
           right={<Toggle on={нст.autoplay} set={(v) => задатьНастройку("autoplay", v)} />}
         />
+        <СтрокаУведомлений />
         <Row
           icon="💱"
           label={t("s_currency")}

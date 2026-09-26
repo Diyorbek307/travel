@@ -129,3 +129,53 @@ async function trim(cache, limit) {
   if (keys.length <= limit) return;
   await Promise.all(keys.slice(0, keys.length - limit).map((k) => cache.delete(k)));
 }
+
+/*
+ * Push: уведомление от кампании из панели (см. src/lib/push.ts).
+ *
+ * Показываем всегда, даже если данных не разобрать: браузеры наказывают
+ * воркер, который получил push и ничего не показал, — следующие могут не
+ * дойти вовсе.
+ */
+self.addEventListener("push", (event) => {
+  let данные = {};
+  try {
+    данные = event.data ? event.data.json() : {};
+  } catch {
+    данные = { body: event.data ? event.data.text() : "" };
+  }
+  const title = данные.title || "HelloUZ";
+  event.waitUntil(
+    self.registration.showNotification(title, {
+      body: данные.body || "",
+      icon: "/icons/icon-192.png",
+      badge: "/icons/icon-192.png",
+      // Одна кампания — одно уведомление: повторная рассылка заменяет прежнее.
+      tag: данные.tag || undefined,
+      data: { url: данные.url || "/" },
+    }),
+  );
+});
+
+/*
+ * Нажатие на уведомление: открыть приложение на нужном разделе.
+ *
+ * Если приложение уже открыто, не плодим вторую вкладку — разворачиваем
+ * открытую и передаём ей, куда перейти. Иначе открываем новую по адресу
+ * «/?open=…», его разбирает сама страница.
+ */
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const url = new URL((event.notification.data && event.notification.data.url) || "/", self.location.origin);
+  const открыть = url.searchParams.get("open");
+  event.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((окна) => {
+      const своё = окна.find((о) => new URL(о.url).origin === self.location.origin);
+      if (своё) {
+        if (открыть) своё.postMessage({ type: "open", link: открыть });
+        return своё.focus();
+      }
+      return self.clients.openWindow(url.href);
+    }),
+  );
+});

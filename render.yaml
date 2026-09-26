@@ -43,9 +43,20 @@ services:
       - key: MAIL_FROM
         sync: false
 
-      # AI-гид в профиле. Без ключа гид отвечает только на быстрые
+      # ИИ-гид в разделе HelloUZ. Без ключа гид отвечает только на быстрые
       # вопросы-подсказки. Ключ — на console.anthropic.com.
       - key: ANTHROPIC_API_KEY
+        sync: false
+
+      # Push-уведомления на телефон. Ключи: npx web-push generate-vapid-keys
+      # (один раз — при смене все подписки устройств отвалятся). SUBJECT —
+      # mailto:адрес для связи со службой браузера. Без всех трёх push
+      # выключен, уведомления видны только в колокольчике приложения.
+      - key: VAPID_PUBLIC_KEY
+        sync: false
+      - key: VAPID_PRIVATE_KEY
+        sync: false
+      - key: VAPID_SUBJECT
         sync: false
 
       # Адрес лендинга (например https://hellouz.uz): ему разрешено

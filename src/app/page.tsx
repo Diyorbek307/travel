@@ -17,11 +17,14 @@ import FavoritesScreen from "@/components/screens/favorites";
 import RouteView from "@/components/route-view";
 import { MiniPlayer, Toast } from "@/components/widgets";
 import { AdInterstitial } from "@/components/ads";
-import { ContentProvider } from "@/components/content-provider";
+import { ContentProvider, useAppContent, useContentReady } from "@/components/content-provider";
 import { LangProvider } from "@/components/lang-provider";
 import { WeatherProvider } from "@/components/weather-provider";
 import { CurrencyProvider } from "@/components/currency-provider";
-import { GeoProvider } from "@/components/geo-provider";
+import { GeoProvider, useGeo } from "@/components/geo-provider";
+import { ближайшийГород } from "@/data/geo";
+import { useГородПодписки } from "@/lib/push-client";
+import { разобратьСсылку } from "@/lib/campaign-rules";
 import { AudioPlayerProvider } from "@/components/audio-player";
 import { AuthSplash, LoginScreen, RegisterScreen } from "@/components/auth-screens";
 import NativeBack from "@/components/native-back";
@@ -79,6 +82,9 @@ function запомнитьВход(да: boolean): void {
 
 type Phase = "checking" | "splash" | "register" | "login" | "lang" | "interests" | "app";
 
+/** Вкладка при входе и та, куда ведёт «назад» с остальных. */
+const СТАРТ: Tab = "explore";
+
 export default function Page() {
   return (
     <ContentProvider>
@@ -100,7 +106,9 @@ export default function Page() {
 function App() {
   const [phase, setPhase] = useState<Phase>("checking");
   const [user, setUser] = useState<PublicUser | null>(null);
-  const [tab, setTab] = useState<Tab>("home");
+  // Приложение открывается на HelloUZ — сетке разделов: за ней человек и
+  // приходит (город, где поесть, где жить). Главная — на своей вкладке.
+  const [tab, setTab] = useState<Tab>(СТАРТ);
   const [detail, setDetail] = useState<Detail | null>(null);
   /*
    * Код на табличке ведёт на «/?audio=<номер>». Большинство людей снимают
@@ -110,6 +118,17 @@ function App() {
    * заново, даже когда человек давно занят другим.
    */
   const [кодЗаписи, setКодЗаписи] = useState<string | null>(null);
+  /*
+   * Ссылка из уведомления, которую ещё не открыли: приложение могло
+   * стартовать с неё раньше, чем человек вошёл, а данные пришли с сервера.
+   */
+  const [ссылкаЖдёт, setСсылкаЖдёт] = useState<string | null>(null);
+  const { PLACES, HOTELS, RESTAURANTS } = useAppContent();
+  const данныеГотовы = useContentReady();
+  const { pos } = useGeo();
+  // Город у push-подписки освежаем при каждом открытии: кампании «по
+  // городу» должны приходить туда, где человек сейчас.
+  useГородПодписки(ближайшийГород(pos));
 
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState(""); // предзаполнение поиска (напр. клик по городу)
@@ -227,6 +246,40 @@ function App() {
     переход();
   };
   const openПуть = (название: string, город: string) => setDetail({ kind: "путь", название, город });
+
+  /*
+   * Переход по ссылке кампании — из колокольчика или push. Запись могли
+   * удалить после рассылки: тогда открываем её раздел, а не пустоту.
+   */
+  const openLink = (ссылка: string) => {
+    const п = разобратьСсылку(ссылка);
+    if (!п) return;
+    switch (п.kind) {
+      case "explore":
+        return openExplore(п.раздел as РазделОбзора | undefined);
+      case "map":
+      case "profile":
+        return switchTab(п.kind);
+      case "place": {
+        const место = PLACES.find((x) => x.id === п.id);
+        if (!место) return openExplore("places");
+        switchTab("explore");
+        return openPlace(место);
+      }
+      case "hotel": {
+        const отель = HOTELS.find((x) => x.id === п.id);
+        if (!отель) return openExplore("hotels");
+        switchTab("explore");
+        return openHotel(отель);
+      }
+      case "restaurant": {
+        const заведение = RESTAURANTS.find((x) => x.id === п.id);
+        if (!заведение) return openExplore("restaurants");
+        switchTab("explore");
+        return openRestaurant(заведение);
+      }
+    }
+  };
   /*
    * Вход по адресу: QR-код ведёт на `?audio=<id>`, а ярлыки приложения на
    * домашнем экране телефона — на `?tab=<вкладка>` (долгое нажатие по
@@ -239,6 +292,12 @@ function App() {
     const id = п.get("audio");
     const вкладка = п.get("tab");
     const вкладки: Tab[] = ["home", "explore", "map", "audio", "profile"];
+    // Нажатие на push-уведомление открывает «/?open=<ссылка кампании>».
+    const открыть = п.get("open");
+    if (открыть) {
+      setСсылкаЖдёт(открыть);
+      п.delete("open");
+    }
 
     if (id) {
       setКодЗаписи(id);
@@ -247,7 +306,7 @@ function App() {
     } else if (вкладка && (вкладки as string[]).includes(вкладка)) {
       setTab(вкладка as Tab);
     }
-    if (!id && !вкладка) return;
+    if (!id && !вкладка && !открыть) return;
 
     п.delete("tab");
     const хвост = п.toString();
@@ -279,6 +338,27 @@ function App() {
     setTabKey((k) => k + 1);
   };
 
+  // Ссылку из уведомления открываем, когда человек уже в приложении и
+  // данные пришли с сервера — иначе свежая запись из панели не нашлась бы.
+  useEffect(() => {
+    if (phase !== "app" || !ссылкаЖдёт || !данныеГотовы) return;
+    openLink(ссылкаЖдёт);
+    setСсылкаЖдёт(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase, ссылкаЖдёт, данныеГотовы]);
+
+  // Приложение уже открыто, и человек нажал на push: service worker не
+  // открывает вторую вкладку, а присылает сюда, куда перейти.
+  useEffect(() => {
+    if (!("serviceWorker" in navigator)) return;
+    const принять = (e: MessageEvent) => {
+      const д = e.data as { type?: string; link?: unknown } | null;
+      if (д?.type === "open" && typeof д.link === "string") setСсылкаЖдёт(д.link);
+    };
+    navigator.serviceWorker.addEventListener("message", принять);
+    return () => navigator.serviceWorker.removeEventListener("message", принять);
+  }, []);
+
   const openExplore = (раздел?: РазделОбзора) => {
     switchTab("explore");
     // После switchTab: он сбрасывает раздел, а нам нужен выбранный.
@@ -290,7 +370,7 @@ function App() {
     localStorage.removeItem(ВХОДИЛ);
     setUser(null);
     setPhase("splash");
-    setTab("home");
+    setTab(СТАРТ);
     setDetail(null);
     setShowMenu(false);
   };
@@ -316,7 +396,7 @@ function App() {
     if (tab === "explore" && разделОбзора) return setРазделОбзора(undefined), true;
     if (phase === "register" || phase === "login") return setPhase("splash"), true;
     if (phase === "interests") return setPhase("lang"), true;
-    if (phase === "app" && tab !== "home") return switchTab("home"), true;
+    if (phase === "app" && tab !== СТАРТ) return switchTab(СТАРТ), true;
     return false;
   }, [
     showSearch,
@@ -405,6 +485,7 @@ function App() {
             )}
             {showNotifs && (
               <NotifsPanel
+                onLink={openLink}
                 onClose={() => setShowNotifs(false)}
                 onOpen={(раздел) => {
                   switchTab("profile");

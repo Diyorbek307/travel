@@ -85,6 +85,8 @@ const РАЗДЕЛ_ДОСТУП: Record<string, AdminRole[]> = {
   audio: ["owner", "editor"],
   cities: ["owner", "editor"],
   theme: ["owner", "editor"],
+  // Уведомления туристам — тоже содержимое: пишет редактор.
+  push: ["owner", "editor"],
   // Монетизация и сотрудники — владелец.
   ads: ["owner"],
   staff: ["owner"],
