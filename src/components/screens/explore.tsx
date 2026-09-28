@@ -198,6 +198,15 @@ export function ExploreScreen({
       // но место в конце сетки зарезервировано — когда она появится, здесь
       // достаточно будет заменить скоро на go с настоящим разделом.
       { ключ: "vr", заголовок: t("ex_vr"), под: t("ex_vr_sub"), скоро: true, go: () => {} },
+      // Тоже будущее: говорящий ИИ-гид по фото и переводчик с камеры.
+      { ключ: "photo", заголовок: t("ex_photo"), под: t("ex_photo_sub"), скоро: true, go: () => {} },
+      {
+        ключ: "translate",
+        заголовок: t("ex_translate"),
+        под: t("ex_translate_sub"),
+        скоро: true,
+        go: () => {},
+      },
     ];
     const по = (ключ: string) => плитки.find((п) => п.ключ === ключ)!;
     // Сквозной номер для «лесенки» появления через все группы.
@@ -228,9 +237,11 @@ export function ExploreScreen({
           {ГРУППЫ.map((г) => (
             <section key={г.заголовок} className="mb-5">
               <h2
-                className="mb-2.5 text-base font-bold"
+                className="mb-2.5 flex items-center gap-2 text-base font-bold"
                 style={{ color: TEXT, fontFamily: "var(--font-heading)" }}
               >
+                {/* Цветная метка группы — того же цвета, что свечение в её плитках. */}
+                <span className="h-4 w-1 rounded-full" style={{ background: г.метка }} />
                 {t(г.заголовок)}
               </h2>
               <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -243,14 +254,12 @@ export function ExploreScreen({
                     // Нечётная последняя плитка на телефоне — во всю ширину,
                     // иначе рядом с ней зияла бы дыра.
                     широкая={г.ключи.length % 2 === 1 && i === г.ключи.length - 1}
+                    тон={г.тон}
                   />
                 ))}
               </div>
             </section>
           ))}
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-            <Плитка плитка={по("vr")} номер={порядок++} lang={lang} широкая />
-          </div>
 
           <div className="mt-4">
             <AdInline isPremium={isPremium} cities={город ? [город] : рядом ? [рядом] : undefined} />
@@ -313,11 +322,33 @@ export function ExploreScreen({
   );
 }
 
-/** Группы плиток на экране HelloUZ. ИИ-гид и VR стоят отдельно. */
-const ГРУППЫ: { заголовок: TKey; ключи: string[] }[] = [
-  { заголовок: "ex_group_see", ключи: ["places", "museums", "excursions", "routes"] },
-  { заголовок: "ex_group_stay", ключи: ["hotels", "restaurants", "bars"] },
-  { заголовок: "ex_group_road", ключи: ["cities", "transport", "tips"] },
+/** Группы плиток на экране HelloUZ. ИИ-гид стоит отдельно, над ними. */
+const ГРУППЫ: { заголовок: TKey; ключи: string[]; тон: string; метка: string }[] = [
+  {
+    заголовок: "ex_group_see",
+    ключи: ["places", "museums", "excursions", "routes"],
+    тон: "var(--accent-soft)",
+    метка: "var(--accent)",
+  },
+  {
+    заголовок: "ex_group_stay",
+    ключи: ["hotels", "restaurants", "bars"],
+    тон: "var(--accent-2-soft)",
+    метка: "var(--accent-2)",
+  },
+  {
+    заголовок: "ex_group_road",
+    ключи: ["cities", "transport", "tips"],
+    тон: "rgba(96, 165, 250, 0.14)",
+    метка: "#60A5FA",
+  },
+  // Будущие разделы вместе, отдельной группой: их не спутать с работающими.
+  {
+    заголовок: "ex_group_soon",
+    ключи: ["photo", "translate", "vr"],
+    тон: "var(--accent-soft)",
+    метка: "var(--accent)",
+  },
 ];
 
 /**
@@ -429,10 +460,13 @@ function Плитка({
   номер,
   lang,
   широкая = false,
+  тон,
 }: {
   плитка: ПлиткаДанные;
   номер: number;
   lang: string;
+  /** Цвет мягкого свечения за иллюстрацией — свой у каждой группы. */
+  тон?: string;
   /** Во всю ширину в две колонки — для нечётной последней плитки группы. */
   широкая?: boolean;
 }) {
@@ -449,7 +483,14 @@ function Плитка({
       style={{
         // Будущий раздел чуть подкрашен фирменной бирюзой в углу: видно,
         // что он особенный, но не кричит поверх соседних плиток.
-        background: плитка.скоро ? `linear-gradient(150deg, ${SURFACE} 55%, ${ACCENT_SOFT})` : SURFACE,
+        // Мягкое пятно света за иллюстрацией: плитка кажется объёмной, а
+        // у каждой группы свой оттенок. Будущий раздел — ещё и с бирюзой
+        // по диагонали: видно, что он особенный.
+        background: плитка.скоро
+          ? `radial-gradient(circle at 88% 82%, ${
+              тон ?? ACCENT_SOFT
+            }, transparent 58%), linear-gradient(150deg, ${SURFACE} 55%, ${ACCENT_SOFT})`
+          : `radial-gradient(circle at 88% 82%, ${тон ?? ACCENT_SOFT}, transparent 58%), ${SURFACE}`,
         borderColor: BORDER,
         boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
         opacity: плитка.пусто ? 0.6 : 1,
@@ -470,7 +511,9 @@ function Плитка({
       </p>
       <p
         lang={lang}
-        className="relative z-10 mt-1 line-clamp-2 max-w-[55%] text-[10px] leading-snug"
+        className={`relative z-10 mt-1 text-[10px] leading-snug ${
+          плитка.скоро ? "line-clamp-3 max-w-[62%]" : "line-clamp-2 max-w-[55%]"
+        }`}
         style={{ color: MUTED, hyphens: "auto" }}
       >
         {плитка.под}
@@ -494,7 +537,7 @@ function Плитка({
         </span>
       )}
       {плитка.скоро ? (
-        <ИллюстрацияVR />
+        <ИллюстрацияСкоро ключ={плитка.ключ} широкая={широкая} />
       ) : (
         <img
           src={`/tiles/${плитка.ключ}.webp`}
@@ -520,7 +563,7 @@ function Плитка({
  * id градиентов уникальны на экземпляр (useId): одинаковые id в SVG на
  * одной странице перебивают друг друга.
  */
-function ИллюстрацияVR() {
+function ИллюстрацияVR({ широкая }: { широкая: boolean }) {
   const id = useId().replace(/:/g, "");
   const линза = (cx: number) => (
     <g>
@@ -552,7 +595,9 @@ function ИллюстрацияVR() {
     <svg
       aria-hidden
       viewBox="0 6 120 86"
-      className="pointer-events-none absolute bottom-[22%] -right-[3%] w-[50%] select-none transition-transform duration-300 group-hover:scale-105"
+      className={`pointer-events-none absolute bottom-[22%] right-[3%] select-none transition-transform duration-300 group-hover:scale-105 ${ширинаСкоро(
+        широкая,
+      )}`}
       style={{ filter: "drop-shadow(0 6px 8px rgba(7,104,95,0.25))", transform: "rotate(-8deg)" }}
     >
       <defs>
@@ -592,6 +637,138 @@ function ИллюстрацияVR() {
       <path d="M100 20 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2 Z" fill={GOLD} />
       <path d="M86 12 l1.2 3 3 1.2 -3 1.2 -1.2 3 -1.2 -3 -3 -1.2 3 -1.2 Z" fill={GOLD} opacity="0.8" />
     </svg>
+  );
+}
+
+/** Иллюстрация будущего раздела — по ключу плитки. */
+function ИллюстрацияСкоро({ ключ, широкая }: { ключ: string; широкая: boolean }) {
+  if (ключ === "photo") return <ИллюстрацияФото широкая={широкая} />;
+  if (ключ === "translate") return <ИллюстрацияПереводчик широкая={широкая} />;
+  return <ИллюстрацияVR широкая={широкая} />;
+}
+
+/** Общая рамка иллюстраций «скоро»: тот же угол и размер, что у VR. */
+/** Ширина иллюстрации «скоро»: на широкой плитке — меньше, иначе она обрезается. */
+const ширинаСкоро = (широкая: boolean) => (широкая ? "w-[32%] sm:w-[24%] lg:w-[50%]" : "w-[50%]");
+
+function СвгСкоро({ children, широкая }: { children: React.ReactNode; широкая: boolean }) {
+  return (
+    <svg
+      aria-hidden
+      viewBox="0 6 120 86"
+      className={`pointer-events-none absolute bottom-[22%] right-[3%] select-none transition-transform duration-300 group-hover:scale-105 ${ширинаСкоро(
+        широкая,
+      )}`}
+      style={{ filter: "drop-shadow(0 6px 8px rgba(7,104,95,0.25))", transform: "rotate(-8deg)" }}
+    >
+      {children}
+    </svg>
+  );
+}
+
+/**
+ * Фото-гид: камера смотрит на купол и минарет, а справа — звуковые волны:
+ * ИИ рассказывает о снятом вслух.
+ */
+function ИллюстрацияФото({ широкая }: { широкая: boolean }) {
+  const id = useId().replace(/:/g, "");
+  return (
+    <СвгСкоро широкая={широкая}>
+      <defs>
+        <linearGradient id={`${id}b`} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#2FD0C6" />
+          <stop offset="0.55" stopColor="#0FB3AC" />
+          <stop offset="1" stopColor="#07685F" />
+        </linearGradient>
+        <linearGradient id={`${id}s`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#F6D58A" />
+          <stop offset="1" stopColor="#E9955A" />
+        </linearGradient>
+        <clipPath id={`${id}l`}>
+          <circle cx="48" cy="58" r="16" />
+        </clipPath>
+      </defs>
+      {/* Корпус камеры и видоискатель. */}
+      <rect x="30" y="28" width="22" height="10" rx="4" fill="#07685F" />
+      <rect x="12" y="34" width="72" height="50" rx="14" fill={`url(#${id}b)`} />
+      <path d="M22 40 h52" stroke="#ffffff" strokeOpacity="0.35" strokeWidth="3" strokeLinecap="round" />
+      {/* Объектив, а в нём — купол и минарет на закате. */}
+      <circle cx="48" cy="58" r="19" fill="#0b4f49" />
+      <circle cx="48" cy="58" r="16" fill={`url(#${id}s)`} />
+      <g clipPath={`url(#${id}l)`} fill="#0B4F49">
+        <rect x="32" y="66" width="32" height="8" />
+        <rect x="40" y="59" width="13" height="8" />
+        <path d="M40.5 59.5 a6 6 0 0 1 12 0 Z" />
+        <rect x="56" y="50" width="3.5" height="18" />
+        <path d="M55.5 50 l2.2 -4 l2.2 4 Z" />
+      </g>
+      <circle cx="48" cy="58" r="16" fill="none" stroke="#ffffff" strokeOpacity="0.45" strokeWidth="1.5" />
+      {/* Вспышка. */}
+      <rect x="68" y="40" width="9" height="5" rx="2" fill={GOLD} />
+      {/* Звук: ИИ рассказывает о снятом. */}
+      <g fill="none" stroke={GOLD} strokeWidth="3" strokeLinecap="round">
+        <path d="M92 50 a10 10 0 0 1 0 16" />
+        <path d="M99 44 a18 18 0 0 1 0 28" opacity="0.7" />
+        <path d="M106 38 a26 26 0 0 1 0 40" opacity="0.45" />
+      </g>
+    </СвгСкоро>
+  );
+}
+
+/**
+ * Переводчик: узбекское слово на бирюзовом облачке переходит в перевод на
+ * белом — как меню, которое вдруг стало понятным.
+ */
+function ИллюстрацияПереводчик({ широкая }: { широкая: boolean }) {
+  const id = useId().replace(/:/g, "");
+  return (
+    <СвгСкоро широкая={широкая}>
+      <defs>
+        <linearGradient id={`${id}b`} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#2FD0C6" />
+          <stop offset="0.55" stopColor="#0FB3AC" />
+          <stop offset="1" stopColor="#07685F" />
+        </linearGradient>
+      </defs>
+      {/* Облачко с узбекским словом. */}
+      <path
+        d="M10 22 h56 a10 10 0 0 1 10 10 v22 a10 10 0 0 1 -10 10 h-34 l-12 10 v-10 h-10 a10 10 0 0 1 -10 -10 v-22 a10 10 0 0 1 10 -10 Z"
+        fill={`url(#${id}b)`}
+      />
+      <text
+        x="38"
+        y="50"
+        textAnchor="middle"
+        fontSize="17"
+        fontWeight="700"
+        fill="#ffffff"
+        fontFamily="var(--font-heading), sans-serif"
+      >
+        Oʻ
+      </text>
+      {/* Облачко перевода. */}
+      <path
+        d="M54 44 h54 a10 10 0 0 1 10 10 v22 a10 10 0 0 1 -10 10 h-10 v10 l-12 -10 h-32 a10 10 0 0 1 -10 -10 v-22 a10 10 0 0 1 10 -10 Z"
+        fill="#ffffff"
+        stroke="#0FB3AC"
+        strokeOpacity="0.35"
+        strokeWidth="1.5"
+      />
+      <text
+        x="81"
+        y="72"
+        textAnchor="middle"
+        fontSize="17"
+        fontWeight="700"
+        fill="#07685F"
+        fontFamily="var(--font-heading), sans-serif"
+      >
+        Aa
+      </text>
+      {/* Искры — «перевод случился». */}
+      <path d="M104 26 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2 Z" fill={GOLD} />
+      <path d="M92 16 l1.2 3 3 1.2 -3 1.2 -1.2 3 -1.2 -3 -3 -1.2 3 -1.2 Z" fill={GOLD} opacity="0.8" />
+    </СвгСкоро>
   );
 }
 

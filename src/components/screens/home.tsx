@@ -321,20 +321,6 @@ export function HomeScreen({
                   {h.tag}
                 </span>
               </div>
-              {(() => {
-                const w = погода.get(h.city);
-                return w ? (
-                  <div className="absolute top-3 right-3">
-                    <span
-                      className="text-[8px] font-bold px-2 py-0.5 rounded-full"
-                      style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(6px)", color: "white" }}
-                    >
-                      {w.icon}
-                      {w.temp}°
-                    </span>
-                  </div>
-                ) : null;
-              })()}
               <div className="absolute bottom-0 left-0 right-0 p-3">
                 <p className="text-[8px] mb-0.5" style={{ color: "rgba(255,255,255,0.45)" }}>
                   📍 {трК(h.city)}
@@ -436,20 +422,6 @@ export function HomeScreen({
                   {r.cuisine}
                 </span>
               </div>
-              {(() => {
-                const w = погода.get(r.city);
-                return w ? (
-                  <div className="absolute top-3 right-3">
-                    <span
-                      className="text-[8px] font-bold px-2 py-0.5 rounded-full"
-                      style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(6px)", color: "white" }}
-                    >
-                      {w.icon}
-                      {w.temp}°
-                    </span>
-                  </div>
-                ) : null;
-              })()}
               <div className="absolute bottom-0 left-0 right-0 p-3">
                 <p className="text-[8px] mb-0.5" style={{ color: "rgba(255,255,255,0.45)" }}>
                   📍 {трК(r.city)}

@@ -6,7 +6,6 @@ import { useAppContent } from "./content-provider";
 import { useT } from "@/components/lang-provider";
 import { useДистанция } from "@/lib/distance";
 import { useДеньги } from "@/lib/money";
-import { useWeather } from "@/components/weather-provider";
 import { useGeo } from "@/components/geo-provider";
 import { дистанцияКм } from "@/data/geo";
 import { ВИДЕО, кадрыГорода } from "@/data/city-reels";
@@ -177,12 +176,10 @@ export function CardDeckBase({
 
 export function CardDeck({ places, onPlace }: { places: Place[]; onPlace: (p: Place) => void }) {
   const { t, трК } = useT();
-  const погода = useWeather();
   const { pos } = useGeo();
   const дист = useДистанция();
   const дг = useДеньги();
   const items: DeckItem[] = places.map((p) => {
-    const w = погода.get(p.city); // настоящая погода города (Open-Meteo)
     const км = дистанцияКм(pos, p.nameRu ?? p.name, p.city); // живое расстояние «от меня»
     return {
       img: p.img,
@@ -190,10 +187,8 @@ export function CardDeck({ places, onPlace }: { places: Place[]; onPlace: (p: Pl
       sub: `${трК(p.city)} · ${t("uz_country")}`,
       badge: p.type,
       badgeColor: "rgba(233,196,106,0.92)",
-      // Погода — чипом в углу, как у отелей.
-      temp: w ? String(w.temp) : undefined,
-      tempIcon: w?.icon,
-      // Три коротких метрики (как у отелей): рейтинг, отзывы, расстояние.
+      // Три коротких метрики: рейтинг, отзывы, расстояние. Погоду здесь
+      // не показываем — она одна на весь город и уже есть в шапке главной.
       stat1: `${p.rating}★`,
       stat1l: t("card_rating"),
       stat2: String(p.reviews),
@@ -209,11 +204,9 @@ export function CardDeck({ places, onPlace }: { places: Place[]; onPlace: (p: Pl
 }
 
 export function CityDeck({ onSearch }: { onSearch: (city?: string) => void }) {
-  const { POPULAR_CITIES, PLACES } = useAppContent();
+  const { POPULAR_CITIES, PLACES, HOTELS } = useAppContent();
   const { t, трК } = useT();
-  const погода = useWeather();
   const items: DeckItem[] = POPULAR_CITIES.map((c) => {
-    const w = погода.get(c.name); // настоящая погода города (Open-Meteo)
     return {
       img: c.img,
       кадры: кадрыГорода(c.name, c.img, { PLACES }),
@@ -224,16 +217,14 @@ export function CityDeck({ onSearch }: { onSearch: (city?: string) => void }) {
       badgeColor: "rgba(7,120,111,0.85)",
       // Зелёный бейдж — светлый текст, иначе тёмный на тёмном не читался.
       badgeTextColor: WHITE,
-      // Погода — чипом в углу, как у отелей.
-      temp: w ? String(w.temp) : undefined,
-      tempIcon: w?.icon,
-      // Три коротких метрики: рейтинг, «ощущается», ветер (единица локализована).
+      // Что в городе есть для туриста — полезнее погоды, которая и так в
+      // шапке главной: рейтинг, сколько мест и гостиниц в приложении.
       stat1: `${c.rating}★`,
       stat1l: t("card_rating"),
-      stat2: w ? `${w.feels}°` : "—",
-      stat2l: t("w_feels"),
-      stat3: w ? `${w.windKmh} ${t("w_wind")}` : "—",
-      stat3l: t("card_wind"),
+      stat2: String(PLACES.filter((x) => x.city === c.name).length),
+      stat2l: t("home_places"),
+      stat3: String(HOTELS.filter((x) => x.city === c.name).length),
+      stat3l: t("ex_stay"),
       price: t("card_open"),
       pricel: t("card_direction"),
     };
