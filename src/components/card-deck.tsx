@@ -32,7 +32,7 @@ function CardFace({ it }: { it: DeckItem }) {
         {it.кадры && it.кадры.length > 1 ? (
           <CityReel кадры={it.кадры} видео={it.видео} alt={it.title} />
         ) : (
-          <img src={it.img} alt={it.title} className="h-full w-full object-cover" />
+          <img src={it.img} alt={it.title} className="skel h-full w-full object-cover" />
         )}
         <div
           className="absolute inset-0"

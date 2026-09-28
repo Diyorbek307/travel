@@ -950,7 +950,7 @@ function СписокГородов({ рядом, onВыбор }: { рядом: 
             onClick={() => onВыбор(c.name)}
             className="relative h-32 w-full overflow-hidden rounded-2xl text-left shadow-sm active:scale-[0.98] transition-all"
           >
-            <img src={c.img} alt={трК(c.name)} className="h-full w-full object-cover" />
+            <img src={c.img} alt={трК(c.name)} className="skel h-full w-full object-cover" />
             <div
               className="absolute inset-0"
               style={{ background: "linear-gradient(to top,rgba(0,0,0,0.72) 0%,transparent 65%)" }}
@@ -1031,7 +1031,7 @@ function СписокМест({
             className="w-full relative rounded-2xl overflow-hidden shadow-sm text-left active:scale-[0.98] sm:col-span-2 xl:col-span-3"
             style={{ height: 180 }}
           >
-            <img src={главное.img} alt={главное.name} className="w-full h-full object-cover" />
+            <img src={главное.img} alt={главное.name} className="skel w-full h-full object-cover" />
             <div
               className="absolute inset-0"
               style={{ background: "linear-gradient(to top,rgba(0,0,0,0.7) 0%,transparent 55%)" }}
@@ -1079,15 +1079,20 @@ function СписокМест({
             </div>
           </button>
         )}
-        {остальные.map((p) => (
+        {остальные.map((p, i) => (
           <button
             key={p.id}
             onClick={() => onPlace(p)}
-            className="w-full flex gap-3 bg-white rounded-2xl overflow-hidden shadow-sm text-left border active:scale-[0.98]"
-            style={{ borderColor: BORDER }}
+            style={{ borderColor: BORDER, animationDelay: `${Math.min(i, 10) * 40}ms` }}
+            className="tile-in w-full flex gap-3 bg-white rounded-2xl overflow-hidden shadow-sm text-left border active:scale-[0.98]"
           >
             <div className="w-24 flex-shrink-0 bg-gray-100">
-              <img src={p.img} alt={p.name} className="w-full h-full object-cover" style={{ height: 96 }} />
+              <img
+                src={p.img}
+                alt={p.name}
+                className="skel w-full h-full object-cover"
+                style={{ height: 96 }}
+              />
             </div>
             <div className="flex-1 py-3 pr-3 min-w-0">
               <div className="flex items-center gap-1.5 mb-1">
@@ -1157,15 +1162,15 @@ function СписокОтелей({
       <Чипы варианты={ВИДЫ_ГОСТИНИЦ} выбран={вид} onВыбор={setВид} />
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         {список.length === 0 && <Пусто сброс={сброс} />}
-        {список.map((h) => (
+        {список.map((h, i) => (
           <button
             key={h.id}
             onClick={() => onHotel(h)}
-            className="w-full bg-white rounded-2xl overflow-hidden shadow-sm border text-left active:scale-[0.98] transition-all"
-            style={{ borderColor: BORDER }}
+            style={{ borderColor: BORDER, animationDelay: `${Math.min(i, 10) * 40}ms` }}
+            className="tile-in w-full bg-white rounded-2xl overflow-hidden shadow-sm border text-left active:scale-[0.98] transition-all"
           >
             <div className="relative h-40">
-              <img src={h.img} alt={h.name} className="w-full h-full object-cover" />
+              <img src={h.img} alt={h.name} className="skel w-full h-full object-cover" />
               <div
                 className="absolute inset-0"
                 style={{ background: "linear-gradient(to top,rgba(0,0,0,0.65) 0%,transparent 55%)" }}
@@ -1230,15 +1235,20 @@ function СписокРесторанов({
   return (
     <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
       {рестораны.length === 0 && <Пусто сброс={сброс} />}
-      {рестораны.map((r) => (
+      {рестораны.map((r, i) => (
         <button
           key={r.id}
           onClick={() => onRestaurant(r)}
-          className="w-full flex gap-3 bg-white rounded-2xl overflow-hidden shadow-sm text-left border active:scale-[0.98]"
-          style={{ borderColor: BORDER }}
+          style={{ borderColor: BORDER, animationDelay: `${Math.min(i, 10) * 40}ms` }}
+          className="tile-in w-full flex gap-3 bg-white rounded-2xl overflow-hidden shadow-sm text-left border active:scale-[0.98]"
         >
           <div className="w-24 flex-shrink-0 bg-gray-100">
-            <img src={r.img} alt={r.name} className="w-full h-full object-cover" style={{ height: 96 }} />
+            <img
+              src={r.img}
+              alt={r.name}
+              className="skel w-full h-full object-cover"
+              style={{ height: 96 }}
+            />
           </div>
           <div className="flex-1 py-3 pr-3 min-w-0">
             <Badge text={r.cuisine} color={"#C1603A"} />
@@ -1279,18 +1289,18 @@ function СписокЭкскурсий({
   return (
     <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
       {туры.length === 0 && <Пусто сброс={сброс} />}
-      {туры.map((r) => (
+      {туры.map((r, i) => (
         <button
           key={r.id}
           onClick={() => onRoute(r)}
-          className="w-full flex gap-3 bg-white rounded-2xl overflow-hidden shadow-sm text-left border active:scale-[0.98]"
-          style={{ borderColor: BORDER }}
+          style={{ borderColor: BORDER, animationDelay: `${Math.min(i, 10) * 40}ms` }}
+          className="tile-in w-full flex gap-3 bg-white rounded-2xl overflow-hidden shadow-sm text-left border active:scale-[0.98]"
         >
           <div
             className="w-24 flex-shrink-0 flex items-center justify-center text-3xl"
             style={{ background: r.color, minHeight: 104 }}
           >
-            {r.img ? <img src={r.img} alt={r.title} className="h-full w-full object-cover" /> : r.icon}
+            {r.img ? <img src={r.img} alt={r.title} className="skel h-full w-full object-cover" /> : r.icon}
           </div>
           <div className="flex-1 py-3 pr-3 min-w-0">
             <Badge text={трК(r.badge)} color={GREEN} />

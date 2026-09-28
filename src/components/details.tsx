@@ -93,7 +93,7 @@ export function PlaceDetail({
   return (
     <div className="flex flex-col h-full animate-slide-up" style={{ background: CREAM }}>
       <div className="relative flex-shrink-0" style={{ height: 260 }}>
-        <img src={place.img} alt={place.name} className="w-full h-full object-cover" />
+        <img src={place.img} alt={place.name} className="skel hero-in w-full h-full object-cover" />
         <div
           className="absolute inset-0"
           style={{
@@ -132,6 +132,8 @@ export function PlaceDetail({
           style={{ ...glass }}
         >
           <svg
+            key={fav ? "on" : "off"}
+            className={fav ? "heart-pop" : undefined}
             width="16"
             height="16"
             viewBox="0 0 24 24"
@@ -325,7 +327,11 @@ export function HotelDetail({ hotel, onBack }: { hotel: Hotel; onBack: () => voi
   return (
     <div className="flex flex-col h-full animate-slide-up" style={{ background: CREAM }}>
       <div className="relative flex-shrink-0" style={{ height: 250 }}>
-        <img src={hotel.imgs[imgIdx] || hotel.img} alt={hotel.name} className="w-full h-full object-cover" />
+        <img
+          src={hotel.imgs[imgIdx] || hotel.img}
+          alt={hotel.name}
+          className="skel hero-in w-full h-full object-cover"
+        />
         <div
           className="absolute inset-0"
           style={{ background: "linear-gradient(to top,rgba(0,0,0,0.6) 0%,transparent 50%)" }}
@@ -362,6 +368,8 @@ export function HotelDetail({ hotel, onBack }: { hotel: Hotel; onBack: () => voi
           style={{ ...glass }}
         >
           <svg
+            key={fav ? "on" : "off"}
+            className={fav ? "heart-pop" : undefined}
             width="16"
             height="16"
             viewBox="0 0 24 24"
@@ -558,7 +566,7 @@ export function RestaurantDetail({
   return (
     <div className="flex flex-col h-full animate-slide-up" style={{ background: CREAM }}>
       <div className="relative flex-shrink-0" style={{ height: 240 }}>
-        <img src={r.img} alt={r.name} className="w-full h-full object-cover" />
+        <img src={r.img} alt={r.name} className="skel hero-in w-full h-full object-cover" />
         <div
           className="absolute inset-0"
           style={{ background: "linear-gradient(to top,rgba(0,0,0,0.72) 0%,transparent 55%)" }}
@@ -595,6 +603,8 @@ export function RestaurantDetail({
           style={{ ...glass }}
         >
           <svg
+            key={fav ? "on" : "off"}
+            className={fav ? "heart-pop" : undefined}
             width="16"
             height="16"
             viewBox="0 0 24 24"

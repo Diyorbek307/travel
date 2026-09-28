@@ -184,6 +184,23 @@ function App() {
 
   // Перемонтирует содержимое вкладки, чтобы въезд проигрывался заново.
   const [tabKey, setTabKey] = useState(0);
+  // С какой стороны въезжает новая вкладка — по положению кнопок в меню.
+  const [направление, setНаправление] = useState<"left" | "right" | undefined>(undefined);
+
+  // Фото с «переливом» (.skel): как только загрузилось, перелив гасим.
+  // Событие load не всплывает, поэтому ловим его на погружении.
+  useEffect(() => {
+    const загрузилось = (e: Event) => {
+      const el = e.target;
+      if (el instanceof HTMLImageElement && el.classList.contains("skel")) el.classList.add("loaded");
+    };
+    document.addEventListener("load", загрузилось, true);
+    document.addEventListener("error", загрузилось, true);
+    return () => {
+      document.removeEventListener("load", загрузилось, true);
+      document.removeEventListener("error", загрузилось, true);
+    };
+  }, []);
 
   // Сохранённую тему применяем сразу при запуске; по умолчанию она
   // следует за системой телефона.
@@ -339,6 +356,10 @@ function App() {
     // при обычном перелистывании разделов, а не только при открытии
     // карточек. Частота всё равно ограничена настройкой в панели.
     if (next !== tab) переход();
+    const порядок: Tab[] = ["home", "map", "explore", "audio", "profile"];
+    const откуда = порядок.indexOf(tab);
+    const куда = порядок.indexOf(next);
+    setНаправление(куда === откуда ? undefined : куда > откуда ? "right" : "left");
     setTab(next);
     setTabKey((k) => k + 1);
   };
@@ -586,7 +607,7 @@ function App() {
             {showPremium && <PremiumModal onClose={() => setShowPremium(false)} />}
 
             <div className="device-content flex-1 overflow-hidden">
-              <div key={tabKey} className="app-page animate-fade-in h-full">
+              <div key={tabKey} className="app-page animate-fade-in h-full" data-dir={направление}>
                 <Screen
                   tab={tab}
                   detail={detail}

@@ -1044,10 +1044,13 @@ export function ProfileScreen({
               {штампы.map((s, i) => (
                 <div
                   key={i}
-                  className="rounded-2xl p-3 aspect-square flex flex-col items-center justify-center text-center shadow-sm"
+                  // Полученный штамп «ставится» как печать, по очереди.
+                  className={`rounded-2xl p-3 aspect-square flex flex-col items-center justify-center text-center shadow-sm ${
+                    s.earned ? "stamp-in" : ""
+                  }`}
                   style={
                     s.earned
-                      ? { background: ACCENT_FILL }
+                      ? { background: ACCENT_FILL, animationDelay: `${i * 90}ms` }
                       : { background: SURFACE, border: `2px dashed ${BORDER}` }
                   }
                 >

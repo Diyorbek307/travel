@@ -508,6 +508,106 @@ button[aria-disabled="true"] {
   }
 }
 
+/* Смена вкладки: экран въезжает со стороны нажатой кнопки — так видно,
+   куда мы перешли, «левее» или «правее» по меню. */
+.app-page[data-dir="right"] {
+  animation-name: page-enter-right;
+}
+.app-page[data-dir="left"] {
+  animation-name: page-enter-left;
+}
+@keyframes page-enter-right {
+  from {
+    opacity: 0;
+    transform: translateX(28px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes page-enter-left {
+  from {
+    opacity: 0;
+    transform: translateX(-28px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Фото открытой карточки плавно «наезжает» — будто выросло из списка. */
+.hero-in {
+  animation: hero-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes hero-in {
+  from {
+    opacity: 0.4;
+    transform: scale(1.12);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Сердечко: короткий удар, когда место добавили в избранное. */
+.heart-pop {
+  animation: heart-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes heart-pop {
+  0% {
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(1.45);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Штамп паспорта ставится как печать: сверху, с поворотом и отскоком. */
+.stamp-in {
+  animation: stamp-in 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+}
+@keyframes stamp-in {
+  0% {
+    opacity: 0;
+    transform: scale(1.8) rotate(-14deg);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(0.92) rotate(3deg);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+/* Пока фото грузится — мягкий перелив вместо пустого прямоугольника.
+   Загрузилось — перелив выключается (класс .loaded ставит page.tsx),
+   иначе он бы крутился под каждой картинкой впустую. */
+.skel:not(.loaded) {
+  background: linear-gradient(100deg, var(--border) 20%, var(--surface) 50%, var(--border) 80%);
+  background-size: 200% 100%;
+  animation: skel 1.3s ease-in-out infinite;
+}
+@keyframes skel {
+  from {
+    background-position: 150% 0;
+  }
+  to {
+    background-position: -50% 0;
+  }
+}
+
+/* Индикатор активной вкладки скользит под кнопками нижнего меню. */
+.nav-indicator {
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 /* Движение — украшение, а не смысл: тем, кто просил его отключить,
    показываем статичный кадр вместо бесконечных циклов. */
 @media (prefers-reduced-motion: reduce) {
@@ -522,7 +622,11 @@ button[aria-disabled="true"] {
 /* Задержка лесенки осталась бы и без длительности — плитки выходили бы
    с запозданием. Тем, кто просил покоя, показываем их сразу. */
 @media (prefers-reduced-motion: reduce) {
-  .tile-in {
+  .tile-in,
+  .stamp-in,
+  .hero-in,
+  .heart-pop,
+  .skel:not(.loaded) {
     animation: none;
   }
 }

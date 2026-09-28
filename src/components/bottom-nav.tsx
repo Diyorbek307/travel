@@ -125,7 +125,23 @@ export default function BottomNav({ tab, onTab }: { tab: Tab; onTab: (t: Tab) =>
           по углам и перестают читаться как одна панель. Держим их вместе:
           на телефоне ограничение всё равно не срабатывает.
         */}
-        <div className="flex h-full w-full max-w-lg items-center">
+        <div className="relative flex h-full w-full max-w-lg items-center">
+          {/* Полоска над активной кнопкой — скользит к новой вкладке. */}
+          <span
+            aria-hidden
+            className="nav-indicator pointer-events-none absolute top-0 left-0 flex justify-center"
+            style={{
+              width: `${100 / ITEMS.length}%`,
+              transform: `translateX(${
+                Math.max(
+                  0,
+                  ITEMS.findIndex((i) => i.key === tab),
+                ) * 100
+              }%)`,
+            }}
+          >
+            <span className="h-[3px] w-8 rounded-b-full" style={{ background: "var(--accent)" }} />
+          </span>
           {ITEMS.map(({ key, ключ, icon }) => {
             const active = tab === key;
             return (
