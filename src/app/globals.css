@@ -59,6 +59,8 @@
   --border: #e3edec;
   /* Мягкое свечение акцентом под кнопками */
   --glow: rgba(15, 179, 172, 0.35);
+  /* Нижнее меню: на светлой — обычная поверхность, на тёмной — стекло. */
+  --nav-bg: var(--surface);
 }
 
 /* Тёмные токены. Один и тот же набор в двух случаях: система говорит
@@ -78,12 +80,13 @@
     --brand-ink: #e8f1ef;
     --glass: rgba(16, 24, 22, 0.82);
     --glass-border: rgba(255, 255, 255, 0.14);
-    --cream: #0a0f0e;
-    --surface: #131a18;
+    --cream: #0a1110;
+    --surface: #13201e;
     --text: #e8f1ef;
     --muted: #8a9b96;
-    --border: #202b28;
+    --border: #22322f;
     --glow: rgba(52, 220, 207, 0.45);
+    --nav-bg: rgba(15, 26, 24, 0.78);
   }
 }
 html[data-theme="dark"] {
@@ -100,12 +103,13 @@ html[data-theme="dark"] {
   --brand-ink: #e8f1ef;
   --glass: rgba(16, 24, 22, 0.82);
   --glass-border: rgba(255, 255, 255, 0.14);
-  --cream: #0a0f0e;
-  --surface: #131a18;
+  --cream: #0a1110;
+  --surface: #13201e;
   --text: #e8f1ef;
   --muted: #8a9b96;
-  --border: #202b28;
+  --border: #22322f;
   --glow: rgba(52, 220, 207, 0.45);
+  --nav-bg: rgba(15, 26, 24, 0.78);
 }
 
 /* Классы фона Tailwind тоже переводим на поверхность темы, чтобы карточки
@@ -123,6 +127,47 @@ html[data-theme="dark"] .bg-white {
 }
 html[data-theme="dark"] .bg-gray-100 {
   background-color: var(--border);
+}
+
+/*
+ * Глубина тёмной темы. На почти чёрном фоне тень не видна, поэтому
+ * карточку «поднимает» не тень, а свет: тонкий блик по верхней кромке и
+ * еле заметный бирюзовый контур, как у стекла. Плюс мягкое свечение
+ * сверху экрана — без него тёмная тема читалась плоской пустотой.
+ * Цвета те же, что у бренда: меняется только глубина.
+ */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) :is(.bg-white, [style*="var(--surface)"]):not(nav) {
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 0 0 1px rgba(52, 220, 207, 0.05),
+      0 12px 28px -14px rgba(0, 0, 0, 0.7);
+  }
+  :root:not([data-theme="light"]) .device-content::after {
+    opacity: 1;
+  }
+}
+html[data-theme="dark"] :is(.bg-white, [style*="var(--surface)"]):not(nav) {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 0 0 1px rgba(52, 220, 207, 0.05),
+    0 12px 28px -14px rgba(0, 0, 0, 0.7);
+}
+html[data-theme="dark"] .device-content::after {
+  opacity: 1;
+}
+
+/* Свечение сверху — поверх содержимого, но прозрачное для нажатий. На
+   светлой теме выключено: там свет и так есть. */
+.device-content {
+  position: relative;
+}
+.device-content::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 55%;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  background: radial-gradient(120% 70% at 50% -12%, rgba(52, 220, 207, 0.1), transparent 62%);
 }
 
 * {

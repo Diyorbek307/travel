@@ -115,8 +115,10 @@ export default function BottomNav({ tab, onTab }: { tab: Tab; onTab: (t: Tab) =>
     <>
       {/* Телефон и планшет: панель внизу, под большим пальцем. */}
       <nav
-        className="device-nav absolute bottom-0 left-0 right-0 flex items-center justify-center border-t lg:hidden"
-        style={{ background: "var(--surface)", borderColor: "var(--border)" }}
+        className="device-nav absolute bottom-0 left-0 right-0 flex items-center justify-center border-t backdrop-blur-xl lg:hidden"
+        // На тёмной теме --nav-bg полупрозрачный: сквозь меню чуть видно
+        // содержимое, и оно читается стеклом, а не чёрной полосой.
+        style={{ background: "var(--nav-bg)", borderColor: "var(--border)" }}
       >
         {/*
           На планшете пять кнопок, растянутых на всю ширину, расползаются
