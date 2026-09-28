@@ -213,9 +213,7 @@ export const СЛОВАРЬ = {
   home_restaurants: row("Restaurants", "Рестораны", "Restoranlar", "餐厅", "레스토랑", "Restaurants", "Restaurants", "レストラン", "Restoranlar", "مطاعم"),
   home_transport: row("Transport", "Транспорт", "Transport", "交通", "교통", "Transport", "Transport", "交通", "Ulaşım", "النقل"),
   home_transport_sub: row("Flights · Trains · Intercity taxi", "Рейсы · Поезда · Межгород такси", "Reyslar · Poyezdlar · Shaharlararo taksi", "航班 · 火车 · 城际出租车", "항공 · 기차 · 시외 택시", "Flüge · Züge · Überlandtaxi", "Vols · Trains · Taxi interurbain", "航空 · 鉄道 · 都市間タクシー", "Uçuşlar · Trenler · Şehirlerarası taksi", "رحلات · قطارات · تاكسي بين المدن"),
-  home_weather: row("Weather today", "Погода сегодня", "Bugungi ob-havo", "今日天气", "오늘 날씨", "Wetter heute", "Météo du jour", "今日の天気", "Bugün hava", "طقس اليوم"),
   home_popular_cities: row("Popular cities", "Популярные города", "Mashhur shaharlar", "热门城市", "인기 도시", "Beliebte Städte", "Villes populaires", "人気の都市", "Popüler şehirler", "مدن مشهورة"),
-  home_why: row("Why choose HelloUZ?", "Почему выбирают HelloUZ?", "Nega HelloUZ tanlanadi?", "为什么选择 HelloUZ？", "왜 HelloUZ일까요?", "Warum HelloUZ?", "Pourquoi HelloUZ ?", "なぜHelloUZなのか", "Neden HelloUZ?", "لماذا HelloUZ؟"),
   home_all: row("All →", "Все →", "Barchasi →", "全部 →", "전체 →", "Alle →", "Tout →", "すべて →", "Tümü →", "الكل →"),
 
   // Исследовать
@@ -655,13 +653,6 @@ export const СЛОВАРЬ = {
   home_per_night: row("per night", "за ночь", "kechasiga", "每晚", "1박", "pro Nacht", "par nuit", "1泊", "gecelik", "لليلة"),
   home_open_word: row("Open", "Открыт", "Ochilish", "开门", "오픈", "Öffnet", "Ouvre", "開店", "Açılış", "يفتح"),
   home_practical_sub: row("Currency, transport, climate, tips for tourists", "Валюта, транспорт, климат, советы туристу", "Valyuta, transport, iqlim, sayohatchiga maslahatlar", "货币、交通、气候、游客贴士", "환율·교통·기후·여행 팁", "Währung, Transport, Klima, Reisetipps", "Devise, transport, climat, conseils aux voyageurs", "通貨・交通・気候・旅行のヒント", "Para, ulaşım, iklim, turist ipuçları", "العملة، النقل، المناخ، نصائح للسياح"),
-  why_reliable: row("Reliable", "Надёжно", "Ishonchli", "可靠", "믿음직", "Zuverlässig", "Fiable", "信頼", "Güvenilir", "موثوق"),
-  why_reliable_sub: row("Verified", "Проверено", "Tekshirilgan", "已核实", "검증됨", "Geprüft", "Vérifié", "検証済み", "Doğrulanmış", "موثّق"),
-  why_handy: row("Handy", "Удобно", "Qulay", "便捷", "편리함", "Praktisch", "Pratique", "便利", "Kullanışlı", "عملي"),
-  why_handy_sub: row("All in one", "Всё вместе", "Hammasi birga", "一站式", "올인원", "Alles vereint", "Tout-en-un", "オールインワン", "Hepsi bir arada", "الكل في مكان"),
-  why_support_sub: row("Support", "Поддержка", "Qoʻllab-quvvatlash", "客服支持", "지원", "Support", "Assistance", "サポート", "Destek", "دعم"),
-  why_made: row("UZ-made", "UZ-made", "UZ-made", "乌兹别克出品", "UZ 제작", "UZ-made", "Made in UZ", "UZ製", "UZ yapımı", "صنع أوزبكي"),
-  why_made_sub: row("With love", "С любовью", "Mehr bilan", "用心打造", "정성껏", "Mit Liebe", "Avec amour", "愛を込めて", "Sevgiyle", "بحبّ"),
 
   // Поддержка
   sup_hours: row("We reply during business hours", "Отвечаем в рабочие часы", "Ish vaqtida javob beramiz", "工作时间内回复", "업무 시간에 답변드립니다", "Wir antworten zu den Geschäftszeiten", "Nous répondons aux heures ouvrables", "営業時間内に返信します", "Çalışma saatlerinde yanıtlıyoruz", "نردّ خلال ساعات العمل"),

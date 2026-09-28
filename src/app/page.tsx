@@ -702,10 +702,8 @@ function Screen({ tab, detail, ...p }: ScreenProps) {
           onSearch={p.onSearch}
           onHotel={p.onHotel}
           onNotifs={p.onNotifs}
-          onPractical={p.onPractical}
           onRestaurant={p.onRestaurant}
           onMenu={p.onMenu}
-          onTab={p.onTab}
           onExplore={p.onExplore}
           onTransport={p.onTransport}
           onToast={p.onToast}

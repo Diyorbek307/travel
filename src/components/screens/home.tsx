@@ -1,23 +1,20 @@
-import type { Hotel, Place, Restaurant, Tab } from "@/lib/types";
+import type { Hotel, Place, Restaurant } from "@/lib/types";
 import type { РазделОбзора } from "./explore";
 import type { TKey } from "@/lib/i18n";
 import { датаСловами } from "@/lib/i18n";
 import {
   ACCENT_FILL,
-  BORDER,
   CREAM,
   GOLD,
   GREEN,
   MUTED,
   TEXT,
   WHITE,
-  ACCENT_SOFT,
   ACCENT_DEEP,
   GLOW,
   контрастныйТекст,
   ON_GOLD,
 } from "@/lib/theme";
-import { ГОРОДА } from "@/data/geo";
 import { useAppContent } from "@/components/content-provider";
 import { useT } from "@/components/lang-provider";
 import { useWeather } from "@/components/weather-provider";
@@ -43,10 +40,8 @@ export function HomeScreen({
   onSearch,
   onHotel,
   onNotifs,
-  onPractical,
   onRestaurant,
   onMenu,
-  onTab,
   onExplore,
   onTransport,
   onToast,
@@ -56,10 +51,8 @@ export function HomeScreen({
   onSearch: (q?: string) => void;
   onHotel: (h: Hotel) => void;
   onNotifs: () => void;
-  onPractical: () => void;
   onRestaurant: (r: Restaurant) => void;
   onMenu: () => void;
-  onTab: (t: Tab) => void;
   onExplore: (р?: РазделОбзора) => void;
   onTransport: () => void;
   onToast: (m: string) => void;
@@ -84,7 +77,7 @@ export function HomeScreen({
     : PLACES;
   return (
     <div className="flex flex-col h-full overflow-y-auto hide-scroll" style={{ background: CREAM }}>
-      {/* ── Glassmorphism Hero ── */}
+      {/* Glassmorphism Hero */}
       <div className="relative h-[400px] flex-shrink-0 lg:h-[480px]">
         {/* Шапка — короткий ролик о Самарканде: кадры сменяются с наездом,
             поэтому главная не выглядит застывшей открыткой. */}
@@ -226,38 +219,9 @@ export function HomeScreen({
         </div>
       </div>
 
-      {/* ── Quick action grid ── */}
+      {/* Разделы (места, отели, рестораны) живут в HelloUZ — здесь
+          только транспорт, которого там нет. */}
       <div className="px-4 pt-4">
-        <div className="grid grid-cols-4 gap-2.5 mb-2.5">
-          {/* Под плиткой — сколько записей и правда есть в базе, а не
-              круглое число из макета. */}
-          {[
-            { e: "🏛️", l: t("home_places"), sub: String(PLACES.length), go: () => onExplore("places") },
-            { e: "🗺️", l: t("home_routes"), sub: t("map_tab_ai"), go: () => onTab("map") },
-            { e: "🏨", l: t("home_hotels"), sub: String(HOTELS.length), go: () => onExplore("hotels") },
-            {
-              e: "🍽️",
-              l: t("home_restaurants"),
-              sub: String(RESTAURANTS.length),
-              go: () => onExplore("restaurants"),
-            },
-          ].map((c) => (
-            <button
-              key={c.l}
-              onClick={c.go}
-              className="flex flex-col items-center gap-1.5 rounded-2xl border bg-white py-3 text-center shadow-sm transition-all active:scale-95 lg:gap-2 lg:py-6"
-              style={{ borderColor: BORDER }}
-            >
-              <span className="text-2xl lg:text-3xl">{c.e}</span>
-              <p className="text-[10px] font-bold lg:text-sm" style={{ color: TEXT }}>
-                {c.l}
-              </p>
-              <p className="text-[9px] lg:text-xs" style={{ color: MUTED }}>
-                {c.sub}
-              </p>
-            </button>
-          ))}
-        </div>
         <button
           onClick={onTransport}
           className="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl active:scale-[0.98] transition-all"
@@ -295,54 +259,13 @@ export function HomeScreen({
         </button>
       </div>
 
-      {/* ── Weather horizontal scroll ── */}
-      <div className="pt-5">
-        <p
-          className="font-bold text-base mb-3 px-4"
-          style={{ color: TEXT, fontFamily: "var(--font-heading)" }}
-        >
-          🌤️ {t("home_weather")}
-        </p>
-        <div className="flex gap-3 overflow-x-auto hide-scroll px-4 pb-1">
-          {Object.keys(ГОРОДА).map((city) => {
-            const w = погода.get(city);
-            return (
-              <div
-                key={city}
-                className="flex-shrink-0 bg-white rounded-2xl p-3 shadow-sm border text-center"
-                style={{ borderColor: BORDER, minWidth: 96 }}
-              >
-                <p className="text-[10px] font-bold mb-1 truncate" style={{ color: TEXT }}>
-                  {трК(city)}
-                </p>
-                <div className="flex items-center justify-center gap-1">
-                  <p
-                    className="font-bold"
-                    style={{ color: TEXT, fontSize: 28, fontFamily: "var(--font-heading)", lineHeight: 1 }}
-                  >
-                    {w ? `${w.temp}°` : "—"}
-                  </p>
-                  <span style={{ fontSize: 30, lineHeight: 1 }}>{w?.icon ?? "🌡️"}</span>
-                </div>
-                <p className="text-[9px] leading-tight mt-1" style={{ color: MUTED }}>
-                  {w ? t(w.condKey) : ""}
-                </p>
-                <p className="text-[9px] mt-0.5" style={{ color: MUTED }}>
-                  {w ? `💨 ${w.windKmh} ${t("w_wind")}` : ""}
-                </p>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* ── City Deck — image-23 style ── */}
+      {/* Популярные города */}
       <CityDeck onSearch={onSearch} />
 
-      {/* ── Place Card Deck — image-23 style ── */}
+      {/* Достопримечательности по интересам */}
       <CardDeck places={местаПоИнтересам} onPlace={onPlace} />
 
-      {/* ── Events ── */}
+      {/* События */}
       <div className="pt-5">
         <div className="flex items-center justify-between mb-3 px-4">
           <p className="font-bold text-base" style={{ color: TEXT, fontFamily: "var(--font-heading)" }}>
@@ -356,14 +279,14 @@ export function HomeScreen({
         </div>
       </div>
 
-      {/* ── Taxi ── */}
+      {/* Такси */}
       <TaxiOrder />
 
-      {/* ── Ad ── */}
+      {/* Партнёры */}
       <AdSpotlight isPremium={isPremium} cities={городРекл ? [городРекл] : undefined} />
       <AdShelf isPremium={isPremium} />
 
-      {/* ── Flash Deals Hotels — dark image-23 cards ── */}
+      {/* Гостиницы */}
       <div className="pt-5">
         <div className="flex items-center justify-between mb-3 px-4">
           <p className="font-bold text-base" style={{ color: TEXT, fontFamily: "var(--font-heading)" }}>
@@ -475,7 +398,7 @@ export function HomeScreen({
         </div>
       </div>
 
-      {/* ── Top Restaurants — dark image-23 cards ── */}
+      {/* Рестораны */}
       <div className="pt-5">
         <div className="flex items-center justify-between mb-3 px-4">
           <p className="font-bold text-base" style={{ color: TEXT, fontFamily: "var(--font-heading)" }}>
@@ -580,71 +503,6 @@ export function HomeScreen({
                 </div>
               </div>
             </button>
-          ))}
-        </div>
-      </div>
-
-      {/* ── Practical info teaser ── */}
-      <div className="px-4 pt-4">
-        <button
-          onClick={onPractical}
-          className="w-full rounded-2xl p-4 flex items-center gap-3 text-left active:scale-[0.98] transition-all"
-          style={{ background: ACCENT_SOFT }}
-        >
-          <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0"
-            style={{ background: ACCENT_FILL }}
-          >
-            💡
-          </div>
-          <div className="flex-1">
-            <p className="text-sm font-bold" style={{ color: TEXT }}>
-              {t("pr_title")}
-            </p>
-            <p className="text-[10px]" style={{ color: MUTED }}>
-              {t("home_practical_sub")}
-            </p>
-          </div>
-          <svg
-            className="rtl-flip"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke={GREEN}
-            strokeWidth="2"
-          >
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
-        </button>
-      </div>
-
-      {/* ── Why HelloUZ ── */}
-      <div className="px-4 pt-5 pb-8">
-        <p className="font-bold text-base mb-4" style={{ color: TEXT, fontFamily: "var(--font-heading)" }}>
-          {t("home_why")}
-        </p>
-        <div className="grid grid-cols-4 gap-2">
-          {[
-            { icon: "✅", label: t("why_reliable"), sub: t("why_reliable_sub") },
-            { icon: "🗺️", label: t("why_handy"), sub: t("why_handy_sub") },
-            { icon: "🎧", label: "24/7", sub: t("why_support_sub") },
-            { icon: "🇺🇿", label: t("why_made"), sub: t("why_made_sub") },
-          ].map((f) => (
-            <div key={f.label} className="flex flex-col items-center text-center">
-              <div
-                className="w-11 h-11 rounded-2xl flex items-center justify-center text-lg mb-1.5 bg-white shadow-sm border"
-                style={{ borderColor: BORDER }}
-              >
-                {f.icon}
-              </div>
-              <p className="font-semibold leading-tight" style={{ color: TEXT, fontSize: 9 }}>
-                {f.label}
-              </p>
-              <p className="mt-0.5 leading-tight" style={{ color: MUTED, fontSize: 8 }}>
-                {f.sub}
-              </p>
-            </div>
           ))}
         </div>
       </div>
