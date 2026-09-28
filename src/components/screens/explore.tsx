@@ -3,8 +3,10 @@
 import { useId, useState } from "react";
 import type { Hotel, HotelKind, ManagedRoute, Place, Restaurant, Route, Tab } from "@/lib/types";
 import {
+  ACCENT_DEEP,
   ACCENT_FILL,
   ACCENT_SOFT,
+  GLOW,
   BORDER,
   CREAM,
   GOLD,
@@ -24,7 +26,7 @@ import { useДеньги } from "@/lib/money";
 import { useWeather } from "@/components/weather-provider";
 import { useGeo } from "@/components/geo-provider";
 import { дистанцияКм, ближайшийГород } from "@/data/geo";
-import { Badge, StarRow } from "../ui";
+import { Badge, LogoMark, StarRow, Wordmark } from "../ui";
 import { AnimatedBg } from "@/components/animated-bg";
 import CityReel from "@/components/city-reel";
 import { ВИДЕО, ФОН_ВИДЕО, кадрыГорода } from "@/data/city-reels";
@@ -195,6 +197,9 @@ export function ExploreScreen({
       // достаточно будет заменить скоро на go с настоящим разделом.
       { ключ: "vr", заголовок: t("ex_vr"), под: t("ex_vr_sub"), скоро: true, go: () => {} },
     ];
+    const по = (ключ: string) => плитки.find((п) => п.ключ === ключ)!;
+    // Сквозной номер для «лесенки» появления через все группы.
+    let порядок = 0;
     return (
       <div className="flex flex-col h-full" style={{ background: CREAM }}>
         <Шапка
@@ -203,23 +208,45 @@ export function ExploreScreen({
           подзаголовок={выбран ? трК(выбран.sub) : undefined}
           фон={фон}
           высокая
+          логотип
         >
           {чипыГородов}
         </Шапка>
         <div className="flex-1 overflow-y-auto hide-scroll p-4">
-          <p className="mb-3 text-base font-bold" style={{ color: TEXT, fontFamily: "var(--font-heading)" }}>
-            {t("ex_sections")}
-          </p>
+          <КарточкаИИ onClick={по("ai").go} />
           {/*
-            Две колонки на телефоне, как витрина услуг: название и число
-            слева сверху, иллюстрация выглядывает из правого нижнего угла.
+            Двенадцать одинаковых плиток подряд глаз не различает, поэтому
+            они разложены по смыслу: что посмотреть, где жить, как ехать.
+            Две колонки на телефоне и планшете (при трёх в группе из четырёх
+            одна плитка висела бы в ряду одна), четыре — на широком экране.
             Раздел, где в выбранном городе пусто, приглушён, но нажимается —
             внутри можно сразу сменить город.
           */}
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
-            {плитки.map((п, i) => (
-              <Плитка key={п.ключ} плитка={п} номер={i} lang={lang} />
-            ))}
+          {ГРУППЫ.map((г) => (
+            <section key={г.заголовок} className="mb-5">
+              <h2
+                className="mb-2.5 text-base font-bold"
+                style={{ color: TEXT, fontFamily: "var(--font-heading)" }}
+              >
+                {t(г.заголовок)}
+              </h2>
+              <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+                {г.ключи.map((ключ, i) => (
+                  <Плитка
+                    key={ключ}
+                    плитка={по(ключ)}
+                    номер={порядок++}
+                    lang={lang}
+                    // Нечётная последняя плитка на телефоне — во всю ширину,
+                    // иначе рядом с ней зияла бы дыра.
+                    широкая={г.ключи.length % 2 === 1 && i === г.ключи.length - 1}
+                  />
+                ))}
+              </div>
+            </section>
+          ))}
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+            <Плитка плитка={по("vr")} номер={порядок++} lang={lang} широкая />
           </div>
 
           <div className="mt-4">
@@ -281,6 +308,54 @@ export function ExploreScreen({
   );
 }
 
+/** Группы плиток на экране HelloUZ. ИИ-гид и VR стоят отдельно. */
+const ГРУППЫ: { заголовок: TKey; ключи: string[] }[] = [
+  { заголовок: "ex_group_see", ключи: ["places", "museums", "excursions", "routes"] },
+  { заголовок: "ex_group_stay", ключи: ["hotels", "restaurants", "bars"] },
+  { заголовок: "ex_group_road", ключи: ["cities", "transport", "tips"] },
+];
+
+/**
+ * ИИ-гид — самая сильная функция приложения, поэтому он не плитка среди
+ * прочих, а большая карточка над ними: в фирменном градиенте, с роботом
+ * и кнопкой. Кнопка золотая, как главные кнопки приложения.
+ */
+function КарточкаИИ({ onClick }: { onClick: () => void }) {
+  const { t } = useT();
+  return (
+    <button
+      onClick={onClick}
+      className="tile-in group relative mb-5 flex min-h-[140px] w-full items-center overflow-hidden rounded-[22px] p-4 text-left transition-transform duration-150 active:scale-[0.98]"
+      style={{
+        background: `linear-gradient(135deg, ${ACCENT_DEEP}, ${ACCENT_FILL})`,
+        boxShadow: `0 12px 28px -14px ${GLOW}`,
+      }}
+    >
+      <div className="relative z-10 max-w-[62%]">
+        <p
+          className="text-lg font-bold leading-tight text-white"
+          style={{ fontFamily: "var(--font-heading)" }}
+        >
+          {t("ex_ai_card_title")}
+        </p>
+        <p className="mt-1 text-[11px] leading-snug text-white/75">{t("ex_ai_card_sub")}</p>
+        <span
+          className="mt-3 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-bold"
+          style={{ background: GOLD, color: ON_GOLD }}
+        >
+          ✨ {t("ex_ai_card_cta")}
+        </span>
+      </div>
+      <img
+        src="/tiles/ai.webp"
+        alt=""
+        draggable={false}
+        className="pointer-events-none absolute -bottom-[12%] -right-[3%] w-[44%] max-w-[190px] select-none object-contain transition-transform duration-300 group-hover:scale-105"
+      />
+    </button>
+  );
+}
+
 type ПлиткаДанные = {
   ключ: string;
   заголовок: string;
@@ -303,7 +378,18 @@ type ПлиткаДанные = {
  * где попало, поэтому в самых длинных подписях словаря стоят мягкие
  * переносы (\u00AD) по слогам.
  */
-function Плитка({ плитка, номер, lang }: { плитка: ПлиткаДанные; номер: number; lang: string }) {
+function Плитка({
+  плитка,
+  номер,
+  lang,
+  широкая = false,
+}: {
+  плитка: ПлиткаДанные;
+  номер: number;
+  lang: string;
+  /** Во всю ширину в две колонки — для нечётной последней плитки группы. */
+  широкая?: boolean;
+}) {
   const { t } = useT();
   return (
     <button
@@ -311,7 +397,9 @@ function Плитка({ плитка, номер, lang }: { плитка: Пли
       // aria-disabled, а не disabled: карточка остаётся видна и читаема
       // экранным диктором как «скоро», а не пропадает из фокуса совсем.
       aria-disabled={плитка.скоро}
-      className="tile-in group relative flex h-[130px] flex-col items-start justify-start overflow-hidden rounded-[20px] border p-3.5 text-left transition-transform duration-150 active:scale-[0.97]"
+      className={`tile-in group relative flex h-[130px] flex-col sm:h-[160px] items-start justify-start overflow-hidden rounded-[20px] border p-3.5 text-left transition-transform duration-150 active:scale-[0.97] ${
+        широкая ? "col-span-2 lg:col-span-1" : ""
+      }`}
       style={{
         // Будущий раздел чуть подкрашен фирменной бирюзой в углу: видно,
         // что он особенный, но не кричит поверх соседних плиток.
@@ -367,7 +455,9 @@ function Плитка({ плитка, номер, lang }: { плитка: Пли
           alt=""
           loading="lazy"
           draggable={false}
-          className="pointer-events-none absolute -bottom-[10%] -right-[8%] aspect-square w-[60%] select-none object-contain transition-transform duration-300 group-hover:scale-105"
+          className={`pointer-events-none absolute -bottom-[10%] -right-[8%] aspect-square select-none object-contain transition-transform duration-300 group-hover:scale-105 ${
+            широкая ? "w-[34%] sm:w-[24%] lg:w-[60%]" : "w-[60%] sm:w-[46%] lg:w-[60%]"
+          }`}
         />
       )}
     </button>
@@ -473,6 +563,7 @@ function Шапка({
   подзаголовок,
   фон,
   высокая = false,
+  логотип = false,
   onBack,
   children,
 }: {
@@ -481,6 +572,8 @@ function Шапка({
   подзаголовок?: string;
   фон: Фон;
   высокая?: boolean;
+  /** Знак HelloUZ над заголовком — на главном экране раздела. */
+  логотип?: boolean;
   onBack?: () => void;
   children?: React.ReactNode;
 }) {
@@ -531,12 +624,19 @@ function Шапка({
             </button>
           )}
           <div className="min-w-0">
-            <p
-              className="text-[9px] font-bold mb-0.5 uppercase tracking-widest"
-              style={{ color: "rgba(255,255,255,0.6)" }}
-            >
-              {кикер}
-            </p>
+            {логотип ? (
+              <div className="mb-1.5 flex items-center gap-1.5">
+                <LogoMark size={20} tone="#ffffff" />
+                <Wordmark size={13} light />
+              </div>
+            ) : (
+              <p
+                className="text-[9px] font-bold mb-0.5 uppercase tracking-widest"
+                style={{ color: "rgba(255,255,255,0.6)" }}
+              >
+                {кикер}
+              </p>
+            )}
             <h1
               className="truncate text-xl font-bold text-white"
               style={{ fontFamily: "var(--font-heading)" }}
