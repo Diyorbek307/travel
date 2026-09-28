@@ -5,8 +5,9 @@ import { useAppContent } from "./content-provider";
 import { useAudioPlayer, времяЗвука } from "./audio-player";
 import { useSettings } from "@/lib/settings";
 import BookingForm from "./booking-form";
+import { БилетыМеста, ЗалыРесторана, НомераОтеля } from "./venue-details";
 import ReviewForm from "./review-form";
-import type { Hotel, HotelKind, Place, Restaurant, Route } from "@/lib/types";
+import type { Hotel, HotelKind, Place, Restaurant, Route, RoomType } from "@/lib/types";
 import type { TKey } from "@/lib/i18n";
 import {
   ACCENT_FILL,
@@ -194,6 +195,7 @@ export function PlaceDetail({
             {place.desc}
           </p>
         </div>
+        <БилетыМеста place={place} />
         {запись && (
           <div className="rounded-2xl p-4 mb-3" style={{ background: ACCENT_FILL }}>
             <div className="flex items-center gap-3 mb-3">
@@ -321,7 +323,9 @@ export function HotelDetail({ hotel, onBack }: { hotel: Hotel; onBack: () => voi
   const избранное = useFavorites();
   const fav = избранное.some((f) => f.key === `hotel:${hotel.id}`);
   // Цена в данных строкой вида «$89». Нет цифр — итог просто не считаем.
-  const заНочь = parseInt(hotel.price.replace(/[^0-9.]/g, "")) || 0;
+  const [номер, setНомер] = useState<RoomType | null>(null);
+  // Выбран номер — считаем по его цене, иначе по цене «от» из карточки.
+  const заНочь = номер?.price ?? (parseInt(hotel.price.replace(/[^0-9.]/g, "")) || 0);
   const total = заНочь * nights;
   const дг = useДеньги();
   return (
@@ -540,6 +544,13 @@ export function HotelDetail({ hotel, onBack }: { hotel: Hotel; onBack: () => voi
             {t("d_book_terms")}
           </p>
         </div>
+        <НомераОтеля
+          hotel={hotel}
+          ночей={nights}
+          гостей={guests}
+          выбран={номер?.id ?? null}
+          onВыбор={setНомер}
+        />
         <BookingForm kind="hotel" itemId={hotel.id} itemName={hotel.name} ночей={nights} гостей={guests} />
         <ReviewForm placeId={hotel.id} placeName={hotel.name} />
         <div className="pb-6" />
@@ -662,6 +673,7 @@ export function RestaurantDetail({
             {r.desc}
           </p>
         </div>
+        <ЗалыРесторана r={r} />
         {/*
           Здесь был список «фирменных блюд»: одни и те же пять узбекских
           названий у каждого ресторана, включая неузбекские, и цены,

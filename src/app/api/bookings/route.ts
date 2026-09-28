@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
-import { createBooking, listUserBookings, type BookingKind } from "@/lib/community";
+import { createBooking, listUserBookings, setBookingExternal, type BookingKind } from "@/lib/community";
 import { currentUser } from "@/lib/session";
+import { КАТЕГОРИИ } from "@/lib/availability";
+import { отправитьБронь } from "@/lib/partners";
+import { readContent } from "@/lib/store";
+import type { RoomCategory } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
@@ -56,6 +60,18 @@ export async function POST(request: Request) {
     }
   }
 
+  // Категория номера — только у отеля и только из общего словаря.
+  const roomCategory =
+    kind === "hotel" && КАТЕГОРИИ.includes(body.roomCategory as RoomCategory)
+      ? (body.roomCategory as RoomCategory)
+      : undefined;
+  // Время визита — у ресторана, если его выбрали.
+  const time =
+    kind === "restaurant" && typeof body.time === "string" && /^\d{1,2}:\d{2}$/.test(body.time)
+      ? body.time
+      : undefined;
+  const note = typeof body.note === "string" ? body.note.trim().slice(0, 500) : "";
+
   const бронь = await createBooking({
     userId: user.id,
     kind,
@@ -64,8 +80,46 @@ export async function POST(request: Request) {
     date,
     guests,
     nights,
-    note: typeof body.note === "string" ? body.note.trim().slice(0, 500) : "",
+    roomCategory,
+    time,
+    note,
   });
+
+  /*
+   * Заведение подключено к своей системе (OSHBOARD или любой другой по
+   * HelloUZ Partner API) — отправляем бронь туда сразу. Ответ «принято» —
+   * место за туристом; нет связи или отказ — остаётся заявкой, как
+   * раньше, её увидит администратор HelloUZ.
+   */
+  if (kind === "hotel" || kind === "restaurant") {
+    const content = await readContent();
+    const запись =
+      kind === "hotel"
+        ? content.hotels.find((h) => h.id === itemId)
+        : content.restaurants.find((r) => r.id === itemId);
+    if (запись?.connection?.kind === "partner") {
+      const ответ = await отправитьБронь(kind, запись, {
+        helloUzId: бронь.id,
+        date,
+        time,
+        nights,
+        guests,
+        roomCategory,
+        name: `${user.firstName} ${user.lastName}`.trim(),
+        phone: user.phone || undefined,
+        email: user.email,
+        note,
+      });
+      if (ответ) {
+        await setBookingExternal(бронь.id, ответ);
+        return NextResponse.json({
+          ok: true,
+          booking: { ...бронь, external: ответ },
+          confirmed: ответ.status === "confirmed",
+        });
+      }
+    }
+  }
 
   return NextResponse.json({ ok: true, booking: бронь });
 }

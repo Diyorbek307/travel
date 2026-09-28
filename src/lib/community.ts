@@ -1,6 +1,7 @@
 import { randomBytes } from "node:crypto";
 import path from "node:path";
 import { создатьХранилище } from "./storage";
+import type { RoomCategory } from "./types";
 
 /**
  * Всё, что создают сами пользователи: переписка с поддержкой, брони и
@@ -110,9 +111,18 @@ export interface Booking {
   guests: number;
   /** Сколько ночей — только у отеля. */
   nights?: number;
+  /** Категория номера, если турист её выбрал. */
+  roomCategory?: RoomCategory;
+  /** Время визита в ресторан, HH:MM. */
+  time?: string;
   note: string;
   status: BookingStatus;
   createdAt: string;
+  /**
+   * Бронь в системе заведения — если оно подключено к HelloUZ Partner
+   * API и приняло её. Без поля — обычная заявка для администратора.
+   */
+  external?: { id: string; status: "confirmed" | "pending" | "rejected" };
 }
 
 const брони = создатьХранилище<Booking[]>(path.join(DATA_DIR, "bookings.json"), () => []);
@@ -134,6 +144,27 @@ export async function createBooking(input: Omit<Booking, "id" | "status" | "crea
   };
   await брони.update((все) => [[...все, бронь], undefined]);
   return бронь;
+}
+
+/** Записать ответ системы заведения на бронь. */
+export async function setBookingExternal(
+  bookingId: string,
+  external: NonNullable<Booking["external"]>,
+): Promise<void> {
+  await брони.update((все) => {
+    const i = все.findIndex((b) => b.id === bookingId);
+    if (i === -1) return [все, undefined];
+    const копия = [...все];
+    // Заведение подтвердило само — заявка уже не «новая».
+    const status: BookingStatus =
+      external.status === "confirmed"
+        ? "confirmed"
+        : external.status === "rejected"
+        ? "cancelled"
+        : копия[i].status;
+    копия[i] = { ...копия[i], external, status };
+    return [копия, undefined];
+  });
 }
 
 export async function setBookingStatus(bookingId: string, status: BookingStatus): Promise<void> {

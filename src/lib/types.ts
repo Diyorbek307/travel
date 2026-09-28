@@ -18,6 +18,8 @@ export interface Place {
   desc: string;
   audio: boolean;
   qr: boolean;
+  /** Виды билетов: взрослый, детский, для граждан Узбекистана… */
+  tickets?: Ticket[];
 }
 
 export interface RouteStop {
@@ -53,6 +55,67 @@ export type HotelKind = "hotel" | "motel" | "hostel";
 /** Ресторан или бар. Без поля — ресторан. */
 export type RestaurantKind = "restaurant" | "bar";
 
+/**
+ * Категория номера. Общий словарь для всех гостиниц и для систем
+ * партнёров: по нему совпадают наши номера и их наличие у партнёра.
+ */
+export type RoomCategory = "economy" | "standard" | "business" | "lux" | "family" | "dorm";
+
+/** Тип номера в гостинице — то, что турист выбирает перед бронью. */
+export interface RoomType {
+  id: string;
+  category: RoomCategory;
+  /** Своё название, если категории мало: «Стандарт с видом на Регистан». */
+  name?: string;
+  /** Цена за ночь, в долларах. */
+  price: number;
+  /** Сколько гостей помещается. */
+  guests: number;
+  /** Кровати словами: «1 двуспальная», «2 односпальные». */
+  beds: string;
+  /** Площадь, м². */
+  area?: number;
+  amenities: string[];
+  img?: string;
+}
+
+/** Зал или зона ресторана: основной зал, терраса, VIP. */
+export interface Zone {
+  id: string;
+  name: string;
+  seats: number;
+}
+
+/** Вид билета в музей или к достопримечательности. */
+export interface Ticket {
+  id: string;
+  name: string;
+  /** Цена строкой, как на кассе: «$5», «20 000 сум», «Бесплатно». */
+  price: string;
+}
+
+/**
+ * Откуда приложение знает, есть ли свободные места.
+ *   none    — не знает: бронь уходит заявкой, как раньше;
+ *   manual  — заведение само отмечает в панели, сколько свободно;
+ *   partner — живые данные из системы заведения (OSHBOARD или любой
+ *             другой, реализовавшей HelloUZ Partner API).
+ */
+export type ConnectionKind = "none" | "manual" | "partner";
+
+export interface Connection {
+  kind: ConnectionKind;
+  /**
+   * Номер заведения в системе партнёра. Сам ключ доступа хранится не
+   * здесь, а в закрытом хранилище: содержимое отдаётся всем подряд.
+   */
+  externalId?: string;
+  /** Ручной режим: сколько свободно — по категории номера или "tables". */
+  manual?: Partial<Record<RoomCategory | "tables", number>>;
+  /** Когда ручные цифры обновили — туристу видно, насколько они свежие. */
+  manualUpdatedAt?: string;
+}
+
 export interface Hotel {
   id: string;
   name: string;
@@ -66,6 +129,9 @@ export interface Hotel {
   facilities: string[];
   imgs: string[];
   kind?: HotelKind;
+  /** Категории номеров: эконом, стандарт, бизнес… */
+  roomTypes?: RoomType[];
+  connection?: Connection;
 }
 
 export interface Restaurant {
@@ -80,6 +146,10 @@ export interface Restaurant {
   img: string;
   desc: string;
   kind?: RestaurantKind;
+  zones?: Zone[];
+  /** Средний чек на человека строкой: «$10–15», «80 000 сум». */
+  avgCheck?: string;
+  connection?: Connection;
 }
 
 /** Карточка в колоде на главной — одна форма и для городов, и для мест. */
