@@ -32,6 +32,7 @@ import CityReel from "@/components/city-reel";
 import { ВИДЕО, ФОН_ВИДЕО, кадрыГорода } from "@/data/city-reels";
 import { AdInline } from "@/components/ads";
 import AiGuide from "@/components/ai-guide";
+import Туризм, { ФлагУз } from "@/components/tourism";
 
 /**
  * Раздел внутри «Исследовать». Без раздела экран — сетка плиток, как
@@ -46,7 +47,8 @@ export type РазделОбзора =
   | "restaurants"
   | "bars"
   | "excursions"
-  | "ai";
+  | "ai"
+  | "tourism";
 
 /*
  * Город — не отдельный мир, а фильтр над всеми разделами.
@@ -214,6 +216,7 @@ export function ExploreScreen({
         </Шапка>
         <div className="flex-1 overflow-y-auto hide-scroll p-4">
           <КарточкаИИ onClick={по("ai").go} />
+          <БаннерТуризм onClick={() => onРаздел("tourism")} />
           {/*
             Двенадцать одинаковых плиток подряд глаз не различает, поэтому
             они разложены по смыслу: что посмотреть, где жить, как ехать.
@@ -266,6 +269,7 @@ export function ExploreScreen({
     bars: "ex_bars",
     excursions: "ex_excursions",
     ai: "ex_ai",
+    tourism: "tour_title",
   };
   const назад = () => onРаздел(undefined);
 
@@ -283,7 +287,7 @@ export function ExploreScreen({
   return (
     <div className="flex flex-col h-full" style={{ background: CREAM }}>
       <Шапка кикер="HelloUZ" заголовок={t(заголовки[раздел])} фон={фон} onBack={назад}>
-        {раздел !== "cities" && чипыГородов}
+        {раздел !== "cities" && раздел !== "tourism" && чипыГородов}
       </Шапка>
       <div className="flex-1 overflow-y-auto hide-scroll p-4">
         {раздел === "cities" && (
@@ -302,6 +306,7 @@ export function ExploreScreen({
           <СписокРесторанов рестораны={рестораны} onRestaurant={onRestaurant} сброс={сброс} />
         )}
         {раздел === "bars" && <СписокРесторанов рестораны={бары} onRestaurant={onRestaurant} сброс={сброс} />}
+        {раздел === "tourism" && <Туризм />}
         {раздел === "excursions" && <СписокЭкскурсий туры={экскурсии} onRoute={onRoute} сброс={сброс} />}
       </div>
     </div>
@@ -352,6 +357,47 @@ function КарточкаИИ({ onClick }: { onClick: () => void }) {
         draggable={false}
         className="pointer-events-none absolute -bottom-[12%] -right-[3%] w-[44%] max-w-[190px] select-none object-contain transition-transform duration-300 group-hover:scale-105"
       />
+    </button>
+  );
+}
+
+/**
+ * Вход в раздел «Туризм Узбекистана» — узкая полоса под карточкой
+ * ИИ-гида: заметна, но не спорит с ним за внимание.
+ */
+function БаннерТуризм({ onClick }: { onClick: () => void }) {
+  const { t } = useT();
+  return (
+    <button
+      onClick={onClick}
+      className="tile-in mb-5 flex w-full items-center gap-3 rounded-2xl border p-3 text-left transition-transform duration-150 active:scale-[0.98]"
+      style={{ background: SURFACE, borderColor: BORDER }}
+    >
+      <span
+        className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl text-xl"
+        style={{ background: ACCENT_SOFT }}
+      >
+        <ФлагУз ширина={24} />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-sm font-bold" style={{ color: TEXT, fontFamily: "var(--font-heading)" }}>
+          {t("tour_banner_title")}
+        </span>
+        <span className="block truncate text-[11px]" style={{ color: MUTED }}>
+          {t("tour_banner_sub")}
+        </span>
+      </span>
+      <svg
+        className="rtl-flip flex-shrink-0"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke={GREEN}
+        strokeWidth="2.5"
+      >
+        <polyline points="9 18 15 12 9 6" />
+      </svg>
     </button>
   );
 }
