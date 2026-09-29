@@ -573,6 +573,13 @@ export function SettingsView({
         <p className="font-bold text-xs pt-3 pb-1 uppercase tracking-widest" style={{ color: MUTED }}>
           {t("prof_support")}
         </p>
+        {/* Обучение с детьми — то же, что при первом запуске; открывает его page.tsx. */}
+        <Row
+          icon="🎓"
+          label={t("s_tour")}
+          right={шеврон}
+          onClick={() => window.dispatchEvent(new Event("hellouz:tour"))}
+        />
         <Row icon="❓" label={t("s_help")} right={шеврон} onClick={() => setПанель("faq")} />
         <Row icon="💬" label={t("s_write_support")} right={шеврон} onClick={onSupport} />
         <Row icon="⭐" label={t("s_rate")} right={шеврон} onClick={() => setПанель("rate")} />

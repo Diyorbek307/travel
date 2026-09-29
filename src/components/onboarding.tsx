@@ -125,57 +125,122 @@ export function SplashScreen({ onStart, onLogin }: { onStart: () => void; onLogi
 
 // Знакомство с приложением
 
+/*
+ * Выбор языка. Встречают двое детей в национальной одежде: машут и зовут
+ * выбрать язык — реплика над ними сразу переходит на выбранный, так что
+ * человек видит свой язык ещё до того, как нажал «Продолжить».
+ *
+ * Видео зациклено (первый кадр = последний) и без звука. Пока грузится
+ * или если человек отключил анимации в системе — стоит первый кадр.
+ */
+const ДЕТИ_ВИДЕО = "/videos/kids-hello.mp4";
+const ДЕТИ_КАДР = "/videos/kids-hello.webp";
+
+/*
+ * Видео вписываем целиком (contain), а не обрезаем: дети стоят у самых
+ * краёв кадра, и на узком телефоне обрезка срезала бы им руки и подол.
+ * Пустое место вокруг заливает ФОН_ВИДЕО — те же тона, что у краёв кадра,
+ * от серо-бежевого верха к светлому полу.
+ */
+export const ФОН_ВИДЕО = "linear-gradient(#bcaa9b, #cdbbad 45%, #f0dac6 80%)";
+
+export function ДетиВидео({ src = ДЕТИ_ВИДЕО, кадр = ДЕТИ_КАДР }: { src?: string; кадр?: string }) {
+  const [спокойно, setСпокойно] = useState(false);
+  useEffect(() => {
+    setСпокойно(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  }, []);
+  return спокойно ? (
+    <img src={кадр} alt="" className="absolute inset-0 h-full w-full object-contain object-top" />
+  ) : (
+    <video
+      key={src}
+      src={src}
+      poster={кадр}
+      autoPlay
+      muted
+      loop
+      playsInline
+      preload="auto"
+      aria-hidden
+      className="absolute inset-0 h-full w-full object-contain object-top"
+    />
+  );
+}
+
 export function OnboardingLang({ onNext }: { onNext: () => void }) {
   const { lang, setLang, t } = useT();
   return (
-    <div className="flex flex-col h-full animate-slide-up" style={{ background: CREAM }}>
-      <div className="relative h-52 flex-shrink-0" style={{ background: ACCENT_FILL }}>
-        <div className="absolute inset-0 flex items-center justify-center opacity-15">
-          <GeomPattern opacity={1} />
-        </div>
-        <div className="relative z-10 flex flex-col items-center justify-center h-full gap-3">
-          <LogoMark size={52} intro tone="#ffffff" />
-          <p className="text-white text-2xl font-bold" style={{ fontFamily: "var(--font-heading)" }}>
-            {t("onb_welcome")}
-          </p>
-          <p className="text-white/70 text-sm">{t("onb_choose_lang")}</p>
+    <div className="relative flex h-full flex-col overflow-hidden" style={{ background: ФОН_ВИДЕО }}>
+      <ДетиВидео />
+
+      {/* Верх: знак и приветствие — тёмным по светлому фону видео. */}
+      <div className="relative z-10 flex flex-col items-center px-6 pt-12 text-center">
+        <LogoMark size={40} />
+        <p
+          className="mt-2 text-2xl font-bold"
+          style={{ fontFamily: "var(--font-heading)", color: "#10302c" }}
+        >
+          {t("onb_welcome")}
+        </p>
+      </div>
+
+      {/* Реплика детей — на выбранном языке, меняется при выборе. */}
+      <div className="relative z-10 mt-4 flex justify-center px-8">
+        <div
+          key={lang}
+          className="bubble-in relative max-w-[280px] rounded-2xl px-4 py-2.5 text-center text-sm font-semibold shadow-lg"
+          style={{ background: "#ffffff", color: "#10302c" }}
+        >
+          {t("onb_kids_hello")}
+          <span
+            className="absolute -bottom-1.5 left-1/2 h-3 w-3 -translate-x-1/2 rotate-45"
+            style={{ background: "#ffffff" }}
+            aria-hidden
+          />
         </div>
       </div>
-      <div className="flex-1 overflow-y-auto hide-scroll px-4 pt-5 space-y-2.5">
-        {LOCALES.map((код) => {
-          const выбран = lang === код;
-          return (
-            <button
-              key={код}
-              onClick={() => setLang(код)}
-              className="w-full flex items-center justify-between px-4 py-3.5 rounded-2xl border"
-              style={
-                выбран
-                  ? { background: ACCENT_SOFT, borderColor: GREEN }
-                  : { background: SURFACE, borderColor: BORDER }
-              }
-            >
-              <span className="text-base font-medium" style={{ color: TEXT }}>
-                {LOCALE_META[код].label}
-              </span>
-              <div
-                className="w-5 h-5 rounded-full border-2 flex items-center justify-center"
-                style={выбран ? { borderColor: GREEN, background: ACCENT_FILL } : { borderColor: BORDER }}
+
+      {/* Низ: языки и «Продолжить» на полупрозрачной панели. */}
+      <div
+        className="relative z-10 mt-auto rounded-t-[28px] px-4 pb-7 pt-4"
+        style={{
+          background: "color-mix(in srgb, var(--surface) 88%, transparent)",
+          backdropFilter: "blur(14px)",
+          WebkitBackdropFilter: "blur(14px)",
+          boxShadow: "0 -8px 30px rgba(0,0,0,0.12)",
+        }}
+      >
+        <p className="mb-3 text-center text-xs font-semibold" style={{ color: MUTED }}>
+          {t("onb_choose_lang")}
+        </p>
+        <div className="grid grid-cols-3 gap-2">
+          {LOCALES.map((код) => {
+            const выбран = lang === код;
+            return (
+              <button
+                key={код}
+                onClick={() => setLang(код)}
+                aria-pressed={выбран}
+                className="truncate rounded-xl border px-2 py-2.5 text-[13px] font-medium transition-colors"
+                style={
+                  выбран
+                    ? { background: ACCENT_FILL, borderColor: ACCENT_FILL, color: WHITE }
+                    : { background: SURFACE, borderColor: BORDER, color: TEXT }
+                }
               >
-                {выбран && (
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3">
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                )}
-              </div>
-            </button>
-          );
-        })}
-      </div>
-      <div className="px-4 pb-8 pt-3">
+                {LOCALE_META[код].label}
+              </button>
+            );
+          })}
+        </div>
         <button
-          onClick={onNext}
-          className="w-full py-4 rounded-2xl text-white font-bold text-sm flex items-center justify-center gap-2"
+          onClick={() => {
+            // Запоминаем и язык, определённый по системе: иначе экран
+            // выбора показывался бы при каждом входе.
+            setLang(lang);
+            onNext();
+          }}
+          className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl py-4 text-sm font-bold text-white"
           style={{ background: ACCENT_FILL }}
         >
           {t("onb_continue")}{" "}
@@ -191,10 +256,6 @@ export function OnboardingLang({ onNext }: { onNext: () => void }) {
             <polyline points="9 18 15 12 9 6" />
           </svg>
         </button>
-        <div className="flex items-center justify-center gap-2 mt-4">
-          <div className="w-6 h-1.5 rounded-full" style={{ background: ACCENT_FILL }} />
-          <div className="w-1.5 h-1.5 rounded-full" style={{ background: BORDER }} />
-        </div>
       </div>
     </div>
   );

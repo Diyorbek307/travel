@@ -6,6 +6,7 @@ import SideMenu from "@/components/side-menu";
 import { HotelDetail, PlaceDetail, RestaurantDetail, RouteDetail } from "@/components/details";
 import { NotifsPanel, PremiumModal, SearchModal } from "@/components/modals";
 import { OnboardingInterests, OnboardingLang, SplashScreen } from "@/components/onboarding";
+import { ОбучениеДети } from "@/components/kids-tour";
 import HomeScreen from "@/components/screens/home";
 import ExploreScreen, { type РазделОбзора } from "@/components/screens/explore";
 import MapScreen from "@/components/screens/map";
@@ -85,7 +86,20 @@ function запомнитьВход(да: boolean): void {
  * «push» — экран «Включите уведомления» между входом и приложением. Он сам
  * пропускает дальше, если спрашивать нечего (см. components/push-ask).
  */
-type Phase = "checking" | "splash" | "register" | "login" | "lang" | "interests" | "push" | "app";
+type Phase = "checking" | "splash" | "register" | "login" | "lang" | "tour" | "interests" | "push" | "app";
+
+/**
+ * Первый экран для не вошедшего. Язык выбирают до всего остального:
+ * иностранец, которому сразу показали регистрацию по-русски, закрыл бы
+ * приложение. Кто язык уже выбирал — сразу на заставку.
+ */
+function первыйЭкран(): Phase {
+  try {
+    return localStorage.getItem("uzup.lang") ? "splash" : "lang";
+  } catch {
+    return "lang";
+  }
+}
 
 /** Вкладка при входе и та, куда ведёт «назад» с остальных. */
 const СТАРТ: Tab = "explore";
@@ -110,6 +124,13 @@ export default function Page() {
 
 function App() {
   const [phase, setPhase] = useState<Phase>("checking");
+  // Повтор обучения из настроек — поверх приложения, без выхода из него.
+  const [обучение, setОбучение] = useState(false);
+  useEffect(() => {
+    const открыть = () => setОбучение(true);
+    window.addEventListener("hellouz:tour", открыть);
+    return () => window.removeEventListener("hellouz:tour", открыть);
+  }, []);
   const [user, setUser] = useState<PublicUser | null>(null);
   // Приложение открывается на HelloUZ — сетке разделов: за ней человек и
   // приходит (город, где поесть, где жить). Главная — на своей вкладке.
@@ -220,11 +241,11 @@ function App() {
           setUser(d.user);
           setPhase("app");
         } else {
-          setPhase("splash");
+          setPhase(первыйЭкран());
         }
       })
       .catch(() => {
-        if (!cancelled) setPhase("splash");
+        if (!cancelled) setPhase(первыйЭкран());
       });
     return () => {
       cancelled = true;
@@ -410,6 +431,7 @@ function App() {
    * самом верху, дальше только выход из приложения.
    */
   const назадНаШаг = useCallback((): boolean => {
+    if (обучение) return setОбучение(false), true;
     if (showSearch) return setShowSearch(false), true;
     if (showNotifs) return setShowNotifs(false), true;
     if (showPremium) return setShowPremium(false), true;
@@ -421,12 +443,14 @@ function App() {
     if (detail) return setDetail(null), true;
     if (tab === "explore" && разделОбзора) return setРазделОбзора(undefined), true;
     if (phase === "register" || phase === "login") return setPhase("splash"), true;
-    if (phase === "interests") return setPhase("lang"), true;
+    if (phase === "interests") return setPhase("app"), true;
+    if (phase === "tour") return setPhase("lang"), true;
     // «Назад» на экране уведомлений — то же, что «Не сейчас».
     if (phase === "push") return setPhase("app"), true;
     if (phase === "app" && tab !== СТАРТ) return switchTab(СТАРТ), true;
     return false;
   }, [
+    обучение,
     showSearch,
     showNotifs,
     showPremium,
@@ -468,7 +492,7 @@ function App() {
                 setUser(u);
                 // Сюда попадаем уже после подтверждения почты: сессия
                 // открыта. Новичку показываем язык и интересы.
-                setPhase("lang");
+                setPhase("interests");
               }}
             />
           </div>
@@ -489,10 +513,20 @@ function App() {
 
         {phase === "lang" && (
           <div className="overlay-screen device-safe-top absolute inset-0 z-40">
-            <OnboardingLang onNext={() => setPhase("interests")} />
+            <OnboardingLang onNext={() => setPhase(user ? "interests" : "tour")} />
           </div>
         )}
 
+        {обучение && (
+          <div className="overlay-screen device-safe-top absolute inset-0 z-50">
+            <ОбучениеДети onDone={() => setОбучение(false)} />
+          </div>
+        )}
+        {phase === "tour" && (
+          <div className="overlay-screen device-safe-top absolute inset-0 z-40">
+            <ОбучениеДети onDone={() => setPhase("splash")} />
+          </div>
+        )}
         {phase === "interests" && (
           <div className="overlay-screen device-safe-top absolute inset-0 z-40">
             <OnboardingInterests onDone={() => setPhase("push")} />
