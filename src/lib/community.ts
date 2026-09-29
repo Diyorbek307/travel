@@ -167,13 +167,14 @@ export async function setBookingExternal(
   });
 }
 
-export async function setBookingStatus(bookingId: string, status: BookingStatus): Promise<void> {
-  await брони.update((все) => {
+/** Сменить статус заявки. false — такой заявки нет (панель скажет «не найдено»). */
+export async function setBookingStatus(bookingId: string, status: BookingStatus): Promise<boolean> {
+  return брони.update<boolean>((все) => {
     const i = все.findIndex((b) => b.id === bookingId);
-    if (i === -1) return [все, undefined];
+    if (i === -1) return [все, false];
     const копия = [...все];
     копия[i] = { ...копия[i], status };
-    return [копия, undefined];
+    return [копия, true];
   });
 }
 
@@ -267,12 +268,13 @@ export async function createReview(input: Omit<Review, "id" | "status" | "create
   });
 }
 
-export async function setReviewStatus(reviewId: string, status: ReviewStatus): Promise<void> {
-  await отзывы.update((все) => {
+/** Скрыть или вернуть отзыв. false — такого отзыва нет. */
+export async function setReviewStatus(reviewId: string, status: ReviewStatus): Promise<boolean> {
+  return отзывы.update<boolean>((все) => {
     const i = все.findIndex((r) => r.id === reviewId);
-    if (i === -1) return [все, undefined];
+    if (i === -1) return [все, false];
     const копия = [...все];
     копия[i] = { ...копия[i], status };
-    return [копия, undefined];
+    return [копия, true];
   });
 }

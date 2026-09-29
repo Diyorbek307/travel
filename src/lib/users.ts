@@ -1,4 +1,5 @@
 import { createHmac, randomBytes, scrypt, timingSafeEqual } from "node:crypto";
+import { кодСтраны } from "./countries";
 import { promisify } from "node:util";
 import path from "node:path";
 import { создатьХранилище } from "./storage";
@@ -176,7 +177,7 @@ export async function createUser(input: {
       firstName: input.firstName.trim(),
       lastName: input.lastName.trim(),
       hasPhoto: Boolean(input.photo),
-      country: input.country.trim(),
+      country: кодСтраны(input.country) ?? input.country.trim().slice(0, 60),
       phone: input.phone.trim(),
       emailVerified: false,
       createdAt: now,
@@ -238,7 +239,8 @@ export async function updateUser(
     const чистые: typeof fields = {};
     if (typeof fields.firstName === "string") чистые.firstName = fields.firstName.trim().slice(0, 60);
     if (typeof fields.lastName === "string") чистые.lastName = fields.lastName.trim().slice(0, 60);
-    if (typeof fields.country === "string") чистые.country = fields.country.trim().slice(0, 60);
+    if (typeof fields.country === "string")
+      чистые.country = кодСтраны(fields.country) ?? fields.country.trim().slice(0, 60);
     if (typeof fields.phone === "string") чистые.phone = fields.phone.trim().slice(0, 40);
     if (typeof fields.hasPhoto === "boolean") чистые.hasPhoto = fields.hasPhoto;
     копия[i] = { ...копия[i], ...чистые };

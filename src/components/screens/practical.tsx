@@ -29,7 +29,7 @@ export function CurrencyConverter() {
     <select
       value={значение}
       onChange={(e) => менять(e.target.value)}
-      className="rounded-xl border bg-transparent px-2 py-2.5 text-sm font-bold outline-none"
+      className="w-full rounded-xl border bg-transparent px-2 py-2.5 text-sm font-bold outline-none"
       style={{ borderColor: BORDER, color: TEXT, background: CREAM }}
     >
       {валюты.map((к) => (
@@ -47,7 +47,10 @@ export function CurrencyConverter() {
       </p>
 
       <div className="mb-3 flex flex-wrap items-end gap-2">
-        <div className="min-w-0 flex-1">
+        {/* Сумма — своей строкой во всю ширину: рядом с двумя списками
+            валют поле сжималось, и «100» читалось как «10» — казалось,
+            что конвертер ошибся в десять раз. */}
+        <div className="w-full">
           <p className="mb-1 text-[9px] font-bold uppercase tracking-wide" style={{ color: MUTED }}>
             {t("cur_amount")}
           </p>
@@ -59,7 +62,7 @@ export function CurrencyConverter() {
             style={{ borderColor: BORDER, color: TEXT, background: CREAM }}
           />
         </div>
-        <div>
+        <div className="min-w-0 flex-1">
           <p className="mb-1 text-[9px] font-bold uppercase tracking-wide" style={{ color: MUTED }}>
             {t("cur_from")}
           </p>
@@ -76,7 +79,7 @@ export function CurrencyConverter() {
         >
           ⇄
         </button>
-        <div>
+        <div className="min-w-0 flex-1">
           <p className="mb-1 text-[9px] font-bold uppercase tracking-wide" style={{ color: MUTED }}>
             {t("cur_to")}
           </p>
@@ -210,6 +213,7 @@ export function PracticalScreen({ onBack }: { onBack: () => void }) {
       <div className="bg-white px-4 pt-14 pb-4 border-b" style={{ borderColor: BORDER }}>
         <div className="flex items-center gap-3">
           <button
+            aria-label={t("common_back")}
             onClick={onBack}
             className="w-9 h-9 rounded-xl flex items-center justify-center"
             style={{ background: CREAM }}

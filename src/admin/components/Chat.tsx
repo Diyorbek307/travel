@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { названиеСтраны } from "@/lib/countries";
 import { PageHeader, Badge, Btn, склонение } from "./shared";
 import { useNarrow } from "../context/useNarrow";
 
@@ -222,7 +223,7 @@ export default function Chat() {
                     </p>
                     <p className="truncate text-xs" style={{ color: "var(--color-muted)" }}>
                       {ветка.email}
-                      {ветка.country ? ` · ${ветка.country}` : ""}
+                      {ветка.country ? ` · ${названиеСтраны(ветка.country, "ru")}` : ""}
                     </p>
                   </div>
                 </div>

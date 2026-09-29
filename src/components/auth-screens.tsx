@@ -1,5 +1,6 @@
 "use client";
 
+import { списокСтран } from "@/lib/countries";
 import { useEffect, useRef, useState } from "react";
 import { useT } from "@/components/lang-provider";
 import type { TKey } from "@/lib/i18n";
@@ -115,7 +116,7 @@ export function RegisterScreen({
   onBack: () => void;
   onDone: (user: PublicUser) => void;
 }) {
-  const { t } = useT();
+  const { t, lang } = useT();
   const [ждётКод, setЖдётКод] = useState<{ email: string; почтаНастроена: boolean; пауза: number } | null>(
     null,
   );
@@ -132,7 +133,7 @@ export function RegisterScreen({
   const [идёт, setИдёт] = useState(false);
   const файл = useRef<HTMLInputElement>(null);
 
-  const менять = (k: keyof typeof форма) => (e: React.ChangeEvent<HTMLInputElement>) =>
+  const менять = (k: keyof typeof форма) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setФорма((p) => ({ ...p, [k]: e.target.value }));
 
   /** Уменьшаем снимок до 320 пикселей: запись хранится в JSON. */
@@ -264,13 +265,21 @@ export function RegisterScreen({
           className="rounded-xl px-4 py-3 text-sm outline-none"
           style={поле()}
         />
-        <input
-          placeholder={t("reg_country_ph")}
+        {/* Страна — из списка, кодом: ручной ввод давал «Germany» и
+            «Deutschland» как две разные страны. */}
+        <select
           value={форма.country}
           onChange={менять("country")}
           className="rounded-xl px-4 py-3 text-sm outline-none"
-          style={поле()}
-        />
+          style={{ ...поле(), color: форма.country ? undefined : "var(--muted)" }}
+        >
+          <option value="">{t("reg_country_ph")}</option>
+          {списокСтран(lang).map((с) => (
+            <option key={с.код} value={с.код}>
+              {с.имя}
+            </option>
+          ))}
+        </select>
         <input
           placeholder={t("reg_phone_ph")}
           value={форма.phone}

@@ -1,5 +1,6 @@
 "use client";
 
+import { кодСтраны, названиеСтраны, списокСтран } from "@/lib/countries";
 import { useRef, useState } from "react";
 import type { PublicUser } from "@/lib/types";
 import { PremiumModal } from "@/components/modals";
@@ -750,12 +751,28 @@ export function SettingsView({
                     >
                       {label}
                     </label>
-                    <input
-                      value={(форма as Record<string, string>)[k]}
-                      onChange={(e) => setФорма((f) => ({ ...f, [k]: e.target.value }))}
-                      className="w-full rounded-xl px-3 py-2.5 text-sm outline-none border"
-                      style={{ background: CREAM, borderColor: BORDER, color: TEXT }}
-                    />
+                    {k === "country" ? (
+                      <select
+                        value={кодСтраны(форма.country) ?? ""}
+                        onChange={(e) => setФорма((f) => ({ ...f, country: e.target.value }))}
+                        className="w-full rounded-xl px-3 py-2.5 text-sm outline-none border"
+                        style={{ background: CREAM, borderColor: BORDER, color: TEXT }}
+                      >
+                        <option value="">—</option>
+                        {списокСтран(lang).map((с) => (
+                          <option key={с.код} value={с.код}>
+                            {с.имя}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <input
+                        value={(форма as Record<string, string>)[k]}
+                        onChange={(e) => setФорма((f) => ({ ...f, [k]: e.target.value }))}
+                        className="w-full rounded-xl px-3 py-2.5 text-sm outline-none border"
+                        style={{ background: CREAM, borderColor: BORDER, color: TEXT }}
+                      />
+                    )}
                   </div>
                 ))}
                 <button
@@ -879,7 +896,7 @@ export function ProfileScreen({
   const всегоШтампов = штампы.length;
   const процентШтампов = всегоШтампов ? Math.round((заработано / всегоШтампов) * 100) : 0;
   const имя = user ? `${user.firstName} ${user.lastName}`.trim() : t("prof_traveler");
-  const откуда = user?.country ? `🌍 ${user.country}` : `🌍 ${t("prof_traveler")}`;
+  const откуда = user?.country ? `🌍 ${названиеСтраны(user.country, lang)}` : `🌍 ${t("prof_traveler")}`;
   const снимок = user?.hasPhoto ? `/api/photo/${user.id}` : null;
   // Номер паспорта свой у каждого: год регистрации и хвост id аккаунта.
   const номерПаспорта = user

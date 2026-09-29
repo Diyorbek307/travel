@@ -204,6 +204,7 @@ export function TransportScreen({ onBack, isPremium }: { onBack: () => void; isP
         </div>
         <div className="relative z-10">
           <button
+            aria-label={t("common_back")}
             onClick={onBack}
             className="mb-3 w-9 h-9 rounded-xl flex items-center justify-center"
             style={{ background: "rgba(255,255,255,0.2)" }}

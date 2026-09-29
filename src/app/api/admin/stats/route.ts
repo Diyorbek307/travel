@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { кодСтраны } from "@/lib/countries";
 import { isAuthenticated } from "@/lib/admin-auth";
 import { listBookings, listReviews, listThreads } from "@/lib/community";
 import { listUsers } from "@/lib/users";
@@ -58,7 +59,8 @@ export async function GET() {
   // Страны: то, что люди указали сами. Не указавших не приписываем.
   const страны = new Map<string, number>();
   for (const u of users) {
-    const c = u.country.trim();
+    // «Germany» и «Deutschland» — одна страна: считаем по коду.
+    const c = кодСтраны(u.country) ?? u.country.trim();
     if (c) страны.set(c, (страны.get(c) ?? 0) + 1);
   }
 

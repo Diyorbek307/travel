@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { названиеСтраны } from "@/lib/countries";
 import { PageHeader, Btn, Card, SectionTitle, StatCard } from "./shared";
 
 /**
@@ -145,7 +146,7 @@ export default function Analytics() {
               {s.страны.slice(0, 8).map((c) => (
                 <div key={c.name} className="flex flex-wrap items-center gap-3">
                   <span className="min-w-0 flex-1 truncate text-sm" style={{ color: "var(--color-muted)" }}>
-                    {c.name}
+                    {названиеСтраны(c.name, "ru")}
                   </span>
                   <span
                     className="h-1.5 w-14 shrink-0 overflow-hidden rounded-full sm:w-28"

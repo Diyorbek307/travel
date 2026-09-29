@@ -35,6 +35,7 @@ export default function TripScreen({
       <div className="flex-shrink-0 border-b bg-white px-4 pb-4 pt-14" style={{ borderColor: BORDER }}>
         <div className="flex items-center gap-3">
           <button
+            aria-label={t("common_back")}
             onClick={onBack}
             className="flex h-9 w-9 items-center justify-center rounded-xl transition-all active:scale-95"
             style={{ background: CREAM }}

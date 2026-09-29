@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { ipЗапроса, подЛимитом } from "@/lib/rate-limit";
 import { randomBytes } from "node:crypto";
 import { какиеСистемы, ссылкаОплаты, type Система } from "@/lib/payments";
 
@@ -13,6 +14,10 @@ export const dynamic = "force-dynamic";
  * приложение показывает это словами, а не мёртвой кнопкой.
  */
 export async function POST(request: Request) {
+  // Каждый запрос уходит во внешний сервис по нашему ключу: без лимита
+  // любой скрипт выжег бы квоту за минуту.
+  if (!подЛимитом(`pay:${ipЗапроса(request)}`, 20, 60_000))
+    return NextResponse.json({ error: "too_many" }, { status: 429 });
   let body: Record<string, unknown>;
   try {
     body = await request.json();

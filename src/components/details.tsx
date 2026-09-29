@@ -112,6 +112,7 @@ export function PlaceDetail({
           }}
         />
         <button
+          aria-label={t("common_back")}
           onClick={onBack}
           className="absolute top-12 left-4 w-9 h-9 rounded-xl flex items-center justify-center backdrop-blur-sm"
           style={{ ...glass }}
@@ -364,6 +365,7 @@ export function HotelDetail({
           style={{ background: "linear-gradient(to top,rgba(0,0,0,0.6) 0%,transparent 50%)" }}
         />
         <button
+          aria-label={t("common_back")}
           onClick={onBack}
           className="absolute top-12 left-4 w-9 h-9 rounded-xl flex items-center justify-center backdrop-blur-sm"
           style={{ ...glass }}
@@ -628,6 +630,7 @@ export function RestaurantDetail({
           style={{ background: "linear-gradient(to top,rgba(0,0,0,0.72) 0%,transparent 55%)" }}
         />
         <button
+          aria-label={t("common_back")}
           onClick={onBack}
           className="absolute top-12 left-4 w-9 h-9 rounded-xl flex items-center justify-center backdrop-blur-sm"
           style={{ ...glass }}
@@ -786,6 +789,7 @@ export function RouteDetail({
           <GeomPattern opacity={1} />
         </div>
         <button
+          aria-label={t("common_back")}
           onClick={onBack}
           className="mb-3 w-9 h-9 rounded-xl flex items-center justify-center relative z-10"
           style={{ background: "rgba(255,255,255,0.2)" }}

@@ -45,6 +45,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "bad_request" }, { status: 400 });
   }
 
-  await setReviewStatus(id, status);
+  if (!(await setReviewStatus(id, status))) {
+    return NextResponse.json({ error: "not_found" }, { status: 404 });
+  }
   return NextResponse.json({ ok: true });
 }

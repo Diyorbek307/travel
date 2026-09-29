@@ -134,3 +134,23 @@ export async function patchContent(разделы: Partial<Content>): Promise<vo
     undefined,
   ]);
 }
+
+/**
+ * Запись по id в указанных разделах — для проверки того, что прислал
+ * клиент. Отзыв или бронь на выдуманный id раньше принимались и
+ * засоряли модерацию; название тоже брали из запроса, а не из данных.
+ */
+export async function записьПоId(
+  id: string,
+  разделы: ContentKey[],
+): Promise<{ id: string; name?: string; title?: string } | null> {
+  if (!id) return null;
+  const содержимое = await readContent();
+  for (const р of разделы) {
+    const найдено = (содержимое[р] as { id: string; name?: string; title?: string }[]).find(
+      (x) => x.id === id,
+    );
+    if (найдено) return найдено;
+  }
+  return null;
+}

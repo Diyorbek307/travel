@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { подЛимитом } from "@/lib/rate-limit";
+import { записьПоId } from "@/lib/store";
 import { createBooking, listUserBookings, setBookingExternal, type BookingKind } from "@/lib/community";
 import { currentUser } from "@/lib/session";
 import { КАТЕГОРИИ } from "@/lib/availability";
@@ -22,6 +24,9 @@ export async function GET() {
 export async function POST(request: Request) {
   const user = await currentUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  // Заявки уходят заведениям и в их системы: сотня в минуту — это спам.
+  if (!подЛимитом(`booking:${user.id}`, 10, 60_000))
+    return NextResponse.json({ error: "too_many" }, { status: 429 });
 
   let body: Record<string, unknown>;
   try {
@@ -34,8 +39,12 @@ export async function POST(request: Request) {
   if (!ВИДЫ.includes(kind)) return NextResponse.json({ error: "kind_invalid" }, { status: 400 });
 
   const itemId = typeof body.itemId === "string" ? body.itemId : "";
-  const itemName = typeof body.itemName === "string" ? body.itemName.trim().slice(0, 120) : "";
-  if (!itemId || !itemName) return NextResponse.json({ error: "item_required" }, { status: 400 });
+  if (!itemId) return NextResponse.json({ error: "item_required" }, { status: 400 });
+  // Заведение должно существовать; название — из данных, а не из запроса.
+  const раздел = kind === "hotel" ? "hotels" : kind === "restaurant" ? "restaurants" : "routes";
+  const запись = await записьПоId(itemId, [раздел]);
+  if (!запись) return NextResponse.json({ error: "item_not_found" }, { status: 404 });
+  const itemName = (запись.name ?? запись.title ?? itemId).slice(0, 120);
 
   const guests = Number(body.guests);
   if (!Number.isInteger(guests) || guests < 1 || guests > 30) {
@@ -46,7 +55,12 @@ export async function POST(request: Request) {
   const когда = new Date(date).getTime();
   // Бронь задним числом — почти всегда опечатка в календаре. Нечитаемая
   // дата даёт NaN, а сравнение с NaN всегда ложно — её ловим отдельно.
-  if (!Number.isFinite(когда) || когда < Date.now() - 86_400_000) {
+  // И не дальше двух лет вперёд: «2099» — тоже опечатка.
+  if (
+    !Number.isFinite(когда) ||
+    когда < Date.now() - 86_400_000 ||
+    когда > Date.now() + 2 * 365 * 86_400_000
+  ) {
     return NextResponse.json({ error: "date_invalid" }, { status: 400 });
   }
 
@@ -67,7 +81,7 @@ export async function POST(request: Request) {
       : undefined;
   // Время визита — у ресторана, если его выбрали.
   const time =
-    kind === "restaurant" && typeof body.time === "string" && /^\d{1,2}:\d{2}$/.test(body.time)
+    kind === "restaurant" && typeof body.time === "string" && /^([01]?\d|2[0-3]):[0-5]\d$/.test(body.time)
       ? body.time
       : undefined;
   const note = typeof body.note === "string" ? body.note.trim().slice(0, 500) : "";

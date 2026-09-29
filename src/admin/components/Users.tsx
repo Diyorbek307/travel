@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { кодСтраны, названиеСтраны } from "@/lib/countries";
 import { PageHeader, Badge, Btn, Table, StatCard } from "./shared";
 import { useМеня } from "../context/MeContext";
 import { можетДомен } from "@/lib/admin-roles";
@@ -199,7 +200,10 @@ export default function Users() {
         <StatCard label="ВСЕГО" value={String(users.length)} />
         <StatCard label="АКТИВНЫЕ" value={String(users.filter(активен).length)} sub="за 3 месяца" />
         <StatCard label="С ФОТОГРАФИЕЙ" value={String(users.filter((u) => u.photoUrl).length)} />
-        <StatCard label="СТРАН" value={String(new Set(users.map((u) => u.country).filter(Boolean)).size)} />
+        <StatCard
+          label="СТРАН"
+          value={String(new Set(users.map((u) => кодСтраны(u.country) ?? u.country).filter(Boolean)).size)}
+        />
       </div>
 
       {/* Проверка почты: подключается и авторизуется, писем не шлёт. */}
@@ -406,7 +410,7 @@ export default function Users() {
               {premium(u) && <Badge label="premium" color="amber" />}
             </span>,
             u.email,
-            u.country || "—",
+            названиеСтраны(u.country, "ru") || "—",
             дата(u.createdAt),
             <span key="s" className="flex items-center gap-2">
               {дата(u.lastSeenAt)}
@@ -457,7 +461,7 @@ export default function Users() {
                 ["Имя", `${открыт.firstName} ${открыт.lastName}`.trim() || "—"],
                 ["Почта", открыт.email],
                 ["Подтверждение", открыт.emailVerified ? "почта подтверждена ✓" : "не подтверждена"],
-                ["Страна", открыт.country || "не указана"],
+                ["Страна", названиеСтраны(открыт.country, "ru") || "не указана"],
                 ["Телефон", открыт.phone || "не указан"],
                 ["Регистрация", дата(открыт.createdAt)],
                 ["Был в сети", дата(открыт.lastSeenAt)],

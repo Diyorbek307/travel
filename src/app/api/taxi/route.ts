@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { ipЗапроса, подЛимитом } from "@/lib/rate-limit";
 import { оценить, ценаДоступна } from "@/lib/taxi";
 
 export const dynamic = "force-dynamic";
@@ -10,6 +11,10 @@ export const dynamic = "force-dynamic";
  * тут же начнут пользоваться посторонние.
  */
 export async function POST(request: Request) {
+  // Каждый запрос уходит во внешний сервис по нашему ключу: без лимита
+  // любой скрипт выжег бы квоту за минуту.
+  if (!подЛимитом(`taxi:${ipЗапроса(request)}`, 30, 60_000))
+    return NextResponse.json({ error: "too_many" }, { status: 429 });
   let body: Record<string, unknown>;
   try {
     body = await request.json();
