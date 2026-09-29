@@ -167,6 +167,78 @@ export function ДетиВидео({ src = ДЕТИ_ВИДЕО, кадр = ДЕ�
   );
 }
 
+/** «Привет» на языках приложения — по очереди, как будто дети здороваются со всеми. */
+const ПРИВЕТЫ = [
+  "Hello!",
+  "Salom!",
+  "Привет!",
+  "你好!",
+  "안녕!",
+  "Hallo!",
+  "Bonjour!",
+  "こんにちは!",
+  "Merhaba!",
+  "مرحبا!",
+];
+
+function Приветы() {
+  const [i, setI] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setI((n) => (n + 1) % ПРИВЕТЫ.length), 1400);
+    return () => clearInterval(id);
+  }, []);
+  return (
+    <span
+      key={i}
+      dir="auto"
+      className="bubble-in block text-base font-bold"
+      style={{ color: "var(--accent-fill)" }}
+    >
+      {ПРИВЕТЫ[i]}
+    </span>
+  );
+}
+
+/*
+ * Буквы алфавитов, на которых говорит приложение: латиница, кириллица,
+ * иероглифы, хангыль, арабская вязь, кана. Мелкие и полупрозрачные,
+ * всплывают у краёв и между детьми, лица не закрывают.
+ */
+const БУКВЫ: { c: string; x: string; y: string; d: number }[] = [
+  { c: "A", x: "6%", y: "44%", d: 0 },
+  { c: "Б", x: "14%", y: "30%", d: 1.6 },
+  { c: "你", x: "47%", y: "52%", d: 0.8 },
+  { c: "가", x: "88%", y: "40%", d: 2.2 },
+  { c: "ع", x: "80%", y: "27%", d: 3 },
+  { c: "あ", x: "42%", y: "30%", d: 3.8 },
+  { c: "Ü", x: "4%", y: "58%", d: 4.4 },
+  { c: "Ş", x: "92%", y: "55%", d: 1.1 },
+  { c: "ß", x: "55%", y: "58%", d: 2.8 },
+  { c: "Ё", x: "22%", y: "54%", d: 5 },
+];
+
+function БуквыЯзыков() {
+  return (
+    <div className="pointer-events-none absolute inset-0 z-[5]" aria-hidden>
+      {БУКВЫ.map((б) => (
+        <span
+          key={б.c}
+          className="letter-float absolute text-2xl font-extrabold"
+          style={{
+            left: б.x,
+            top: б.y,
+            animationDelay: `${б.d}s`,
+            color: "#0ea69f",
+            textShadow: "0 0 12px rgba(255,255,255,0.95), 0 0 4px rgba(255,255,255,0.9)",
+          }}
+        >
+          {б.c}
+        </span>
+      ))}
+    </div>
+  );
+}
+
 export function OnboardingLang({ onNext }: { onNext: () => void }) {
   const { lang, setLang, t } = useT();
   return (
@@ -184,14 +256,20 @@ export function OnboardingLang({ onNext }: { onNext: () => void }) {
         </p>
       </div>
 
-      {/* Реплика детей — на выбранном языке, меняется при выборе. */}
+      {/* Буквы разных алфавитов всплывают вокруг детей — экран про языки. */}
+      <БуквыЯзыков />
+
+      {/* Реплика детей: «привет» по очереди на всех языках, ниже — просьба
+          выбрать язык на уже выбранном. */}
       <div className="relative z-10 mt-4 flex justify-center px-8">
         <div
-          key={lang}
-          className="bubble-in relative max-w-[280px] rounded-2xl px-4 py-2.5 text-center text-sm font-semibold shadow-lg"
+          className="relative max-w-[280px] rounded-2xl px-4 py-2.5 text-center text-sm font-semibold shadow-lg"
           style={{ background: "#ffffff", color: "#10302c" }}
         >
-          {t("onb_kids_hello")}
+          <Приветы />
+          <span key={lang} className="bubble-in block">
+            {t("onb_kids_pick")}
+          </span>
           <span
             className="absolute -bottom-1.5 left-1/2 h-3 w-3 -translate-x-1/2 rotate-45"
             style={{ background: "#ffffff" }}

@@ -26,14 +26,14 @@ interface Шаг {
 
 const ШАГИ: Шаг[] = [
   {
-    видео: "/videos/kids-phone.mp4",
+    видео: "/videos/kids-map.mp4",
     реплика: "tour1_say",
     заголовок: "tour1_title",
     текст: "tour1_text",
     показ: () => <Плитки />,
   },
   {
-    видео: "/videos/kids-hello.mp4",
+    видео: "/videos/kids-audio.mp4",
     реплика: "tour2_say",
     заголовок: "tour2_title",
     текст: "tour2_text",

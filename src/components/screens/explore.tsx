@@ -382,11 +382,27 @@ function КарточкаИИ({ onClick }: { onClick: () => void }) {
           ✨ {t("ex_ai_card_cta")}
         </span>
       </div>
+      {/* Робот живой: машет и листает карту. Видео снято на цвете карточки,
+          края растворяются маской — прямоугольника кадра не видно. */}
+      <video
+        src="/videos/ai-robot.mp4"
+        poster="/videos/ai-robot.webp"
+        autoPlay
+        muted
+        loop
+        playsInline
+        aria-hidden
+        className="robot-live pointer-events-none absolute -bottom-[6%] right-0 w-[46%] max-w-[200px] select-none transition-transform duration-300 group-hover:scale-105"
+        style={{
+          maskImage: "radial-gradient(closest-side, #000 72%, transparent 100%)",
+          WebkitMaskImage: "radial-gradient(closest-side, #000 72%, transparent 100%)",
+        }}
+      />
       <img
         src="/tiles/ai.webp"
         alt=""
         draggable={false}
-        className="pointer-events-none absolute -bottom-[12%] -right-[3%] w-[44%] max-w-[190px] select-none object-contain transition-transform duration-300 group-hover:scale-105"
+        className="robot-still pointer-events-none absolute -bottom-[12%] -right-[3%] w-[44%] max-w-[190px] select-none object-contain"
       />
     </button>
   );

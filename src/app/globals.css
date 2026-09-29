@@ -1072,3 +1072,42 @@ html.intro-landing [data-brand-logo] {
     animation: none;
   }
 }
+
+/* Буквы алфавитов на экране языка: всплывают, светятся и тают. */
+.letter-float {
+  opacity: 0;
+  animation: letter-float 6s ease-in-out infinite;
+}
+@keyframes letter-float {
+  0% {
+    opacity: 0;
+    transform: translateY(12px) scale(0.8);
+  }
+  20%,
+  60% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-36px) scale(1.1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .letter-float {
+    animation: none;
+    opacity: 0.5;
+  }
+}
+
+/* Робот ИИ-гида: видео, а без анимаций — прежняя картинка. */
+.robot-still {
+  display: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .robot-live {
+    display: none;
+  }
+  .robot-still {
+    display: block;
+  }
+}
