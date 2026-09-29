@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ACCENT_FILL, ACCENT_SOFT, BORDER, CREAM, GREEN, MUTED, TEXT, WHITE } from "@/lib/theme";
 import { useT } from "@/components/lang-provider";
 import { useДеньги } from "@/lib/money";
 import type { Наличие } from "@/lib/availability";
 import type { TKey } from "@/lib/i18n";
-import type { Hotel, Place, Restaurant, RoomCategory, RoomType } from "@/lib/types";
+import type { Hotel, MenuItem, Place, Restaurant, RoomCategory, RoomType } from "@/lib/types";
 
 /**
  * Подробности заведений: номера гостиницы, залы ресторана, билеты места —
@@ -21,6 +21,8 @@ export const КАТЕГОРИЯ_НОМЕРА: Record<RoomCategory, TKey> = {
   lux: "room_cat_lux",
   family: "room_cat_family",
   dorm: "room_cat_dorm",
+  comfort: "room_cat_comfort",
+  presidential: "room_cat_presidential",
 };
 
 /**
@@ -132,12 +134,10 @@ export function НомераОтеля({
                 opacity: занят ? 0.6 : 1,
               }}
             >
-              {н.img && (
-                <img
-                  src={н.img}
-                  alt=""
-                  loading="lazy"
-                  className="skel h-20 w-20 flex-shrink-0 rounded-lg object-cover"
+              {(н.imgs?.[0] ?? н.img) && (
+                <ФотоСПросмотром
+                  фото={н.imgs?.length ? н.imgs : [н.img as string]}
+                  className="h-20 w-20 flex-shrink-0 rounded-lg"
                 />
               )}
               <div className="min-w-0 flex-1">
@@ -270,6 +270,157 @@ export function БилетыМеста({ place }: { place: Place }) {
           <div key={б.id} className="flex items-center justify-between py-2 text-sm">
             <span style={{ color: TEXT }}>{трК(б.name)}</span>
             <b style={{ color: GREEN }}>{дг.цена(б.price)}</b>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Фото во весь экран: листать пальцем, закрыть крестиком или «назад».
+ * Открывается с того снимка, на который нажали.
+ */
+export function ПросмотрФото({ фото, с, onClose }: { фото: string[]; с: number; onClose: () => void }) {
+  const лента = useRef<HTMLDivElement>(null);
+  const [номер, setНомер] = useState(с);
+
+  useEffect(() => {
+    const el = лента.current;
+    if (el) el.scrollLeft = с * el.clientWidth;
+    const esc = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", esc);
+    return () => window.removeEventListener("keydown", esc);
+  }, [с, onClose]);
+
+  return (
+    <div className="fixed inset-0 z-[90] flex flex-col bg-black" role="dialog" aria-modal>
+      <div className="flex items-center justify-between px-4 pb-2 pt-12 text-sm text-white/80">
+        <span>
+          {номер + 1} / {фото.length}
+        </span>
+        <button
+          onClick={onClose}
+          aria-label="close"
+          className="h-9 w-9 rounded-xl text-xl text-white"
+          style={{ background: "rgba(255,255,255,0.15)" }}
+        >
+          ×
+        </button>
+      </div>
+      <div
+        ref={лента}
+        onScroll={(e) => setНомер(Math.round(e.currentTarget.scrollLeft / e.currentTarget.clientWidth))}
+        className="hide-scroll flex flex-1 snap-x snap-mandatory overflow-x-auto"
+      >
+        {фото.map((src, i) => (
+          <div
+            key={src + i}
+            className="flex h-full w-full flex-shrink-0 snap-center items-center justify-center"
+          >
+            <img src={src} alt="" className="max-h-full max-w-full object-contain" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** Картинка, которая по нажатию открывает весь набор фото. */
+function ФотоСПросмотром({ фото, className, с = 0 }: { фото: string[]; className: string; с?: number }) {
+  const [открыто, setОткрыто] = useState(false);
+  return (
+    <>
+      <button onClick={() => setОткрыто(true)} className={`relative overflow-hidden ${className}`}>
+        <img src={фото[с]} alt="" loading="lazy" className="skel h-full w-full object-cover" />
+        {фото.length > 1 && (
+          <span className="absolute bottom-1 right-1 rounded-md bg-black/55 px-1 text-[9px] font-bold text-white">
+            {фото.length}
+          </span>
+        )}
+      </button>
+      {открыто && <ПросмотрФото фото={фото} с={с} onClose={() => setОткрыто(false)} />}
+    </>
+  );
+}
+
+/** Лента фото заведения; по нажатию — во весь экран. */
+export function ГалереяЗаведения({ фото }: { фото: string[] }) {
+  const { t } = useT();
+  const [с, setС] = useState<number | null>(null);
+  if (фото.length < 2) return null;
+  return (
+    <div className="mb-3 rounded-2xl border bg-white p-4 shadow-sm" style={{ borderColor: BORDER }}>
+      <p className="mb-2 text-sm font-bold" style={{ color: TEXT }}>
+        📷 {t("d_photos")} · {фото.length}
+      </p>
+      <div className="hide-scroll -mx-1 flex gap-2 overflow-x-auto px-1">
+        {фото.map((src, i) => (
+          <button
+            key={src + i}
+            onClick={() => setС(i)}
+            className="h-24 w-32 flex-shrink-0 overflow-hidden rounded-xl"
+          >
+            <img src={src} alt="" loading="lazy" className="skel h-full w-full object-cover" />
+          </button>
+        ))}
+      </div>
+      {с !== null && <ПросмотрФото фото={фото} с={с} onClose={() => setС(null)} />}
+    </div>
+  );
+}
+
+/** Меню ресторана по разделам: блюдо, описание, цена, фото. */
+export function МенюРесторана({ меню }: { меню: MenuItem[] }) {
+  const { t, трК } = useT();
+  const дг = useДеньги();
+  const разделы = [...new Set(меню.map((б) => б.section))];
+  const [раздел, setРаздел] = useState<string | null>(null);
+  if (меню.length === 0) return null;
+  const видно = раздел ? меню.filter((б) => б.section === раздел) : меню;
+
+  return (
+    <div className="mb-3 rounded-2xl border bg-white p-4 shadow-sm" style={{ borderColor: BORDER }}>
+      <p className="mb-2 text-sm font-bold" style={{ color: TEXT }}>
+        🍽 {t("d_menu")}
+      </p>
+      {разделы.length > 1 && (
+        <div className="hide-scroll -mx-1 mb-3 flex gap-1.5 overflow-x-auto px-1">
+          {[null, ...разделы].map((р) => (
+            <button
+              key={р ?? "*"}
+              onClick={() => setРаздел(р)}
+              className="flex-shrink-0 rounded-full px-3 py-1 text-xs font-semibold"
+              style={
+                раздел === р
+                  ? { background: ACCENT_FILL, color: WHITE }
+                  : { background: CREAM, color: MUTED, border: `1px solid ${BORDER}` }
+              }
+            >
+              {р === null ? t("d_menu_all") : трК(р)}
+            </button>
+          ))}
+        </div>
+      )}
+      <div className="flex flex-col divide-y" style={{ borderColor: BORDER }}>
+        {видно.map((б) => (
+          <div key={б.id} className="flex gap-3 py-2.5">
+            {б.img && <ФотоСПросмотром фото={[б.img]} className="h-16 w-16 flex-shrink-0 rounded-lg" />}
+            <div className="min-w-0 flex-1">
+              <div className="flex items-start justify-between gap-2">
+                <p className="text-sm font-semibold" style={{ color: TEXT }}>
+                  {трК(б.name)}
+                </p>
+                <b className="flex-shrink-0 text-sm" style={{ color: GREEN }}>
+                  {дг.цена(б.price)}
+                </b>
+              </div>
+              {б.desc && (
+                <p className="mt-0.5 text-[11px] leading-snug" style={{ color: MUTED }}>
+                  {трК(б.desc)}
+                </p>
+              )}
+            </div>
           </div>
         ))}
       </div>

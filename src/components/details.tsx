@@ -5,7 +5,14 @@ import { useAppContent } from "./content-provider";
 import { useAudioPlayer, времяЗвука } from "./audio-player";
 import { useSettings } from "@/lib/settings";
 import BookingForm from "./booking-form";
-import { БилетыМеста, ЗалыРесторана, КАТЕГОРИЯ_НОМЕРА, НомераОтеля } from "./venue-details";
+import {
+  БилетыМеста,
+  ГалереяЗаведения,
+  ЗалыРесторана,
+  КАТЕГОРИЯ_НОМЕРА,
+  МенюРесторана,
+  НомераОтеля,
+} from "./venue-details";
 import ReviewForm from "./review-form";
 import type { Hotel, HotelKind, Place, Restaurant, Route, RoomType } from "@/lib/types";
 import type { TKey } from "@/lib/i18n";
@@ -195,6 +202,7 @@ export function PlaceDetail({
             {place.desc}
           </p>
         </div>
+        <ГалереяЗаведения фото={place.imgs ?? []} />
         <БилетыМеста place={place} />
         {запись && (
           <div className="rounded-2xl p-4 mb-3" style={{ background: ACCENT_FILL }}>
@@ -544,6 +552,7 @@ export function HotelDetail({ hotel, onBack }: { hotel: Hotel; onBack: () => voi
             {t("d_book_terms")}
           </p>
         </div>
+        <ГалереяЗаведения фото={hotel.imgs ?? []} />
         <НомераОтеля
           hotel={hotel}
           ночей={nights}
@@ -684,6 +693,8 @@ export function RestaurantDetail({
             {r.desc}
           </p>
         </div>
+        <ГалереяЗаведения фото={r.imgs ?? []} />
+        <МенюРесторана меню={r.menu ?? []} />
         <ЗалыРесторана r={r} />
         {/*
           Здесь был список «фирменных блюд»: одни и те же пять узбекских

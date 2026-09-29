@@ -55,7 +55,7 @@ export default function Destinations() {
   // Черновик правки: и новое место, и изменение старого правятся копией
   // и применяются разом по «Сохранить».
   const [selected, setSelected] = useState<Dest | null>(null);
-  // Окно «Билеты» — отдельно от основного редактирования.
+  // Окно «Фото и билеты» — отдельно от основного редактирования.
   const [подробности, setПодробности] = useState<Dest | null>(null);
 
   const поСтатусу = filter === "all" ? dests : dests.filter((d) => d.status === filter);
@@ -410,7 +410,7 @@ export default function Destinations() {
                     setSelected(null);
                   }}
                 >
-                  Билеты{selected.tickets?.length ? ` · ${selected.tickets.length}` : ""}
+                  Фото и билеты{selected.tickets?.length ? ` · ${selected.tickets.length}` : ""}
                 </Btn>
               )}
               <Btn variant="ghost" onClick={() => setSelected(null)}>

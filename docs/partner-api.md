@@ -65,8 +65,9 @@ GET {адрес}/v1/availability/hotel?external_id=…&checkin=2026-10-01&nights
 }
 ```
 
-- `category` — одна из: `economy`, `standard`, `business`, `lux`, `family`,
-  `dorm` (место в общем номере хостела). Другие значения HelloUZ пропускает.
+- `category` — одна из: `dorm` (место в общем номере хостела), `economy`,
+  `standard`, `comfort`, `business`, `lux`, `presidential`, `family`. Другие
+  значения HelloUZ пропускает.
 - `free` — сколько номеров этой категории свободно на все выбранные ночи.
 - `price` — необязательно: цена за ночь в долларах на эти даты. Если не
   указана, турист видит цену из карточки HelloUZ.

@@ -28,7 +28,7 @@ export default function Restaurants() {
   // Черновик правки: карточка заведения раньше только показывала поля,
   // изменить их было нельзя. Правим копию, применяем по «Сохранить».
   const [draft, setDraft] = useState<Restaurant | null>(null);
-  // Окно «Залы и наличие» — отдельно от основного редактирования.
+  // Окно «Фото, меню, залы» — отдельно от основного редактирования.
   const [подробности, setПодробности] = useState<Restaurant | null>(null);
   const [view, setView] = useState<"cards" | "table">("cards");
   const [showAdd, setShowAdd] = useState(false);
@@ -609,7 +609,7 @@ export default function Restaurants() {
                   setSelected(null);
                 }}
               >
-                Залы и наличие
+                Фото, меню, залы
               </Btn>
               <Btn variant="ghost" onClick={() => setSelected(null)}>
                 Отмена

@@ -20,7 +20,16 @@ export interface Наличие {
   ближайшее?: string;
 }
 
-export const КАТЕГОРИИ: RoomCategory[] = ["economy", "standard", "business", "lux", "family", "dorm"];
+export const КАТЕГОРИИ: RoomCategory[] = [
+  "dorm",
+  "economy",
+  "standard",
+  "comfort",
+  "business",
+  "lux",
+  "presidential",
+  "family",
+];
 
 /**
  * Ручной режим: цифры, которые заведение отметило в панели. Старше

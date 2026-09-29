@@ -67,7 +67,7 @@ export default function Hotels() {
   const [editing, setEditing] = useState<Hotel | null>(null);
   const [showAdd, setShowAdd] = useState(false);
   const [form, setForm] = useState<HotelForm>(EMPTY_FORM);
-  // Окно «Номера и наличие» — отдельно от основного редактирования.
+  // Окно «Фото, номера, наличие» — отдельно от основного редактирования.
   const [подробности, setПодробности] = useState<Hotel | null>(null);
 
   const openEdit = (h: Hotel) => {
@@ -422,7 +422,7 @@ export default function Hotels() {
                     Изменить
                   </Btn>
                   <Btn variant="ghost" small onClick={() => setПодробности(h)}>
-                    Номера и наличие{h.roomTypes?.length ? ` · ${h.roomTypes.length}` : ""}
+                    Фото, номера, наличие{h.roomTypes?.length ? ` · ${h.roomTypes.length}` : ""}
                   </Btn>
                   <Btn
                     variant={h.status === "active" ? "danger" : "ghost"}

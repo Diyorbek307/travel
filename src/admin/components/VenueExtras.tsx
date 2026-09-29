@@ -2,15 +2,17 @@
 
 import { useEffect, useState } from "react";
 import { Btn } from "./shared";
+import { ГалереяФото, ПолеФото } from "./PhotoField";
 import { КАТЕГОРИИ } from "@/lib/availability";
 import { типовыеНомера } from "@/lib/rooms";
-import type { Connection, ConnectionKind, RoomCategory, RoomType, Ticket, Zone } from "@/lib/types";
+import type { Connection, ConnectionKind, MenuItem, RoomCategory, RoomType, Ticket, Zone } from "@/lib/types";
 
 /**
  * Подробности заведения и наличие мест.
  *
- *   гостиница — категории номеров (эконом, стандарт, бизнес…);
- *   ресторан  — залы и средний чек;
+ *   у всех     — фотографии (загрузка с устройства или ссылка);
+ *   гостиница — категории номеров со своими фото;
+ *   ресторан  — меню, залы и средний чек;
  *   место     — виды билетов;
  *
  * и у гостиниц с ресторанами — откуда приложение знает о свободных местах:
@@ -19,12 +21,16 @@ import type { Connection, ConnectionKind, RoomCategory, RoomType, Ticket, Zone }
  * отдельно, в закрытом хранилище, и обратно в панель не приходит.
  *
  * Своя кнопка «Сохранить»: окно правит только эти поля, а основные
- * (название, город, фото) остаются в обычном окне редактирования.
+ * (название, город, описание) остаются в обычном окне редактирования.
+ * Первое фото галереи становится обложкой — и главным фото записи.
  */
 
 export type Вид = "hotel" | "restaurant" | "place";
 
 export interface Подробности {
+  img?: string;
+  imgs?: string[];
+  menu?: MenuItem[];
   roomTypes?: RoomType[];
   zones?: Zone[];
   avgCheck?: string;
@@ -39,6 +45,8 @@ const НАЗВАНИЕ_КАТЕГОРИИ: Record<RoomCategory, string> = {
   lux: "Люкс",
   family: "Семейный",
   dorm: "Место в общем номере",
+  comfort: "Комфорт",
+  presidential: "Президентский люкс",
 };
 
 const РЕЖИМ: Record<ConnectionKind, string> = {
@@ -103,10 +111,15 @@ export default function VenueExtras({
   onClose,
 }: {
   вид: Вид;
-  запись: Подробности & { id: string; name: string; priceFrom?: number; kind?: string };
+  запись: Подробности & { id: string; name: string; img?: string; priceFrom?: number; kind?: string };
   onSave: (изменения: Подробности) => void;
   onClose: () => void;
 }) {
+  // Галерея: обложка и остальные фото вместе, без повторов.
+  const [фото, setФото] = useState<string[]>(() => [
+    ...new Set([запись.img, ...(запись.imgs ?? [])].filter((x): x is string => Boolean(x))),
+  ]);
+  const [меню, setМеню] = useState<MenuItem[]>(запись.menu ?? []);
   const [номера, setНомера] = useState<RoomType[]>(запись.roomTypes ?? []);
   const [залы, setЗалы] = useState<Zone[]>(запись.zones ?? []);
   const [чек, setЧек] = useState(запись.avgCheck ?? "");
@@ -116,9 +129,16 @@ export default function VenueExtras({
   const естьНаличие = вид === "hotel" || вид === "restaurant";
 
   function сохранить() {
-    const изменения: Подробности = {};
-    if (вид === "hotel") изменения.roomTypes = номера.filter((н) => н.price > 0);
+    const изменения: Подробности = { imgs: фото };
+    // Без фото обложку не трогаем: пустая карточка хуже старого снимка.
+    if (фото[0]) изменения.img = фото[0];
+    if (вид === "hotel") {
+      изменения.roomTypes = номера
+        .filter((н) => н.price > 0)
+        .map((н) => ({ ...н, img: н.imgs?.[0] ?? н.img }));
+    }
     if (вид === "restaurant") {
+      изменения.menu = меню.filter((б) => б.name.trim() && б.price.trim());
       изменения.zones = залы.filter((з) => з.name.trim());
       изменения.avgCheck = чек.trim() || undefined;
     }
@@ -148,8 +168,12 @@ export default function VenueExtras({
             className="text-lg font-semibold"
             style={{ fontFamily: "var(--font-display)", color: "var(--color-text)" }}
           >
-            {вид === "hotel" ? "Номера и наличие" : вид === "restaurant" ? "Залы и наличие" : "Билеты"} —{" "}
-            {запись.name}
+            {вид === "hotel"
+              ? "Фото, номера и наличие"
+              : вид === "restaurant"
+              ? "Фото, меню, залы и наличие"
+              : "Фото и билеты"}{" "}
+            — {запись.name}
           </h3>
           <button
             onClick={onClose}
@@ -159,6 +183,10 @@ export default function VenueExtras({
             ×
           </button>
         </div>
+
+        <Заголовок>Фотографии</Заголовок>
+
+        <ГалереяФото label="ПЕРВОЕ ФОТО — ОБЛОЖКА В СПИСКАХ И КАРТОЧКЕ" values={фото} onChange={setФото} />
 
         {вид === "hotel" && (
           <>
@@ -219,11 +247,13 @@ export default function VenueExtras({
                         value={н.area ?? ""}
                         onChange={(v) => правка({ area: Number(v) || undefined })}
                       />
-                      <Поле
-                        label="ФОТО (ССЫЛКА)"
-                        value={н.img ?? ""}
-                        onChange={(v) => правка({ img: v.trim() || undefined })}
-                      />
+                      <div className="col-span-2 sm:col-span-4">
+                        <ГалереяФото
+                          label="ФОТО НОМЕРА: СПАЛЬНЯ, ВАННАЯ, ВИД ИЗ ОКНА…"
+                          values={н.imgs ?? (н.img ? [н.img] : [])}
+                          onChange={(imgs) => правка({ imgs, img: imgs[0] })}
+                        />
+                      </div>
                       <Поле
                         label="УДОБСТВА ЧЕРЕЗ ЗАПЯТУЮ"
                         value={н.amenities.join(", ")}
@@ -294,6 +324,7 @@ export default function VenueExtras({
 
         {вид === "restaurant" && (
           <>
+            <РедакторМеню меню={меню} setМеню={setМеню} />
             <Заголовок>Залы и места</Заголовок>
             <div className="flex flex-col gap-2">
               {залы.map((з, i) => (
@@ -586,6 +617,96 @@ function НаличиеМест({
           </p>
         </div>
       )}
+    </>
+  );
+}
+
+/**
+ * Меню ресторана: блюда по разделам, с ценой, описанием и фото. Разделы —
+ * свободный текст с подсказками: у чайханы и у ресторана они разные.
+ */
+function РедакторМеню({ меню, setМеню }: { меню: MenuItem[]; setМеню: (m: MenuItem[]) => void }) {
+  const разделы = [
+    ...new Set([
+      "Салаты",
+      "Супы",
+      "Горячее",
+      "Плов",
+      "Выпечка",
+      "Десерты",
+      "Напитки",
+      ...меню.map((б) => б.section),
+    ]),
+  ];
+  const правка = (i: number, изм: Partial<MenuItem>) =>
+    setМеню(меню.map((б, j) => (j === i ? { ...б, ...изм } : б)));
+  return (
+    <>
+      <Заголовок>Меню</Заголовок>
+      <datalist id="разделы-меню">
+        {разделы.map((р) => (
+          <option key={р} value={р} />
+        ))}
+      </datalist>
+      <div className="flex flex-col gap-3">
+        {меню.map((б, i) => (
+          <div key={б.id} className="rounded-lg p-3" style={{ border: "1px solid var(--color-border)" }}>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+              <label className="text-[10px]" style={подпись}>
+                РАЗДЕЛ
+                <input
+                  list="разделы-меню"
+                  value={б.section}
+                  onChange={(e) => правка(i, { section: e.target.value })}
+                  className="mt-0.5 w-full rounded px-2 py-1.5 text-xs outline-none"
+                  style={поле}
+                />
+              </label>
+              <Поле
+                label="БЛЮДО"
+                value={б.name}
+                onChange={(v) => правка(i, { name: v })}
+                className="sm:col-span-2"
+              />
+              <Поле
+                label="ЦЕНА"
+                value={б.price}
+                onChange={(v) => правка(i, { price: v })}
+                placeholder="$6 или 45 000 сум"
+              />
+              <Поле
+                label="ОПИСАНИЕ"
+                value={б.desc ?? ""}
+                onChange={(v) => правка(i, { desc: v || undefined })}
+                className="col-span-2 sm:col-span-4"
+                placeholder="состав, порция, острота…"
+              />
+              <div className="col-span-2 sm:col-span-4">
+                <ПолеФото label="ФОТО БЛЮДА" value={б.img} onChange={(img) => правка(i, { img })} />
+              </div>
+            </div>
+            <div className="mt-2 text-right">
+              <Btn small variant="danger" onClick={() => setМеню(меню.filter((_, j) => j !== i))}>
+                Убрать блюдо
+              </Btn>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="mt-2">
+        <Btn
+          small
+          variant="ghost"
+          onClick={() =>
+            setМеню([
+              ...меню,
+              { id: новыйId("m"), section: меню[меню.length - 1]?.section ?? "Горячее", name: "", price: "" },
+            ])
+          }
+        >
+          + Блюдо
+        </Btn>
+      </div>
     </>
   );
 }

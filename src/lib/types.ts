@@ -20,6 +20,8 @@ export interface Place {
   qr: boolean;
   /** Виды билетов: взрослый, детский, для граждан Узбекистана… */
   tickets?: Ticket[];
+  /** Галерея: фото места, кроме главного. */
+  imgs?: string[];
 }
 
 export interface RouteStop {
@@ -59,7 +61,15 @@ export type RestaurantKind = "restaurant" | "bar";
  * Категория номера. Общий словарь для всех гостиниц и для систем
  * партнёров: по нему совпадают наши номера и их наличие у партнёра.
  */
-export type RoomCategory = "economy" | "standard" | "business" | "lux" | "family" | "dorm";
+export type RoomCategory =
+  | "dorm"
+  | "economy"
+  | "standard"
+  | "comfort"
+  | "business"
+  | "lux"
+  | "presidential"
+  | "family";
 
 /** Тип номера в гостинице — то, что турист выбирает перед бронью. */
 export interface RoomType {
@@ -76,6 +86,21 @@ export interface RoomType {
   /** Площадь, м². */
   area?: number;
   amenities: string[];
+  /** Первое фото номера — старое поле, остаётся для совместимости. */
+  img?: string;
+  /** Все фото номера: спальня, ванная, вид из окна… */
+  imgs?: string[];
+}
+
+/** Блюдо в меню ресторана. */
+export interface MenuItem {
+  id: string;
+  /** Раздел меню: «Супы», «Горячее», «Напитки»… */
+  section: string;
+  name: string;
+  /** Цена строкой, как в меню: «$6», «45 000 сум». */
+  price: string;
+  desc?: string;
   img?: string;
 }
 
@@ -150,6 +175,9 @@ export interface Restaurant {
   /** Средний чек на человека строкой: «$10–15», «80 000 сум». */
   avgCheck?: string;
   connection?: Connection;
+  menu?: MenuItem[];
+  /** Галерея: зал, терраса, блюда… */
+  imgs?: string[];
 }
 
 /** Карточка в колоде на главной — одна форма и для городов, и для мест. */
