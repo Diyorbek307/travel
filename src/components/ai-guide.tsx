@@ -103,7 +103,7 @@ export default function AiGuide() {
             показывают на телефон и зовут спросить. */}
         {messages.length <= 1 && (
           <div
-            className="relative h-44 overflow-hidden rounded-2xl"
+            className="relative aspect-[2/1] max-h-64 overflow-hidden rounded-2xl"
             style={{ background: "linear-gradient(#cdbbad, #f0dac6)" }}
           >
             <video
@@ -115,10 +115,12 @@ export default function AiGuide() {
               playsInline
               aria-hidden
               className="absolute inset-0 h-full w-full object-cover"
-              style={{ objectPosition: "center 47%" }}
+              // Кадр держится за головы детей: высота карточки растёт с
+              // шириной, и на широком экране головы не срезаются.
+              style={{ objectPosition: "center 37%" }}
             />
             <span
-              className="bubble-in absolute left-1/2 top-2.5 -translate-x-1/2 whitespace-nowrap rounded-xl px-3 py-1.5 text-xs font-semibold shadow"
+              className="bubble-in absolute bottom-2.5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-xl px-3 py-1.5 text-xs font-semibold shadow"
               style={{ background: "#ffffff", color: "#10302c" }}
             >
               {t("tour3_say")}
