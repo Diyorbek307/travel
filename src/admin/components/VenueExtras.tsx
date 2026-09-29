@@ -29,6 +29,11 @@ export type Вид = "hotel" | "restaurant" | "place";
 
 export interface Подробности {
   img?: string;
+  /** Гостиница: метка на фото («Лучшая цена») и удобства. */
+  tag?: string;
+  facilities?: string[];
+  /** Ресторан: диапазон цен в шапке карточки («$5–15»). */
+  price?: string;
   imgs?: string[];
   menu?: MenuItem[];
   roomTypes?: RoomType[];
@@ -111,7 +116,13 @@ export default function VenueExtras({
   onClose,
 }: {
   вид: Вид;
-  запись: Подробности & { id: string; name: string; img?: string; priceFrom?: number; kind?: string };
+  запись: Подробности & {
+    id: string;
+    name: string;
+    img?: string;
+    priceFrom?: number;
+    kind?: string;
+  };
   onSave: (изменения: Подробности) => void;
   onClose: () => void;
 }) {
@@ -120,6 +131,9 @@ export default function VenueExtras({
     ...new Set([запись.img, ...(запись.imgs ?? [])].filter((x): x is string => Boolean(x))),
   ]);
   const [меню, setМеню] = useState<MenuItem[]>(запись.menu ?? []);
+  const [метка, setМетка] = useState(запись.tag ?? "");
+  const [удобства, setУдобства] = useState((запись.facilities ?? []).join(", "));
+  const [цены, setЦены] = useState(запись.price ?? "");
   const [номера, setНомера] = useState<RoomType[]>(запись.roomTypes ?? []);
   const [залы, setЗалы] = useState<Zone[]>(запись.zones ?? []);
   const [чек, setЧек] = useState(запись.avgCheck ?? "");
@@ -133,6 +147,11 @@ export default function VenueExtras({
     // Без фото обложку не трогаем: пустая карточка хуже старого снимка.
     if (фото[0]) изменения.img = фото[0];
     if (вид === "hotel") {
+      изменения.tag = метка.trim();
+      изменения.facilities = удобства
+        .split(",")
+        .map((x) => x.trim())
+        .filter(Boolean);
       изменения.roomTypes = номера
         .filter((н) => н.price > 0)
         .map((н) => ({ ...н, img: н.imgs?.[0] ?? н.img }));
@@ -141,6 +160,8 @@ export default function VenueExtras({
       изменения.menu = меню.filter((б) => б.name.trim() && б.price.trim());
       изменения.zones = залы.filter((з) => з.name.trim());
       изменения.avgCheck = чек.trim() || undefined;
+      // Пустой диапазон не сохраняем: без него шапка карточки осталась бы с дырой.
+      if (цены.trim()) изменения.price = цены.trim();
     }
     if (вид === "place") изменения.tickets = билеты.filter((б) => б.name.trim() && б.price.trim());
     if (естьНаличие) {
@@ -190,6 +211,22 @@ export default function VenueExtras({
 
         {вид === "hotel" && (
           <>
+            <Заголовок>О гостинице</Заголовок>
+            <div className="grid gap-2 sm:grid-cols-3">
+              <Поле
+                label="МЕТКА НА ФОТО"
+                value={метка}
+                onChange={setМетка}
+                placeholder="Лучшая цена, Популярный…"
+              />
+              <Поле
+                label="УДОБСТВА ЧЕРЕЗ ЗАПЯТУЮ"
+                value={удобства}
+                onChange={setУдобства}
+                className="sm:col-span-2"
+                placeholder="Wi-Fi, Бассейн, Парковка, Завтрак…"
+              />
+            </div>
             <Заголовок>Категории номеров</Заголовок>
             <div className="flex flex-col gap-3">
               {номера.map((н, i) => {
@@ -362,13 +399,14 @@ export default function VenueExtras({
                 + Зал
               </Btn>
             </div>
-            <div className="mt-3 max-w-xs">
+            <div className="mt-3 grid max-w-md gap-2 sm:grid-cols-2">
               <Поле
                 label="СРЕДНИЙ ЧЕК НА ЧЕЛОВЕКА"
                 value={чек}
                 onChange={setЧек}
                 placeholder="$10–15 или 80 000 сум"
               />
+              <Поле label="ЦЕНЫ В ШАПКЕ КАРТОЧКИ" value={цены} onChange={setЦены} placeholder="$5–15" />
             </div>
           </>
         )}
