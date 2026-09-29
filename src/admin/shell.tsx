@@ -33,6 +33,7 @@ import PushCampaigns from "./components/PushCampaigns";
 import Integrations from "./components/Integrations";
 import AccessControl from "./components/AccessControl";
 import Staff from "./components/Staff";
+import Translations from "./components/Translations";
 import { можетРаздел, ROLE_META } from "@/lib/admin-roles";
 import { МеняКонтекст, type Меня } from "./context/MeContext";
 import { Иконка, type ИмяИконки } from "./icons";
@@ -86,6 +87,7 @@ const NAV_GROUPS: {
       { id: "events", label: "События", icon: "events" },
       { id: "audio", label: "Аудиогиды", icon: "audio" },
       { id: "cities", label: "Города", icon: "cities" },
+      { id: "translations", label: "Переводы", icon: "translations" },
       { id: "push", label: "Уведомления", icon: "push" },
     ],
   },
@@ -205,6 +207,7 @@ export default function AdminShell() {
     integrations: <Integrations />,
     access: <AccessControl />,
     staff: <Staff />,
+    translations: <Translations />,
   };
 
   const sidebarWidth = sidebarCollapsed ? "56px" : "224px";

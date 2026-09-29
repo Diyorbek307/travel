@@ -147,6 +147,7 @@ export default function BottomNav({ tab, onTab }: { tab: Tab; onTab: (t: Tab) =>
             return (
               <button
                 key={key}
+                data-tour={`nav-${key}`}
                 onClick={() => onTab(key)}
                 aria-current={active ? "page" : undefined}
                 className="flex flex-1 flex-col items-center justify-center gap-1 py-2 transition-all active:scale-95"

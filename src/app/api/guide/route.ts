@@ -1,8 +1,9 @@
-import Anthropic from "@anthropic-ai/sdk";
 import { NextResponse } from "next/server";
 import { readContent } from "@/lib/store";
 import { ipЗапроса, подЛимитом } from "@/lib/rate-limit";
 import type { Content } from "@/lib/types";
+import { карточкиОтвета } from "@/lib/guide-links";
+import { anthropic, МОДЕЛЬ, текстОтвета } from "@/lib/ai";
 
 export const dynamic = "force-dynamic";
 
@@ -18,7 +19,6 @@ export const dynamic = "force-dynamic";
  * турист тут же найдёт в приложении, а не выдуманные заведения.
  */
 
-const МОДЕЛЬ = process.env.ANTHROPIC_MODEL ?? "claude-sonnet-5";
 /** Потолок запросов в сутки на весь сервис — чтобы счёт не улетел. */
 const В_СУТКИ = Number(process.env.AI_DAILY_LIMIT ?? 500);
 const СУТКИ = 24 * 60 * 60 * 1000;
@@ -27,14 +27,6 @@ const МАКС_СООБЩЕНИЙ = 12;
 const МАКС_ДЛИНА = 1000;
 
 type Реплика = { role: "user" | "ai"; text: string };
-
-let клиент: Anthropic | null = null;
-function anthropic(): Anthropic | null {
-  const ключ = process.env.ANTHROPIC_API_KEY;
-  if (!ключ) return null;
-  клиент ??= new Anthropic({ apiKey: ключ });
-  return клиент;
-}
 
 /** Показываем гиду только то, что видно туристу. */
 function справочник(c: Content): string {
@@ -47,15 +39,19 @@ function справочник(c: Content): string {
 
   строки.push("\nМЕСТА:");
   for (const м of c.places.filter((x) => видно(x.status)))
-    строки.push(`- ${м.name} — ${м.city}, ${м.type}; вход ${м.entry}; часы ${м.hours}. ${м.desc}`);
+    строки.push(
+      `- [place:${м.id}] ${м.name} — ${м.city}, ${м.type}; вход ${м.entry}; часы ${м.hours}. ${м.desc}`,
+    );
 
   строки.push("\nОТЕЛИ:");
   for (const о of c.hotels.filter((x) => видно(x.status)))
-    строки.push(`- ${о.name} — ${о.city}, от ${о.price} за ночь, ${о.stars}★. ${о.desc}`);
+    строки.push(`- [hotel:${о.id}] ${о.name} — ${о.city}, от ${о.price} за ночь, ${о.stars}★. ${о.desc}`);
 
   строки.push("\nРЕСТОРАНЫ:");
   for (const р of c.restaurants.filter((x) => видно(x.status)))
-    строки.push(`- ${р.name} — ${р.city}, ${р.cuisine}, ${р.price}, ${р.open}. ${р.desc}`);
+    строки.push(
+      `- [restaurant:${р.id}] ${р.name} — ${р.city}, ${р.cuisine}, ${р.price}, ${р.open}. ${р.desc}`,
+    );
 
   строки.push("\nСОБЫТИЯ:");
   for (const с of c.events.filter((x) => видно(x.status)))
@@ -72,6 +68,8 @@ function подсказка(c: Content): string {
 Отвечай на языке последнего сообщения туриста.
 
 Когда советуешь места, отели, рестораны или события — бери их из справочника ниже: турист найдёт их в приложении. Если в справочнике нужного нет, можешь рассказать общеизвестное об Узбекистане, но не придумывай названия заведений, цены, телефоны и часы работы. Не знаешь — так и скажи.
+
+У мест, отелей и ресторанов в справочнике есть метка вида [place:ID]. Если советуешь конкретные записи, в самом конце ответа отдельной строкой перечисли их метки через запятую в двойных скобках, до 4 штук, например: [[place:1-reg, restaurant:6-rs6]]. Приложение покажет их карточками. В самом тексте меток не пиши. Не советуешь ничего конкретного — строку не добавляй.
 
 Курс валют не называй: он меняется, пусть турист смотрит конвертер в профиле. Бронировать гид не умеет — подскажи, что отель или стол бронируются на их странице в приложении. При угрозе жизни — сразу номер 112 и кнопка SOS в приложении.
 
@@ -121,21 +119,20 @@ export async function POST(request: Request) {
   if (!подЛимитом("guide:all", В_СУТКИ, СУТКИ))
     return NextResponse.json({ error: "too_many" }, { status: 429 });
 
+  const содержимое = await readContent();
   try {
     const ответ = await ai.messages.create({
       model: МОДЕЛЬ,
       max_tokens: 700,
       // Справочник одинаков для всех, поэтому кешируем его: повторные
       // вопросы стоят в разы дешевле.
-      system: [{ type: "text", text: подсказка(await readContent()), cache_control: { type: "ephemeral" } }],
+      system: [{ type: "text", text: подсказка(содержимое), cache_control: { type: "ephemeral" } }],
       messages: реплики.map((r) => ({ role: r.role === "ai" ? "assistant" : "user", content: r.text })),
     });
-    const текст = ответ.content
-      .flatMap((b) => (b.type === "text" ? [b.text] : []))
-      .join("\n")
-      .trim();
-    if (!текст) return NextResponse.json({ error: "empty" }, { status: 502 });
-    return NextResponse.json({ text: текст });
+    const текст = текстОтвета(ответ);
+    const разбор = карточкиОтвета(текст, содержимое);
+    if (!разбор.текст) return NextResponse.json({ error: "empty" }, { status: 502 });
+    return NextResponse.json({ text: разбор.текст, links: разбор.ссылки });
   } catch (e) {
     console.error("[guide]", e instanceof Error ? e.message : e);
     return NextResponse.json({ error: "upstream" }, { status: 502 });

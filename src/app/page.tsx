@@ -1,6 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useLayoutEffect, useState } from "react";
+import { ЖивоеОбучение } from "@/components/live-tour";
+import { ТуристProvider } from "@/components/tourist-provider";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import BottomNav from "@/components/bottom-nav";
 import SideMenu from "@/components/side-menu";
 import { HotelDetail, PlaceDetail, RestaurantDetail, RouteDetail } from "@/components/details";
@@ -127,6 +129,21 @@ function App() {
   const [phase, setPhase] = useState<Phase>("checking");
   // Повтор обучения из настроек — поверх приложения, без выхода из него.
   const [обучение, setОбучение] = useState(false);
+  // Обучение поверх настоящего интерфейса: после экранов с детьми и
+  // при первом входе в приложение.
+  const [живойТур, setЖивойТур] = useState(false);
+  useEffect(() => {
+    if (phase !== "app") return;
+    let было = true;
+    try {
+      было = localStorage.getItem("uzup.liveTour") === "1";
+    } catch {
+      было = true;
+    }
+    if (было) return;
+    const id = setTimeout(() => setЖивойТур(true), 1500);
+    return () => clearTimeout(id);
+  }, [phase]);
   useEffect(() => {
     const открыть = () => setОбучение(true);
     window.addEventListener("hellouz:tour", открыть);
@@ -335,6 +352,34 @@ function App() {
     }
   };
   /*
+   * Карточка из чата ИИ-гида: запись ложится поверх чата, вкладку не
+   * меняем — после «назад» человек возвращается к разговору.
+   */
+  const openFromChat = (ссылка: string) => {
+    const п = разобратьСсылку(ссылка);
+    if (!п || !("id" in п)) return;
+    if (п.kind === "place") {
+      const м = PLACES.find((x) => x.id === п.id);
+      if (м) openPlace(м);
+    } else if (п.kind === "hotel") {
+      const о = HOTELS.find((x) => x.id === п.id);
+      if (о) openHotel(о);
+    } else {
+      const р = RESTAURANTS.find((x) => x.id === п.id);
+      if (р) openRestaurant(р);
+    }
+  };
+  const openFromChatRef = useRef(openFromChat);
+  openFromChatRef.current = openFromChat;
+  useEffect(() => {
+    const открыть = (e: Event) => {
+      const ссылка = (e as CustomEvent<string>).detail;
+      if (typeof ссылка === "string") openFromChatRef.current(ссылка);
+    };
+    window.addEventListener("hellouz:open", открыть);
+    return () => window.removeEventListener("hellouz:open", открыть);
+  }, []);
+  /*
    * Вход по адресу: QR-код ведёт на `?audio=<id>`, а ярлыки приложения на
    * домашнем экране телефона — на `?tab=<вкладка>` (долгое нажатие по
    * значку). Оба параметра одноразовые: сразу после разбора стираем их из
@@ -476,223 +521,258 @@ function App() {
     tab,
   ]);
 
+  // Карточкам заведений: есть ли Premium и как открыть его окно.
+  const турист = {
+    имя: user ? `${user.firstName} ${user.lastName}`.trim() : "",
+    isPremium,
+    premiumUntil: user?.premiumUntil ?? null,
+    открытьPremium: () => setShowPremium(true),
+  };
+
   return (
-    <div className="device-shell">
-      {!introDone && заставка === null && <div className="fixed inset-0 z-[100] bg-black" />}
-      {!introDone && заставка === "полная" && <IntroCinematic onDone={() => setIntroDone(true)} />}
-      {!introDone && заставка === "короткая" && <IntroLogo onDone={() => setIntroDone(true)} />}
-      <NativeBack onBack={назадНаШаг} />
-      <div className="device">
-        {phase === "checking" && (
-          <div className="phase-in absolute inset-0 z-40">
-            <AuthSplash />
-          </div>
-        )}
-
-        {phase === "splash" && (
-          <div className="phase-in absolute inset-0 z-40">
-            <SplashScreen onStart={() => setPhase("register")} onLogin={() => setPhase("login")} />
-          </div>
-        )}
-
-        {phase === "register" && (
-          <div className="phase-in absolute inset-0 z-40">
-            <RegisterScreen
-              onBack={() => setPhase("splash")}
-              onDone={(u) => {
-                setUser(u);
-                // Сюда попадаем уже после подтверждения почты: сессия
-                // открыта. Новичку показываем язык и интересы.
-                setPhase("interests");
-              }}
-            />
-          </div>
-        )}
-
-        {phase === "login" && (
-          <div className="phase-in absolute inset-0 z-40">
-            <LoginScreen
-              onBack={() => setPhase("splash")}
-              onRegister={() => setPhase("register")}
-              onDone={(u) => {
-                setUser(u);
-                setPhase("push");
-              }}
-            />
-          </div>
-        )}
-
-        {phase === "lang" && (
-          <div className="overlay-screen device-safe-top absolute inset-0 z-40">
-            <OnboardingLang onNext={() => setPhase(user ? "interests" : "tour")} />
-          </div>
-        )}
-
-        <Слой открыт={обучение} className="overlay-screen device-safe-top absolute inset-0 z-50">
-          <ОбучениеДети onDone={() => setОбучение(false)} />
-        </Слой>
-        {phase === "tour" && (
-          <div className="overlay-screen device-safe-top absolute inset-0 z-40">
-            <ОбучениеДети onDone={() => setPhase("splash")} />
-          </div>
-        )}
-        {phase === "interests" && (
-          <div className="overlay-screen device-safe-top absolute inset-0 z-40">
-            <OnboardingInterests onDone={() => setPhase("push")} />
-          </div>
-        )}
-
-        {phase === "push" && (
-          <div className="overlay-screen device-safe-top absolute inset-0 z-40">
-            <ЭкранУведомлений onDone={() => setPhase("app")} />
-          </div>
-        )}
-
-        {phase === "app" && (
-          <>
-            <Слой открыт={showSearch}>
-              <SearchModal
-                initialQuery={searchQuery}
-                onClose={() => setShowSearch(false)}
-                onPlace={(p) => {
-                  setShowSearch(false);
-                  openPlace(p);
-                }}
-              />
-            </Слой>
-            <Слой открыт={showNotifs}>
-              <NotifsPanel
-                onLink={openLink}
-                onClose={() => setShowNotifs(false)}
-                onOpen={(раздел) => {
-                  switchTab("profile");
-                  // После switchTab: он сбрасывает раздел профиля.
-                  setProfileView(раздел);
-                }}
-              />
-            </Слой>
-            <Слой открыт={showPractical} className="overlay-screen absolute inset-0 z-40">
-              <PracticalScreen onBack={() => setShowPractical(false)} />
-            </Слой>
-            <Слой открыт={showTransport} className="overlay-screen device-safe-top absolute inset-0 z-40">
-              <TransportScreen onBack={() => setShowTransport(false)} isPremium={isPremium} />
-            </Слой>
-            <Слой открыт={showTrip} className="overlay-screen device-safe-top absolute inset-0 z-40">
-              <TripScreen
-                onBack={() => setShowTrip(false)}
-                onPlace={(p) => {
-                  setShowTrip(false);
-                  openPlace(p);
-                }}
-                onПуть={(название, город) => {
-                  setShowTrip(false);
-                  openПуть(название, город);
-                }}
-              />
-            </Слой>
-            <Слой открыт={showFavorites} className="overlay-screen device-safe-top absolute inset-0 z-40">
-              <FavoritesScreen
-                onBack={() => setShowFavorites(false)}
-                onPlace={(p) => {
-                  setShowFavorites(false);
-                  openPlace(p);
-                }}
-                onHotel={(h) => {
-                  setShowFavorites(false);
-                  openHotel(h);
-                }}
-                onRestaurant={(r) => {
-                  setShowFavorites(false);
-                  openRestaurant(r);
-                }}
-                onRoute={(m) => {
-                  setShowFavorites(false);
-                  openRoute(m);
-                }}
-              />
-            </Слой>
-            <Слой открыт={showMenu}>
-              <SideMenu
-                user={user}
-                onClose={() => setShowMenu(false)}
-                onTab={switchTab}
-                currentTab={tab}
-                isPremium={isPremium}
-                onFavorites={() => {
-                  setShowMenu(false);
-                  setShowFavorites(true);
-                }}
-                onTrip={() => {
-                  setShowMenu(false);
-                  setShowTrip(true);
-                }}
-                onProfileStats={() => {
-                  setShowMenu(false);
-                  switchTab("profile");
-                  // После switchTab: он сбрасывает раздел, а нам нужен «Стат.».
-                  setProfileView("stats");
-                }}
-                onPremium={() => {
-                  setShowMenu(false);
-                  setShowPremium(true);
-                }}
-                onLogout={logout}
-              />
-            </Слой>
-            <Слой открыт={showPremium}>
-              <PremiumModal onClose={() => setShowPremium(false)} />
-            </Слой>
-
-            <div className="device-content flex-1 overflow-hidden">
-              <div key={tabKey} className="app-page animate-fade-in h-full" data-dir={направление}>
-                <Screen
-                  tab={tab}
-                  detail={detail}
-                  isPremium={isPremium}
-                  onCloseDetail={closeDetail}
-                  onPlace={openPlace}
-                  onRoute={openRoute}
-                  onExcursion={openExcursion}
-                  onHotel={openHotel}
-                  onRestaurant={openRestaurant}
-                  onПуть={openПуть}
-                  profileView={profileView}
-                  разделОбзора={разделОбзора}
-                  onРазделОбзора={setРазделОбзора}
-                  городОбзора={городОбзора}
-                  onГородОбзора={setГородОбзора}
-                  onExplore={openExplore}
-                  кодЗаписи={кодЗаписи}
-                  onTab={switchTab}
-                  onToast={showToast}
-                  onSearch={(q?: string) => {
-                    setSearchQuery(q ?? "");
-                    setShowSearch(true);
-                  }}
-                  onNotifs={() => setShowNotifs(true)}
-                  onPractical={() => setShowPractical(true)}
-                  onTransport={() => setShowTransport(true)}
-                  onMenu={() => setShowMenu(true)}
-                  onLogout={logout}
-                  user={user}
-                />
-              </div>
+    <ТуристProvider value={турист}>
+      <div className="device-shell">
+        {!introDone && заставка === null && <div className="fixed inset-0 z-[100] bg-black" />}
+        {!introDone && заставка === "полная" && <IntroCinematic onDone={() => setIntroDone(true)} />}
+        {!introDone && заставка === "короткая" && <IntroLogo onDone={() => setIntroDone(true)} />}
+        <NativeBack onBack={назадНаШаг} />
+        <div className="device">
+          {phase === "checking" && (
+            <div className="phase-in absolute inset-0 z-40">
+              <AuthSplash />
             </div>
+          )}
 
-            <MiniPlayer />
-            {toast && <Toast msg={toast} onDone={() => setToast(null)} />}
+          {phase === "splash" && (
+            <div className="phase-in absolute inset-0 z-40">
+              <SplashScreen onStart={() => setPhase("register")} onLogin={() => setPhase("login")} />
+            </div>
+          )}
 
-            {/* Полноэкранная видео-реклама: сама решает, показываться ли,
+          {phase === "register" && (
+            <div className="phase-in absolute inset-0 z-40">
+              <RegisterScreen
+                onBack={() => setPhase("splash")}
+                onDone={(u) => {
+                  setUser(u);
+                  // Сюда попадаем уже после подтверждения почты: сессия
+                  // открыта. Новичку показываем язык и интересы.
+                  setPhase("interests");
+                }}
+              />
+            </div>
+          )}
+
+          {phase === "login" && (
+            <div className="phase-in absolute inset-0 z-40">
+              <LoginScreen
+                onBack={() => setPhase("splash")}
+                onRegister={() => setPhase("register")}
+                onDone={(u) => {
+                  setUser(u);
+                  setPhase("push");
+                }}
+              />
+            </div>
+          )}
+
+          {phase === "lang" && (
+            <div className="overlay-screen device-safe-top absolute inset-0 z-40">
+              <OnboardingLang onNext={() => setPhase(user ? "interests" : "tour")} />
+            </div>
+          )}
+
+          <Слой открыт={обучение} className="overlay-screen device-safe-top absolute inset-0 z-50">
+            <ОбучениеДети
+              onDone={() => {
+                setОбучение(false);
+                // Экраны объяснили — теперь показываем на самом приложении.
+                setDetail(null);
+                setРазделОбзора(undefined);
+                setЖивойТур(true);
+              }}
+            />
+          </Слой>
+          {phase === "tour" && (
+            <div className="overlay-screen device-safe-top absolute inset-0 z-40">
+              <ОбучениеДети onDone={() => setPhase("splash")} />
+            </div>
+          )}
+          {phase === "interests" && (
+            <div className="overlay-screen device-safe-top absolute inset-0 z-40">
+              <OnboardingInterests onDone={() => setPhase("push")} />
+            </div>
+          )}
+
+          {phase === "push" && (
+            <div className="overlay-screen device-safe-top absolute inset-0 z-40">
+              <ЭкранУведомлений onDone={() => setPhase("app")} />
+            </div>
+          )}
+
+          {phase === "app" && (
+            <>
+              <Слой открыт={showSearch}>
+                <SearchModal
+                  initialQuery={searchQuery}
+                  onClose={() => setShowSearch(false)}
+                  onPlace={(p) => {
+                    setShowSearch(false);
+                    openPlace(p);
+                  }}
+                />
+              </Слой>
+              <Слой открыт={showNotifs}>
+                <NotifsPanel
+                  onLink={openLink}
+                  onClose={() => setShowNotifs(false)}
+                  onOpen={(раздел) => {
+                    switchTab("profile");
+                    // После switchTab: он сбрасывает раздел профиля.
+                    setProfileView(раздел);
+                  }}
+                />
+              </Слой>
+              <Слой открыт={showPractical} className="overlay-screen absolute inset-0 z-40">
+                <PracticalScreen onBack={() => setShowPractical(false)} />
+              </Слой>
+              <Слой открыт={showTransport} className="overlay-screen device-safe-top absolute inset-0 z-40">
+                <TransportScreen onBack={() => setShowTransport(false)} isPremium={isPremium} />
+              </Слой>
+              <Слой открыт={showTrip} className="overlay-screen device-safe-top absolute inset-0 z-40">
+                <TripScreen
+                  onBack={() => setShowTrip(false)}
+                  onPlace={(p) => {
+                    setShowTrip(false);
+                    openPlace(p);
+                  }}
+                  onПуть={(название, город) => {
+                    setShowTrip(false);
+                    openПуть(название, город);
+                  }}
+                />
+              </Слой>
+              <Слой открыт={showFavorites} className="overlay-screen device-safe-top absolute inset-0 z-40">
+                <FavoritesScreen
+                  onBack={() => setShowFavorites(false)}
+                  onPlace={(p) => {
+                    setShowFavorites(false);
+                    openPlace(p);
+                  }}
+                  onHotel={(h) => {
+                    setShowFavorites(false);
+                    openHotel(h);
+                  }}
+                  onRestaurant={(r) => {
+                    setShowFavorites(false);
+                    openRestaurant(r);
+                  }}
+                  onRoute={(m) => {
+                    setShowFavorites(false);
+                    openRoute(m);
+                  }}
+                />
+              </Слой>
+              <Слой открыт={showMenu}>
+                <SideMenu
+                  user={user}
+                  onClose={() => setShowMenu(false)}
+                  onTab={switchTab}
+                  currentTab={tab}
+                  isPremium={isPremium}
+                  onFavorites={() => {
+                    setShowMenu(false);
+                    setShowFavorites(true);
+                  }}
+                  onTrip={() => {
+                    setShowMenu(false);
+                    setShowTrip(true);
+                  }}
+                  onProfileStats={() => {
+                    setShowMenu(false);
+                    switchTab("profile");
+                    // После switchTab: он сбрасывает раздел, а нам нужен «Стат.».
+                    setProfileView("stats");
+                  }}
+                  onPremium={() => {
+                    setShowMenu(false);
+                    setShowPremium(true);
+                  }}
+                  onLogout={logout}
+                />
+              </Слой>
+              <Слой открыт={showPremium}>
+                <PremiumModal onClose={() => setShowPremium(false)} />
+              </Слой>
+
+              <div className="device-content flex-1 overflow-hidden">
+                <div key={tabKey} className="app-page animate-fade-in h-full" data-dir={направление}>
+                  <Screen
+                    tab={tab}
+                    detail={detail}
+                    isPremium={isPremium}
+                    onCloseDetail={closeDetail}
+                    onPlace={openPlace}
+                    onRoute={openRoute}
+                    onExcursion={openExcursion}
+                    onHotel={openHotel}
+                    onRestaurant={openRestaurant}
+                    onПуть={openПуть}
+                    profileView={profileView}
+                    разделОбзора={разделОбзора}
+                    onРазделОбзора={setРазделОбзора}
+                    городОбзора={городОбзора}
+                    onГородОбзора={setГородОбзора}
+                    onExplore={openExplore}
+                    кодЗаписи={кодЗаписи}
+                    onTab={switchTab}
+                    onToast={showToast}
+                    onSearch={(q?: string) => {
+                      setSearchQuery(q ?? "");
+                      setShowSearch(true);
+                    }}
+                    onNotifs={() => setShowNotifs(true)}
+                    onPractical={() => setShowPractical(true)}
+                    onTransport={() => setShowTransport(true)}
+                    onMenu={() => setShowMenu(true)}
+                    onLogout={logout}
+                    user={user}
+                  />
+                </div>
+              </div>
+
+              <MiniPlayer />
+              {toast && <Toast msg={toast} onDone={() => setToast(null)} />}
+
+              {/* Полноэкранная видео-реклама: сама решает, показываться ли,
                 по счётчику переходов и настройке частоты из панели. */}
-            <AdInterstitial isPremium={isPremium} navCount={navCount} />
+              <AdInterstitial isPremium={isPremium} navCount={navCount} />
 
-            <BottomNav tab={tab} onTab={switchTab} />
-            {/* Предложение включить уведомления: само решает, пора ли. */}
-            {!user ? null : <PushAsk />}
-          </>
-        )}
+              <BottomNav tab={tab} onTab={switchTab} />
+              {живойТур && (
+                <ЖивоеОбучение
+                  onTab={(t) => {
+                    setDetail(null);
+                    setРазделОбзора(undefined);
+                    setTab(t);
+                  }}
+                  onDone={() => {
+                    setЖивойТур(false);
+                    try {
+                      localStorage.setItem("uzup.liveTour", "1");
+                    } catch {
+                      // приватный режим — покажем ещё раз, не беда
+                    }
+                  }}
+                />
+              )}
+              {/* Предложение включить уведомления: само решает, пора ли. */}
+              {!user ? null : <PushAsk />}
+            </>
+          )}
+        </div>
       </div>
-    </div>
+    </ТуристProvider>
   );
 }
 

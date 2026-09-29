@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { отказЕсли } from "@/lib/admin-auth";
 import { patchContent, readContent } from "@/lib/store";
 import type { Content, ContentKey } from "@/lib/types";
+import { запланироватьАвтоперевод } from "@/lib/content-translations";
 
 export const dynamic = "force-dynamic";
 
@@ -47,5 +48,7 @@ export async function PUT(request: Request) {
   }
 
   await patchContent(разделы as Partial<Content>);
+  // Новое из панели переведётся само, если подключён Claude.
+  запланироватьАвтоперевод();
   return NextResponse.json({ ok: true });
 }

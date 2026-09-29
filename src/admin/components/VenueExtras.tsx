@@ -63,6 +63,8 @@ export interface Подробности {
   tickets?: Ticket[];
   /** Место: авторы и лицензия фото (CC BY-SA требует подписи). */
   credits?: string;
+  /** Гостиница и ресторан: скидка для Premium, %. */
+  premiumDiscount?: number;
   tables?: TableType[];
   facts?: Fact[];
   connection?: Connection;
@@ -169,6 +171,7 @@ export default function VenueExtras({
   const [чек, setЧек] = useState(запись.avgCheck ?? "");
   const [билеты, setБилеты] = useState<Ticket[]>(запись.tickets ?? []);
   const [авторы, setАвторы] = useState(запись.credits ?? "");
+  const [скидка, setСкидка] = useState<number | "">(запись.premiumDiscount ?? "");
   const [столы, setСтолы] = useState<TableType[]>(запись.tables ?? []);
   const [факты, setФакты] = useState<Fact[]>(запись.facts ?? []);
   const [связь, setСвязь] = useState<Connection>(запись.connection ?? { kind: "none" });
@@ -214,6 +217,11 @@ export default function VenueExtras({
       изменения.tables = столы.filter((с) => с.seats > 0 && с.count > 0);
       // Пустой диапазон не сохраняем: без него шапка карточки осталась бы с дырой.
       if (цены.trim()) изменения.price = цены.trim();
+    }
+    if (вид !== "place") {
+      // Скидка — 0…50 %: больше похоже на опечатку, чем на щедрость.
+      const n = Number(скидка);
+      изменения.premiumDiscount = скидка === "" || !Number.isFinite(n) ? 0 : Math.max(0, Math.min(50, Math.round(n)));
     }
     if (вид === "place") {
       изменения.tickets = билеты.filter((б) => б.name.trim() && б.price.trim());
@@ -263,6 +271,24 @@ export default function VenueExtras({
         <Заголовок>Фотографии</Заголовок>
 
         <ГалереяФото label="ПЕРВОЕ ФОТО — ОБЛОЖКА В СПИСКАХ И КАРТОЧКЕ" values={фото} onChange={setФото} />
+        {вид !== "place" && (
+          <>
+            <Заголовок>Скидка для Premium</Заголовок>
+            <div className="max-w-xs">
+              <Поле
+                label="СКИДКА, % (0 — НЕТ, МАКСИМУМ 50)"
+                type="number"
+                value={скидка}
+                onChange={(v) => setСкидка(v === "" ? "" : Number(v))}
+                placeholder="например, 10"
+              />
+            </div>
+            <p className="mt-1 text-[11px]" style={подпись}>
+              Турист с Premium показывает экран скидки на кассе или ресепшене. Договоритесь о скидке с
+              заведением заранее.
+            </p>
+          </>
+        )}
         {вид === "place" && (
           <div className="mt-2">
             <Поле

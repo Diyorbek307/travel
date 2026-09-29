@@ -27,7 +27,7 @@ const MEDIA_LIMIT = 200;
 const STATIC_LIMIT = 400;
 
 /** Данные, без которых приложение без сети пустое. */
-const ДАННЫЕ = ["/api/content", "/api/site-config", "/api/ad-policy"];
+const ДАННЫЕ = ["/api/content", "/api/site-config", "/api/ad-policy", "/api/translations"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(

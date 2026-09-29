@@ -314,6 +314,7 @@ export function SearchModal({
 }
 
 export function PremiumModal({ onClose }: { onClose: () => void }) {
+  const { HOTELS, RESTAURANTS } = useAppContent();
   const { t } = useT();
   const [plan, setPlan] = useState<"month" | "year">("year");
   const [идёт, setИдёт] = useState(false);
@@ -351,13 +352,25 @@ export function PremiumModal({ onClose }: { onClose: () => void }) {
       setИдёт(false);
     }
   }
-  const PERKS: { e: string; tk: import("@/lib/i18n").TKey; sk: import("@/lib/i18n").TKey }[] = [
-    { e: "🚫", tk: "pay_no_ads", sk: "prem_no_ads_sub" },
-    { e: "🎧", tk: "prem_all_audio", sk: "prem_all_audio_sub" },
-    { e: "🗺️", tk: "prem_offline", sk: "prem_offline_sub" },
-    { e: "🤖", tk: "prem_ai_pro", sk: "prem_ai_pro_sub" },
-    { e: "⚡", tk: "prem_priority", sk: "prem_priority_sub" },
-    { e: "🏷️", tk: "prem_discounts", sk: "prem_discounts_sub" },
+  /*
+   * Только то, что Premium правда даёт. Раньше здесь обещались «все
+   * аудиогиды», офлайн, «ИИ Pro» и приоритетная поддержка — аудиогиды и
+   * офлайн и так бесплатны всем, остального не было вовсе. Скидки — лишь
+   * если хоть одно заведение их даёт, с настоящим числом и размером.
+   */
+  const соСкидкой = [...HOTELS, ...RESTAURANTS].filter((x) => (x.premiumDiscount ?? 0) > 0);
+  const максимум = Math.max(0, ...соСкидкой.map((x) => x.premiumDiscount ?? 0));
+  const PERKS: { e: string; заголовок: string; под: string }[] = [
+    { e: "🚫", заголовок: t("pay_no_ads"), под: t("prem_no_ads_sub") },
+    ...(соСкидкой.length
+      ? [
+          {
+            e: "🏷️",
+            заголовок: t("prem_discounts"),
+            под: t("prem_disc_perk").replace("{n}", String(соСкидкой.length)).replace("{m}", String(максимум)),
+          },
+        ]
+      : []),
   ];
   return (
     <div
@@ -440,6 +453,9 @@ export function PremiumModal({ onClose }: { onClose: () => void }) {
         <p className="font-bold text-sm mb-3" style={{ color: TEXT }}>
           {t("prem_title")}
         </p>
+        <p className="mb-3 -mt-1 text-[11px]" style={{ color: MUTED }}>
+          🎧 {t("prem_free_note")}
+        </p>
         <div className="space-y-2.5 mb-4">
           {PERKS.map((p, i) => (
             <div
@@ -455,10 +471,10 @@ export function PremiumModal({ onClose }: { onClose: () => void }) {
               </div>
               <div>
                 <p className="font-bold text-sm" style={{ color: TEXT }}>
-                  {t(p.tk)}
+                  {p.заголовок}
                 </p>
                 <p className="text-[10px] mt-0.5" style={{ color: MUTED }}>
-                  {t(p.sk)}
+                  {p.под}
                 </p>
               </div>
               <svg

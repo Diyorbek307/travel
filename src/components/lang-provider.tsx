@@ -2,7 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { LOCALE_META, переведи, языкУстройства, type Locale, type TKey } from "@/lib/i18n";
-import { переведиКонтент } from "@/lib/content-i18n";
+import { переведиКонтент, type ЖивыеПереводы } from "@/lib/content-i18n";
 
 /**
  * Язык интерфейса для всего приложения.
@@ -45,6 +45,20 @@ export function LangProvider({ children }: { children: React.ReactNode }) {
     setLangState(выбор ?? языкУстройства());
   }, []);
 
+  // Переводы того, что добавили в панели (руками или автопереводом).
+  // Не загрузились — остаётся словарь, приложение работает как раньше.
+  const [живые, setЖивые] = useState<ЖивыеПереводы>({});
+  useEffect(() => {
+    let жив = true;
+    fetch("/api/translations")
+      .then((r) => (r.ok ? r.json() : {}))
+      .then((d: ЖивыеПереводы) => жив && d && typeof d === "object" && setЖивые(d))
+      .catch(() => undefined);
+    return () => {
+      жив = false;
+    };
+  }, []);
+
   useEffect(() => {
     const dir = LOCALE_META[lang].dir;
     document.documentElement.setAttribute("lang", lang);
@@ -65,10 +79,10 @@ export function LangProvider({ children }: { children: React.ReactNode }) {
       lang,
       setLang,
       t: (key: TKey) => переведи(key, lang),
-      трК: (текст: string) => переведиКонтент(текст, lang),
+      трК: (текст: string) => переведиКонтент(текст, lang, живые),
       dir: LOCALE_META[lang].dir,
     }),
-    [lang, setLang],
+    [lang, setLang, живые],
   );
 
   return <ЯзыкContext.Provider value={значение}>{children}</ЯзыкContext.Provider>;

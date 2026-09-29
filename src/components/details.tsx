@@ -1,5 +1,7 @@
 "use client";
 
+import { СкидкаPremium, ЗначокСкидки } from "./premium-discount";
+import { КнопкаПереводаМеню } from "./photo-translator";
 import { useEffect, useRef, useState } from "react";
 import { useAppContent } from "./content-provider";
 import { useAudioPlayer, времяЗвука } from "./audio-player";
@@ -443,6 +445,7 @@ export function HotelDetail({
             {/* Вид — чтобы по карточке было сразу видно, отель это или хостел:
                 от этого зависят и цена, и ожидания. Без поля — отель. */}
             <Badge text={t(ВИД_ГОСТИНИЦЫ[hotel.kind ?? "hotel"])} onPhoto />
+            <ЗначокСкидки процент={hotel.premiumDiscount} />
             <Badge text={hotel.tag} onPhoto />
             <Badge text={трК(hotel.city)} onPhoto />
           </div>
@@ -584,6 +587,7 @@ export function HotelDetail({
             {t("d_book_terms")}
           </p>
         </div>
+        <СкидкаPremium процент={hotel.premiumDiscount} заведение={hotel.name} />
         <ПолезноЗнать факты={hotel.facts ?? []} />
         <button
           onClick={() => onПуть(hotel.name, hotel.city)}
@@ -692,6 +696,7 @@ export function RestaurantDetail({
         <div className="absolute bottom-0 left-0 right-0 p-4">
           <div className="flex items-center gap-1.5 mb-1">
             <Badge text={r.cuisine} onPhoto />
+            <ЗначокСкидки процент={r.premiumDiscount} />
             <Badge text={трК(r.city)} onPhoto />
           </div>
           <p className="text-white text-xl font-bold" style={{ fontFamily: "var(--font-heading)" }}>
@@ -738,6 +743,8 @@ export function RestaurantDetail({
         </div>
         <ГалереяЗаведения фото={r.imgs ?? []} />
         <МенюРесторана меню={r.menu ?? []} название={r.name} чек={r.avgCheck} />
+        <КнопкаПереводаМеню />
+        <СкидкаPremium процент={r.premiumDiscount} заведение={r.name} />
         <ЗалыРесторана r={r} />
         <ПолезноЗнать факты={r.facts ?? []} />
         {/*

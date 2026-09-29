@@ -163,6 +163,8 @@ export interface Hotel {
   connection?: Connection;
   /** «Полезно знать»: заезд и выезд, завтрак, дети, трансфер… */
   facts?: Fact[];
+  /** Скидка для Premium, % (0 — нет). */
+  premiumDiscount?: number;
 }
 
 export interface Restaurant {
@@ -188,6 +190,8 @@ export interface Restaurant {
   tables?: TableType[];
   /** «Полезно знать»: оплата, халяль, музыка, дети… */
   facts?: Fact[];
+  /** Скидка для Premium, % (0 — нет). */
+  premiumDiscount?: number;
 }
 
 /** Карточка в колоде на главной — одна форма и для городов, и для мест. */
@@ -223,6 +227,8 @@ export interface ChatMessage {
   role: "user" | "ai";
   text: string;
   time: string;
+  /** Записи, которые советует гид: «place:ID», «hotel:ID», «restaurant:ID». */
+  links?: string[];
 }
 
 /* ------------------------------------------------------------------ */

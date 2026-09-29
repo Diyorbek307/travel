@@ -6,6 +6,7 @@ import { ACCENT_FILL, BORDER, MUTED, SURFACE, TEXT, WHITE } from "@/lib/theme";
 import { AI_REPLIES } from "@/data/content";
 import { useCurrency } from "@/components/currency-provider";
 import { useT } from "@/components/lang-provider";
+import { useAppContent } from "@/components/content-provider";
 
 /**
  * Чат с AI-гидом.
@@ -54,8 +55,8 @@ export default function AiGuide() {
       setMessages((p) => [...p, моё]);
       setInput("");
       setTyping(true);
-      const ответить = (текст: string) => {
-        setMessages((p) => [...p, { role: "ai", text: текст, time: сейчас() }]);
+      const ответить = (текст: string, links?: string[]) => {
+        setMessages((p) => [...p, { role: "ai", text: текст, time: сейчас(), links }]);
         setTyping(false);
       };
 
@@ -84,8 +85,8 @@ export default function AiGuide() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ messages: [...messages, моё].map(({ role, text }) => ({ role, text })) }),
         });
-        const data = res.ok ? ((await res.json()) as { text?: string }) : null;
-        ответить(data?.text || t("ai_unknown"));
+        const data = res.ok ? ((await res.json()) as { text?: string; links?: string[] }) : null;
+        ответить(data?.text || t("ai_unknown"), data?.text ? data.links : undefined);
       } catch {
         ответить(t("ai_unknown"));
       }
@@ -123,6 +124,7 @@ export default function AiGuide() {
               }
             >
               <p className="text-sm leading-relaxed whitespace-pre-line">{m.text}</p>
+              {m.links?.length ? <КарточкиГида ссылки={m.links} /> : null}
               <p
                 className="text-[10px] mt-1.5"
                 style={{ color: m.role === "user" ? "rgba(255,255,255,0.5)" : MUTED }}
@@ -197,6 +199,54 @@ export default function AiGuide() {
           </button>
         </div>
       </div>
+    </div>
+  );
+}
+
+/**
+ * Заведения, которые посоветовал гид, — карточками прямо в чате: нажал и
+ * сразу на странице отеля или ресторана, без поиска по названию. Открывает
+ * страница приложения по событию, как ссылки из уведомлений.
+ */
+function КарточкиГида({ ссылки }: { ссылки: string[] }) {
+  const { трК } = useT();
+  const { PLACES, HOTELS, RESTAURANTS } = useAppContent();
+  const записи = ссылки.flatMap((ссылка) => {
+    const [вид, id] = ссылка.split(":", 2);
+    const список =
+      вид === "place" ? PLACES : вид === "hotel" ? HOTELS : вид === "restaurant" ? RESTAURANTS : [];
+    const з = (список as { id: string; name: string; city: string; img: string }[]).find((x) => x.id === id);
+    return з ? [{ ссылка, з, значок: вид === "place" ? "📍" : вид === "hotel" ? "🏨" : "🍽️" }] : [];
+  });
+  if (!записи.length) return null;
+  return (
+    <div className="mt-2.5 -mx-1 flex flex-col gap-1.5">
+      {записи.map(({ ссылка, з, значок }) => (
+        <button
+          key={ссылка}
+          onClick={() => window.dispatchEvent(new CustomEvent("hellouz:open", { detail: ссылка }))}
+          className="flex items-center gap-2.5 transition-transform active:scale-[0.98] rounded-xl border p-1.5 text-left"
+          style={{ borderColor: BORDER }}
+        >
+          <img
+            src={з.img}
+            alt=""
+            className="h-10 w-10 flex-shrink-0 rounded-lg object-cover"
+            loading="lazy"
+          />
+          <span className="min-w-0 flex-1">
+            <span className="block truncate text-[13px] font-bold" style={{ color: TEXT }}>
+              {значок} {трК(з.name)}
+            </span>
+            <span className="block truncate text-[11px]" style={{ color: MUTED }}>
+              {трК(з.city)}
+            </span>
+          </span>
+          <span className="pr-1 text-base" style={{ color: MUTED }} aria-hidden>
+            ›
+          </span>
+        </button>
+      ))}
     </div>
   );
 }

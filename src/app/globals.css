@@ -1215,3 +1215,54 @@ img.skel.loaded:not(.hero-in) {
     visibility: hidden;
   }
 }
+
+/* Экран скидки Premium: по карточке бежит блик — живой экран не спутать
+   со скриншотом. */
+.discount-card::after {
+  content: "";
+  position: absolute;
+  inset: -50% auto -50% -60%;
+  width: 40%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+  transform: rotate(12deg);
+  animation: discount-shine 2.4s linear infinite;
+  pointer-events: none;
+}
+@keyframes discount-shine {
+  to {
+    left: 130%;
+  }
+}
+
+/* Переводчик по фото: золотая линия «сканирует» снимок, пока ИИ читает. */
+.photo-scan {
+  top: 0;
+  box-shadow: 0 0 18px 4px rgba(233, 196, 106, 0.7);
+  animation: photo-scan 1.6s ease-in-out infinite alternate;
+}
+@keyframes photo-scan {
+  to {
+    top: calc(100% - 4px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .photo-scan {
+    animation: none;
+    top: 50%;
+  }
+}
+
+/* Подсветка цели в обучении: мягко «дышит», чтобы глаз её нашёл. */
+.tour-spot {
+  animation: tour-pulse 1.6s ease-in-out infinite;
+}
+@keyframes tour-pulse {
+  50% {
+    outline: 6px solid rgba(233, 196, 106, 0.35);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tour-spot {
+    animation: none;
+  }
+}

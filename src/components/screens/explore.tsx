@@ -32,6 +32,7 @@ import CityReel from "@/components/city-reel";
 import { ВИДЕО, ФОН_ВИДЕО, кадрыГорода } from "@/data/city-reels";
 import { AdInline } from "@/components/ads";
 import AiGuide from "@/components/ai-guide";
+import { ПереводчикФото, useФотоИИ } from "@/components/photo-translator";
 import Туризм, { ФлагУз } from "@/components/tourism";
 
 /**
@@ -49,7 +50,9 @@ export type РазделОбзора =
   | "bars"
   | "excursions"
   | "ai"
-  | "tourism";
+  | "tourism"
+  | "translate"
+  | "photo";
 
 /*
  * Город — не отдельный мир, а фильтр над всеми разделами.
@@ -104,6 +107,7 @@ export function ExploreScreen({
   const { CITIES, HOTELS, PLACES, POPULAR_CITIES, RESTAURANTS, ROUTES } = useAppContent();
   const { t, трК, lang } = useT();
   const { pos } = useGeo();
+  const фотоИИ = useФотоИИ();
   const рядом = ближайшийГород(pos);
   const выбран = город ? CITIES.find((c) => c.name === город) : undefined;
 
@@ -204,14 +208,21 @@ export function ExploreScreen({
       // но место в конце сетки зарезервировано — когда она появится, здесь
       // достаточно будет заменить скоро на go с настоящим разделом.
       { ключ: "vr", заголовок: t("ex_vr"), под: t("ex_vr_sub"), скоро: true, go: () => {} },
-      // Тоже будущее: говорящий ИИ-гид по фото и переводчик с камеры.
-      { ключ: "photo", заголовок: t("ex_photo"), под: t("ex_photo_sub"), скоро: true, go: () => {} },
+      // Фото-гид и переводчик с камеры работают на Claude: пока на
+      // сервере нет ключа, плитки честно помечены «скоро».
+      {
+        ключ: "photo",
+        заголовок: t("ex_photo"),
+        под: t("ex_photo_sub"),
+        скоро: !фотоИИ,
+        go: () => onРаздел("photo"),
+      },
       {
         ключ: "translate",
         заголовок: t("ex_translate"),
         под: t("ex_translate_sub"),
-        скоро: true,
-        go: () => {},
+        скоро: !фотоИИ,
+        go: () => onРаздел("translate"),
       },
     ];
     const по = (ключ: string) => плитки.find((п) => п.ключ === ключ)!;
@@ -242,8 +253,8 @@ export function ExploreScreen({
             Раздел, где в выбранном городе пусто, приглушён, но нажимается —
             внутри можно сразу сменить город.
           */}
-          {ГРУППЫ.map((г) => (
-            <section key={г.заголовок} className="mb-5">
+          {ГРУППЫ.map((г, номерГруппы) => (
+            <section key={г.заголовок} className="mb-5" data-tour={номерГруппы === 0 ? "tiles" : undefined}>
               <h2
                 className="mb-2.5 flex items-center gap-2 text-base font-bold"
                 style={{ color: TEXT, fontFamily: "var(--font-heading)" }}
@@ -288,7 +299,12 @@ export function ExploreScreen({
     excursions: "ex_excursions",
     ai: "ex_ai",
     tourism: "tour_title",
+    translate: "ex_translate",
+    photo: "ex_photo",
   };
+  // У ИИ-помощников город ни при чём — чипы городов им не нужны.
+  const безГородов =
+    раздел === "cities" || раздел === "tourism" || раздел === "translate" || раздел === "photo";
   const назад = () => onРаздел(undefined);
 
   // Чат занимает экран целиком и прокручивается сам: общая прокрутка
@@ -318,7 +334,7 @@ export function ExploreScreen({
   return (
     <div className="flex flex-col h-full" style={{ background: CREAM }}>
       <Шапка кикер="HelloUZ" заголовок={t(заголовки[раздел])} фон={фон} onBack={назад}>
-        {раздел !== "cities" && раздел !== "tourism" && чипыГородов}
+        {!безГородов && чипыГородов}
       </Шапка>
       <div className="flex-1 overflow-y-auto hide-scroll p-4">
         {раздел === "cities" && (
@@ -339,6 +355,8 @@ export function ExploreScreen({
         )}
         {раздел === "bars" && <СписокРесторанов рестораны={бары} onRestaurant={onRestaurant} сброс={сброс} />}
         {раздел === "tourism" && <Туризм />}
+        {раздел === "translate" && <ПереводчикФото />}
+        {раздел === "photo" && <ПереводчикФото режим="guide" />}
         {раздел === "excursions" && <СписокЭкскурсий туры={экскурсии} onRoute={onRoute} сброс={сброс} />}
       </div>
     </div>
@@ -365,10 +383,17 @@ const ГРУППЫ: { заголовок: TKey; ключи: string[]; тон: st
     тон: "rgba(96, 165, 250, 0.14)",
     метка: "#60A5FA",
   },
-  // Будущие разделы вместе, отдельной группой: их не спутать с работающими.
+  // Помощники на ИИ: фото-гид и переводчик с камеры.
+  {
+    заголовок: "ex_group_ai",
+    ключи: ["photo", "translate"],
+    тон: "rgba(233, 196, 106, 0.2)",
+    метка: GOLD,
+  },
+  // Будущие разделы отдельной группой: их не спутать с работающими.
   {
     заголовок: "ex_group_soon",
-    ключи: ["photo", "translate", "vr"],
+    ключи: ["vr"],
     тон: "var(--accent-soft)",
     метка: "var(--accent)",
   },
@@ -384,6 +409,7 @@ function КарточкаИИ({ onClick }: { onClick: () => void }) {
   return (
     <button
       onClick={onClick}
+      data-tour="ai"
       className="tile-in group relative mb-5 flex min-h-[140px] w-full items-center overflow-hidden rounded-[22px] p-4 text-left transition-transform duration-150 active:scale-[0.98]"
       style={{
         background: `linear-gradient(135deg, ${ACCENT_DEEP}, ${ACCENT_FILL})`,
@@ -526,7 +552,7 @@ function ЛентаКрасивых({
   const { t, трК } = useT();
   if (места.length === 0) return null;
   return (
-    <section className="mb-5">
+    <section className="mb-5" data-tour="scenic">
       <div className="mb-2.5 flex items-center justify-between">
         <div>
           <h2
@@ -670,7 +696,9 @@ function Плитка({
           {t("ex_soon_badge")}
         </span>
       )}
-      {плитка.скоро ? (
+      {/* У ИИ-помощников своя рисованная иллюстрация — и пока они «скоро»,
+          и когда уже работают. */}
+      {плитка.скоро || РИСОВАННЫЕ.has(плитка.ключ) ? (
         <ИллюстрацияСкоро ключ={плитка.ключ} широкая={широкая} />
       ) : (
         <>
@@ -797,6 +825,8 @@ function ИллюстрацияVR({ широкая }: { широкая: boolean 
 /** Иллюстрация будущего раздела — по ключу плитки. */
 /** Плитки, у которых есть живая версия — видео в public/videos/tiles. */
 const ЖИВЫЕ_ПЛИТКИ = new Set(["museums", "places", "restaurants", "bars", "routes", "excursions", "hotels"]);
+/** Плитки с иллюстрацией-SVG вместо картинки из public/tiles. */
+const РИСОВАННЫЕ = new Set(["photo", "translate", "vr"]);
 
 function ИллюстрацияСкоро({ ключ, широкая }: { ключ: string; широкая: boolean }) {
   if (ключ === "photo") return <ИллюстрацияФото широкая={широкая} />;
