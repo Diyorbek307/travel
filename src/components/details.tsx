@@ -166,7 +166,10 @@ export function PlaceDetail({
             {place.name}
           </h2>
           <p className="text-white/70 text-xs mt-0.5">
-            {трК(place.city)} · ★ {оценка.рейтинг} ({оценка.отзывов.toLocaleString()} {t("d_reviews_word")})
+            {трК(place.city)} · {/* Новое место без отзывов — не «★ 0 (0 отзывов)», а «Новое». */}
+            {оценка.рейтинг > 0
+              ? `★ ${оценка.рейтинг} (${оценка.отзывов.toLocaleString()} ${t("d_reviews_word")})`
+              : `✨ ${t("new_badge")}`}
           </p>
         </div>
       </div>
@@ -179,7 +182,13 @@ export function PlaceDetail({
               k: "d_distance" as const,
             },
             { e: "🎫", v: дг.цена(place.entry), k: "d_entry" as const },
-            { e: "🕐", v: place.hours.length > 8 ? t("d_always") : place.hours, k: "d_hours" as const },
+            // «Всегда» — переводим; остальное («Весна–осень», «09:00–18:00») как есть.
+            // Раньше любая строка длиннее 8 знаков превращалась во «Всегда».
+            {
+              e: "🕐",
+              v: /^(всегда|круглосуточно|24\/7)$/i.test(place.hours) ? t("d_always") : трК(place.hours),
+              k: "d_hours" as const,
+            },
             ...(запись?.seconds ? [{ e: "⏱", v: времяЗвука(запись.seconds), k: "d_audio" as const }] : []),
           ].map((s) => (
             <div
@@ -206,7 +215,13 @@ export function PlaceDetail({
           </p>
         </div>
         {/* В галерее места — виды города вокруг, так и подписываем. */}
-        <ГалереяЗаведения фото={place.imgs ?? []} подпись={трК(place.city)} />
+        {/* Свои фото места — «Фото» и авторы (лицензия CC BY-SA это требует). */}
+        <ГалереяЗаведения фото={place.imgs ?? []} подпись={place.credits ? t("d_photos") : трК(place.city)} />
+        {place.credits && (
+          <p className="-mt-2 mb-3 px-1 text-[10px] leading-snug" style={{ color: MUTED }}>
+            {place.credits}
+          </p>
+        )}
         {/* Записи диктора нет — рассказ читает сам телефон. */}
         {!запись && place.audio && <АудиогидГолосом заголовок={place.name} текст={place.desc} />}
         <БилетыМеста place={place} />

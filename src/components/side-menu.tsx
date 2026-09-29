@@ -1,4 +1,5 @@
 import type { PublicUser, Tab } from "@/lib/types";
+import { названиеСтраны } from "@/lib/countries";
 import { useT } from "@/components/lang-provider";
 import type { TKey } from "@/lib/i18n";
 import { ACCENT_FILL, GOLD, GREEN, SURFACE, CREAM, TEXT, MUTED, BORDER, ACCENT_BORDER } from "@/lib/theme";
@@ -27,7 +28,7 @@ export function SideMenu({
   onProfileStats: () => void;
   user: PublicUser | null;
 }) {
-  const { t } = useT();
+  const { t, lang } = useT();
   const NAV: [Tab, string, TKey][] = [
     ["home", "🏠", "nav_home"],
     ["map", "🗺️", "nav_map"],
@@ -44,9 +45,11 @@ export function SideMenu({
     ["⬇️", "menu_downloads", "audio"],
     ["💱", "cur_title", "profile"],
     ["🆘", "menu_emergency", "profile"],
+    ["🎓", "s_tour", null],
   ];
   const имя = user ? `${user.firstName} ${user.lastName}`.trim() : "—";
-  const откуда = user?.country || "";
+  // Страна хранится кодом (UZ) — показываем название на языке интерфейса.
+  const откуда = названиеСтраны(user?.country, lang);
   return (
     <>
       <div
@@ -142,6 +145,9 @@ export function SideMenu({
                   onFavorites();
                 } else if (k === "trip_title") {
                   onTrip();
+                } else if (k === "s_tour") {
+                  // Обучение с детьми — его показывает page.tsx поверх всего.
+                  window.dispatchEvent(new Event("hellouz:tour"));
                 } else if (k === "cur_title" || k === "menu_emergency") {
                   onProfileStats();
                 } else if (target) {

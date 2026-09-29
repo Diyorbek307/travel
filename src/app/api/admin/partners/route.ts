@@ -10,6 +10,7 @@ import {
   удалитьСекрет,
   type ВидЗаведения,
 } from "@/lib/partners";
+import { выдатьКлючПриёма, отозватьКлючПриёма, состояниеПриёма } from "@/lib/partner-push";
 
 export const dynamic = "force-dynamic";
 
@@ -30,13 +31,39 @@ function разобрать(body: unknown): { вид: ВидЗаведения; 
   return { вид, id };
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   const нет = await отказЕсли("content");
   if (нет) return нет;
+  // С ?kind=&id= — ещё и состояние приёма «система присылает сама».
+  const q = new URL(request.url).searchParams;
+  const цель = разобрать({ kind: q.get("kind"), id: q.get("id") });
   return NextResponse.json(
-    { подключения: await списокПодключений() },
+    {
+      подключения: await списокПодключений(),
+      ...(цель ? { приём: await состояниеПриёма(цель.вид, цель.id) } : {}),
+    },
     { headers: { "Cache-Control": "no-store" } },
   );
+}
+
+/**
+ * Ключ приёма для режима «система присылает сама»: выдать новый (прежний
+ * перестаёт работать) или отозвать. Ключ целиком показывается один раз —
+ * в этом ответе.
+ */
+export async function PATCH(request: Request) {
+  const нет = await отказЕсли("content");
+  if (нет) return нет;
+  const body = (await request.json().catch(() => null)) as Record<string, unknown> | null;
+  const цель = разобрать(body);
+  if (!цель || !body) return NextResponse.json({ error: "bad_request" }, { status: 400 });
+  if (body.action === "revoke") {
+    await отозватьКлючПриёма(цель.вид, цель.id);
+    return NextResponse.json({ ok: true });
+  }
+  if (body.action !== "issue") return NextResponse.json({ error: "bad_request" }, { status: 400 });
+  const ключ = await выдатьКлючПриёма(цель.вид, цель.id);
+  return NextResponse.json({ ok: true, ключ });
 }
 
 /** Сохранить адрес и ключ. Ключ можно не присылать — тогда остаётся прежний. */

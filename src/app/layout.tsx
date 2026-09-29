@@ -65,11 +65,11 @@ export const metadata: Metadata = {
     icon: [
       // Иконка — картина со знаком над водой. SVG-вариант убран: браузер
       // предпочёл бы его, а в нём только плоский знак.
-      { url: "/icons/favicon-32.png", sizes: "32x32", type: "image/png" },
-      { url: "/icons/favicon-48.png", sizes: "48x48", type: "image/png" },
-      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/favicon-32.png?v=3", sizes: "32x32", type: "image/png" },
+      { url: "/icons/favicon-48.png?v=3", sizes: "48x48", type: "image/png" },
+      { url: "/icons/icon-192.png?v=3", sizes: "192x192", type: "image/png" },
     ],
-    apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180" }],
+    apple: [{ url: "/icons/apple-touch-icon.png?v=3", sizes: "180x180" }],
   },
   formatDetection: {
     // Телефоны и даты в текстах — часть вёрстки. Автоссылки от iOS их

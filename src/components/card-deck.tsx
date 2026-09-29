@@ -189,14 +189,19 @@ export function CardDeck({ places, onPlace }: { places: Place[]; onPlace: (p: Pl
       badgeColor: "rgba(233,196,106,0.92)",
       // Три коротких метрики: рейтинг, отзывы, расстояние. Погоду здесь
       // не показываем — она одна на весь город и уже есть в шапке главной.
-      stat1: `${p.rating}★`,
+      stat1: p.rating > 0 ? `${p.rating}★` : "✨",
       stat1l: t("card_rating"),
       stat2: String(p.reviews),
       stat2l: t("d_reviews_word"),
       // Расстояние — только настоящее, от текущей позиции. Без геолокации
       // число из данных всем показывало «0.3 км» до Регистана, даже в
       // Ташкенте, — тогда полезнее часы работы.
-      stat3: км != null ? дист.формат(км) : p.hours.length > 11 ? t("d_always") : p.hours,
+      stat3:
+        км != null
+          ? дист.формат(км)
+          : /^(всегда|круглосуточно|24\/7)$/i.test(p.hours)
+          ? t("d_always")
+          : трК(p.hours),
       stat3l: км != null ? t("card_dist") : t("d_hours"),
       price: дг.цена(p.entry),
       pricel: t("card_entry"),

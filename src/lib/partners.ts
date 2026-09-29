@@ -2,6 +2,7 @@ import path from "node:path";
 import { создатьХранилище } from "./storage";
 import { разобратьОтветПартнёра, ручноеНаличие, type Наличие } from "./availability";
 import type { Connection, RoomCategory } from "./types";
+import { присланноеНаличие } from "./partner-push";
 
 /**
  * Связь с системами заведений: OSHBOARD, iiko, R-Keeper, системы
@@ -151,6 +152,8 @@ export async function наличие(
   if (!с || с.kind === "none") return null;
   if (с.kind === "manual") return ручноеНаличие(с);
   if (с.kind === "partner" && с.externalId) return спроситьПартнёра(вид, запись.id, с.externalId, п);
+  // Система присылает сама: отдаём последнее присланное, если оно свежее.
+  if (с.kind === "push") return присланноеНаличие(вид, запись.id);
   return null;
 }
 

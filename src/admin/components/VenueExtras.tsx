@@ -61,6 +61,8 @@ export interface Подробности {
   zones?: Zone[];
   avgCheck?: string;
   tickets?: Ticket[];
+  /** Место: авторы и лицензия фото (CC BY-SA требует подписи). */
+  credits?: string;
   tables?: TableType[];
   facts?: Fact[];
   connection?: Connection;
@@ -80,7 +82,8 @@ const НАЗВАНИЕ_КАТЕГОРИИ: Record<RoomCategory, string> = {
 const РЕЖИМ: Record<ConnectionKind, string> = {
   none: "Нет — бронь уходит заявкой",
   manual: "Вручную — отмечаю свободные места здесь",
-  partner: "Система заведения (OSHBOARD и др.)",
+  partner: "Система заведения — мы опрашиваем её API (OSHBOARD и др.)",
+  push: "Система присылает сама — любая касса или система гостиницы",
 };
 
 const новыйId = (префикс: string) =>
@@ -165,6 +168,7 @@ export default function VenueExtras({
   const [залы, setЗалы] = useState<Zone[]>(запись.zones ?? []);
   const [чек, setЧек] = useState(запись.avgCheck ?? "");
   const [билеты, setБилеты] = useState<Ticket[]>(запись.tickets ?? []);
+  const [авторы, setАвторы] = useState(запись.credits ?? "");
   const [столы, setСтолы] = useState<TableType[]>(запись.tables ?? []);
   const [факты, setФакты] = useState<Fact[]>(запись.facts ?? []);
   const [связь, setСвязь] = useState<Connection>(запись.connection ?? { kind: "none" });
@@ -211,7 +215,10 @@ export default function VenueExtras({
       // Пустой диапазон не сохраняем: без него шапка карточки осталась бы с дырой.
       if (цены.trim()) изменения.price = цены.trim();
     }
-    if (вид === "place") изменения.tickets = билеты.filter((б) => б.name.trim() && б.price.trim());
+    if (вид === "place") {
+      изменения.tickets = билеты.filter((б) => б.name.trim() && б.price.trim());
+      изменения.credits = авторы.trim() || undefined;
+    }
     if (естьНаличие) {
       // Ручные цифры — с отметкой времени: туристу они видны сутки.
       изменения.connection =
@@ -256,6 +263,16 @@ export default function VenueExtras({
         <Заголовок>Фотографии</Заголовок>
 
         <ГалереяФото label="ПЕРВОЕ ФОТО — ОБЛОЖКА В СПИСКАХ И КАРТОЧКЕ" values={фото} onChange={setФото} />
+        {вид === "place" && (
+          <div className="mt-2">
+            <Поле
+              label="АВТОРЫ ФОТО И ЛИЦЕНЗИЯ (ПОДПИСЬ ПОД ГАЛЕРЕЕЙ)"
+              value={авторы}
+              onChange={setАвторы}
+              placeholder="Фото: Имя Автора — Wikimedia Commons, CC BY-SA 4.0"
+            />
+          </div>
+        )}
 
         {вид === "hotel" && (
           <>
@@ -765,6 +782,8 @@ function НаличиеМест({
         </div>
       )}
 
+      {связь.kind === "push" && <ПриёмОтСистемы вид={вид} id={id} />}
+
       {связь.kind === "partner" && (
         <div className="mt-3 rounded-lg p-3" style={{ border: "1px solid var(--color-border)" }}>
           <div className="grid gap-2 sm:grid-cols-2">
@@ -808,6 +827,101 @@ function НаличиеМест({
         </div>
       )}
     </>
+  );
+}
+
+/**
+ * Режим «система присылает сама»: ключ приёма и подсказка разработчику
+ * системы — куда и что слать. Ключ виден один раз, сразу после выдачи.
+ */
+function ПриёмОтСистемы({ вид, id }: { вид: "hotel" | "restaurant"; id: string }) {
+  const [состояние, setСостояние] = useState<{
+    ключВыдан: string | null;
+    последнееОбновление: string | null;
+  }>();
+  const [новыйКлюч, setНовыйКлюч] = useState<string | null>(null);
+  const адрес = typeof window === "undefined" ? "" : window.location.origin;
+
+  const загрузить = () =>
+    fetch(`/api/admin/partners?kind=${вид}&id=${encodeURIComponent(id)}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => d?.приём && setСостояние(d.приём))
+      .catch(() => {});
+  useEffect(() => {
+    void загрузить();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [вид, id]);
+
+  async function выдать() {
+    if (состояние?.ключВыдан && !confirm("Выдать новый ключ? Старый сразу перестанет работать.")) return;
+    const res = await fetch("/api/admin/partners", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ kind: вид, id, action: "issue" }),
+    }).catch(() => null);
+    const d = res?.ok ? await res.json().catch(() => null) : null;
+    if (d?.ключ) {
+      setНовыйКлюч(d.ключ);
+      void загрузить();
+    }
+  }
+
+  async function отозвать() {
+    if (!confirm("Отозвать ключ? Система заведения перестанет присылать данные.")) return;
+    await fetch("/api/admin/partners", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ kind: вид, id, action: "revoke" }),
+    }).catch(() => null);
+    setНовыйКлюч(null);
+    void загрузить();
+  }
+
+  const когда = (iso: string | null | undefined) => (iso ? new Date(iso).toLocaleString("ru-RU") : "—");
+  const пример =
+    вид === "hotel"
+      ? `{"rooms":[{"category":"standard","free":3,"price":85}]}`
+      : `{"free_tables":4,"next_free_time":"19:30"}`;
+
+  return (
+    <div className="mt-3 rounded-lg p-3 text-xs" style={{ border: "1px solid var(--color-border)" }}>
+      <p style={{ color: "var(--color-text)" }}>
+        Ключ выдан: <b>{когда(состояние?.ключВыдан)}</b> · Последние данные от системы:{" "}
+        <b>{когда(состояние?.последнееОбновление)}</b>
+      </p>
+      <div className="mt-2 flex flex-wrap gap-2">
+        <Btn small variant="ghost" onClick={выдать}>
+          {состояние?.ключВыдан ? "Выдать новый ключ" : "Выдать ключ приёма"}
+        </Btn>
+        {состояние?.ключВыдан && (
+          <Btn small variant="danger" onClick={отозвать}>
+            Отозвать
+          </Btn>
+        )}
+      </div>
+      {новыйКлюч && (
+        <div className="mt-2 rounded p-2" style={{ background: "var(--color-dim)" }}>
+          <p style={{ color: "var(--color-rose)" }}>Скопируйте ключ сейчас — больше он показан не будет:</p>
+          <code className="mt-1 block select-all break-all" style={{ color: "var(--color-text)" }}>
+            {новыйКлюч}
+          </code>
+        </div>
+      )}
+      <div className="mt-3 space-y-1" style={{ color: "var(--color-muted)" }}>
+        <p>Передайте разработчику системы заведения:</p>
+        <code className="block break-all">
+          POST {адрес}/api/partner/v1/availability — свободные места, пример: {пример}
+        </code>
+        <code className="block break-all">
+          GET {адрес}/api/partner/v1/reservations — новые брони туристов
+        </code>
+        <code className="block break-all">
+          POST {адрес}/api/partner/v1/reservations/&lt;id&gt; — {`{"status":"confirmed"}`} или rejected
+        </code>
+        <p>Заголовок каждого запроса: Authorization: Bearer &lt;ключ&gt;. Подробно — docs/partner-api.md.</p>
+        <p>Цифры старше 6 часов туристам не показываются — система должна присылать их хотя бы раз в час.</p>
+      </div>
+    </div>
   );
 }
 

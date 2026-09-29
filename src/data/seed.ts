@@ -90,8 +90,8 @@ const places: ManagedPlace[] = PLACES.map((p, i) => ({
   status: "active",
   // Билеты, «Полезно знать» и галерея — заготовка до правки в панели.
   tickets: p.tickets ?? типовыеБилеты(p),
-  facts: фактыМеста(p),
-  imgs: галереяМеста(p),
+  facts: p.facts ?? фактыМеста(p),
+  imgs: p.imgs ?? галереяМеста(p),
 }));
 
 const hotels: ManagedHotel[] = HOTELS.map((h, i) => {
@@ -250,6 +250,8 @@ const ПОЗДНИЕ_ИСХОДНЫЕ = new Set([
   // Экскурсии по городам
   "r7", "r8", "r9", "r10",
   // Второе наполнение: все разделы во всех городах
+  // Красивые места
+  "sckitob", "scurng", "sczaam", "scsarm", "scmuyn", "scsent", "scshoh", "scamir", "sckosn", "scboys", "scsukk",
   "xnamm", "xkasm", "xgulm", "xb10", "xb11", "r19",
   "xkhiv", "xsito", "xmizd", "xyodg", "xrish", "xkhud", "xakhs", "xotav", "xbabm", "xandj", "xfaya", "xterm", "xhaki", "xkokg", "xodin", "xaydr", "xtemg", "xrash", "xsyrd", "xh1", "xh2", "xh3", "xh4", "xh5", "xh6", "xh7", "xh8", "xh9", "xh10", "xh11", "xh12", "xr1", "xr2", "xr3", "xr4", "xr5", "xr6", "xr7", "xr8", "xb1", "xb2", "xb3", "xb4", "xb5", "xb6", "xb7", "xb8", "xb9", "r11", "r12", "r13", "r14", "r15", "r16", "r17", "r18",
 ]);

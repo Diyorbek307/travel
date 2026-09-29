@@ -40,6 +40,7 @@ import Туризм, { ФлагУз } from "@/components/tourism";
  * видит список.
  */
 export type РазделОбзора =
+  | "scenic"
   | "cities"
   | "places"
   | "museums"
@@ -119,6 +120,11 @@ export function ExploreScreen({
   const вГороде = <T extends { city: string }>(список: T[]) =>
     город ? список.filter((x) => x.city === город) : список;
   const места = вГороде(PLACES);
+  // Красивые места — природа и глубинка: горы, озёра, ущелья, кишлаки.
+  // Новые (с галереей и авторами фото) — первыми.
+  const красивые = места
+    .filter((p) => (p.typeRu ?? p.type) === "Природа")
+    .sort((a, b) => (b.imgs?.length ?? 0) - (a.imgs?.length ?? 0));
   const музеи = места.filter((p) => (ТИПЫ_МЕСТ["Музеи"] ?? []).includes(p.typeRu ?? p.type));
   const отели = вГороде(HOTELS);
   // Бары — те же заведения из раздела ресторанов, но с видом «bar»: их
@@ -226,6 +232,8 @@ export function ExploreScreen({
         <div className="flex-1 overflow-y-auto hide-scroll p-4">
           <КарточкаИИ onClick={по("ai").go} />
           <БаннерТуризм onClick={() => onРаздел("tourism")} />
+          <КакПользоваться />
+          <ЛентаКрасивых места={красивые} onPlace={onPlace} onВсе={() => onРаздел("scenic")} />
           {/*
             Двенадцать одинаковых плиток подряд глаз не различает, поэтому
             они разложены по смыслу: что посмотреть, где жить, как ехать.
@@ -270,6 +278,7 @@ export function ExploreScreen({
   }
 
   const заголовки: Record<РазделОбзора, TKey> = {
+    scenic: "ex_scenic",
     cities: "ex_cities",
     places: "ex_sights",
     museums: "f_museums",
@@ -322,6 +331,7 @@ export function ExploreScreen({
           />
         )}
         {раздел === "places" && <СписокМест места={места} onPlace={onPlace} сброс={сброс} />}
+        {раздел === "scenic" && <СписокМест места={красивые} onPlace={onPlace} сброс={сброс} безТипов />}
         {раздел === "museums" && <СписокМест места={музеи} onPlace={onPlace} сброс={сброс} безТипов />}
         {раздел === "hotels" && <СписокОтелей отели={отели} onHotel={onHotel} сброс={сброс} />}
         {раздел === "restaurants" && (
@@ -459,6 +469,101 @@ function БаннерТуризм({ onClick }: { onClick: () => void }) {
         <polyline points="9 18 15 12 9 6" />
       </svg>
     </button>
+  );
+}
+
+/** «Как пользоваться» — те же дети, что встречали при входе, и их обучение. */
+function КакПользоваться() {
+  const { t } = useT();
+  return (
+    <button
+      onClick={() => window.dispatchEvent(new Event("hellouz:tour"))}
+      className="tile-in mb-5 flex w-full items-center gap-3 overflow-hidden rounded-2xl border p-0 text-left transition-transform duration-150 active:scale-[0.98]"
+      style={{ background: SURFACE, borderColor: BORDER }}
+    >
+      <img
+        src="/videos/kids-hello.webp"
+        alt=""
+        className="h-16 w-20 flex-shrink-0 object-cover"
+        style={{ objectPosition: "center 42%" }}
+      />
+      <span className="min-w-0 flex-1 py-3">
+        <span className="block text-sm font-bold" style={{ color: TEXT, fontFamily: "var(--font-heading)" }}>
+          🎓 {t("ex_howto_title")}
+        </span>
+        <span className="block truncate text-[11px]" style={{ color: MUTED }}>
+          {t("ex_howto_sub")}
+        </span>
+      </span>
+      <svg
+        className="rtl-flip mr-3 flex-shrink-0"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke={GREEN}
+        strokeWidth="2.5"
+      >
+        <polyline points="9 18 15 12 9 6" />
+      </svg>
+    </button>
+  );
+}
+
+/**
+ * Лента «Красивые места»: крупные фото с прокруткой вбок — горы, озёра,
+ * ущелья. Фото здесь важнее текста, поэтому карточки высокие.
+ */
+function ЛентаКрасивых({
+  места,
+  onPlace,
+  onВсе,
+}: {
+  места: Place[];
+  onPlace: (p: Place) => void;
+  onВсе: () => void;
+}) {
+  const { t, трК } = useT();
+  if (места.length === 0) return null;
+  return (
+    <section className="mb-5">
+      <div className="mb-2.5 flex items-center justify-between">
+        <div>
+          <h2
+            className="flex items-center gap-2 text-base font-bold"
+            style={{ color: TEXT, fontFamily: "var(--font-heading)" }}
+          >
+            <span className="h-4 w-1 rounded-full" style={{ background: "#3f9b52" }} />
+            {t("ex_scenic")}
+          </h2>
+          <p className="ml-3 text-[11px]" style={{ color: MUTED }}>
+            {t("ex_scenic_sub")}
+          </p>
+        </div>
+        <button onClick={onВсе} className="rounded-full px-3 py-1 text-xs font-bold" style={{ color: GREEN }}>
+          {t("ex_all")} · {места.length}
+        </button>
+      </div>
+      <div className="hide-scroll -mx-4 flex gap-3 overflow-x-auto px-4 pb-1">
+        {места.slice(0, 12).map((p) => (
+          <button
+            key={p.id}
+            onClick={() => onPlace(p)}
+            className="relative h-56 w-44 flex-shrink-0 overflow-hidden rounded-2xl text-left shadow-sm transition-transform duration-150 active:scale-[0.98]"
+          >
+            <img src={p.img} alt={p.name} loading="lazy" className="skel h-full w-full object-cover" />
+            <span
+              className="absolute inset-0"
+              style={{ background: "linear-gradient(to top, rgba(0,0,0,0.75), transparent 55%)" }}
+            />
+            <span className="absolute bottom-0 left-0 right-0 p-3">
+              <span className="block text-sm font-bold leading-tight text-white">{p.name}</span>
+              <span className="mt-0.5 block text-[10px] text-white/75">📍 {трК(p.city)}</span>
+            </span>
+          </button>
+        ))}
+      </div>
+    </section>
   );
 }
 

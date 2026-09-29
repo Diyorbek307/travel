@@ -33,12 +33,14 @@ export function Badge({
  * золото, потому что светлое на белом почти не читается.
  */
 export function StarRow({ rating, onPhoto = false }: { rating: number; onPhoto?: boolean }) {
+  const { t } = useT();
   return (
     <span
       className="flex items-center gap-0.5 text-xs font-semibold"
       style={{ color: onPhoto ? GOLD : "var(--gold-ink)" }}
     >
-      ★ {rating}
+      {/* Пока настоящих отзывов нет — не «★ 0», а «Новое». */}
+      {rating > 0 ? `★ ${rating}` : `✨ ${t("new_badge")}`}
     </span>
   );
 }

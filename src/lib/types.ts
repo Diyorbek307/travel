@@ -24,6 +24,8 @@ export interface Place {
   imgs?: string[];
   /** «Полезно знать»: сколько времени нужно, дресс-код, лучшее время… */
   facts?: Fact[];
+  /** Авторы и лицензия фото — подпись под галереей (CC BY-SA требует). */
+  credits?: string;
 }
 
 export interface RouteStop {
@@ -128,7 +130,7 @@ export interface Ticket {
  *   partner — живые данные из системы заведения (OSHBOARD или любой
  *             другой, реализовавшей HelloUZ Partner API).
  */
-export type ConnectionKind = "none" | "manual" | "partner";
+export type ConnectionKind = "none" | "manual" | "partner" | "push";
 
 export interface Connection {
   kind: ConnectionKind;
