@@ -395,6 +395,17 @@ export default function Destinations() {
                   style={полеСтиль}
                 />
               </label>
+              <label
+                className="flex items-center gap-2 text-xs sm:col-span-2"
+                style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+              >
+                <input
+                  type="checkbox"
+                  checked={selected.audio}
+                  onChange={(e) => setSelected((d) => d && { ...d, audio: e.target.checked })}
+                />
+                АУДИОГИД — пока нет записи диктора, описание читает телефон туриста
+              </label>
             </div>
             <div className="flex flex-wrap gap-3 justify-end">
               {selected.id && (
@@ -410,7 +421,7 @@ export default function Destinations() {
                     setSelected(null);
                   }}
                 >
-                  Фото и билеты{selected.tickets?.length ? ` · ${selected.tickets.length}` : ""}
+                  Фото, билеты, полезно знать{selected.tickets?.length ? ` · ${selected.tickets.length}` : ""}
                 </Btn>
               )}
               <Btn variant="ghost" onClick={() => setSelected(null)}>

@@ -22,6 +22,8 @@ export interface Place {
   tickets?: Ticket[];
   /** Галерея: фото места, кроме главного. */
   imgs?: string[];
+  /** «Полезно знать»: сколько времени нужно, дресс-код, лучшее время… */
+  facts?: Fact[];
 }
 
 export interface RouteStop {
@@ -157,6 +159,8 @@ export interface Hotel {
   /** Категории номеров: эконом, стандарт, бизнес… */
   roomTypes?: RoomType[];
   connection?: Connection;
+  /** «Полезно знать»: заезд и выезд, завтрак, дети, трансфер… */
+  facts?: Fact[];
 }
 
 export interface Restaurant {
@@ -178,6 +182,10 @@ export interface Restaurant {
   menu?: MenuItem[];
   /** Галерея: зал, терраса, блюда… */
   imgs?: string[];
+  /** Столы по числу мест: на двоих, на компанию… */
+  tables?: TableType[];
+  /** «Полезно знать»: оплата, халяль, музыка, дети… */
+  facts?: Fact[];
 }
 
 /** Карточка в колоде на главной — одна форма и для городов, и для мест. */
@@ -441,3 +449,17 @@ export interface PublicUser {
 }
 
 export type BookingKind = "hotel" | "restaurant" | "tour";
+
+/** Строка «Полезно знать» в карточке: подпись и значение, как их вписал редактор. */
+export interface Fact {
+  id: string;
+  label: string;
+  value: string;
+}
+
+/** Столы ресторана одного размера: «на 4 места — 6 столов». */
+export interface TableType {
+  id: string;
+  seats: number;
+  count: number;
+}

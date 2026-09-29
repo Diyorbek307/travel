@@ -703,7 +703,7 @@ function Screen({ tab, detail, ...p }: ScreenProps) {
           <PlaceDetail place={detail.value} onBack={p.onCloseDetail} onToast={p.onToast} onПуть={p.onПуть} />
         );
       case "hotel":
-        return <HotelDetail hotel={detail.value} onBack={p.onCloseDetail} />;
+        return <HotelDetail hotel={detail.value} onBack={p.onCloseDetail} onПуть={p.onПуть} />;
       case "restaurant":
         return <RestaurantDetail r={detail.value} onBack={p.onCloseDetail} onПуть={p.onПуть} />;
       case "route":

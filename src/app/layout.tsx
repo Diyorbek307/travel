@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Rubik } from "next/font/google";
+import { Playfair_Display, Rubik } from "next/font/google";
 import ServiceWorker from "@/components/service-worker";
 import "./globals.css";
 
@@ -14,6 +14,17 @@ import "./globals.css";
 const rubik = Rubik({
   subsets: ["latin", "cyrillic"],
   variable: "--font-sans",
+});
+
+/*
+ * Антиква для меню ресторанов: бумажному меню нужен книжный шрифт с
+ * засечками, гротеск делает его похожим на прайс-лист. Не предзагружаем —
+ * шрифт нужен только в карточке ресторана.
+ */
+const playfair = Playfair_Display({
+  subsets: ["latin", "cyrillic"],
+  variable: "--font-menu",
+  preload: false,
 });
 
 export const metadata: Metadata = {
@@ -89,7 +100,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     // отрисовки ставит выбранную человеком: без него тот, кто выбрал
     // тёмную, видел бы вспышку светлого экрана при каждом запуске.
     // suppressHydrationWarning — атрибут меняет этот скрипт, а не React.
-    <html lang="ru" className={rubik.variable} data-theme="light" suppressHydrationWarning>
+    <html
+      lang="ru"
+      className={`${rubik.variable} ${playfair.variable}`}
+      data-theme="light"
+      suppressHydrationWarning
+    >
       <head>
         <script dangerouslySetInnerHTML={{ __html: ТЕМА_ДО_ОТРИСОВКИ }} />
       </head>

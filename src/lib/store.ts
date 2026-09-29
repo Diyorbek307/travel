@@ -52,7 +52,63 @@ export async function readContent(): Promise<Content> {
     );
     if (добавить.length) (итог as Record<ContentKey, Записи>)[ключ] = [...список, ...добавить];
   }
+  return дополнитьПодробности(итог);
+}
+
+/*
+ * Подробности карточек (меню, залы, столы, билеты, «Полезно знать»,
+ * галереи) появились в семенах позже, чем разделы сохранили в панели.
+ * Сохранённая запись о них не знает, и без досыпки карточка на сайте
+ * так и осталась бы пустой.
+ *
+ * Досыпаем только в записи из семян и только в поля, которых у записи
+ * нет. Всё, что редактор хоть раз сохранил, — даже пустой список —
+ * остаётся как есть: «убрал меню» значит убрал.
+ */
+const ПОДРОБНОСТИ = {
+  hotels: ["facts"],
+  restaurants: ["menu", "zones", "tables", "avgCheck", "imgs", "facts"],
+  places: ["tickets", "facts", "imgs"],
+} as const;
+
+function дополнитьПодробности(содержимое: Content): Content {
+  const итог = { ...содержимое };
+  for (const [ключ, поля] of Object.entries(ПОДРОБНОСТИ) as [keyof typeof ПОДРОБНОСТИ, readonly string[]][]) {
+    const семена = new Map((SEED[ключ] as Записи).map((x) => [x.id, x as Record<string, unknown>]));
+    (итог as Record<string, unknown>)[ключ] = (содержимое[ключ] as Записи).map((запись) => {
+      const семя = семена.get(запись.id);
+      if (!семя) return запись;
+      const r = запись as Record<string, unknown>;
+      const добавка: Record<string, unknown> = {};
+      for (const поле of поля)
+        if (r[поле] === undefined && семя[поле] !== undefined) добавка[поле] = семя[поле];
+      // Галерея и номера гостиницы были в данных и раньше — меняем их,
+      // только если это нетронутая старая заготовка.
+      // Обложка-пицца из первых данных: редактор её не менял — меняем мы.
+      if (ключ === "restaurants" && typeof r.img === "string" && r.img.includes("photo-1565299624946"))
+        добавка.img = семя.img;
+      if (ключ === "hotels") {
+        if (старыеНомера(r)) добавка.roomTypes = семя.roomTypes;
+        // Старая галерея — начало новой: её никто не правил.
+        const было = r.imgs as string[] | undefined;
+        const стало = семя.imgs as string[];
+        if (!было || (было.length < стало.length && было.every((x, i) => x === стало[i])))
+          добавка.imgs = стало;
+      }
+      return Object.keys(добавка).length ? { ...запись, ...добавка } : запись;
+    });
+  }
   return итог;
+}
+
+/** Номера из первой заготовки: без фото и названий, id вида «гостиница-категория». */
+function старыеНомера(r: Record<string, unknown>): boolean {
+  const номера = r.roomTypes as { id: string; name?: string; imgs?: string[]; img?: string }[] | undefined;
+  if (номера === undefined) return true;
+  return (
+    номера.length > 0 &&
+    номера.every((н) => н.id.startsWith(`${r.id}-`) && !н.name && !н.imgs?.length && !н.img)
+  );
 }
 
 /**

@@ -61,6 +61,14 @@
   --glow: rgba(15, 179, 172, 0.35);
   /* Нижнее меню: на светлой — обычная поверхность, на тёмной — стекло. */
   --nav-bg: var(--surface);
+  /* Меню ресторана: тёплая бумага и золото, на тёмной — бирюзовая
+     «кожаная обложка» с кремовыми буквами. */
+  --menu-paper: #fbf6ea;
+  --menu-paper-2: #f3ead3;
+  --menu-ink: #23302d;
+  --menu-muted: #7c7461;
+  --menu-gold: #a8801f;
+  --menu-line: rgba(168, 128, 31, 0.35);
 }
 
 /* Тёмные токены. Один и тот же набор в двух случаях: система говорит
@@ -87,6 +95,12 @@
     --border: #22322f;
     --glow: rgba(52, 220, 207, 0.45);
     --nav-bg: rgba(15, 26, 24, 0.78);
+    --menu-paper: #0f2b28;
+    --menu-paper-2: #0a201e;
+    --menu-ink: #f1e8d2;
+    --menu-muted: #a8a38f;
+    --menu-gold: #f2ce6e;
+    --menu-line: rgba(242, 206, 110, 0.3);
   }
 }
 html[data-theme="dark"] {
@@ -110,6 +124,12 @@ html[data-theme="dark"] {
   --border: #22322f;
   --glow: rgba(52, 220, 207, 0.45);
   --nav-bg: rgba(15, 26, 24, 0.78);
+  --menu-paper: #0f2b28;
+  --menu-paper-2: #0a201e;
+  --menu-ink: #f1e8d2;
+  --menu-muted: #a8a38f;
+  --menu-gold: #f2ce6e;
+  --menu-line: rgba(242, 206, 110, 0.3);
 }
 
 /* Классы фона Tailwind тоже переводим на поверхность темы, чтобы карточки
@@ -1018,5 +1038,21 @@ html.intro-landing [data-brand-logo] {
   100% {
     opacity: 0;
     transform: translateY(-4px);
+  }
+}
+
+/* Полоски «эквалайзера», пока телефон читает аудиогид. */
+.eq-bar {
+  height: 40%;
+  animation: eq 0.9s ease-in-out infinite alternate;
+}
+@keyframes eq {
+  to {
+    height: 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .eq-bar {
+    animation: none;
   }
 }

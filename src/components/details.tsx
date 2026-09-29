@@ -11,9 +11,11 @@ import {
   ЗалыРесторана,
   КАТЕГОРИЯ_НОМЕРА,
   МенюРесторана,
+  АудиогидГолосом,
+  ПолезноЗнать,
   НомераОтеля,
 } from "./venue-details";
-import ReviewForm from "./review-form";
+import ReviewForm, { useРейтинг } from "./review-form";
 import type { Hotel, HotelKind, Place, Restaurant, Route, RoomType } from "@/lib/types";
 import type { TKey } from "@/lib/i18n";
 import {
@@ -74,6 +76,7 @@ export function PlaceDetail({
   const fav = избранное.some((f) => f.key === `place:${place.id}`);
   const маршрут = useTrip();
   const вМаршруте = маршрут.some((x) => x.id === place.id);
+  const оценка = useРейтинг(place.id, place.rating, place.reviews ?? 0);
   /*
    * Аудиогид — настоящие записи этого места из панели. Здесь раньше был
    * нарисованный плеер: полоска бежала по таймеру, у всех мест одинаковые
@@ -162,8 +165,7 @@ export function PlaceDetail({
             {place.name}
           </h2>
           <p className="text-white/70 text-xs mt-0.5">
-            {трК(place.city)} · ★ {place.rating} ({(place.reviews ?? 0).toLocaleString()}{" "}
-            {t("d_reviews_word")})
+            {трК(place.city)} · ★ {оценка.рейтинг} ({оценка.отзывов.toLocaleString()} {t("d_reviews_word")})
           </p>
         </div>
       </div>
@@ -202,8 +204,12 @@ export function PlaceDetail({
             {place.desc}
           </p>
         </div>
-        <ГалереяЗаведения фото={place.imgs ?? []} />
+        {/* В галерее места — виды города вокруг, так и подписываем. */}
+        <ГалереяЗаведения фото={place.imgs ?? []} подпись={трК(place.city)} />
+        {/* Записи диктора нет — рассказ читает сам телефон. */}
+        {!запись && place.audio && <АудиогидГолосом заголовок={place.name} текст={place.desc} />}
         <БилетыМеста place={place} />
+        <ПолезноЗнать факты={place.facts ?? []} />
         {запись && (
           <div className="rounded-2xl p-4 mb-3" style={{ background: ACCENT_FILL }}>
             <div className="flex items-center gap-3 mb-3">
@@ -323,13 +329,22 @@ const ВИД_ГОСТИНИЦЫ: Record<HotelKind, TKey> = {
   hostel: "hk_hostel",
 };
 
-export function HotelDetail({ hotel, onBack }: { hotel: Hotel; onBack: () => void }) {
+export function HotelDetail({
+  hotel,
+  onBack,
+  onПуть,
+}: {
+  hotel: Hotel;
+  onBack: () => void;
+  onПуть: (название: string, город: string) => void;
+}) {
   const { t, трК } = useT();
   const [imgIdx, setImgIdx] = useState(0);
   const [guests, setGuests] = useState(2);
   const [nights, setNights] = useState(2);
   const избранное = useFavorites();
   const fav = избранное.some((f) => f.key === `hotel:${hotel.id}`);
+  const оценка = useРейтинг(hotel.id, hotel.rating, hotel.reviews);
   // Цена в данных строкой вида «$89». Нет цифр — итог просто не считаем.
   const [номер, setНомер] = useState<RoomType | null>(null);
   // Выбран номер — считаем по его цене, иначе по цене «от» из карточки.
@@ -418,9 +433,9 @@ export function HotelDetail({ hotel, onBack }: { hotel: Hotel; onBack: () => voi
             {hotel.name}
           </p>
           <div className="flex items-center gap-3">
-            <StarRow rating={hotel.rating} onPhoto />
+            <StarRow rating={оценка.рейтинг} onPhoto />
             <span className="text-white/60 text-xs">
-              {hotel.reviews} {t("d_reviews_word")}
+              {оценка.отзывов.toLocaleString()} {t("d_reviews_word")}
             </span>
           </div>
         </div>
@@ -552,6 +567,14 @@ export function HotelDetail({ hotel, onBack }: { hotel: Hotel; onBack: () => voi
             {t("d_book_terms")}
           </p>
         </div>
+        <ПолезноЗнать факты={hotel.facts ?? []} />
+        <button
+          onClick={() => onПуть(hotel.name, hotel.city)}
+          className="mb-3 w-full rounded-2xl py-3.5 text-sm font-bold text-white transition-all active:scale-[0.98]"
+          style={{ background: ACCENT_FILL }}
+        >
+          📍 {t("d_route")}
+        </button>
         <ГалереяЗаведения фото={hotel.imgs ?? []} />
         <НомераОтеля
           hotel={hotel}
@@ -594,6 +617,8 @@ export function RestaurantDetail({
   const дг = useДеньги();
   const избранное = useFavorites();
   const fav = избранное.some((f) => f.key === `restaurant:${r.id}`);
+  const оценка = useРейтинг(r.id, r.rating, r.reviews);
+  const телефон = "phone" in r && typeof r.phone === "string" ? r.phone.trim() : "";
   return (
     <div className="flex flex-col h-full animate-slide-up" style={{ background: CREAM }}>
       <div className="relative flex-shrink-0" style={{ height: 240 }}>
@@ -655,9 +680,9 @@ export function RestaurantDetail({
             {r.name}
           </p>
           <div className="flex items-center gap-3 mt-0.5">
-            <StarRow rating={r.rating} onPhoto />
+            <StarRow rating={оценка.рейтинг} onPhoto />
             <span className="text-white/70 text-xs">
-              {r.reviews} {t("d_reviews_word")}
+              {оценка.отзывов.toLocaleString()} {t("d_reviews_word")}
             </span>
             <span className="text-white/70 text-xs">{r.price}</span>
           </div>
@@ -694,8 +719,9 @@ export function RestaurantDetail({
           </p>
         </div>
         <ГалереяЗаведения фото={r.imgs ?? []} />
-        <МенюРесторана меню={r.menu ?? []} />
+        <МенюРесторана меню={r.menu ?? []} название={r.name} чек={r.avgCheck} />
         <ЗалыРесторана r={r} />
+        <ПолезноЗнать факты={r.facts ?? []} />
         {/*
           Здесь был список «фирменных блюд»: одни и те же пять узбекских
           названий у каждого ресторана, включая неузбекские, и цены,
@@ -704,8 +730,17 @@ export function RestaurantDetail({
           Вернуть блок можно, когда блюда появятся в панели.
         */}
         <div className="flex gap-3 mb-3">
-          {/* Кнопка «Позвонить» показывала «звоним…» и ничего не набирала:
-              телефона заведения в данных нет. Убрана до появления номера. */}
+          {/* «Позвонить» — только когда номер вписан в панели: кнопка,
+              которая ничего не набирает, хуже никакой. */}
+          {телефон && (
+            <a
+              href={`tel:${телефон.replace(/[^+\d]/g, "")}`}
+              className="flex-1 rounded-2xl border py-3.5 text-center text-sm font-bold"
+              style={{ color: GREEN, borderColor: GREEN }}
+            >
+              📞 {t("d_call")}
+            </a>
+          )}
           <button
             onClick={() => onПуть(r.name, r.city)}
             className="flex-1 py-3.5 rounded-2xl text-white text-sm font-bold active:scale-[0.98] transition-all"

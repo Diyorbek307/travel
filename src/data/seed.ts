@@ -10,6 +10,20 @@ import {
 } from "./content";
 import { GREEN } from "@/lib/theme";
 import { типовыеНомера } from "@/lib/rooms";
+import {
+  галереяГостиницы,
+  галереяМеста,
+  галереяРесторана,
+  обложкаРесторана,
+  типовоеМеню,
+  типовойЧек,
+  типовыеБилеты,
+  типовыеЗалы,
+  типовыеСтолы,
+  фактыГостиницы,
+  фактыМеста,
+  фактыРесторана,
+} from "@/lib/venue-demo";
 import type {
   Content,
   ContentKey,
@@ -74,6 +88,10 @@ const places: ManagedPlace[] = PLACES.map((p, i) => ({
   visits: p.reviews * 3,
   tours: ROUTES.filter((r) => r.stops.some((s) => s.name === p.name)).length,
   status: "active",
+  // Билеты, «Полезно знать» и галерея — заготовка до правки в панели.
+  tickets: p.tickets ?? типовыеБилеты(p),
+  facts: фактыМеста(p),
+  imgs: галереяМеста(p),
 }));
 
 const hotels: ManagedHotel[] = HOTELS.map((h, i) => {
@@ -93,6 +111,8 @@ const hotels: ManagedHotel[] = HOTELS.map((h, i) => {
     // Категории номеров — демонстрационные, от цены «от»: редактор
     // заменяет их настоящими в панели («Номера и наличие»).
     roomTypes: типовыеНомера(slug(h.id, i), priceFrom, h.kind === "hostel"),
+    imgs: галереяГостиницы(h),
+    facts: фактыГостиницы(h),
   };
 });
 
@@ -108,6 +128,15 @@ const restaurants: ManagedRestaurant[] = RESTAURANTS.map((r, i) => {
     monthlyViews: r.reviews,
     phone: "",
     address: "",
+    // Меню, залы, столы и галерея — демонстрационные: у каждого своё,
+    // по кухне и городу. Редактор заменяет их настоящими в панели.
+    img: обложкаРесторана(r),
+    menu: типовоеМеню(r),
+    zones: типовыеЗалы(r),
+    tables: типовыеСтолы(r),
+    avgCheck: типовойЧек(r),
+    imgs: галереяРесторана(r),
+    facts: фактыРесторана(r),
   };
 });
 

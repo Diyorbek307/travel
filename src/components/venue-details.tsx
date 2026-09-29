@@ -7,7 +7,8 @@ import { useT } from "@/components/lang-provider";
 import { useДеньги } from "@/lib/money";
 import type { Наличие } from "@/lib/availability";
 import type { TKey } from "@/lib/i18n";
-import type { Hotel, MenuItem, Place, Restaurant, RoomCategory, RoomType } from "@/lib/types";
+import { РазделительМеню, РисунокМеню, рисунокРаздела } from "./menu-art";
+import type { Fact, Hotel, MenuItem, Place, Restaurant, RoomCategory, RoomType } from "@/lib/types";
 
 /**
  * Подробности заведений: номера гостиницы, залы ресторана, билеты места —
@@ -208,7 +209,8 @@ export function ЗалыРесторана({ r }: { r: Restaurant }) {
     guests: 2,
   });
   const зоны = r.zones ?? [];
-  if (зоны.length === 0 && !r.avgCheck && !наличие) return null;
+  const столы = (r.tables ?? []).filter((с) => с.count > 0).sort((a, b) => a.seats - b.seats);
+  if (зоны.length === 0 && столы.length === 0 && !r.avgCheck && !наличие) return null;
 
   return (
     <div className="mb-3 rounded-2xl border bg-white p-4 shadow-sm" style={{ borderColor: BORDER }}>
@@ -246,7 +248,34 @@ export function ЗалыРесторана({ r }: { r: Restaurant }) {
           </div>
         </>
       )}
-      {r.avgCheck && (
+      {столы.length > 0 && (
+        <>
+          <p className="mb-2 mt-3 text-sm font-bold" style={{ color: TEXT }}>
+            {t("d_tables")}
+          </p>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            {столы.map((с) => (
+              <div
+                key={с.id}
+                className="flex items-center gap-2 rounded-xl border px-3 py-2"
+                style={{ background: CREAM, borderColor: BORDER }}
+              >
+                <ЗначокСтола мест={с.seats} />
+                <div className="leading-tight">
+                  <p className="text-xs font-semibold" style={{ color: TEXT }}>
+                    {t("d_table_seats").replace("{n}", String(с.seats))}
+                  </p>
+                  <p className="text-[10px]" style={{ color: MUTED }}>
+                    × {с.count}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+      {/* Есть меню — чек уже написан внизу меню, второй раз не повторяем. */}
+      {r.avgCheck && !r.menu?.length && (
         <p className="mt-3 text-xs" style={{ color: MUTED }}>
           {t("d_avg_check")}: <b style={{ color: TEXT }}>{дг.цена(r.avgCheck)}</b>
         </p>
@@ -355,14 +384,14 @@ function ФотоСПросмотром({ фото, className, с = 0 }: { фо�
 }
 
 /** Лента фото заведения; по нажатию — во весь экран. */
-export function ГалереяЗаведения({ фото }: { фото: string[] }) {
+export function ГалереяЗаведения({ фото, подпись }: { фото: string[]; подпись?: string }) {
   const { t } = useT();
   const [с, setС] = useState<number | null>(null);
   if (фото.length < 2) return null;
   return (
     <div className="mb-3 rounded-2xl border bg-white p-4 shadow-sm" style={{ borderColor: BORDER }}>
       <p className="mb-2 text-sm font-bold" style={{ color: TEXT }}>
-        📷 {t("d_photos")} · {фото.length}
+        📷 {подпись ?? t("d_photos")} · {фото.length}
       </p>
       <div className="hide-scroll -mx-1 flex gap-2 overflow-x-auto px-1">
         {фото.map((src, i) => (
@@ -380,64 +409,311 @@ export function ГалереяЗаведения({ фото }: { фото: strin
   );
 }
 
-/** Меню ресторана по разделам: блюдо, описание, цена, фото. */
-export function МенюРесторана({ меню }: { меню: MenuItem[] }) {
+/*
+ * Меню ресторана — как бумажная карта на столе: тёплая бумага в рамке
+ * из бирюзы и золота, разделы с рисунками посуды, цена через точки.
+ * Фото блюд не показываем: рисунок украшает, а снимок «плова вообще»
+ * обещал бы гостю не то, что принесут. Содержимое у каждого заведения
+ * своё — из панели, раздел за разделом.
+ */
+const ПОКАЗАТЬ_СРАЗУ = 8;
+const ШРИФТ_МЕНЮ = "var(--font-menu), Georgia, serif";
+
+/** Раздел в рамке, как «From our oven» на печатных меню. */
+const ФИРМЕННЫЙ = /тандыр|фирмен|от шефа|выпечк|oven|signature|chef/i;
+
+export function МенюРесторана({ меню, название, чек }: { меню: MenuItem[]; название: string; чек?: string }) {
   const { t, трК } = useT();
   const дг = useДеньги();
-  const разделы = [...new Set(меню.map((б) => б.section))];
   const [раздел, setРаздел] = useState<string | null>(null);
+  const [целиком, setЦеликом] = useState(false);
   if (меню.length === 0) return null;
-  const видно = раздел ? меню.filter((б) => б.section === раздел) : меню;
+
+  const разделы = [...new Set(меню.map((б) => б.section || "—"))];
+  const выбранные = раздел ? [раздел] : разделы;
+  // Длинное меню сворачиваем по целым разделам: обрезанный посередине
+  // раздел выглядел бы как ошибка.
+  let набрано = 0;
+  const видимые = выбранные.filter((р) => {
+    if (раздел || целиком) return true;
+    const было = набрано;
+    набрано += меню.filter((б) => (б.section || "—") === р).length;
+    return было < ПОКАЗАТЬ_СРАЗУ;
+  });
+  const скрыто = выбранные.length > видимые.length;
 
   return (
-    <div className="mb-3 rounded-2xl border bg-white p-4 shadow-sm" style={{ borderColor: BORDER }}>
-      <p className="mb-2 text-sm font-bold" style={{ color: TEXT }}>
-        🍽 {t("d_menu")}
-      </p>
-      {разделы.length > 1 && (
-        <div className="hide-scroll -mx-1 mb-3 flex gap-1.5 overflow-x-auto px-1">
-          {[null, ...разделы].map((р) => (
-            <button
-              key={р ?? "*"}
-              onClick={() => setРаздел(р)}
-              className="flex-shrink-0 rounded-full px-3 py-1 text-xs font-semibold"
-              style={
-                раздел === р
-                  ? { background: ACCENT_FILL, color: WHITE }
-                  : { background: CREAM, color: MUTED, border: `1px solid ${BORDER}` }
-              }
-            >
-              {р === null ? t("d_menu_all") : трК(р)}
-            </button>
-          ))}
-        </div>
-      )}
-      <div className="flex flex-col">
-        {видно.map((б, i) => (
-          <div
-            key={б.id}
-            className="flex gap-3 py-2.5"
-            style={{ borderTop: i ? `1px solid ${BORDER}` : undefined }}
+    <div
+      className="mb-3 rounded-[22px] p-[1.5px] shadow-sm"
+      style={{
+        background: "linear-gradient(145deg, var(--accent), var(--accent-2) 55%, var(--accent-deep))",
+      }}
+    >
+      <div
+        className="relative overflow-hidden rounded-[21px] px-5 pb-5 pt-6"
+        style={{
+          background: "radial-gradient(120% 70% at 50% 0%, var(--menu-paper), var(--menu-paper-2))",
+          color: "var(--menu-ink)",
+        }}
+      >
+        {/* Тонкая внутренняя рамка — след тиснения на обложке. */}
+        <div
+          className="pointer-events-none absolute inset-2 rounded-2xl"
+          style={{ border: "1px solid var(--menu-line)" }}
+          aria-hidden
+        />
+
+        <header className="relative text-center">
+          <p
+            className="text-[10px] font-semibold uppercase tracking-[0.4em]"
+            style={{ color: "var(--menu-gold)" }}
           >
-            {б.img && <ФотоСПросмотром фото={[б.img]} className="h-16 w-16 flex-shrink-0 rounded-lg" />}
-            <div className="min-w-0 flex-1">
-              <div className="flex items-start justify-between gap-2">
-                <p className="text-sm font-semibold" style={{ color: TEXT }}>
-                  {трК(б.name)}
-                </p>
-                <b className="flex-shrink-0 text-sm" style={{ color: GREEN }}>
-                  {дг.цена(б.price)}
-                </b>
-              </div>
-              {б.desc && (
-                <p className="mt-0.5 text-[11px] leading-snug" style={{ color: MUTED }}>
-                  {трК(б.desc)}
-                </p>
-              )}
-            </div>
+            {t("d_menu")}
+          </p>
+          <h3 className="mt-1 text-[22px] leading-tight" style={{ fontFamily: ШРИФТ_МЕНЮ, fontWeight: 600 }}>
+            {трК(название)}
+          </h3>
+          <div className="mt-2">
+            <РазделительМеню />
           </div>
-        ))}
+        </header>
+
+        {разделы.length > 2 && (
+          <nav className="hide-scroll relative -mx-1 mt-4 flex gap-1 overflow-x-auto px-1">
+            {[null, ...разделы].map((р) => (
+              <button
+                key={р ?? "*"}
+                onClick={() => setРаздел(р)}
+                className="flex-shrink-0 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-wider"
+                style={
+                  раздел === р
+                    ? { background: "var(--menu-gold)", color: "var(--menu-paper)" }
+                    : { color: "var(--menu-muted)", border: "1px solid var(--menu-line)" }
+                }
+              >
+                {р === null ? t("d_menu_all") : трК(р)}
+              </button>
+            ))}
+          </nav>
+        )}
+
+        <div className="relative mt-2">
+          {видимые.map((р) => {
+            const блюда = меню.filter((б) => (б.section || "—") === р);
+            const фирменный = ФИРМЕННЫЙ.test(р);
+            return (
+              <section
+                key={р}
+                className={фирменный ? "mt-5 rounded-xl px-3 pb-2 pt-3" : "mt-5"}
+                style={фирменный ? { border: "1px solid var(--menu-gold)" } : undefined}
+              >
+                <div className="mb-2 flex flex-col items-center" style={{ color: "var(--menu-gold)" }}>
+                  <РисунокМеню вид={рисунокРаздела(р, разделы.indexOf(р))} size={34} />
+                  <div className="mt-1 flex w-full items-center gap-3">
+                    <span className="h-px flex-1" style={{ background: "var(--menu-line)" }} />
+                    <h4
+                      className="text-center text-[15px] uppercase tracking-[0.18em]"
+                      style={{ fontFamily: ШРИФТ_МЕНЮ, color: "var(--menu-ink)", fontWeight: 600 }}
+                    >
+                      {трК(р)}
+                    </h4>
+                    <span className="h-px flex-1" style={{ background: "var(--menu-line)" }} />
+                  </div>
+                </div>
+                {блюда.map((б) => (
+                  <div key={б.id} className="py-1.5">
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-[14px] font-semibold" style={{ fontFamily: ШРИФТ_МЕНЮ }}>
+                        {трК(б.name)}
+                      </span>
+                      {/* Точки до цены — глаз ведёт по строке, как в печатном меню. */}
+                      <span
+                        className="min-w-4 flex-1 -translate-y-[3px]"
+                        style={{ borderBottom: "1.5px dotted var(--menu-line)" }}
+                        aria-hidden
+                      />
+                      <span
+                        className="flex-shrink-0 text-[13px] font-bold"
+                        style={{ color: "var(--menu-gold)" }}
+                      >
+                        {дг.цена(б.price)}
+                      </span>
+                    </div>
+                    {б.desc && (
+                      <p
+                        className="mt-0.5 pr-10 text-[12px] italic leading-snug"
+                        style={{ color: "var(--menu-muted)", fontFamily: ШРИФТ_МЕНЮ }}
+                      >
+                        {трК(б.desc)}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </section>
+            );
+          })}
+        </div>
+
+        {!раздел && (скрыто || целиком) && (
+          <div className="relative mt-4 text-center">
+            <button
+              onClick={() => setЦеликом(!целиком)}
+              className="rounded-full px-4 py-1.5 text-xs font-semibold"
+              style={{ border: "1px solid var(--menu-gold)", color: "var(--menu-gold)" }}
+            >
+              {целиком ? t("d_menu_less") : `${t("d_menu_full")} · ${меню.length} ${t("d_menu_dishes")}`}
+            </button>
+          </div>
+        )}
+
+        <footer className="relative mt-5 flex flex-col items-center gap-1.5 text-center">
+          <div style={{ color: "var(--menu-gold)" }}>
+            <РисунокМеню вид="ваза" size={30} />
+          </div>
+          {чек && (
+            <p className="text-xs" style={{ fontFamily: ШРИФТ_МЕНЮ }}>
+              {t("d_avg_check")}: <b style={{ color: "var(--menu-gold)" }}>{дг.цена(чек)}</b>
+            </p>
+          )}
+          <p className="text-[10px]" style={{ color: "var(--menu-muted)" }}>
+            {t("d_menu_note")}
+          </p>
+        </footer>
       </div>
+    </div>
+  );
+}
+
+/** Стол сверху: круг и стулья вокруг — сколько мест, столько точек. */
+function ЗначокСтола({ мест }: { мест: number }) {
+  const n = Math.min(мест, 10);
+  return (
+    <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden className="flex-shrink-0">
+      <circle cx="15" cy="15" r="6.5" fill="none" stroke={GREEN} strokeWidth="1.5" />
+      {Array.from({ length: n }, (_, i) => {
+        const у = (i / n) * Math.PI * 2 - Math.PI / 2;
+        return <circle key={i} cx={15 + Math.cos(у) * 11} cy={15 + Math.sin(у) * 11} r="2" fill={GREEN} />;
+      })}
+    </svg>
+  );
+}
+
+/** «Полезно знать»: короткие строки, которые редактор ведёт в панели. */
+export function ПолезноЗнать({ факты }: { факты: Fact[] }) {
+  const { t, трК } = useT();
+  const видно = факты.filter((ф) => ф.label.trim() && ф.value.trim());
+  if (видно.length === 0) return null;
+  return (
+    <div className="mb-3 rounded-2xl border bg-white p-4 shadow-sm" style={{ borderColor: BORDER }}>
+      <p className="mb-1 text-sm font-bold" style={{ color: TEXT }}>
+        💡 {t("d_useful")}
+      </p>
+      {видно.map((ф, i) => (
+        <div
+          key={ф.id}
+          className="flex gap-3 py-2 text-xs"
+          style={{ borderTop: i ? `1px solid ${BORDER}` : undefined }}
+        >
+          <span className="w-[38%] flex-shrink-0" style={{ color: MUTED }}>
+            {трК(ф.label)}
+          </span>
+          <span className="font-medium" style={{ color: TEXT }}>
+            {трК(ф.value)}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/*
+ * Аудиогид голосом телефона — для мест, где записи диктора ещё нет.
+ * Читает рассказ о месте на языке интерфейса встроенным синтезом речи:
+ * без файлов и без сети, а когда редактор загрузит настоящую запись,
+ * карточка покажет её вместо этого блока.
+ */
+const ГОЛОС: Record<string, string> = {
+  ru: "ru-RU",
+  en: "en-US",
+  uz: "uz-UZ",
+  zh: "zh-CN",
+  ko: "ko-KR",
+  de: "de-DE",
+  fr: "fr-FR",
+  ja: "ja-JP",
+  tr: "tr-TR",
+  ar: "ar-SA",
+};
+
+export function АудиогидГолосом({ заголовок, текст }: { заголовок: string; текст: string }) {
+  const { t, lang } = useT();
+  const [играет, setИграет] = useState(false);
+  const [нет, setНет] = useState(false);
+
+  // Ушёл с карточки — рассказ замолкает, а не продолжает на фоне.
+  useEffect(() => () => window.speechSynthesis?.cancel(), []);
+
+  function переключить() {
+    const синтез = typeof window !== "undefined" ? window.speechSynthesis : undefined;
+    if (!синтез) {
+      setНет(true);
+      return;
+    }
+    if (играет) {
+      синтез.cancel();
+      setИграет(false);
+      return;
+    }
+    const речь = new SpeechSynthesisUtterance(`${заголовок}. ${текст}`);
+    речь.lang = ГОЛОС[lang] ?? "en-US";
+    // Голос нужного языка, если он есть в системе; нет — браузер выберет сам.
+    const голос = синтез.getVoices().find((г) => г.lang.startsWith(lang));
+    if (голос) речь.voice = голос;
+    речь.rate = 0.95;
+    речь.onend = () => setИграет(false);
+    речь.onerror = () => setИграет(false);
+    синтез.cancel();
+    синтез.speak(речь);
+    setИграет(true);
+  }
+
+  return (
+    <div
+      className="mb-3 flex items-center gap-3 rounded-2xl p-4"
+      style={{ background: "linear-gradient(135deg, var(--accent-fill), var(--accent-deep))" }}
+    >
+      <button
+        onClick={переключить}
+        aria-label={играет ? t("d_pause") : t("d_listen")}
+        className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl"
+        style={{ background: "var(--accent-2)" }}
+      >
+        {играет ? (
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#1c1606">
+            <rect x="5" y="4" width="5" height="16" rx="1" />
+            <rect x="14" y="4" width="5" height="16" rx="1" />
+          </svg>
+        ) : (
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#1c1606">
+            <polygon points="6 3 20 12 6 21 6 3" />
+          </svg>
+        )}
+      </button>
+      <div className="min-w-0 flex-1">
+        <p className="text-sm font-semibold text-white">🎧 {t("d_audioguide")}</p>
+        <p className="text-[11px] text-white/70">{нет ? t("d_audio_no_voice") : t("d_audio_voice")}</p>
+      </div>
+      {играет && (
+        <span className="flex h-5 items-end gap-0.5" aria-hidden>
+          {[0, 1, 2, 3].map((i) => (
+            <span
+              key={i}
+              className="eq-bar w-1 rounded-full bg-white/80"
+              style={{ animationDelay: `${i * 0.15}s` }}
+            />
+          ))}
+        </span>
+      )}
     </div>
   );
 }

@@ -2,17 +2,38 @@
 
 import { useEffect, useState } from "react";
 import { Btn } from "./shared";
-import { ГалереяФото, ПолеФото } from "./PhotoField";
+import { ГалереяФото } from "./PhotoField";
 import { КАТЕГОРИИ } from "@/lib/availability";
 import { типовыеНомера } from "@/lib/rooms";
-import type { Connection, ConnectionKind, MenuItem, RoomCategory, RoomType, Ticket, Zone } from "@/lib/types";
+import {
+  типовоеМеню,
+  типовыеБилеты,
+  типовыеСтолы,
+  фактыГостиницы,
+  фактыМеста,
+  фактыРесторана,
+} from "@/lib/venue-demo";
+import type {
+  Connection,
+  ConnectionKind,
+  Fact,
+  Hotel,
+  MenuItem,
+  Place,
+  Restaurant,
+  RoomCategory,
+  RoomType,
+  TableType,
+  Ticket,
+  Zone,
+} from "@/lib/types";
 
 /**
  * Подробности заведения и наличие мест.
  *
- *   у всех     — фотографии (загрузка с устройства или ссылка);
+ *   у всех     — фотографии и «Полезно знать»;
  *   гостиница — категории номеров со своими фото;
- *   ресторан  — меню, залы и средний чек;
+ *   ресторан  — меню, залы, столы и средний чек;
  *   место     — виды билетов;
  *
  * и у гостиниц с ресторанами — откуда приложение знает о свободных местах:
@@ -40,6 +61,8 @@ export interface Подробности {
   zones?: Zone[];
   avgCheck?: string;
   tickets?: Ticket[];
+  tables?: TableType[];
+  facts?: Fact[];
   connection?: Connection;
 }
 
@@ -122,6 +145,10 @@ export default function VenueExtras({
     img?: string;
     priceFrom?: number;
     kind?: string;
+    city?: string;
+    cuisine?: string;
+    type?: string;
+    entry?: string;
   };
   onSave: (изменения: Подробности) => void;
   onClose: () => void;
@@ -138,12 +165,32 @@ export default function VenueExtras({
   const [залы, setЗалы] = useState<Zone[]>(запись.zones ?? []);
   const [чек, setЧек] = useState(запись.avgCheck ?? "");
   const [билеты, setБилеты] = useState<Ticket[]>(запись.tickets ?? []);
+  const [столы, setСтолы] = useState<TableType[]>(запись.tables ?? []);
+  const [факты, setФакты] = useState<Fact[]>(запись.facts ?? []);
   const [связь, setСвязь] = useState<Connection>(запись.connection ?? { kind: "none" });
 
   const естьНаличие = вид === "hotel" || вид === "restaurant";
 
+  // Запись в том виде, какой ждут генераторы заготовок.
+  const какРесторан = (): Restaurant =>
+    ({
+      ...запись,
+      city: запись.city ?? "",
+      cuisine: запись.cuisine ?? "",
+      price: цены || запись.price || "$5–10",
+    } as Restaurant);
+  const заготовкаФактов = (): Fact[] =>
+    вид === "hotel"
+      ? фактыГостиницы({ ...запись, facilities: удобства.split(",").map((x) => x.trim()) } as Hotel)
+      : вид === "restaurant"
+      ? фактыРесторана(какРесторан())
+      : фактыМеста({ ...запись, type: запись.type ?? "", entry: запись.entry ?? "" } as Place);
+
   function сохранить() {
-    const изменения: Подробности = { imgs: фото };
+    const изменения: Подробности = {
+      imgs: фото,
+      facts: факты.filter((ф) => ф.label.trim() && ф.value.trim()),
+    };
     // Без фото обложку не трогаем: пустая карточка хуже старого снимка.
     if (фото[0]) изменения.img = фото[0];
     if (вид === "hotel") {
@@ -160,6 +207,7 @@ export default function VenueExtras({
       изменения.menu = меню.filter((б) => б.name.trim() && б.price.trim());
       изменения.zones = залы.filter((з) => з.name.trim());
       изменения.avgCheck = чек.trim() || undefined;
+      изменения.tables = столы.filter((с) => с.seats > 0 && с.count > 0);
       // Пустой диапазон не сохраняем: без него шапка карточки осталась бы с дырой.
       if (цены.trim()) изменения.price = цены.trim();
     }
@@ -361,7 +409,7 @@ export default function VenueExtras({
 
         {вид === "restaurant" && (
           <>
-            <РедакторМеню меню={меню} setМеню={setМеню} />
+            <РедакторМеню меню={меню} setМеню={setМеню} заготовка={() => типовоеМеню(какРесторан())} />
             <Заголовок>Залы и места</Заголовок>
             <div className="flex flex-col gap-2">
               {залы.map((з, i) => (
@@ -398,6 +446,59 @@ export default function VenueExtras({
               >
                 + Зал
               </Btn>
+            </div>
+            <Заголовок>Столы по числу мест</Заголовок>
+            <p className="mb-2 text-[11px]" style={подпись}>
+              Сколько столов на двоих, на четверых, на компанию — турист видит это в карточке.
+            </p>
+            <div className="flex flex-col gap-2">
+              {столы.map((с, i) => (
+                <div key={с.id} className="flex items-end gap-2">
+                  <Поле
+                    label="МЕСТ ЗА СТОЛОМ"
+                    type="number"
+                    value={с.seats}
+                    onChange={(v) =>
+                      setСтолы((все) =>
+                        все.map((x, j) => (j === i ? { ...x, seats: Math.max(0, Number(v) || 0) } : x)),
+                      )
+                    }
+                    className="w-32"
+                  />
+                  <Поле
+                    label="СТОЛОВ"
+                    type="number"
+                    value={с.count}
+                    onChange={(v) =>
+                      setСтолы((все) =>
+                        все.map((x, j) => (j === i ? { ...x, count: Math.max(0, Number(v) || 0) } : x)),
+                      )
+                    }
+                    className="w-28"
+                  />
+                  <Btn
+                    small
+                    variant="danger"
+                    onClick={() => setСтолы((все) => все.filter((_, j) => j !== i))}
+                  >
+                    ×
+                  </Btn>
+                </div>
+              ))}
+            </div>
+            <div className="mt-2 flex flex-wrap gap-2">
+              <Btn
+                small
+                variant="ghost"
+                onClick={() => setСтолы((все) => [...все, { id: новыйId("tb"), seats: 4, count: 1 }])}
+              >
+                + Стол
+              </Btn>
+              {столы.length === 0 && (
+                <Btn small variant="ghost" onClick={() => setСтолы(типовыеСтолы(какРесторан()))}>
+                  Заполнить: на 2, 4, 6 и 10
+                </Btn>
+              )}
             </div>
             <div className="mt-3 grid max-w-md gap-2 sm:grid-cols-2">
               <Поле
@@ -450,10 +551,61 @@ export default function VenueExtras({
                 onClick={() => setБилеты((все) => [...все, { id: новыйId("t"), name: "", price: "" }])}
               >
                 + Билет
-              </Btn>
+              </Btn>{" "}
+              {билеты.length === 0 && (
+                <Btn
+                  small
+                  variant="ghost"
+                  onClick={() => setБилеты(типовыеБилеты({ ...запись, entry: запись.entry ?? "" } as Place))}
+                >
+                  Заполнить: взрослый, детский, льготный…
+                </Btn>
+              )}
             </div>
           </>
         )}
+
+        <Заголовок>Полезно знать</Заголовок>
+        <p className="mb-2 text-[11px]" style={подпись}>
+          Короткие строки для туриста: заезд и выезд, дресс-код, оплата, халяль, лучшее время…
+        </p>
+        <div className="flex flex-col gap-2">
+          {факты.map((ф, i) => (
+            <div key={ф.id} className="flex items-end gap-2">
+              <Поле
+                label="ЧТО"
+                value={ф.label}
+                onChange={(v) => setФакты((все) => все.map((x, j) => (j === i ? { ...x, label: v } : x)))}
+                className="w-40"
+                placeholder="Дресс-код"
+              />
+              <Поле
+                label="КАК"
+                value={ф.value}
+                onChange={(v) => setФакты((все) => все.map((x, j) => (j === i ? { ...x, value: v } : x)))}
+                className="flex-1"
+                placeholder="Плечи и колени закрыты"
+              />
+              <Btn small variant="danger" onClick={() => setФакты((все) => все.filter((_, j) => j !== i))}>
+                ×
+              </Btn>
+            </div>
+          ))}
+        </div>
+        <div className="mt-2 flex flex-wrap gap-2">
+          <Btn
+            small
+            variant="ghost"
+            onClick={() => setФакты((все) => [...все, { id: новыйId("f"), label: "", value: "" }])}
+          >
+            + Строка
+          </Btn>
+          {факты.length === 0 && (
+            <Btn small variant="ghost" onClick={() => setФакты(заготовкаФактов())}>
+              Заполнить примером
+            </Btn>
+          )}
+        </div>
 
         {естьНаличие && (
           <НаличиеМест
@@ -660,10 +812,21 @@ function НаличиеМест({
 }
 
 /**
- * Меню ресторана: блюда по разделам, с ценой, описанием и фото. Разделы —
+ * Меню ресторана: блюда по разделам, с ценой и описанием. Разделы —
  * свободный текст с подсказками: у чайханы и у ресторана они разные.
+ *
+ * Фото блюд нет намеренно: меню в приложении оформлено как бумажное,
+ * с рисунками посуды, а снимок блюда обещал бы то, чего могут не подать.
  */
-function РедакторМеню({ меню, setМеню }: { меню: MenuItem[]; setМеню: (m: MenuItem[]) => void }) {
+function РедакторМеню({
+  меню,
+  setМеню,
+  заготовка,
+}: {
+  меню: MenuItem[];
+  setМеню: (m: MenuItem[]) => void;
+  заготовка: () => MenuItem[];
+}) {
   const разделы = [
     ...new Set([
       "Салаты",
@@ -719,9 +882,6 @@ function РедакторМеню({ меню, setМеню }: { меню: MenuIte
                 className="col-span-2 sm:col-span-4"
                 placeholder="состав, порция, острота…"
               />
-              <div className="col-span-2 sm:col-span-4">
-                <ПолеФото label="ФОТО БЛЮДА" value={б.img} onChange={(img) => правка(i, { img })} />
-              </div>
             </div>
             <div className="mt-2 text-right">
               <Btn small variant="danger" onClick={() => setМеню(меню.filter((_, j) => j !== i))}>
@@ -743,7 +903,12 @@ function РедакторМеню({ меню, setМеню }: { меню: MenuIte
           }
         >
           + Блюдо
-        </Btn>
+        </Btn>{" "}
+        {меню.length === 0 && (
+          <Btn small variant="ghost" onClick={() => setМеню(заготовка())}>
+            Заполнить примером по кухне
+          </Btn>
+        )}
       </div>
     </>
   );
