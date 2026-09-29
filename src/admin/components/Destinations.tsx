@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { PageHeader, Badge, Btn, Table } from "./shared";
 import { useEntity } from "../context/useEntity";
+import VenueExtras from "./VenueExtras";
 import type { ManagedPlace as Dest } from "@/lib/types";
 import { ТИПЫ_МЕСТ } from "@/data/content";
 
@@ -54,6 +55,8 @@ export default function Destinations() {
   // Черновик правки: и новое место, и изменение старого правятся копией
   // и применяются разом по «Сохранить».
   const [selected, setSelected] = useState<Dest | null>(null);
+  // Окно «Билеты» — отдельно от основного редактирования.
+  const [подробности, setПодробности] = useState<Dest | null>(null);
 
   const поСтатусу = filter === "all" ? dests : dests.filter((d) => d.status === filter);
   const filtered = typeFilter === "all" ? поСтатусу : поСтатусу.filter((d) => d.type === typeFilter);
@@ -399,6 +402,17 @@ export default function Destinations() {
                   Удалить
                 </Btn>
               )}
+              {selected.id && (
+                <Btn
+                  variant="ghost"
+                  onClick={() => {
+                    setПодробности(selected);
+                    setSelected(null);
+                  }}
+                >
+                  Билеты{selected.tickets?.length ? ` · ${selected.tickets.length}` : ""}
+                </Btn>
+              )}
               <Btn variant="ghost" onClick={() => setSelected(null)}>
                 Отмена
               </Btn>
@@ -411,6 +425,16 @@ export default function Destinations() {
             )}
           </div>
         </div>
+      )}
+      {подробности && (
+        <VenueExtras
+          вид="place"
+          запись={подробности}
+          onClose={() => setПодробности(null)}
+          onSave={(изм) =>
+            setDests((prev) => prev.map((d) => (d.id === подробности.id ? { ...d, ...изм } : d)))
+          }
+        />
       )}
     </div>
   );

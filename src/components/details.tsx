@@ -5,7 +5,7 @@ import { useAppContent } from "./content-provider";
 import { useAudioPlayer, времяЗвука } from "./audio-player";
 import { useSettings } from "@/lib/settings";
 import BookingForm from "./booking-form";
-import { БилетыМеста, ЗалыРесторана, НомераОтеля } from "./venue-details";
+import { БилетыМеста, ЗалыРесторана, КАТЕГОРИЯ_НОМЕРА, НомераОтеля } from "./venue-details";
 import ReviewForm from "./review-form";
 import type { Hotel, HotelKind, Place, Restaurant, Route, RoomType } from "@/lib/types";
 import type { TKey } from "@/lib/i18n";
@@ -532,7 +532,7 @@ export function HotelDetail({ hotel, onBack }: { hotel: Hotel; onBack: () => voi
                   {дг.одна(total)}
                 </p>
                 <p className="text-[9px]" style={{ color: MUTED }}>
-                  {дг.цена(hotel.price)}
+                  {номер ? дг.одна(номер.price) : дг.цена(hotel.price)}
                   {t("d_per_night")} × {nights}
                 </p>
               </div>
@@ -551,7 +551,18 @@ export function HotelDetail({ hotel, onBack }: { hotel: Hotel; onBack: () => voi
           выбран={номер?.id ?? null}
           onВыбор={setНомер}
         />
-        <BookingForm kind="hotel" itemId={hotel.id} itemName={hotel.name} ночей={nights} гостей={guests} />
+        <BookingForm
+          kind="hotel"
+          itemId={hotel.id}
+          itemName={hotel.name}
+          ночей={nights}
+          гостей={guests}
+          номер={
+            номер
+              ? { category: номер.category, название: номер.name || t(КАТЕГОРИЯ_НОМЕРА[номер.category]) }
+              : undefined
+          }
+        />
         <ReviewForm placeId={hotel.id} placeName={hotel.name} />
         <div className="pb-6" />
       </div>

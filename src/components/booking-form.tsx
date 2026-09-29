@@ -4,15 +4,15 @@ import { useState } from "react";
 import { BORDER, GOLD, GREEN, MUTED, TEXT, SURFACE, ON_GOLD } from "@/lib/theme";
 import { useT } from "@/components/lang-provider";
 import { датаСловами } from "@/lib/i18n";
-import type { BookingKind } from "@/lib/types";
+import type { BookingKind, RoomCategory } from "@/lib/types";
 
 /**
  * Заявка на бронь.
  *
- * Именно заявка, а не подтверждённая бронь: интеграции с системами
- * отелей и ресторанов нет, и обещать место мы не можем. Администратор
- * видит заявку в панели и подтверждает её сам. Формулировки об этом
- * говорят прямо — «заявка отправлена», а не «столик ваш».
+ * Обычно это заявка: администратор видит её в панели и подтверждает сам,
+ * и формулировки говорят об этом прямо — «заявка отправлена», а не
+ * «столик ваш». Если заведение подключено к своей системе (HelloUZ
+ * Partner API) и сразу приняло бронь, турист видит «Бронь подтверждена».
  *
  * У отеля ночи и гостей человек уже выбрал в карточке — форма берёт их
  * оттуда, а не спрашивает второй раз своими полями.
@@ -23,19 +23,24 @@ export default function BookingForm({
   itemName,
   ночей,
   гостей,
+  номер,
 }: {
   kind: BookingKind;
   itemId: string;
   itemName: string;
   ночей?: number;
   гостей?: number;
+  /** Номер, выбранный в карточке гостиницы. */
+  номер?: { category: RoomCategory; название: string };
 }) {
   const { t, lang } = useT();
   const [открыта, setОткрыта] = useState(false);
   const [date, setDate] = useState("");
   const [guests, setGuests] = useState(2);
   const [note, setNote] = useState("");
-  const [итог, setИтог] = useState<"нет" | "ок" | "нужен-вход" | "ошибка">("нет");
+  // Время визита — у ресторана: без него заведению нечего подтверждать.
+  const [time, setTime] = useState("19:00");
+  const [итог, setИтог] = useState<"нет" | "ок" | "подтверждено" | "отказ" | "нужен-вход" | "ошибка">("нет");
   const [идёт, setИдёт] = useState(false);
 
   const изКарточки = гостей !== undefined;
@@ -59,18 +64,53 @@ export default function BookingForm({
       const res = await fetch("/api/bookings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ kind, itemId, itemName, date, guests: сколькоГостей, nights: ночей, note }),
+        body: JSON.stringify({
+          kind,
+          itemId,
+          itemName,
+          date,
+          guests: сколькоГостей,
+          nights: ночей,
+          roomCategory: номер?.category,
+          time: kind === "restaurant" ? time : undefined,
+          note,
+        }),
       });
       if (res.status === 401) {
         setИтог("нужен-вход");
         return;
       }
-      setИтог(res.ok ? "ок" : "ошибка");
+      if (!res.ok) {
+        setИтог("ошибка");
+        return;
+      }
+      const d = (await res.json().catch(() => ({}))) as {
+        confirmed?: boolean;
+        booking?: { external?: { status?: string } };
+      };
+      setИтог(d.confirmed ? "подтверждено" : d.booking?.external?.status === "rejected" ? "отказ" : "ок");
     } catch {
       setИтог("ошибка");
     } finally {
       setИдёт(false);
     }
+  }
+
+  if (итог === "подтверждено") {
+    return (
+      <div
+        id="заявка"
+        className="mb-3 rounded-2xl p-4"
+        style={{ background: SURFACE, border: `1px solid ${GREEN}` }}
+      >
+        <p className="text-sm font-semibold" style={{ color: GREEN }}>
+          ✓ {t("bk_confirmed_title")}
+        </p>
+        <p className="mt-1 text-xs leading-relaxed" style={{ color: MUTED }}>
+          {t("bk_confirmed_note")}
+        </p>
+      </div>
+    );
   }
 
   if (итог === "ок") {
@@ -135,8 +175,23 @@ export default function BookingForm({
         />
       </label>
 
+      {kind === "restaurant" && (
+        <label className="text-xs" style={{ color: MUTED }}>
+          {t("bk_time")}
+          <input
+            required
+            type="time"
+            value={time}
+            onChange={(e) => setTime(e.target.value)}
+            className="mt-1 w-full rounded-xl px-3 py-2.5 text-sm outline-none"
+            style={поле}
+          />
+        </label>
+      )}
+
       {изКарточки ? (
         <p className="text-xs" style={{ color: MUTED }}>
+          {номер ? `${t("bk_room")}: ${номер.название} · ` : ""}
           {ночей ? `${t("d_nights")}: ${ночей} · ` : ""}
           {t("d_guests")}: {сколькоГостей}
           {датаВыезда ? ` · ${t("d_checkout")}: ${датаВыезда}` : ""}
@@ -172,6 +227,11 @@ export default function BookingForm({
       {итог === "нужен-вход" && (
         <p className="text-xs" style={{ color: "#c1603a" }}>
           {t("bk_need_login")}
+        </p>
+      )}
+      {итог === "отказ" && (
+        <p className="text-xs" style={{ color: "#c1603a" }}>
+          {t("bk_rejected")}
         </p>
       )}
       {итог === "ошибка" && (

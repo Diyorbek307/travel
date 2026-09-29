@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { PageHeader, Badge, Btn, Table } from "./shared";
 import { useEntity } from "../context/useEntity";
+import VenueExtras from "./VenueExtras";
 import type { HotelKind, ManagedHotel as Hotel } from "@/lib/types";
 
 /**
@@ -66,6 +67,8 @@ export default function Hotels() {
   const [editing, setEditing] = useState<Hotel | null>(null);
   const [showAdd, setShowAdd] = useState(false);
   const [form, setForm] = useState<HotelForm>(EMPTY_FORM);
+  // Окно «Номера и наличие» — отдельно от основного редактирования.
+  const [подробности, setПодробности] = useState<Hotel | null>(null);
 
   const openEdit = (h: Hotel) => {
     setEditing(h);
@@ -418,6 +421,9 @@ export default function Hotels() {
                   <Btn variant="ghost" small onClick={() => openEdit(h)}>
                     Изменить
                   </Btn>
+                  <Btn variant="ghost" small onClick={() => setПодробности(h)}>
+                    Номера и наличие{h.roomTypes?.length ? ` · ${h.roomTypes.length}` : ""}
+                  </Btn>
                   <Btn
                     variant={h.status === "active" ? "danger" : "ghost"}
                     small
@@ -530,6 +536,17 @@ export default function Hotels() {
             )}
           </div>
         </div>
+      )}
+
+      {подробности && (
+        <VenueExtras
+          вид="hotel"
+          запись={подробности}
+          onClose={() => setПодробности(null)}
+          onSave={(изм) =>
+            setHotels((prev) => prev.map((h) => (h.id === подробности.id ? { ...h, ...изм } : h)))
+          }
+        />
       )}
     </div>
   );

@@ -9,6 +9,7 @@ import {
   UZ_CITIES,
 } from "./content";
 import { GREEN } from "@/lib/theme";
+import { типовыеНомера } from "@/lib/rooms";
 import type {
   Content,
   ContentKey,
@@ -89,6 +90,9 @@ const hotels: ManagedHotel[] = HOTELS.map((h, i) => {
     occupied: Math.round(rooms * (h.rating / 5) * 0.92),
     priceFrom,
     status: "active",
+    // Категории номеров — демонстрационные, от цены «от»: редактор
+    // заменяет их настоящими в панели («Номера и наличие»).
+    roomTypes: типовыеНомера(slug(h.id, i), priceFrom, h.kind === "hostel"),
   };
 });
 

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { PageHeader, Badge, Btn, Table } from "./shared";
 import { useEntity } from "../context/useEntity";
+import VenueExtras from "./VenueExtras";
 import type { ManagedRestaurant as Restaurant, RestaurantKind } from "@/lib/types";
 
 /**
@@ -27,6 +28,8 @@ export default function Restaurants() {
   // Черновик правки: карточка заведения раньше только показывала поля,
   // изменить их было нельзя. Правим копию, применяем по «Сохранить».
   const [draft, setDraft] = useState<Restaurant | null>(null);
+  // Окно «Залы и наличие» — отдельно от основного редактирования.
+  const [подробности, setПодробности] = useState<Restaurant | null>(null);
   const [view, setView] = useState<"cards" | "table">("cards");
   const [showAdd, setShowAdd] = useState(false);
   const [newRest, setNewRest] = useState({
@@ -599,6 +602,15 @@ export default function Restaurants() {
               >
                 {draft.promoted ? "Убрать продвижение" : "Продвигать ★"}
               </Btn>
+              <Btn
+                variant="ghost"
+                onClick={() => {
+                  setПодробности(draft);
+                  setSelected(null);
+                }}
+              >
+                Залы и наличие
+              </Btn>
               <Btn variant="ghost" onClick={() => setSelected(null)}>
                 Отмена
               </Btn>
@@ -608,6 +620,16 @@ export default function Restaurants() {
             </div>
           </div>
         </div>
+      )}
+      {подробности && (
+        <VenueExtras
+          вид="restaurant"
+          запись={подробности}
+          onClose={() => setПодробности(null)}
+          onSave={(изм) =>
+            setItems((prev) => prev.map((r) => (r.id === подробности.id ? { ...r, ...изм } : r)))
+          }
+        />
       )}
     </div>
   );
