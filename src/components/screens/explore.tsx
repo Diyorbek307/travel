@@ -192,7 +192,7 @@ export function ExploreScreen({
         go: () => onРаздел("excursions"),
       },
       { ключ: "ai", заголовок: t("ex_ai"), под: t("ex_ai_sub"), go: () => onРаздел("ai") },
-      { ключ: "routes", заголовок: t("home_routes"), под: t("map_tab_ai"), go: () => onTab("map") },
+      { ключ: "routes", заголовок: t("home_routes"), под: t("ex_routes_sub"), go: () => onTab("map") },
       { ключ: "tips", заголовок: t("ex_tips"), под: t("home_practical_sub"), go: onPractical },
       // Заглушка на будущее: настоящей 3D/VR-реконструкции городов ещё нет,
       // но место в конце сетки зарезервировано — когда она появится, здесь

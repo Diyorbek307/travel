@@ -150,7 +150,7 @@ export function НомераОтеля({
                   {есть && <БейджНаличия свободно={есть.свободно} живое={наличие?.источник === "partner"} />}
                 </div>
                 <p className="mt-0.5 text-[11px]" style={{ color: MUTED }}>
-                  👤 {н.guests} {t("d_up_to_guests")} · 🛏 {трК(н.beds)}
+                  👤 {t("d_up_to_guests")} {н.guests} · 🛏 {трК(н.beds)}
                   {н.area ? ` · ${н.area} м²` : ""}
                 </p>
                 {н.amenities.length > 0 && (

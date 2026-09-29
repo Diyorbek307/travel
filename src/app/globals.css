@@ -1140,3 +1140,78 @@ html[data-theme="dark"] .tile-still {
     display: block !important;
   }
 }
+
+/*
+ * Плавность переходов по всему приложению.
+ *
+ * Экраны поверх вкладок (транспорт, маршрут, избранное…) въезжают сбоку,
+ * а уходят — через .layer-out (см. components/layer.tsx), а не обрывом.
+ * У окон со своим подъёмом снизу (поиск, уведомления) анимация своя.
+ */
+.overlay-screen:not(.animate-slide-up) {
+  animation: overlay-in 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes overlay-in {
+  from {
+    opacity: 0;
+    transform: translateX(28px);
+  }
+}
+.layer-out {
+  animation: layer-out 0.22s ease both;
+  pointer-events: none;
+}
+.overlay-screen.layer-out {
+  animation: overlay-out 0.22s ease both;
+}
+@keyframes layer-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes overlay-out {
+  to {
+    opacity: 0;
+    transform: translateX(28px);
+  }
+}
+/* Экраны входа и затемнение под меню — мягко проявляются. */
+.phase-in,
+.backdrop-in {
+  animation: fade-only 0.28s ease both;
+}
+@keyframes fade-only {
+  from {
+    opacity: 0;
+  }
+}
+/* Поля ввода: подсветка при фокусе плавно, без щелчка. */
+input,
+textarea,
+select {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+/* Картинки проявляются, а не вспыхивают, когда догрузились. */
+img.skel.loaded:not(.hero-in) {
+  animation: fade-only 0.35s ease both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .overlay-screen,
+  .layer-out,
+  .phase-in,
+  .backdrop-in,
+  img.skel.loaded {
+    animation: none !important;
+  }
+}
+
+/* Вкладка под открытой карточкой: прячется, когда карточка уже въехала,
+   — не тратит отрисовку, но и не выгружается (прокрутка цела). */
+.under-detail {
+  animation: hide-later 0s linear 0.35s forwards;
+}
+@keyframes hide-later {
+  to {
+    visibility: hidden;
+  }
+}

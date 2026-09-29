@@ -19,7 +19,7 @@ import { useAppContent } from "@/components/content-provider";
 import { useT } from "@/components/lang-provider";
 import { useWeather } from "@/components/weather-provider";
 import { useGeo } from "@/components/geo-provider";
-import { ближайшийГород } from "@/data/geo";
+import { ГОРОДА, ближайшийГород, расстояниеТочноКм } from "@/data/geo";
 import { GeomPattern, LogoMark, Wordmark } from "../ui";
 import { AnimatedBg } from "@/components/animated-bg";
 import { CardDeck, CityDeck } from "@/components/card-deck";
@@ -58,12 +58,25 @@ export function HomeScreen({
   onToast: (m: string) => void;
   isPremium: boolean;
 }) {
-  const { EVENTS, HOTELS, PLACES, RESTAURANTS } = useAppContent();
+  const { EVENTS, HOTELS, PLACES, POPULAR_CITIES, RESTAURANTS } = useAppContent();
   const { t, lang, трК } = useT();
   const погода = useWeather();
-  const самарканд = погода.get("Самарканд");
+  const { pos } = useGeo();
   // Город пользователя для таргетинга рекламы (по геолокации).
-  const городРекл = ближайшийГород(useGeo().pos);
+  const городРекл = ближайшийГород(pos);
+  /*
+   * Шапка — город, где человек сейчас, если он рядом с одним из
+   * популярных (до 80 км). Раньше всем показывался Самарканд с его
+   * погодой — и туристу в Хиве главная рассказывала про чужую погоду.
+   * Дома, в дороге или без геолокации — Самарканд, витрина страны.
+   */
+  const рядом =
+    городРекл && pos && ГОРОДА[городРекл] && расстояниеТочноКм(pos, ГОРОДА[городРекл]) < 80
+      ? POPULAR_CITIES.find((c) => c.name === городРекл)
+      : undefined;
+  const главныйГород = рядом?.name ?? "Самарканд";
+  const подписьГорода = рядом && рядом.name !== "Самарканд" ? трК(рядом.sub) : t("home_city_tagline");
+  const самарканд = погода.get(главныйГород);
   const дг = useДеньги();
   // Точка на колокольчике — только когда правда есть непрочитанное.
   const естьНепрочитанные = useУведомления().some((n) => n.unread);
@@ -72,9 +85,16 @@ export function HomeScreen({
   const { interests } = useSettings();
   const близкиеТипы = new Set(interests.flatMap((i) => ТИПЫ_МЕСТ[i] ?? []));
   const подходит = (p: Place) => близкиеТипы.has(p.typeRu ?? p.type);
-  const местаПоИнтересам = близкиеТипы.size
-    ? [...PLACES.filter(подходит), ...PLACES.filter((p) => !подходит(p))]
-    : PLACES;
+  /*
+   * «Топ» — это топ, а не все места подряд: лучшие по рейтингу с
+   * поправкой на число отзывов (4.9 у тысячи человек весомее 5.0 у двух).
+   * Подходящие по интересам идут первыми.
+   */
+  const вес = (p: Place) => p.rating * 2 + Math.log10((p.reviews ?? 0) + 1);
+  const топ = [...PLACES].sort((a, b) => вес(b) - вес(a));
+  const местаПоИнтересам = (
+    близкиеТипы.size ? [...топ.filter(подходит), ...топ.filter((p) => !подходит(p))] : топ
+  ).slice(0, 12);
   return (
     <div className="flex flex-col h-full overflow-y-auto hide-scroll" style={{ background: CREAM }}>
       {/* Glassmorphism Hero */}
@@ -82,13 +102,15 @@ export function HomeScreen({
         {/* Шапка — короткий ролик о Самарканде: кадры сменяются с наездом,
             поэтому главная не выглядит застывшей открыткой. */}
         <CityReel
+          key={главныйГород}
           кадры={кадрыГорода(
-            "Самарканд",
-            "https://images.unsplash.com/photo-1664602078796-68ee76b3fc59?w=900&h=900&fit=crop&auto=format",
+            главныйГород,
+            рядом?.img ??
+              "https://images.unsplash.com/photo-1664602078796-68ee76b3fc59?w=900&h=900&fit=crop&auto=format",
             { PLACES },
           )}
-          видео={ВИДЕО["Самарканд"] ?? ФОН_ВИДЕО}
-          alt="Самарканд"
+          видео={ВИДЕО[главныйГород] ?? ФОН_ВИДЕО}
+          alt={главныйГород}
         />
         <div
           className="absolute inset-0"
@@ -151,7 +173,7 @@ export function HomeScreen({
           style={{ ...glassLight, minWidth: 118 }}
         >
           <p className="text-[9px] font-bold mb-1.5 uppercase tracking-wider" style={{ color: MUTED }}>
-            {трК("Самарканд")}
+            {трК(главныйГород)}
           </p>
           <div className="flex items-center gap-2">
             <span className="text-3xl">{самарканд?.icon ?? "🌡️"}</span>
@@ -183,9 +205,9 @@ export function HomeScreen({
             className="text-white font-bold leading-tight mb-1"
             style={{ fontSize: 34, fontFamily: "var(--font-heading)" }}
           >
-            {трК("Самарканд")}
+            {трК(главныйГород)}
           </h1>
-          <p className="text-white/65 text-xs mb-3">{t("home_city_tagline")}</p>
+          <p className="text-white/65 text-xs mb-3">{подписьГорода}</p>
           <button
             onClick={() => onSearch()}
             className="w-full flex items-center gap-3 rounded-2xl px-4 py-3.5"

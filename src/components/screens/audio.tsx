@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import type { Place } from "@/lib/types";
 import { ACCENT_FILL, BORDER, CREAM, GREEN, MUTED, TEXT, WHITE, ACCENT_SOFT } from "@/lib/theme";
 import { PRACTICAL } from "@/data/content";
 import { useAppContent } from "@/components/content-provider";
@@ -29,12 +30,19 @@ import { useAudioPlayer, времяЗвука } from "@/components/audio-player"
 export function AudioScreen({
   isPremium,
   сразуИграть,
+  onPlace,
 }: {
   isPremium: boolean;
   /** Номер записи из кода на табличке: её включаем не дожидаясь нажатия. */
   сразуИграть?: string | null;
+  /** Открыть место — там кнопка аудиогида голосом телефона. */
+  onPlace?: (p: Place) => void;
 }) {
-  const { AUDIO } = useAppContent();
+  const { AUDIO, PLACES } = useAppContent();
+  // Места с аудиогидом, у которых нет записи диктора: рассказ читает
+  // телефон. Раньше вкладка писала «аудиогидов пока нет», хотя в самих
+  // местах кнопка «Слушать» уже была.
+  const голосом = PLACES.filter((p) => p.audio && !AUDIO.some((а) => а.placeId === p.id));
   const плеер = useAudioPlayer();
   const { t, трК, lang } = useT();
   // Живой курс для карточки «Валюта»: вписанный в данные уже устарел.
@@ -172,58 +180,101 @@ export function AudioScreen({
           </p>
         )}
 
-        <div>
-          <div className="mb-2.5 flex items-center gap-2">
-            <div className="h-2 w-2 rounded-full bg-green-500" />
-            <p className="text-sm font-bold" style={{ color: TEXT }}>
-              {AUDIO.length ? t("audio_available") : t("audio_records")}
-            </p>
-          </div>
-
-          {видимые.length === 0 ? (
-            <div className="rounded-2xl border bg-white p-4" style={{ borderColor: BORDER }}>
-              <p className="text-sm leading-relaxed" style={{ color: MUTED }}>
-                {AUDIO.length === 0 ? t("audio_empty_none") : t("audio_empty_lang")}
+        {голосом.length > 0 && onPlace && (
+          <div>
+            <div className="mb-2.5">
+              <p className="text-sm font-bold" style={{ color: TEXT }}>
+                🎧 {t("audio_voice_title")} · {голосом.length}
+              </p>
+              <p className="text-[11px]" style={{ color: MUTED }}>
+                {t("d_audio_voice")}
               </p>
             </div>
-          ) : (
             <div className="grid gap-2.5 sm:grid-cols-2 xl:grid-cols-3">
-              {видимые.map((а) => {
-                const это = играет === а.id;
-                return (
-                  <div
-                    key={а.id}
-                    className="flex items-center gap-3 rounded-2xl border bg-white p-3 shadow-sm"
-                    style={{ borderColor: это ? GREEN : BORDER }}
-                  >
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-bold" style={{ color: TEXT }}>
-                        {трК(а.title)}
-                      </p>
-                      <p className="mt-0.5 truncate text-xs" style={{ color: MUTED }}>
-                        {трК(а.placeName)} · {трК(а.lang)}
-                        {а.seconds ? ` · ${времяЗвука(а.seconds)}` : ""}
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => {
-                        setПлохойКод(false);
-                        плеер.включить(а);
-                      }}
-                      aria-label={это ? t("d_pause") : t("d_listen")}
-                      className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl"
-                      style={{ background: это ? ACCENT_FILL : ACCENT_SOFT }}
-                    >
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill={это ? WHITE : GREEN}>
-                        {это ? <path d="M6 4h4v16H6zM14 4h4v16h-4z" /> : <path d="M8 5v14l11-7z" />}
-                      </svg>
-                    </button>
+              {голосом.map((p) => (
+                <button
+                  key={p.id}
+                  onClick={() => onPlace(p)}
+                  className="flex items-center gap-3 rounded-2xl border bg-white p-2.5 text-left shadow-sm"
+                  style={{ borderColor: BORDER }}
+                >
+                  <img src={p.img} alt="" loading="lazy" className="skel h-12 w-12 rounded-xl object-cover" />
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-bold" style={{ color: TEXT }}>
+                      {p.name}
+                    </p>
+                    <p className="text-[11px]" style={{ color: MUTED }}>
+                      {трК(p.city)} · {трК(p.type)}
+                    </p>
                   </div>
-                );
-              })}
+                  <span
+                    className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl"
+                    style={{ background: "var(--accent-fill)" }}
+                  >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="#ffffff">
+                      <polygon points="6 3 20 12 6 21 6 3" />
+                    </svg>
+                  </span>
+                </button>
+              ))}
             </div>
-          )}
-        </div>
+          </div>
+        )}
+
+        {(AUDIO.length > 0 || голосом.length === 0) && (
+          <div>
+            <div className="mb-2.5 flex items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-green-500" />
+              <p className="text-sm font-bold" style={{ color: TEXT }}>
+                {AUDIO.length ? t("audio_available") : t("audio_records")}
+              </p>
+            </div>
+
+            {видимые.length === 0 ? (
+              <div className="rounded-2xl border bg-white p-4" style={{ borderColor: BORDER }}>
+                <p className="text-sm leading-relaxed" style={{ color: MUTED }}>
+                  {AUDIO.length === 0 ? t("audio_empty_none") : t("audio_empty_lang")}
+                </p>
+              </div>
+            ) : (
+              <div className="grid gap-2.5 sm:grid-cols-2 xl:grid-cols-3">
+                {видимые.map((а) => {
+                  const это = играет === а.id;
+                  return (
+                    <div
+                      key={а.id}
+                      className="flex items-center gap-3 rounded-2xl border bg-white p-3 shadow-sm"
+                      style={{ borderColor: это ? GREEN : BORDER }}
+                    >
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-bold" style={{ color: TEXT }}>
+                          {трК(а.title)}
+                        </p>
+                        <p className="mt-0.5 truncate text-xs" style={{ color: MUTED }}>
+                          {трК(а.placeName)} · {трК(а.lang)}
+                          {а.seconds ? ` · ${времяЗвука(а.seconds)}` : ""}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => {
+                          setПлохойКод(false);
+                          плеер.включить(а);
+                        }}
+                        aria-label={это ? t("d_pause") : t("d_listen")}
+                        className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl"
+                        style={{ background: это ? ACCENT_FILL : ACCENT_SOFT }}
+                      >
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill={это ? WHITE : GREEN}>
+                          {это ? <path d="M6 4h4v16H6zM14 4h4v16h-4z" /> : <path d="M8 5v14l11-7z" />}
+                        </svg>
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
 
         <div>
           <p className="mb-2.5 text-sm font-bold" style={{ color: TEXT }}>

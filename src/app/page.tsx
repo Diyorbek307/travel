@@ -7,6 +7,7 @@ import { HotelDetail, PlaceDetail, RestaurantDetail, RouteDetail } from "@/compo
 import { NotifsPanel, PremiumModal, SearchModal } from "@/components/modals";
 import { OnboardingInterests, OnboardingLang, SplashScreen } from "@/components/onboarding";
 import { ОбучениеДети } from "@/components/kids-tour";
+import { Слой } from "@/components/layer";
 import HomeScreen from "@/components/screens/home";
 import ExploreScreen, { type РазделОбзора } from "@/components/screens/explore";
 import MapScreen from "@/components/screens/map";
@@ -23,7 +24,7 @@ import { LangProvider } from "@/components/lang-provider";
 import { WeatherProvider } from "@/components/weather-provider";
 import { CurrencyProvider } from "@/components/currency-provider";
 import { GeoProvider, useGeo } from "@/components/geo-provider";
-import { ближайшийГород } from "@/data/geo";
+import { ГОРОДА, ближайшийГород, дистанцияКм, расстояниеТочноКм } from "@/data/geo";
 import { useГородПодписки } from "@/lib/push-client";
 import { разобратьСсылку } from "@/lib/campaign-rules";
 import { AudioPlayerProvider } from "@/components/audio-player";
@@ -257,12 +258,22 @@ function App() {
   // Каждое открытие карточки — переход: считаем их для показа рекламы.
   const переход = () => setNavCount((n) => n + 1);
 
+  /*
+   * «Цифровой паспорт» — про настоящие поездки. Штамп места ставится,
+   * только когда человек рядом с ним (до километра), город — когда он в
+   * городе. Раньше хватало открыть карточку из дома, и паспорт
+   * наполнялся штампами мест, где человек не был.
+   */
+  const вГороде = (город: string) =>
+    Boolean(pos && ГОРОДА[город] && расстояниеТочноКм(pos, ГОРОДА[город]) < 40);
+
   const openPlace = (value: Place) => {
-    // Город и само место — в «Цифровой паспорт»: у места свой штамп.
-    отметитьВизит(value.city);
-    отметитьМесто(value.id);
+    const км = дистанцияКм(pos, value.nameRu ?? value.name, value.city);
+    if (км != null && км <= 1) отметитьМесто(value.id);
+    if (вГороде(value.city)) отметитьВизит(value.city);
+    // Карточка ложится поверх текущей вкладки: раньше открытие места с
+    // главной перекидывало на «HelloUZ», и «назад» вело не туда.
     setDetail({ kind: "place", value });
-    setTab("explore");
     переход();
   };
 
@@ -279,12 +290,12 @@ function App() {
   };
 
   const openHotel = (value: Hotel) => {
-    отметитьВизит(value.city);
+    if (вГороде(value.city)) отметитьВизит(value.city);
     setDetail({ kind: "hotel", value });
     переход();
   };
   const openRestaurant = (value: Restaurant) => {
-    отметитьВизит(value.city);
+    if (вГороде(value.city)) отметитьВизит(value.city);
     setDetail({ kind: "restaurant", value });
     переход();
   };
@@ -473,19 +484,19 @@ function App() {
       <NativeBack onBack={назадНаШаг} />
       <div className="device">
         {phase === "checking" && (
-          <div className="absolute inset-0 z-40">
+          <div className="phase-in absolute inset-0 z-40">
             <AuthSplash />
           </div>
         )}
 
         {phase === "splash" && (
-          <div className="absolute inset-0 z-40">
+          <div className="phase-in absolute inset-0 z-40">
             <SplashScreen onStart={() => setPhase("register")} onLogin={() => setPhase("login")} />
           </div>
         )}
 
         {phase === "register" && (
-          <div className="absolute inset-0 z-40">
+          <div className="phase-in absolute inset-0 z-40">
             <RegisterScreen
               onBack={() => setPhase("splash")}
               onDone={(u) => {
@@ -499,7 +510,7 @@ function App() {
         )}
 
         {phase === "login" && (
-          <div className="absolute inset-0 z-40">
+          <div className="phase-in absolute inset-0 z-40">
             <LoginScreen
               onBack={() => setPhase("splash")}
               onRegister={() => setPhase("register")}
@@ -517,11 +528,9 @@ function App() {
           </div>
         )}
 
-        {обучение && (
-          <div className="overlay-screen device-safe-top absolute inset-0 z-50">
-            <ОбучениеДети onDone={() => setОбучение(false)} />
-          </div>
-        )}
+        <Слой открыт={обучение} className="overlay-screen device-safe-top absolute inset-0 z-50">
+          <ОбучениеДети onDone={() => setОбучение(false)} />
+        </Слой>
         {phase === "tour" && (
           <div className="overlay-screen device-safe-top absolute inset-0 z-40">
             <ОбучениеДети onDone={() => setPhase("splash")} />
@@ -541,7 +550,7 @@ function App() {
 
         {phase === "app" && (
           <>
-            {showSearch && (
+            <Слой открыт={showSearch}>
               <SearchModal
                 initialQuery={searchQuery}
                 onClose={() => setShowSearch(false)}
@@ -550,8 +559,8 @@ function App() {
                   openPlace(p);
                 }}
               />
-            )}
-            {showNotifs && (
+            </Слой>
+            <Слой открыт={showNotifs}>
               <NotifsPanel
                 onLink={openLink}
                 onClose={() => setShowNotifs(false)}
@@ -561,56 +570,48 @@ function App() {
                   setProfileView(раздел);
                 }}
               />
-            )}
-            {showPractical && (
-              <div className="overlay-screen absolute inset-0 z-40">
-                <PracticalScreen onBack={() => setShowPractical(false)} />
-              </div>
-            )}
-            {showTransport && (
-              <div className="overlay-screen device-safe-top absolute inset-0 z-40">
-                <TransportScreen onBack={() => setShowTransport(false)} isPremium={isPremium} />
-              </div>
-            )}
-            {showTrip && (
-              <div className="overlay-screen device-safe-top absolute inset-0 z-40">
-                <TripScreen
-                  onBack={() => setShowTrip(false)}
-                  onPlace={(p) => {
-                    setShowTrip(false);
-                    openPlace(p);
-                  }}
-                  onПуть={(название, город) => {
-                    setShowTrip(false);
-                    openПуть(название, город);
-                  }}
-                />
-              </div>
-            )}
-            {showFavorites && (
-              <div className="overlay-screen device-safe-top absolute inset-0 z-40">
-                <FavoritesScreen
-                  onBack={() => setShowFavorites(false)}
-                  onPlace={(p) => {
-                    setShowFavorites(false);
-                    openPlace(p);
-                  }}
-                  onHotel={(h) => {
-                    setShowFavorites(false);
-                    openHotel(h);
-                  }}
-                  onRestaurant={(r) => {
-                    setShowFavorites(false);
-                    openRestaurant(r);
-                  }}
-                  onRoute={(m) => {
-                    setShowFavorites(false);
-                    openRoute(m);
-                  }}
-                />
-              </div>
-            )}
-            {showMenu && (
+            </Слой>
+            <Слой открыт={showPractical} className="overlay-screen absolute inset-0 z-40">
+              <PracticalScreen onBack={() => setShowPractical(false)} />
+            </Слой>
+            <Слой открыт={showTransport} className="overlay-screen device-safe-top absolute inset-0 z-40">
+              <TransportScreen onBack={() => setShowTransport(false)} isPremium={isPremium} />
+            </Слой>
+            <Слой открыт={showTrip} className="overlay-screen device-safe-top absolute inset-0 z-40">
+              <TripScreen
+                onBack={() => setShowTrip(false)}
+                onPlace={(p) => {
+                  setShowTrip(false);
+                  openPlace(p);
+                }}
+                onПуть={(название, город) => {
+                  setShowTrip(false);
+                  openПуть(название, город);
+                }}
+              />
+            </Слой>
+            <Слой открыт={showFavorites} className="overlay-screen device-safe-top absolute inset-0 z-40">
+              <FavoritesScreen
+                onBack={() => setShowFavorites(false)}
+                onPlace={(p) => {
+                  setShowFavorites(false);
+                  openPlace(p);
+                }}
+                onHotel={(h) => {
+                  setShowFavorites(false);
+                  openHotel(h);
+                }}
+                onRestaurant={(r) => {
+                  setShowFavorites(false);
+                  openRestaurant(r);
+                }}
+                onRoute={(m) => {
+                  setShowFavorites(false);
+                  openRoute(m);
+                }}
+              />
+            </Слой>
+            <Слой открыт={showMenu}>
               <SideMenu
                 user={user}
                 onClose={() => setShowMenu(false)}
@@ -637,8 +638,10 @@ function App() {
                 }}
                 onLogout={logout}
               />
-            )}
-            {showPremium && <PremiumModal onClose={() => setShowPremium(false)} />}
+            </Слой>
+            <Слой открыт={showPremium}>
+              <PremiumModal onClose={() => setShowPremium(false)} />
+            </Слой>
 
             <div className="device-content flex-1 overflow-hidden">
               <div key={tabKey} className="app-page animate-fade-in h-full" data-dir={направление}>
@@ -723,14 +726,31 @@ interface ScreenProps {
 }
 
 /**
- * Что показывать на текущей вкладке.
+ * Вкладка и открытая поверх неё карточка.
  *
- * Открытая карточка перекрывает вкладку целиком — поэтому сначала
- * разбираем её, и лишь потом доходим до самих экранов. Так порядок
- * проверок читается сверху вниз вместо гирлянды из && по всем сочетаниям.
+ * Карточка ложится сверху, а вкладка под ней остаётся на месте: раньше
+ * карточка заменяла вкладку, и, вернувшись из ресторана, человек
+ * оказывался в начале списка, который только что листал. Теперь список
+ * ждёт с той же прокруткой, а карточка уходит плавно (см. Слой).
  */
-function Screen({ tab, detail, ...p }: ScreenProps) {
-  if (detail) {
+function Screen(props: ScreenProps) {
+  const { detail } = props;
+  return (
+    <div className="relative h-full">
+      {/* Под открытой карточкой вкладку не рисуем (visibility — после того,
+          как карточка въехала), но и не выгружаем: прокрутка цела. */}
+      <div className={`h-full ${detail ? "under-detail" : ""}`} aria-hidden={detail ? true : undefined}>
+        <ЭкранВкладки {...props} />
+      </div>
+      <Слой открыт={Boolean(detail)} className="absolute inset-0 z-30">
+        {detail && <Карточка {...props} detail={detail} />}
+      </Слой>
+    </div>
+  );
+}
+
+function Карточка({ detail, ...p }: ScreenProps & { detail: Detail }) {
+  {
     switch (detail.kind) {
       case "place":
         return (
@@ -748,7 +768,10 @@ function Screen({ tab, detail, ...p }: ScreenProps) {
         return <RouteView название={detail.название} город={detail.город} onBack={p.onCloseDetail} />;
     }
   }
+}
 
+/** Экран самой вкладки. */
+function ЭкранВкладки({ tab, ...p }: ScreenProps) {
   switch (tab) {
     case "home":
       return (
@@ -785,7 +808,7 @@ function Screen({ tab, detail, ...p }: ScreenProps) {
     case "map":
       return <MapScreen onRoute={p.onRoute} onAudio={() => p.onTab("audio")} onPlace={p.onPlace} />;
     case "audio":
-      return <AudioScreen isPremium={p.isPremium} сразуИграть={p.кодЗаписи} />;
+      return <AudioScreen isPremium={p.isPremium} сразуИграть={p.кодЗаписи} onPlace={p.onPlace} />;
     case "profile":
       return (
         <ProfileScreen

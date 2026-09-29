@@ -50,7 +50,7 @@ export function SideMenu({
   return (
     <>
       <div
-        className="absolute inset-0 z-40"
+        className="backdrop-in absolute inset-0 z-40"
         style={{ background: "rgba(0,0,0,0.55)", backdropFilter: "blur(3px)" }}
         onClick={onClose}
       />
