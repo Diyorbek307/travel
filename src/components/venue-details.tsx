@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { ACCENT_FILL, ACCENT_SOFT, BORDER, CREAM, GREEN, MUTED, TEXT, WHITE } from "@/lib/theme";
 import { useT } from "@/components/lang-provider";
 import { useДеньги } from "@/lib/money";
@@ -265,9 +266,13 @@ export function БилетыМеста({ place }: { place: Place }) {
       <p className="mb-2 text-sm font-bold" style={{ color: TEXT }}>
         🎫 {t("d_tickets")}
       </p>
-      <div className="flex flex-col divide-y" style={{ borderColor: BORDER }}>
-        {билеты.map((б) => (
-          <div key={б.id} className="flex items-center justify-between py-2 text-sm">
+      <div className="flex flex-col">
+        {билеты.map((б, i) => (
+          <div
+            key={б.id}
+            className="flex items-center justify-between py-2 text-sm"
+            style={{ borderTop: i ? `1px solid ${BORDER}` : undefined }}
+          >
             <span style={{ color: TEXT }}>{трК(б.name)}</span>
             <b style={{ color: GREEN }}>{дг.цена(б.price)}</b>
           </div>
@@ -280,6 +285,10 @@ export function БилетыМеста({ place }: { place: Place }) {
 /**
  * Фото во весь экран: листать пальцем, закрыть крестиком или «назад».
  * Открывается с того снимка, на который нажали.
+ *
+ * Рисуется прямо в body: у экрана есть анимация появления (transform), и
+ * fixed внутри неё прилипал бы к экрану, а не к окну — нижнее меню
+ * оставалось бы поверх фото.
  */
 export function ПросмотрФото({ фото, с, onClose }: { фото: string[]; с: number; onClose: () => void }) {
   const лента = useRef<HTMLDivElement>(null);
@@ -293,7 +302,7 @@ export function ПросмотрФото({ фото, с, onClose }: { фото: 
     return () => window.removeEventListener("keydown", esc);
   }, [с, onClose]);
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-[90] flex flex-col bg-black" role="dialog" aria-modal>
       <div className="flex items-center justify-between px-4 pb-2 pt-12 text-sm text-white/80">
         <span>
@@ -322,7 +331,8 @@ export function ПросмотрФото({ фото, с, onClose }: { фото: 
           </div>
         ))}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 
@@ -402,9 +412,13 @@ export function МенюРесторана({ меню }: { меню: MenuItem[] 
           ))}
         </div>
       )}
-      <div className="flex flex-col divide-y" style={{ borderColor: BORDER }}>
-        {видно.map((б) => (
-          <div key={б.id} className="flex gap-3 py-2.5">
+      <div className="flex flex-col">
+        {видно.map((б, i) => (
+          <div
+            key={б.id}
+            className="flex gap-3 py-2.5"
+            style={{ borderTop: i ? `1px solid ${BORDER}` : undefined }}
+          >
             {б.img && <ФотоСПросмотром фото={[б.img]} className="h-16 w-16 flex-shrink-0 rounded-lg" />}
             <div className="min-w-0 flex-1">
               <div className="flex items-start justify-between gap-2">
