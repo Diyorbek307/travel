@@ -99,34 +99,6 @@ export default function AiGuide() {
   return (
     <div className="flex flex-col flex-1 overflow-hidden animate-fade-in">
       <div className="flex-1 overflow-y-auto hide-scroll px-4 py-3 space-y-3">
-        {/* Пока разговор не начался — те же дети, что встречали при входе:
-            показывают на телефон и зовут спросить. */}
-        {messages.length <= 1 && (
-          <div
-            className="relative aspect-[2/1] max-h-64 overflow-hidden rounded-2xl"
-            style={{ background: "linear-gradient(#cdbbad, #f0dac6)" }}
-          >
-            <video
-              src="/videos/kids-phone.mp4"
-              poster="/videos/kids-hello.webp"
-              autoPlay
-              muted
-              loop
-              playsInline
-              aria-hidden
-              className="absolute inset-0 h-full w-full object-cover"
-              // Кадр держится за головы детей: высота карточки растёт с
-              // шириной, и на широком экране головы не срезаются.
-              style={{ objectPosition: "center 37%" }}
-            />
-            <span
-              className="bubble-in absolute bottom-2.5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-xl px-3 py-1.5 text-xs font-semibold shadow"
-              style={{ background: "#ffffff", color: "#10302c" }}
-            >
-              {t("tour3_say")}
-            </span>
-          </div>
-        )}
         {messages.map((m, i) => (
           <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
             {m.role === "ai" && (

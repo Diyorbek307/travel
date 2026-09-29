@@ -26,11 +26,14 @@ export default function CityReel({
   видео,
   alt,
   className,
+  позиция,
 }: {
   кадры: string[];
   видео?: string;
   alt: string;
   className?: string;
+  /** Какую часть кадра держать в окне (object-position): «center 30%». */
+  позиция?: string;
 }) {
   const [кадр, setКадр] = useState(0);
   const [виден, setВиден] = useState(false);
@@ -96,6 +99,7 @@ export default function CityReel({
             onPlaying={() => setИграет(true)}
             onPause={() => setИграет(false)}
             className="absolute inset-0 h-full w-full object-cover"
+            style={позиция ? { objectPosition: позиция } : undefined}
           />
           {/* Кадр поверх видео, пока оно не заиграло: заодно закрывает
               нативную кнопку «play», которую iOS рисует на паузе. */}
@@ -105,6 +109,7 @@ export default function CityReel({
             aria-hidden={играет}
             className="absolute inset-0 h-full w-full object-cover"
             style={{
+              objectPosition: позиция,
               opacity: играет ? 0 : 1,
               transform: `scale(${играет ? 1 : 1.05})`,
               transition: "opacity 0.8s ease",

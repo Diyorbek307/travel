@@ -287,7 +287,20 @@ export function ExploreScreen({
   if (раздел === "ai") {
     return (
       <div className="flex flex-col h-full" style={{ background: CREAM }}>
-        <Шапка кикер="HelloUZ" заголовок={t("ex_ai")} фон={фон} onBack={назад} />
+        {/* Фон шапки — дети, что встречали при входе: показывают на
+            телефон, как бы зовут спросить. Кадр держится за их лица. */}
+        <Шапка
+          кикер="HelloUZ"
+          заголовок={t("ex_ai")}
+          фон={{
+            кадры: ["/videos/kids-hello.webp"],
+            видео: "/videos/kids-phone.mp4",
+            alt: "HelloUZ",
+            позиция: "center 30%",
+          }}
+          высокая
+          onBack={назад}
+        />
         <AiGuide />
       </div>
     );
@@ -811,7 +824,7 @@ function ИллюстрацияПереводчик({ широкая }: { шир
   );
 }
 
-type Фон = { кадры: string[]; видео?: string; alt: string };
+type Фон = { кадры: string[]; видео?: string; alt: string; позиция?: string };
 
 /**
  * Шапка экрана: живой фон (ролик или кадры города), подпись, заголовок и
@@ -849,7 +862,7 @@ function Шапка({
       {естьФон ? (
         <>
           {/* key — чтобы при смене города ролик или кадры начинались с первого кадра. */}
-          <CityReel key={фон.alt} кадры={фон.кадры} видео={фон.видео} alt={фон.alt} />
+          <CityReel key={фон.alt} кадры={фон.кадры} видео={фон.видео} alt={фон.alt} позиция={фон.позиция} />
           <div
             className="absolute inset-0"
             style={{
