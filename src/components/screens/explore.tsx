@@ -296,9 +296,9 @@ export function ExploreScreen({
             кадры: ["/videos/kids-hello.webp"],
             видео: "/videos/kids-phone.mp4",
             alt: "HelloUZ",
-            позиция: "center 30%",
+            позиция: "center 33%",
+            светлый: true,
           }}
-          высокая
           onBack={назад}
         />
         <AiGuide />
@@ -824,7 +824,14 @@ function ИллюстрацияПереводчик({ широкая }: { шир
   );
 }
 
-type Фон = { кадры: string[]; видео?: string; alt: string; позиция?: string };
+type Фон = {
+  кадры: string[];
+  видео?: string;
+  alt: string;
+  позиция?: string;
+  /** Светлый фон (дети на бежевом): затемняем только низ под надписью. */
+  светлый?: boolean;
+};
 
 /**
  * Шапка экрана: живой фон (ролик или кадры города), подпись, заголовок и
@@ -856,7 +863,9 @@ function Шапка({
   const естьФон = фон.кадры.length > 0 || Boolean(фон.видео);
   return (
     <div
-      className={`relative overflow-hidden border-b ${высокая ? "pt-28 pb-4" : "pt-14 pb-3"}`}
+      className={`relative overflow-hidden border-b ${
+        фон.светлый ? "pt-44 pb-4" : высокая ? "pt-28 pb-4" : "pt-14 pb-3"
+      }`}
       style={{ borderColor: BORDER, background: ACCENT_FILL }}
     >
       {естьФон ? (
@@ -866,8 +875,9 @@ function Шапка({
           <div
             className="absolute inset-0"
             style={{
-              background:
-                "linear-gradient(to bottom,rgba(0,0,0,0.35) 0%,rgba(0,0,0,0.1) 40%,rgba(0,0,0,0.65) 100%)",
+              background: фон.светлый
+                ? "linear-gradient(to bottom,transparent 55%,rgba(0,0,0,0.55) 100%)"
+                : "linear-gradient(to bottom,rgba(0,0,0,0.35) 0%,rgba(0,0,0,0.1) 40%,rgba(0,0,0,0.65) 100%)",
             }}
           />
         </>
