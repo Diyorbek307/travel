@@ -1111,3 +1111,32 @@ html.intro-landing [data-brand-logo] {
     display: block;
   }
 }
+
+/* Живые плитки: видео на белом видно только в светлой теме — «умножение»
+   растворяет белый в светлой подсветке, а на тёмной плитке остался бы
+   белый квадрат. В тёмной теме и без анимаций — прежняя картинка. */
+.tile-still {
+  display: none;
+}
+html[data-theme="dark"] .tile-live {
+  display: none;
+}
+html[data-theme="dark"] .tile-still {
+  display: block;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .tile-live {
+    display: none;
+  }
+  :root:not([data-theme="light"]) .tile-still {
+    display: block;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tile-live {
+    display: none !important;
+  }
+  .tile-still {
+    display: block !important;
+  }
+}

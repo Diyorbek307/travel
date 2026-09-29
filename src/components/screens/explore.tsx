@@ -555,15 +555,35 @@ function Плитка({
       {плитка.скоро ? (
         <ИллюстрацияСкоро ключ={плитка.ключ} широкая={широкая} />
       ) : (
-        <img
-          src={`/tiles/${плитка.ключ}.webp`}
-          alt=""
-          loading="lazy"
-          draggable={false}
-          className={`pointer-events-none absolute -bottom-[10%] -right-[8%] aspect-square select-none object-contain transition-transform duration-300 group-hover:scale-105 ${
-            широкая ? "w-[34%] sm:w-[24%] lg:w-[60%]" : "w-[60%] sm:w-[46%] lg:w-[60%]"
-          }`}
-        />
+        <>
+          <img
+            src={`/tiles/${плитка.ключ}.webp`}
+            alt=""
+            loading="lazy"
+            draggable={false}
+            className={`pointer-events-none absolute -bottom-[10%] -right-[8%] aspect-square select-none object-contain transition-transform duration-300 group-hover:scale-105 ${
+              широкая ? "w-[34%] sm:w-[24%] lg:w-[60%]" : "w-[60%] sm:w-[46%] lg:w-[60%]"
+            } ${ЖИВЫЕ_ПЛИТКИ.has(плитка.ключ) ? "tile-still" : ""}`}
+          />
+          {/* Живая версия: снята на белом, «умножение» растворяет белый в
+              подсветке плитки. В тёмной теме белый так не растворить —
+              там остаётся картинка (см. .tile-live в globals.css). */}
+          {ЖИВЫЕ_ПЛИТКИ.has(плитка.ключ) && (
+            <video
+              src={`/videos/tiles/${плитка.ключ}.mp4`}
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              aria-hidden
+              className={`tile-live pointer-events-none absolute -bottom-[10%] -right-[8%] aspect-square select-none object-contain transition-transform duration-300 group-hover:scale-105 ${
+                широкая ? "w-[34%] sm:w-[24%] lg:w-[60%]" : "w-[60%] sm:w-[46%] lg:w-[60%]"
+              }`}
+              style={{ mixBlendMode: "multiply" }}
+            />
+          )}
+        </>
       )}
     </button>
   );
@@ -657,6 +677,9 @@ function ИллюстрацияVR({ широкая }: { широкая: boolean 
 }
 
 /** Иллюстрация будущего раздела — по ключу плитки. */
+/** Плитки, у которых есть живая версия — видео в public/videos/tiles. */
+const ЖИВЫЕ_ПЛИТКИ = new Set(["museums", "places", "restaurants", "bars", "routes", "excursions", "hotels"]);
+
 function ИллюстрацияСкоро({ ключ, широкая }: { ключ: string; широкая: boolean }) {
   if (ключ === "photo") return <ИллюстрацияФото широкая={широкая} />;
   if (ключ === "translate") return <ИллюстрацияПереводчик широкая={широкая} />;
