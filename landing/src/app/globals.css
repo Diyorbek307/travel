@@ -1,36 +1,32 @@
 @import "tailwindcss";
 
 /*
- * Палитра лендинга — та же, что в приложении: бирюза изразцов Регистана,
- * охра сырцовой глины, кобальт хивинской майолики. Но лендинг сделан
- * тёмным: 3D-сцена на тёмном фоне читается лучше, а «дорогой» вид
- * почти всегда строится на глубоком фоне и одном ярком акценте.
+ * Лендинг HelloUZ: тёплая бумага, кирпич и бирюза изразцов.
+ *
+ * Образ — как у лучших туристических лендингов: светлый кремовый фон,
+ * крупная антиква, карандашные наброски памятников и живые фото. Бирюза —
+ * цвет куполов Самарканда и бренда HelloUZ, кирпич — жжёная глина стен.
  */
-@theme {
-  --color-tile-300: #8ae9e0;
-  --color-tile-400: #34dccf;
-  --color-tile-500: #0ea69f;
-  --color-tile-600: #0b8a83;
-  --color-gold-300: #f2ce6e;
-  --color-gold-400: #e9c46a;
-  --color-gold-500: #d4a841;
-  --color-void-900: #070d12;
-  --color-void-950: #04080b;
-}
 
 :root {
-  --bg: #04080b;
-  --bg-soft: #0a1219;
-  --line: #16242f;
-  --text: #e9f1f5;
-  --text-soft: #8ba3b3;
-  --accent: #34dccf;
-  --gold: #e9c46a;
+  --paper: #fbf6ef;
+  --cream: #f4ebdd;
+  --sand: #e9dcc6;
+  --ink: #221a13;
+  --ink-soft: #6c5b4c;
+  --brick: #9a3b22;
+  --brick-deep: #7c2d18;
+  --tile: #0e8f88;
+  --tile-light: #2fd0c6;
+  --gold: #d9a93d;
+  --night: #14201f;
+  --night-soft: #1e2d2b;
+  --line: rgba(34, 26, 19, 0.12);
 }
 
 html {
-  background: var(--bg);
-  color: var(--text);
+  background: var(--paper);
+  color: var(--ink);
   /* Плавный скролл делает Lenis — нативный отключаем, иначе они дерутся. */
   scroll-behavior: auto;
 }
@@ -42,80 +38,187 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Заголовки: крупная сетка и плотный трекинг — это половина ощущения
-   дорогой типографики. Размер тянется от ширины экрана, без брейкпоинтов. */
-.display {
-  font-size: clamp(2.5rem, 8vw, 7rem);
-  line-height: 0.95;
-  letter-spacing: -0.04em;
-  font-weight: 600;
+.serif {
+  font-family: var(--font-serif), Georgia, serif;
 }
-
-.display-sm {
-  font-size: clamp(1.75rem, 4vw, 3.25rem);
-  line-height: 1.05;
-  letter-spacing: -0.03em;
-  font-weight: 600;
+.hand {
+  font-family: var(--font-hand), cursive;
 }
-
-.eyebrow {
-  font-size: 0.75rem;
-  letter-spacing: 0.22em;
+.condensed {
+  font-family: var(--font-condensed), "Arial Narrow", sans-serif;
   text-transform: uppercase;
-  color: var(--text-soft);
+  letter-spacing: -0.01em;
 }
 
-.soft {
-  color: var(--text-soft);
+/* ── Бумага: едва заметное зерно, чтобы кремовый не был пластиком ── */
+.paper-grain {
+  background-color: var(--paper);
+  background-image:
+    radial-gradient(circle at 20% 10%, rgba(217, 169, 61, 0.1), transparent 45%),
+    radial-gradient(circle at 85% 30%, rgba(14, 143, 136, 0.08), transparent 40%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.06'/%3E%3C/svg%3E");
 }
 
-/* Градиентный текст для одного акцентного слова в заголовке. */
-.shine {
-  background: linear-gradient(100deg, var(--accent) 0%, var(--gold) 55%, var(--accent) 100%);
-  background-size: 200% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  animation: shine 6s linear infinite;
+/* ── Наброски: линия рисуется, как карандашом ── */
+.sketch path,
+.sketch line,
+.sketch circle,
+.sketch polyline {
+  stroke-dasharray: var(--len, 1200);
+  stroke-dashoffset: var(--len, 1200);
+  animation: draw 2.6s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+  animation-delay: var(--delay, 0.3s);
 }
-
-@keyframes shine {
+@keyframes draw {
   to {
-    background-position: -200% 0;
+    stroke-dashoffset: 0;
   }
 }
 
-/* Тонкая линия-разделитель, гаснущая к краям. */
-.hairline {
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--line) 20%, var(--line) 80%, transparent);
+/* ── Бегущая строка приветствий ── */
+.marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 38s linear infinite;
+}
+.marquee:hover {
+  animation-play-state: paused;
+}
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
 }
 
-/* Стеклянная карточка. Без перебора: один слой, аккуратная рамка. */
+/* ── Медленный наезд фото ── */
+.kenburns {
+  animation: kenburns 9s ease-out both;
+}
+@keyframes kenburns {
+  from {
+    transform: scale(1.14) translate3d(1.5%, 1%, 0);
+  }
+  to {
+    transform: scale(1) translate3d(0, 0, 0);
+  }
+}
+
+/* ── Шкала листания городов ── */
+@keyframes grow {
+  to {
+    width: 100%;
+  }
+}
+
+/* ── Вращающийся значок ── */
+.spin-slow {
+  animation: spin 22s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ── Лёгкое парение ── */
+.float {
+  animation: float 6s ease-in-out infinite;
+}
+@keyframes float {
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* ── Блик по билету ── */
+.shine-sweep {
+  position: relative;
+  overflow: hidden;
+}
+.shine-sweep::after {
+  content: "";
+  position: absolute;
+  inset: -40% auto -40% -60%;
+  width: 35%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+  transform: rotate(14deg);
+  animation: sweep 5.5s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes sweep {
+  0%,
+  55% {
+    left: -60%;
+  }
+  100% {
+    left: 140%;
+  }
+}
+
+/* ── Стекло ── */
 .glass {
-  background: color-mix(in srgb, var(--bg-soft) 70%, transparent);
-  border: 1px solid var(--line);
-  backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(18px) saturate(1.2);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+}
+.glass-light {
+  background: rgba(251, 246, 239, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 
-/* Элементы, которые появляются по скроллу, до анимации скрыты. */
-.reveal {
+/* ── Появление строк заголовка ── */
+.line-mask {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.06em;
+}
+.line-mask > span {
+  display: inline-block;
+  transform: translateY(105%);
+  animation: rise 1.1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  animation-delay: var(--delay, 0s);
+}
+@keyframes rise {
+  to {
+    transform: translateY(0);
+  }
+}
+
+.fade-up {
   opacity: 0;
-  transform: translateY(28px);
+  transform: translateY(18px);
+  animation: fadeUp 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  animation-delay: var(--delay, 0s);
 }
-
-/* Уважение к системной настройке: при prefers-reduced-motion всё
-   показываем сразу и не двигаем. Иначе анимации вредят доступности. */
-@media (prefers-reduced-motion: reduce) {
-  .reveal {
+@keyframes fadeUp {
+  to {
     opacity: 1;
     transform: none;
   }
-  .shine {
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sketch path,
+  .sketch line,
+  .sketch circle,
+  .sketch polyline {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+  .marquee,
+  .kenburns,
+  .spin-slow,
+  .float,
+  .shine-sweep::after {
     animation: none;
   }
-  * {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
+  .line-mask > span,
+  .fade-up {
+    animation: none;
+    transform: none;
+    opacity: 1;
   }
 }
