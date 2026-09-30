@@ -6,7 +6,7 @@ import Features from "@/components/features";
 import Showcase from "@/components/showcase";
 import Quiz from "@/components/quiz";
 import Finale from "@/components/finale";
-import DomeSection from "@/components/dome-section";
+import PortalSection from "@/components/portal-section";
 import GlobeSection from "@/components/globe-section";
 import Manifesto from "@/components/manifesto";
 import { APP_URL } from "@/lib/i18n";
@@ -38,7 +38,7 @@ export default async function Home() {
       <Hero цифры={await цифры()} />
       <Marquee />
       <Manifesto />
-      <DomeSection />
+      <PortalSection />
       <Destinations />
       <Features />
       <GlobeSection />

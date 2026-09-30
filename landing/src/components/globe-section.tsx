@@ -24,7 +24,7 @@ export default function GlobeSection() {
     <section
       id="globe"
       className="relative overflow-hidden py-24 sm:py-32"
-      style={{ background: "radial-gradient(ellipse at 70% 50%, #123f3a, #0a1f1d 70%)" }}
+      style={{ background: "radial-gradient(ellipse at 70% 50%, #0d1f33, #03070d 70%)" }}
     >
       {/* Звёздная пыль */}
       <div
