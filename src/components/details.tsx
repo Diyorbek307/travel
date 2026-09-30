@@ -1,5 +1,6 @@
 "use client";
 
+import { КнопкаВМаршрут } from "./trip-button";
 import { СтатусОткрыто } from "./open-status";
 import { КнопкаПоделиться } from "./share-button";
 import { СкидкаPremium, ЗначокСкидки } from "./premium-discount";
@@ -615,6 +616,7 @@ export function HotelDetail({
         >
           📍 {t("d_route")}
         </button>
+        <КнопкаВМаршрут вид="hotel" id={hotel.id} name={hotel.name} city={hotel.city} img={hotel.img} />
         <ГалереяЗаведения фото={hotel.imgs ?? []} />
         <НомераОтеля
           hotel={hotel}
@@ -803,6 +805,7 @@ export function RestaurantDetail({
             📍 {t("d_route")}
           </button>
         </div>
+        <КнопкаВМаршрут вид="restaurant" id={r.id} name={r.name} city={r.city} img={r.img} />
         <BookingForm kind="restaurant" itemId={r.id} itemName={r.name} />
         <ReviewForm placeId={r.id} placeName={r.name} />
         <div className="pb-6" />

@@ -1,5 +1,6 @@
 "use client";
 
+import { разобратьКод, заменитьМаршрут, текущийМаршрут } from "@/lib/trip";
 import { лёгкийСейчас } from "@/lib/lite";
 import { ЖивоеОбучение } from "@/components/live-tour";
 import { гость, статьГостем, забытьГостя, ПАРАМЕТРЫ_ССЫЛКИ } from "@/lib/guest";
@@ -24,7 +25,7 @@ import RouteView from "@/components/route-view";
 import { MiniPlayer, Toast } from "@/components/widgets";
 import { AdInterstitial } from "@/components/ads";
 import { ContentProvider, useAppContent, useContentReady } from "@/components/content-provider";
-import { LangProvider } from "@/components/lang-provider";
+import { LangProvider, useT } from "@/components/lang-provider";
 import { WeatherProvider } from "@/components/weather-provider";
 import { CurrencyProvider } from "@/components/currency-provider";
 import { GeoProvider, useGeo } from "@/components/geo-provider";
@@ -179,8 +180,11 @@ function App() {
    * стартовать с неё раньше, чем человек вошёл, а данные пришли с сервера.
    */
   const [ссылкаЖдёт, setСсылкаЖдёт] = useState<string | null>(null);
+  // План поездки из ссылки — ждёт данных, чтобы найти названия и фото.
+  const [планЖдёт, setПланЖдёт] = useState<string | null>(null);
   const { PLACES, HOTELS, RESTAURANTS } = useAppContent();
   const данныеГотовы = useContentReady();
+  const { t } = useT();
   const { pos } = useGeo();
   // Город у push-подписки освежаем при каждом открытии: кампании «по
   // городу» должны приходить туда, где человек сейчас.
@@ -424,8 +428,14 @@ function App() {
       setСсылкаЖдёт(открыть);
       п.delete("open");
     }
+    // Присланный план поездки: «/?trip=<код>».
+    const план = п.get("trip");
+    if (план) {
+      setПланЖдёт(план);
+      п.delete("trip");
+    }
     // «Поделиться» ведёт на «/?place=<id>» (или hotel, restaurant).
-    let запись = false;
+    let запись = !!план;
     for (const вид of ["place", "hotel", "restaurant"] as const) {
       const номер = п.get(вид);
       if (!номер) continue;
@@ -485,6 +495,29 @@ function App() {
     setСсылкаЖдёт(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase, ссылкаЖдёт, данныеГотовы]);
+
+  // Присланный план: собираем точки из своих данных и, если свой план
+  // уже есть, спрашиваем, заменить ли его.
+  useEffect(() => {
+    if (phase !== "app" || !планЖдёт || !данныеГотовы) return;
+    setПланЖдёт(null);
+    const точки = разобратьКод(планЖдёт).flatMap((т) => {
+      const з =
+        т.kind === "hotel"
+          ? HOTELS.find((x) => x.id === т.id)
+          : т.kind === "restaurant"
+          ? RESTAURANTS.find((x) => x.id === т.id)
+          : PLACES.find((x) => x.id === т.id);
+      if (!з) return [];
+      const имя = "nameRu" in з && з.nameRu ? з.nameRu : з.name;
+      return [{ id: т.id, kind: т.kind, day: т.day, name: имя, city: з.city, img: з.img }];
+    });
+    if (!точки.length) return;
+    if (текущийМаршрут().length && !window.confirm(t("trip_import"))) return;
+    заменитьМаршрут(точки);
+    setShowTrip(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase, планЖдёт, данныеГотовы]);
 
   // Приложение уже открыто, и человек нажал на push: service worker не
   // открывает вторую вкладку, а присылает сюда, куда перейти.
@@ -687,13 +720,9 @@ function App() {
               <Слой открыт={showTrip} className="overlay-screen device-safe-top absolute inset-0 z-40">
                 <TripScreen
                   onBack={() => setShowTrip(false)}
-                  onPlace={(p) => {
+                  onOpen={(ссылка) => {
                     setShowTrip(false);
-                    openPlace(p);
-                  }}
-                  onПуть={(название, город) => {
-                    setShowTrip(false);
-                    openПуть(название, город);
+                    openFromChat(ссылка);
                   }}
                 />
               </Слой>

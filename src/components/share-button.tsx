@@ -2,14 +2,16 @@
 
 import { useState } from "react";
 import { useT } from "@/components/lang-provider";
+import { адресСтраницы } from "@/lib/seo-links";
 
 /**
  * «Поделиться» местом, отелем или рестораном.
  *
- * Ссылка ведёт на «/?place=<id>» — у получателя приложение открывается
- * сразу на этой карточке, без регистрации (см. гостевой режим в
- * page.tsx). На телефоне — системное окно «Поделиться» (мессенджеры,
- * почта), где его нет — копируем ссылку и показываем галочку.
+ * Ссылка ведёт на страницу записи «/place/<id>» (см. lib/seo): у неё
+ * настоящее превью в мессенджере — фото, название, описание — на языке
+ * того, кто делится. Кнопка на странице открывает запись в приложении,
+ * без регистрации. На телефоне — системное окно «Поделиться», где его
+ * нет — копируем ссылку и показываем галочку.
  */
 export function КнопкаПоделиться({
   вид,
@@ -24,11 +26,11 @@ export function КнопкаПоделиться({
   className?: string;
   style?: React.CSSProperties;
 }) {
-  const { t } = useT();
+  const { t, lang } = useT();
   const [скопировано, setСкопировано] = useState(false);
 
   const поделиться = async () => {
-    const url = `${window.location.origin}/?${вид}=${encodeURIComponent(id)}`;
+    const url = `${window.location.origin}${адресСтраницы(вид, id, lang)}`;
     const данные = { title: `${название} — HelloUZ`, text: название, url };
     try {
       if (navigator.share) {
