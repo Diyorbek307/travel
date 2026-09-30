@@ -7,6 +7,8 @@ import path from "node:path";
 // Заказы — во временной папке, Airalo и почта — подменены.
 process.env.DATA_DIR = mkdtempSync(path.join(tmpdir(), "esim-"));
 process.env.ESIM_USD_UZS = "12000";
+// Суммы в проверках оплаты — без сбора, чтобы считать в уме.
+process.env.ESIM_MARKUP_PERCENT = "0";
 process.env.PAYME_KEY = "test-payme-key";
 process.env.CLICK_SECRET = "test-click-key";
 process.env.CLICK_SERVICE_ID = "777";
@@ -71,6 +73,9 @@ describe("цена в сумах", () => {
     expect(з.ценаВСумах(4.5, 12000, 0)).toBe(54000);
     expect(з.ценаВСумах(4.5, 12000, 10)).toBe(60000); // 59 400 → 60 000
     expect(з.ценаВСумах(0.01, 12000, 0)).toBe(1000);
+    // По умолчанию — цена Airalo плюс 10 % за нашу услугу.
+    expect(з.НАЦЕНКА_ПО_УМОЛЧАНИЮ).toBe(10);
+    expect(з.ценаВСумах(4.5, 12000, з.НАЦЕНКА_ПО_УМОЛЧАНИЮ)).toBe(60000); // 59 400 → 60 000
   });
 });
 

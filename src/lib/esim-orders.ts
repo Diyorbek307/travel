@@ -96,9 +96,16 @@ async function сумовЗаДоллар(): Promise<number> {
 }
 
 /**
- * Цена для туриста в сумах: рекомендованная цена Airalo плюс наша наценка
- * (ESIM_MARKUP_PERCENT, по умолчанию 0), округлённо до тысячи вверх.
+ * Цена для туриста в сумах: та же, что у самого Airalo (рекомендованная
+ * розничная), плюс небольшой сбор за нашу услугу — ESIM_MARKUP_PERCENT,
+ * по умолчанию 10 %. Округляем до тысячи вверх.
+ *
+ * Закупаем мы дешевле розницы (net_price), так что разница между ними —
+ * тоже наша; сбор идёт сверху.
  */
+/** Сбор за нашу услугу поверх цены Airalo, %. */
+export const НАЦЕНКА_ПО_УМОЛЧАНИЮ = 10;
+
 export function ценаВСумах(retailUsd: number, курсСума: number, наценка: number): number {
   const сум = retailUsd * (1 + Math.max(0, наценка) / 100) * курсСума;
   return Math.max(1000, Math.ceil(сум / 1000) * 1000);
@@ -106,7 +113,8 @@ export function ценаВСумах(retailUsd: number, курсСума: number
 
 export async function пакетыСЦенами(): Promise<(ПакетEsim & { сумма: number })[]> {
   const [пакеты, к] = await Promise.all([пакетыУзбекистана(), сумовЗаДоллар()]);
-  const наценка = Number(process.env.ESIM_MARKUP_PERCENT) || 0;
+  const задано = process.env.ESIM_MARKUP_PERCENT;
+  const наценка = задано !== undefined && задано.trim() !== "" ? Number(задано) || 0 : НАЦЕНКА_ПО_УМОЛЧАНИЮ;
   return пакеты.map((п) => ({ ...п, сумма: ценаВСумах(п.retailUsd, к, наценка) }));
 }
 

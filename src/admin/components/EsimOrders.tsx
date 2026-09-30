@@ -108,7 +108,8 @@ export default function EsimOrders() {
           <>
             В Render → Environment: <code>AIRALO_CLIENT_ID</code> и <code>AIRALO_CLIENT_SECRET</code> из
             партнёрского кабинета Airalo. Для проверки без денег — ещё <code>AIRALO_API_URL</code> песочницы.
-            Наценка —<code>ESIM_MARKUP_PERCENT</code> (по умолчанию 0 — рекомендованная цена Airalo).
+            Наценка — <code>ESIM_MARKUP_PERCENT</code> (по умолчанию 10 % сверху к цене Airalo; 0 — ровно как
+            у Airalo).
           </>,
         )}
         {строка(
