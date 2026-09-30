@@ -14,6 +14,12 @@ services:
     buildCommand: npm ci && npm run build
     startCommand: npm start
 
+    # Лендинг живёт в landing/ и выкладывается отдельным сервисом —
+    # его правки не должны пересобирать приложение.
+    buildFilter:
+      ignoredPaths:
+        - landing/**
+
     healthCheckPath: /
 
     envVars:
@@ -81,3 +87,22 @@ services:
       # показывать приложение в рамке «живого демо». Админку — никогда.
       - key: LANDING_ORIGIN
         sync: false
+
+  # Лендинг HelloUZ — отдельный сайт-витрина (папка landing/). Секретов
+  # не нужно: цифры мест он берёт из открытого /api/content приложения.
+  # С rootDir Render пересобирает его только при правках внутри landing/.
+  - type: web
+    name: hellouz-landing
+    runtime: node
+    plan: free
+    region: frankfurt
+    rootDir: landing
+
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+
+    healthCheckPath: /
+
+    envVars:
+      - key: NODE_VERSION
+        value: 24.13.0
