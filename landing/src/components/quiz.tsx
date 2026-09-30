@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { APP_URL, useЯзык, type Язык } from "@/lib/i18n";
+import { APP_URL, useЯзык, тр, type Многоязычно } from "@/lib/i18n";
 import Reveal from "./reveal";
 
 /**
@@ -16,7 +16,8 @@ type Старт = "tashkent" | "samarkand" | "bukhara";
 interface Точка {
   вид: "p" | "r";
   id: string;
-  имя: Record<Язык, string>;
+  /** Имена собственные: по-русски и латиницей для остальных языков. */
+  имя: Многоязычно;
 }
 
 const м = (id: string, ru: string, en: string): Точка => ({ вид: "p", id, имя: { ru, en } });
@@ -25,33 +26,91 @@ const р = (id: string, ru: string, en: string): Точка => ({ вид: "r", i
 /** Дни по городам: сперва город старта, дальше — по Шёлковому пути. */
 const ДНИ: Record<Интерес, Record<Старт | "khiva" | "extra", Точка[][]>> = {
   history: {
-    tashkent: [[м("14-hast", "Хаст-Имам", "Hast-Imam"), м("15-chorsu", "Базар Чорсу", "Chorsu Bazaar"), м("22-timur", "Музей Амира Темура", "Amir Timur Museum")]],
+    tashkent: [
+      [
+        м("14-hast", "Хаст-Имам", "Hast-Imam"),
+        м("15-chorsu", "Базар Чорсу", "Chorsu Bazaar"),
+        м("22-timur", "Музей Амира Темура", "Amir Timur Museum"),
+      ],
+    ],
     samarkand: [
-      [м("1-reg", "Регистан", "Registan"), м("6-gur", "Гур-Эмир", "Gur-e-Amir"), м("2-shah", "Шахи-Зинда", "Shah-i-Zinda")],
-      [м("9-bibi", "Мечеть Биби-Ханым", "Bibi-Khanym Mosque"), м("10-ulug", "Обсерватория Улугбека", "Ulugh Beg Observatory"), м("26-meros", "Бумажная фабрика «Мейрос»", "Meros paper mill")],
+      [
+        м("1-reg", "Регистан", "Registan"),
+        м("6-gur", "Гур-Эмир", "Gur-e-Amir"),
+        м("2-shah", "Шахи-Зинда", "Shah-i-Zinda"),
+      ],
+      [
+        м("9-bibi", "Мечеть Биби-Ханым", "Bibi-Khanym Mosque"),
+        м("10-ulug", "Обсерватория Улугбека", "Ulugh Beg Observatory"),
+        м("26-meros", "Бумажная фабрика «Мейрос»", "Meros paper mill"),
+      ],
     ],
     bukhara: [
-      [м("3-ark", "Арк", "Ark Fortress"), м("5-kalon", "Минарет Калян", "Kalon Minaret"), м("11-labi", "Ляби-Хауз", "Lyabi-Hauz")],
-      [м("12-ismail", "Мавзолей Самани", "Samanid Mausoleum"), м("29-xsito", "Ситораи Мохи-Хоса", "Sitorai Mohi-Khosa")],
+      [
+        м("3-ark", "Арк", "Ark Fortress"),
+        м("5-kalon", "Минарет Калян", "Kalon Minaret"),
+        м("11-labi", "Ляби-Хауз", "Lyabi-Hauz"),
+      ],
+      [
+        м("12-ismail", "Мавзолей Самани", "Samanid Mausoleum"),
+        м("29-xsito", "Ситораи Мохи-Хоса", "Sitorai Mohi-Khosa"),
+      ],
     ],
-    khiva: [[м("4-ikhon", "Ичан-Кала", "Itchan Kala"), м("13-ihlj", "Минарет Ислам-Ходжа", "Islam Khodja Minaret")]],
+    khiva: [
+      [м("4-ikhon", "Ичан-Кала", "Itchan Kala"), м("13-ihlj", "Минарет Ислам-Ходжа", "Islam Khodja Minaret")],
+    ],
     extra: [],
   },
   nature: {
     tashkent: [
-      [м("7-chrvk", "Чарвакское водохранилище", "Charvak Reservoir"), м("19-chimgn", "Чимганские горы", "Chimgan Mountains")],
-      [м("51-scurng", "Урунгачские озёра", "Urungach Lakes"), м("57-scamir", "Курорт Амирсой", "Amirsoy Resort")],
+      [
+        м("7-chrvk", "Чарвакское водохранилище", "Charvak Reservoir"),
+        м("19-chimgn", "Чимганские горы", "Chimgan Mountains"),
+      ],
+      [
+        м("51-scurng", "Урунгачские озёра", "Urungach Lakes"),
+        м("57-scamir", "Курорт Амирсой", "Amirsoy Resort"),
+      ],
     ],
     samarkand: [[м("52-sczaam", "Зааминский нацпарк", "Zaamin National Park")]],
-    bukhara: [[м("43-xaydr", "Озеро Айдаркуль", "Aydarkul Lake"), м("55-scsent", "Сентоб и Нуратинские горы", "Sentob & Nuratau")]],
+    bukhara: [
+      [
+        м("43-xaydr", "Озеро Айдаркуль", "Aydarkul Lake"),
+        м("55-scsent", "Сентоб и Нуратинские горы", "Sentob & Nuratau"),
+      ],
+    ],
     khiva: [[м("53-scsarm", "Петроглифы Сармишсая", "Sarmishsay petroglyphs")]],
     extra: [[м("56-scshoh", "Шахимардан", "Shakhimardan")]],
   },
   food: {
-    tashkent: [[м("15-chorsu", "Базар Чорсу", "Chorsu Bazaar"), р("1-rs1", "Плов-центр", "Central Asian Plov Centre"), р("3-rs3", "Чайхана Рохат", "Rokhat Teahouse")]],
-    samarkand: [[м("20-savsav", "Базар Сиаб", "Siyob Bazaar"), р("5-rs5", "Плов-центр Самарканда", "Samarkand Plov Centre"), р("9-rs9", "Чайхана у Регистана", "Registan Teahouse")]],
-    bukhara: [[м("11-labi", "Ляби-Хауз", "Lyabi-Hauz"), р("7-rs7", "Ресторан Ляби-Хауз", "Lyabi-Hauz Restaurant"), р("8-rs8", "Minzifa", "Minzifa")]],
-    khiva: [[м("4-ikhon", "Ичан-Кала", "Itchan Kala"), р("10-rs10", "Oshxona Khiva", "Oshxona Khiva"), р("11-rs11", "Terrassa Khiva", "Terrassa Khiva")]],
+    tashkent: [
+      [
+        м("15-chorsu", "Базар Чорсу", "Chorsu Bazaar"),
+        р("1-rs1", "Плов-центр", "Central Asian Plov Centre"),
+        р("3-rs3", "Чайхана Рохат", "Rokhat Teahouse"),
+      ],
+    ],
+    samarkand: [
+      [
+        м("20-savsav", "Базар Сиаб", "Siyob Bazaar"),
+        р("5-rs5", "Плов-центр Самарканда", "Samarkand Plov Centre"),
+        р("9-rs9", "Чайхана у Регистана", "Registan Teahouse"),
+      ],
+    ],
+    bukhara: [
+      [
+        м("11-labi", "Ляби-Хауз", "Lyabi-Hauz"),
+        р("7-rs7", "Ресторан Ляби-Хауз", "Lyabi-Hauz Restaurant"),
+        р("8-rs8", "Minzifa", "Minzifa"),
+      ],
+    ],
+    khiva: [
+      [
+        м("4-ikhon", "Ичан-Кала", "Itchan Kala"),
+        р("10-rs10", "Oshxona Khiva", "Oshxona Khiva"),
+        р("11-rs11", "Terrassa Khiva", "Terrassa Khiva"),
+      ],
+    ],
     extra: [[р("6-rs6", "Silk Road Spices", "Silk Road Spices"), р("2-rs2", "Caravan", "Caravan")]],
   },
 };
@@ -87,7 +146,10 @@ export default function Quiz() {
     варианты: [T, string][],
   ) => (
     <label className="block">
-      <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: "var(--ink-soft)" }}>
+      <span
+        className="mb-2 block text-xs font-semibold uppercase tracking-[0.14em]"
+        style={{ color: "var(--ink-soft)" }}
+      >
         {подпись}
       </span>
       <div className="flex flex-wrap gap-2">
@@ -120,7 +182,9 @@ export default function Quiz() {
           className="mx-auto max-w-6xl rounded-[36px] border px-6 py-12 sm:px-12"
           style={{ borderColor: "var(--line)", background: "linear-gradient(135deg,#fffaf2,#f3e3cc)" }}
         >
-          <h2 className="serif mb-3 text-[clamp(2rem,4vw,3rem)] font-semibold leading-tight">{t("quiz_title")}</h2>
+          <h2 className="serif mb-3 text-[clamp(2rem,4vw,3rem)] font-semibold leading-tight">
+            {t("quiz_title")}
+          </h2>
           <p className="mb-10 max-w-xl text-[15px]" style={{ color: "var(--ink-soft)" }}>
             {t("quiz_sub")}
           </p>
@@ -136,9 +200,9 @@ export default function Quiz() {
               ["long", t("q_long")],
             ])}
             {выбор(t("quiz_q3"), старт, setСтарт, [
-              ["tashkent", язык === "ru" ? "Ташкент" : "Tashkent"],
-              ["samarkand", язык === "ru" ? "Самарканд" : "Samarkand"],
-              ["bukhara", язык === "ru" ? "Бухара" : "Bukhara"],
+              ["tashkent", t("city_tashkent")],
+              ["samarkand", t("city_samarkand")],
+              ["bukhara", t("city_bukhara")],
             ])}
           </div>
           <button
@@ -153,14 +217,18 @@ export default function Quiz() {
             <div className="fade-up mt-10">
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {маршрут.map((день, d) => (
-                  <div key={d} className="rounded-2xl border bg-white/70 p-4" style={{ borderColor: "var(--line)" }}>
+                  <div
+                    key={d}
+                    className="rounded-2xl border bg-white/70 p-4"
+                    style={{ borderColor: "var(--line)" }}
+                  >
                     <p className="hand mb-1 text-2xl" style={{ color: "var(--brick)" }}>
                       {t("quiz_day")} {d + 1}
                     </p>
                     <ul className="space-y-1 text-sm">
                       {день.map((т) => (
                         <li key={т.id}>
-                          {т.вид === "r" ? "🍽️" : "📍"} {т.имя[язык]}
+                          {т.вид === "r" ? "🍽️" : "📍"} {тр(т.имя, язык)}
                         </li>
                       ))}
                     </ul>

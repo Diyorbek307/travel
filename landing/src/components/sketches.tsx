@@ -15,7 +15,11 @@ const штрих = {
 /** Минарет Калян, Бухара: высокий конический ствол с фонарём наверху. */
 export function Минарет({ className, delay = 0.4 }: { className?: string; delay?: number }) {
   return (
-    <svg viewBox="0 0 80 200" className={`sketch ${className ?? ""}`} style={{ ["--delay" as string]: `${delay}s` }}>
+    <svg
+      viewBox="0 0 80 200"
+      className={`sketch ${className ?? ""}`}
+      style={{ ["--delay" as string]: `${delay}s` }}
+    >
       <g {...штрих}>
         <path d="M28 190 L33 70 L47 70 L52 190 Z" />
         <path d="M31 150 H49 M32 120 H48 M33 95 H47" />
@@ -35,7 +39,11 @@ export function Минарет({ className, delay = 0.4 }: { className?: string;
 /** Гур-Эмир, Самарканд: ребристый купол на барабане и два портала. */
 export function Купол({ className, delay = 0.9 }: { className?: string; delay?: number }) {
   return (
-    <svg viewBox="0 0 200 150" className={`sketch ${className ?? ""}`} style={{ ["--delay" as string]: `${delay}s` }}>
+    <svg
+      viewBox="0 0 200 150"
+      className={`sketch ${className ?? ""}`}
+      style={{ ["--delay" as string]: `${delay}s` }}
+    >
       <g {...штрих}>
         <path d="M58 70 Q100 -2 142 70" />
         <path d="M70 70 Q100 8 130 70 M84 70 Q100 12 116 70 M100 70 V14" />
@@ -54,7 +62,11 @@ export function Купол({ className, delay = 0.9 }: { className?: string; del
 /** Портал медресе (пештак) Регистана со стрельчатой аркой. */
 export function Портал({ className, delay = 1.3 }: { className?: string; delay?: number }) {
   return (
-    <svg viewBox="0 0 160 150" className={`sketch ${className ?? ""}`} style={{ ["--delay" as string]: `${delay}s` }}>
+    <svg
+      viewBox="0 0 160 150"
+      className={`sketch ${className ?? ""}`}
+      style={{ ["--delay" as string]: `${delay}s` }}
+    >
       <g {...штрих}>
         <path d="M40 140 V30 H120 V140" />
         <path d="M58 140 V80 Q80 42 102 80 V140" />
@@ -71,7 +83,11 @@ export function Портал({ className, delay = 1.3 }: { className?: string; d
 /** Летящие птицы — три галочки. */
 export function Птицы({ className }: { className?: string }) {
   return (
-    <svg viewBox="0 0 60 24" className={`sketch ${className ?? ""}`} style={{ ["--delay" as string]: "1.8s" }}>
+    <svg
+      viewBox="0 0 60 24"
+      className={`sketch ${className ?? ""}`}
+      style={{ ["--delay" as string]: "1.8s" }}
+    >
       <g {...штрих}>
         <path d="M2 10 Q7 4 12 10 Q17 4 22 10" />
         <path d="M30 6 Q34 2 38 6 Q42 2 46 6" />

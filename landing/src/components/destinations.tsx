@@ -24,51 +24,201 @@ interface Город {
 const ГОРОДА: Город[] = [
   {
     id: "samarkand",
-    регион: { ru: "Самаркандская область", en: "Samarkand region" },
-    имя: { ru: "Самарканд", en: "Samarkand" },
+    регион: {
+      en: "Samarkand region",
+      ru: "Самаркандская область",
+      uz: "Samarqand viloyati",
+      zh: "撒马尔罕州",
+      ko: "사마르칸트주",
+      de: "Region Samarkand",
+      fr: "Région de Samarcande",
+      ja: "サマルカンド州",
+      tr: "Semerkant bölgesi",
+      ar: "ولاية سمرقند",
+    },
+    имя: {
+      en: "Samarkand",
+      ru: "Самарканд",
+      uz: "Samarqand",
+      zh: "撒马尔罕",
+      ko: "사마르칸트",
+      de: "Samarkand",
+      fr: "Samarcande",
+      ja: "サマルカンド",
+      tr: "Semerkant",
+      ar: "سمرقند",
+    },
     текст: {
-      ru: "Регистан, Шахи-Зинда и Гур-Эмир — бирюзовые купола, которым больше шести веков.",
       en: "Registan, Shah-i-Zinda and Gur-e-Amir — turquoise domes more than six centuries old.",
+      ru: "Регистан, Шахи-Зинда и Гур-Эмир — бирюзовые купола, которым больше шести веков.",
+      uz: "Registon, Shohi Zinda va Goʻri Amir — olti asrdan oshiq feruza gumbazlar.",
+      zh: "雷吉斯坦、夏伊辛达和古尔-埃米尔——六百多年的绿松石穹顶。",
+      ko: "레기스탄, 샤히진다, 구르에미르 — 600년이 넘은 청록색 돔들.",
+      de: "Registan, Schah-i-Sinda und Gur-Emir — türkise Kuppeln, über sechs Jahrhunderte alt.",
+      fr: "Registan, Shah-i-Zinda et Gour-Emir — des coupoles turquoise vieilles de six siècles.",
+      ja: "レギスタン、シャーヒ・ズィンダ、グーリ・アミール — 600年を超えるターコイズのドーム。",
+      tr: "Registan, Şah-ı Zinde ve Gur-i Emir — altı asırlık turkuaz kubbeler.",
+      ar: "ريجستان وشاه زنده وكور أمير — قباب فيروزية عمرها أكثر من ستة قرون.",
     },
     img: фото("1664602078796-68ee76b3fc59"),
   },
   {
     id: "bukhara",
-    регион: { ru: "Бухарская область", en: "Bukhara region" },
-    имя: { ru: "Бухара", en: "Bukhara" },
+    регион: {
+      en: "Bukhara region",
+      ru: "Бухарская область",
+      uz: "Buxoro viloyati",
+      zh: "布哈拉州",
+      ko: "부하라주",
+      de: "Region Buchara",
+      fr: "Région de Boukhara",
+      ja: "ブハラ州",
+      tr: "Buhara bölgesi",
+      ar: "ولاية بخارى",
+    },
+    имя: {
+      en: "Bukhara",
+      ru: "Бухара",
+      uz: "Buxoro",
+      zh: "布哈拉",
+      ko: "부하라",
+      de: "Buchara",
+      fr: "Boukhara",
+      ja: "ブハラ",
+      tr: "Buhara",
+      ar: "بخارى",
+    },
     текст: {
-      ru: "Арк, минарет Калян и Ляби-Хауз: старый город, где жизнь идёт вокруг пруда под тутовником.",
       en: "The Ark, Kalon minaret and Lyabi-Hauz: an old town whose life revolves around a pond under mulberries.",
+      ru: "Арк, минарет Калян и Ляби-Хауз: старый город, где жизнь идёт вокруг пруда под тутовником.",
+      uz: "Ark, Minorai Kalon va Labi Hovuz: hayot tut ostidagi hovuz atrofida kechadigan eski shahar.",
+      zh: "雅克城堡、卡扬宣礼塔和里亚比豪兹：生活围绕桑树下水池展开的古城。",
+      ko: "아르크, 칼론 미나렛, 랴비하우즈 — 뽕나무 아래 연못을 중심으로 사는 옛 도시.",
+      de: "Die Ark, das Kalon-Minarett und Labi-Hauz: eine Altstadt, deren Leben um einen Teich unter Maulbeerbäumen kreist.",
+      fr: "L'Ark, le minaret Kalon et Lyabi-Khaouz : une vieille ville qui vit autour d'un bassin sous les mûriers.",
+      ja: "アルク城、カラーン・ミナレット、ラビ・ハウズ — 桑の木陰の池を中心に暮らす旧市街。",
+      tr: "Ark, Kalon minaresi ve Labi Havuz: hayatın dut ağaçları altındaki havuz çevresinde geçtiği eski şehir.",
+      ar: "القلعة ومئذنة كالون وليابي حوض: مدينة قديمة تدور حياتها حول بركة تحت أشجار التوت.",
     },
     img: фото("1653023102302-247f5f0fbdd1"),
   },
   {
     id: "khiva",
-    регион: { ru: "Хорезм", en: "Khorezm" },
-    имя: { ru: "Хива", en: "Khiva" },
+    регион: {
+      en: "Khorezm",
+      ru: "Хорезм",
+      uz: "Xorazm",
+      zh: "花拉子模",
+      ko: "호레즘",
+      de: "Choresm",
+      fr: "Khorezm",
+      ja: "ホラズム",
+      tr: "Harezm",
+      ar: "خوارزم",
+    },
+    имя: {
+      en: "Khiva",
+      ru: "Хива",
+      uz: "Xiva",
+      zh: "希瓦",
+      ko: "히바",
+      de: "Chiwa",
+      fr: "Khiva",
+      ja: "ヒヴァ",
+      tr: "Hive",
+      ar: "خيوة",
+    },
     текст: {
-      ru: "Ичан-Кала — город внутри стен, живой музей под открытым небом.",
       en: "Itchan Kala — a city within walls, a living open-air museum.",
+      ru: "Ичан-Кала — город внутри стен, живой музей под открытым небом.",
+      uz: "Ichan qalʼa — devorlar ichidagi shahar, ochiq osmon ostidagi tirik muzey.",
+      zh: "伊钦卡拉——城墙之内的城市，一座活着的露天博物馆。",
+      ko: "이찬칼라 — 성벽 안의 도시, 살아 있는 야외 박물관.",
+      de: "Itchan Kala — eine Stadt in Mauern, ein lebendiges Freilichtmuseum.",
+      fr: "Itchan Kala — une ville entre ses remparts, un musée vivant à ciel ouvert.",
+      ja: "イチャン・カラ — 城壁の中の街、生きた野外博物館。",
+      tr: "İçan Kale — surlar içinde bir şehir, yaşayan bir açık hava müzesi.",
+      ar: "إيتشان قلعة — مدينة داخل الأسوار ومتحف حيّ في الهواء الطلق.",
     },
     img: фото("1654861857666-1e8c438cbe4a"),
   },
   {
     id: "tashkent",
-    регион: { ru: "Столица", en: "The capital" },
-    имя: { ru: "Ташкент", en: "Tashkent" },
+    регион: {
+      en: "The capital",
+      ru: "Столица",
+      uz: "Poytaxt",
+      zh: "首都",
+      ko: "수도",
+      de: "Die Hauptstadt",
+      fr: "La capitale",
+      ja: "首都",
+      tr: "Başkent",
+      ar: "العاصمة",
+    },
+    имя: {
+      en: "Tashkent",
+      ru: "Ташкент",
+      uz: "Toshkent",
+      zh: "塔什干",
+      ko: "타슈켄트",
+      de: "Taschkent",
+      fr: "Tachkent",
+      ja: "タシケント",
+      tr: "Taşkent",
+      ar: "طشقند",
+    },
     текст: {
-      ru: "Базар Чорсу, Хаст-Имам и метро-музей — столица, с которой начинается поездка.",
       en: "Chorsu bazaar, Hast-Imam and the museum-like metro — the capital where most trips begin.",
+      ru: "Базар Чорсу, Хаст-Имам и метро-музей — столица, с которой начинается поездка.",
+      uz: "Chorsu bozori, Hazrati Imom va muzeyga oʻxshash metro — sayohat boshlanadigan poytaxt.",
+      zh: "乔尔苏巴扎、哈斯特伊玛目和博物馆般的地铁——大多数旅程从这座首都开始。",
+      ko: "초르수 시장, 하스트이맘, 박물관 같은 지하철 — 여행이 시작되는 수도.",
+      de: "Chorsu-Basar, Hast-Imam und die Metro wie ein Museum — die Hauptstadt, in der die meisten Reisen beginnen.",
+      fr: "Le bazar Chorsu, Hast-Imam et le métro-musée — la capitale où commence le voyage.",
+      ja: "チョルスー・バザール、ハスト・イマーム、美術館のような地下鉄 — 旅の始まりの首都。",
+      tr: "Çorsu pazarı, Hast İmam ve müze gibi metro — yolculukların başladığı başkent.",
+      ar: "سوق تشورسو وحضرة إمام والمترو الذي يشبه المتحف — العاصمة التي تبدأ منها الرحلات.",
     },
     img: фото("1622030797403-fa221ce5d208"),
   },
   {
     id: "mountains",
-    регион: { ru: "Горы у Ташкента", en: "Mountains near Tashkent" },
-    имя: { ru: "Амирсой", en: "Amirsoy" },
+    регион: {
+      en: "Mountains near Tashkent",
+      ru: "Горы у Ташкента",
+      uz: "Toshkent yaqinidagi togʻlar",
+      zh: "塔什干附近的山",
+      ko: "타슈켄트 근교의 산",
+      de: "Berge bei Taschkent",
+      fr: "Montagnes près de Tachkent",
+      ja: "タシケント近郊の山",
+      tr: "Taşkent yakınındaki dağlar",
+      ar: "جبال قرب طشقند",
+    },
+    имя: {
+      en: "Amirsoy",
+      ru: "Амирсой",
+      uz: "Amirsoy",
+      zh: "阿米尔索伊",
+      ko: "아미르소이",
+      de: "Amirsoy",
+      fr: "Amirsoy",
+      ja: "アミルソイ",
+      tr: "Amirsoy",
+      ar: "أميرسوي",
+    },
     текст: {
-      ru: "Западный Тянь-Шань рядом со столицей: зимой — лыжи, летом — тропы, Чарвак и Чимган.",
       en: "The Western Tien Shan next to the capital: skiing in winter, trails, Charvak and Chimgan in summer.",
+      ru: "Западный Тянь-Шань рядом со столицей: зимой — лыжи, летом — тропы, Чарвак и Чимган.",
+      uz: "Poytaxt yonidagi Gʻarbiy Tyan-Shan: qishda chang'i, yozda soʻqmoqlar, Chorvoq va Chimyon.",
+      zh: "首都旁的西天山：冬季滑雪，夏季徒步，还有恰尔瓦克湖和奇姆甘山。",
+      ko: "수도 옆 서톈산 — 겨울엔 스키, 여름엔 트레킹과 차르박, 침간.",
+      de: "Der Westliche Tian Shan neben der Hauptstadt: im Winter Ski, im Sommer Pfade, Tscharwak und Tschimgan.",
+      fr: "Le Tian Shan occidental aux portes de la capitale : ski l'hiver, sentiers, Tcharvak et Tchimgan l'été.",
+      ja: "首都のそばの西天山 — 冬はスキー、夏はトレイル、チャルヴァクとチムガン。",
+      tr: "Başkentin yanında Batı Tanrı Dağları: kışın kayak, yazın patikalar, Çarvak ve Çimgan.",
+      ar: "تيان شان الغربية بجوار العاصمة: تزلج في الشتاء، ومسارات وشارفاك وتشيمغان في الصيف.",
     },
     img: фото("1712780943624-b5d3f7a72792"),
     позиция: "center 80%",
@@ -105,7 +255,12 @@ export default function Destinations() {
           aria-hidden={n !== i}
         >
           {n === i && (
-            <img src={г.img} alt="" className="kenburns h-full w-full object-cover" style={{ objectPosition: г.позиция }} />
+            <img
+              src={г.img}
+              alt=""
+              className="kenburns h-full w-full object-cover"
+              style={{ objectPosition: г.позиция }}
+            />
           )}
         </div>
       ))}
@@ -126,7 +281,10 @@ export default function Destinations() {
             <h2 className="line-mask condensed text-[clamp(3.8rem,11vw,9.5rem)] font-bold leading-[0.88]">
               <span style={{ ["--delay" as string]: "0.05s" }}>{город.имя[язык]}</span>
             </h2>
-            <p className="fade-up mt-5 max-w-md text-[15px] leading-relaxed text-white/85" style={{ ["--delay" as string]: "0.25s" }}>
+            <p
+              className="fade-up mt-5 max-w-md text-[15px] leading-relaxed text-white/85"
+              style={{ ["--delay" as string]: "0.25s" }}
+            >
               {город.текст[язык]}
             </p>
             <a
@@ -148,10 +306,19 @@ export default function Destinations() {
                   onClick={() => setI(ГОРОДА.indexOf(г))}
                   className="group relative h-56 w-40 flex-shrink-0 overflow-hidden rounded-2xl text-left shadow-2xl transition-transform duration-500 hover:-translate-y-2 sm:h-64 sm:w-44"
                 >
-                  <img src={г.img.replace("w=1920", "w=500")} alt="" className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                  <span className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.75), transparent 60%)" }} />
+                  <img
+                    src={г.img.replace("w=1920", "w=500")}
+                    alt=""
+                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  />
+                  <span
+                    className="absolute inset-0"
+                    style={{ background: "linear-gradient(to top, rgba(0,0,0,0.75), transparent 60%)" }}
+                  />
                   <span className="absolute bottom-3 left-3 right-3">
-                    <span className="block text-[10px] uppercase tracking-[0.18em] text-white/70">{г.регион[язык]}</span>
+                    <span className="block text-[10px] uppercase tracking-[0.18em] text-white/70">
+                      {г.регион[язык]}
+                    </span>
                     <span className="condensed block text-xl font-bold text-white">{г.имя[язык]}</span>
                   </span>
                 </button>
@@ -183,7 +350,9 @@ export default function Destinations() {
                   }
                 />
               </div>
-              <span className="condensed text-5xl font-bold tabular-nums">{String(i + 1).padStart(2, "0")}</span>
+              <span className="condensed text-5xl font-bold tabular-nums">
+                {String(i + 1).padStart(2, "0")}
+              </span>
             </div>
           </div>
         </div>

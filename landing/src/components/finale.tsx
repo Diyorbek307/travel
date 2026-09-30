@@ -17,7 +17,10 @@ export default function Finale() {
         alt=""
         className="absolute inset-0 h-full w-full object-cover opacity-30"
       />
-      <div className="absolute inset-0" style={{ background: "linear-gradient(180deg,#0d3b37 0%,rgba(13,59,55,0.65) 45%,#0a2b28 100%)" }} />
+      <div
+        className="absolute inset-0"
+        style={{ background: "linear-gradient(180deg,#0d3b37 0%,rgba(13,59,55,0.65) 45%,#0a2b28 100%)" }}
+      />
 
       <div className="relative mx-auto max-w-7xl px-5 pb-10 pt-24 sm:px-8">
         <div className="grid items-center gap-12 lg:grid-cols-[auto_1fr_auto]">
@@ -41,7 +44,9 @@ export default function Finale() {
 
           <div className="text-center">
             <p className="text-sm uppercase tracking-[0.5em] text-white/70">HelloUZ</p>
-            <h2 className="serif my-4 text-[clamp(2.4rem,6vw,5rem)] font-semibold leading-none">{t("fin_title")}</h2>
+            <h2 className="serif my-4 text-[clamp(2.4rem,6vw,5rem)] font-semibold leading-none">
+              {t("fin_title")}
+            </h2>
             <a
               href={APP_URL}
               target="_blank"

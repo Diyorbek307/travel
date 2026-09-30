@@ -1,5 +1,16 @@
 /** Бегущая строка приветствий на 10 языках приложения, между двумя полосами «изразца». */
-const ПРИВЕТЫ = ["Salom", "Hello", "Привет", "你好", "안녕하세요", "Hallo", "Bonjour", "こんにちは", "Merhaba", "مرحبا"];
+const ПРИВЕТЫ = [
+  "Salom",
+  "Hello",
+  "Привет",
+  "你好",
+  "안녕하세요",
+  "Hallo",
+  "Bonjour",
+  "こんにちは",
+  "Merhaba",
+  "مرحبا",
+];
 
 function Изразец() {
   // Узор-«ёлочка» — отсылка к майолике Хивы, без картинок.
@@ -24,7 +35,10 @@ export default function Marquee() {
       <div className="overflow-hidden py-6">
         <div className="marquee">
           {[...ряд, ...ряд].map((с, i) => (
-            <span key={i} className="serif flex items-center gap-8 px-8 text-4xl font-semibold italic sm:text-5xl">
+            <span
+              key={i}
+              className="serif flex items-center gap-8 px-8 text-4xl font-semibold italic sm:text-5xl"
+            >
               {с}
               <span className="text-2xl not-italic" style={{ color: "var(--tile-light)" }}>
                 ✦

@@ -29,6 +29,8 @@ export default function SmoothScroll() {
       smoothWheel: true,
       // На тач-устройствах инерция уже есть своя — вторую не навешиваем.
       syncTouch: false,
+      // Ссылки меню (#cities…) — тоже плавно, с поправкой на шапку.
+      anchors: { offset: -70 },
     });
 
     lenis.on("scroll", ScrollTrigger.update);

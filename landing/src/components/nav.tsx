@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Logo from "./logo";
-import { APP_URL, useЯзык } from "@/lib/i18n";
+import { APP_URL, useЯзык, ЯЗЫКИ } from "@/lib/i18n";
 
 /** Шапка: прозрачная над первым экраном, стеклянная — когда прокрутили. */
 export default function Nav() {
@@ -24,7 +24,9 @@ export default function Nav() {
 
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${прокручено ? "glass-light py-2.5 shadow-[0_8px_30px_-20px_rgba(34,26,19,0.5)]" : "py-5"}`}
+      className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
+        прокручено ? "glass-light py-2.5 shadow-[0_8px_30px_-20px_rgba(34,26,19,0.5)]" : "py-5"
+      }`}
     >
       <div className="mx-auto flex max-w-7xl items-center gap-6 px-5 sm:px-8">
         <a href="#top" className="flex items-center gap-2.5">
@@ -45,18 +47,23 @@ export default function Nav() {
           ))}
         </nav>
         <div className="ml-auto flex items-center gap-2 md:ml-0">
-          <div className="flex rounded-full p-0.5 text-xs font-bold" style={{ background: "var(--sand)" }}>
-            {(["ru", "en"] as const).map((я) => (
-              <button
-                key={я}
-                onClick={() => setЯзык(я)}
-                className="rounded-full px-2.5 py-1 uppercase transition-colors"
-                style={язык === я ? { background: "var(--ink)", color: "var(--paper)" } : { color: "var(--ink-soft)" }}
-              >
-                {я}
-              </button>
-            ))}
-          </div>
+          {/* Все 10 языков приложения; по умолчанию — язык устройства. */}
+          <label className="relative flex items-center">
+            <span className="sr-only">Language</span>
+            <select
+              value={язык}
+              onChange={(e) => setЯзык(e.target.value as typeof язык)}
+              className="appearance-none rounded-full py-2 pl-3 pr-8 text-xs font-bold outline-none"
+              style={{ background: "var(--sand)", color: "var(--ink)" }}
+            >
+              {ЯЗЫКИ.map((я) => (
+                <option key={я.код} value={я.код}>
+                  {я.флаг} {я.имя}
+                </option>
+              ))}
+            </select>
+            <span className="pointer-events-none absolute right-3 text-[10px]">▾</span>
+          </label>
           <a
             href={APP_URL}
             target="_blank"

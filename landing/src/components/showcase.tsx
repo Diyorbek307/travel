@@ -10,7 +10,8 @@ import Reveal from "./reveal";
  * лежат в public/app), по бокам — стеклянные панели, как в интерфейсе.
  */
 
-const фото = (id: string, w = 400) => `https://images.unsplash.com/photo-${id}?w=${w}&q=75&auto=format&fit=crop`;
+const фото = (id: string, w = 400) =>
+  `https://images.unsplash.com/photo-${id}?w=${w}&q=75&auto=format&fit=crop`;
 
 const МЕСТА = [
   { имя: "Registan", где: "Samarkand", img: фото("1664602078796-68ee76b3fc59") },
@@ -38,16 +39,24 @@ export default function Showcase() {
       />
       <div
         className="absolute inset-0"
-        style={{ background: "linear-gradient(180deg, rgba(42,26,18,0.55), rgba(42,26,18,0.35) 40%, rgba(20,12,8,0.85))" }}
+        style={{
+          background:
+            "linear-gradient(180deg, rgba(42,26,18,0.55), rgba(42,26,18,0.35) 40%, rgba(20,12,8,0.85))",
+        }}
       />
 
       <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
         <Reveal>
           <div className="mx-auto mb-14 max-w-2xl text-center text-white">
-            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.25em]" style={{ color: "var(--gold)" }}>
+            <p
+              className="mb-4 text-xs font-semibold uppercase tracking-[0.25em]"
+              style={{ color: "var(--gold)" }}
+            >
               {t("demo_kicker")}
             </p>
-            <h2 className="serif mb-5 text-[clamp(2rem,4vw,3.3rem)] font-semibold leading-[1.05]">{t("demo_title")}</h2>
+            <h2 className="serif mb-5 text-[clamp(2rem,4vw,3.3rem)] font-semibold leading-[1.05]">
+              {t("demo_title")}
+            </h2>
             <p className="text-[15px] leading-relaxed text-white/75">{t("demo_text")}</p>
           </div>
         </Reveal>
@@ -57,14 +66,21 @@ export default function Showcase() {
             {/* Левая панель — город */}
             <div className="hidden overflow-hidden rounded-[26px] lg:block">
               <div className="relative h-[520px]">
-                <img src={фото("1728029062560-4b0e2b958885", 800)} alt="" className="absolute inset-0 h-full w-full object-cover" />
-                <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(20,12,8,0.85), transparent 50%)" }} />
+                <img
+                  src={фото("1728029062560-4b0e2b958885", 800)}
+                  alt=""
+                  className="absolute inset-0 h-full w-full object-cover"
+                />
+                <div
+                  className="absolute inset-0"
+                  style={{ background: "linear-gradient(to top, rgba(20,12,8,0.85), transparent 50%)" }}
+                />
                 <div className="absolute left-6 top-6 text-white">
                   <p className="serif text-5xl font-semibold">Samarkand</p>
                   <p className="mt-1 text-lg">Uzbekistan 🇺🇿</p>
                 </div>
                 <div className="glass absolute bottom-5 left-5 right-5 rounded-2xl p-4 text-white">
-                  <p className="text-sm font-semibold">✨ {язык === "ru" ? "ИИ-гид" : "AI guide"}</p>
+                  <p className="text-sm font-semibold">✨ {t("card1_t")}</p>
                   <p className="mt-1 text-[13px] leading-snug text-white/85">{t("demo_chat")}</p>
                 </div>
               </div>
@@ -79,10 +95,13 @@ export default function Showcase() {
                 {Array.from({ length: СНИМКОВ }, (_, n) => (
                   <img
                     key={n}
-                    src={`/app/${язык}-${n + 1}.jpg`}
+                    src={`/app/${язык === "ru" ? "ru" : "en"}-${n + 1}.jpg`}
                     alt={`HelloUZ screen ${n + 1}`}
                     className="absolute inset-0 h-full w-full object-cover object-top transition-all duration-700"
-                    style={{ opacity: n === кадр ? 1 : 0, transform: n === кадр ? "scale(1)" : "scale(1.04)" }}
+                    style={{
+                      opacity: n === кадр ? 1 : 0,
+                      transform: n === кадр ? "scale(1)" : "scale(1.04)",
+                    }}
                   />
                 ))}
                 <span className="absolute left-1/2 top-2 h-6 w-24 -translate-x-1/2 rounded-full bg-black" />
@@ -94,7 +113,10 @@ export default function Showcase() {
                     aria-label={`${n + 1}`}
                     onClick={() => setКадр(n)}
                     className="h-2 rounded-full transition-all"
-                    style={{ width: n === кадр ? 26 : 8, background: n === кадр ? "var(--gold)" : "rgba(255,255,255,0.4)" }}
+                    style={{
+                      width: n === кадр ? 26 : 8,
+                      background: n === кадр ? "var(--gold)" : "rgba(255,255,255,0.4)",
+                    }}
                   />
                 ))}
               </div>
@@ -105,7 +127,10 @@ export default function Showcase() {
               <p className="mb-4 text-lg font-semibold">{t("demo_must")}</p>
               <div className="space-y-3">
                 {МЕСТА.map((м) => (
-                  <div key={м.имя} className="glass flex items-center gap-4 rounded-2xl p-2.5 transition-transform hover:translate-x-1">
+                  <div
+                    key={м.имя}
+                    className="glass flex items-center gap-4 rounded-2xl p-2.5 transition-transform hover:translate-x-1"
+                  >
                     <img src={м.img} alt="" className="h-16 w-20 rounded-xl object-cover" />
                     <div className="min-w-0 flex-1">
                       <p className="truncate font-semibold">{м.имя}</p>

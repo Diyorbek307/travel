@@ -3,6 +3,7 @@ import { Caveat, Oswald, Playfair_Display, Rubik } from "next/font/google";
 import "./globals.css";
 import SmoothScroll from "@/components/smooth-scroll";
 import { ЯзыкProvider } from "@/lib/i18n";
+import { Заставка, Курсор } from "@/components/effects";
 
 // Rubik — как в приложении и на логотипе; антиква — для заголовков,
 // рукописный — для подписей к наброскам, узкий — для названий городов.
@@ -30,10 +31,26 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ru" className={`${rubik.variable} ${playfair.variable} ${caveat.variable} ${oswald.variable}`}>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${rubik.variable} ${playfair.variable} ${caveat.variable} ${oswald.variable}`}
+    >
+      <head>
+        {/* Первый вход за сессию — заставка; до её конца анимации первого экрана ждут. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{if(!sessionStorage.getItem("hz.seen"))document.documentElement.classList.add("intro-wait")}catch(e){}`,
+          }}
+        />
+      </head>
       <body>
         <SmoothScroll />
-        <ЯзыкProvider>{children}</ЯзыкProvider>
+        <Курсор />
+        <ЯзыкProvider>
+          <Заставка />
+          {children}
+        </ЯзыкProvider>
       </body>
     </html>
   );

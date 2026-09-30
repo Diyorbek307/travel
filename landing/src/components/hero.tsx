@@ -4,6 +4,7 @@ import { useRef } from "react";
 import Logo from "./logo";
 import { APP_URL, useЯзык } from "@/lib/i18n";
 import { Гранат, Купол, Минарет, Портал, Птицы } from "./sketches";
+import { Магнит, Счёт } from "./effects";
 
 export interface Цифры {
   cities: number;
@@ -50,7 +51,10 @@ export default function Hero({ цифры }: { цифры: Цифры }) {
   return (
     <section id="top" className="paper-grain relative overflow-hidden pt-28 sm:pt-32">
       {/* Наброски по краям — как на полях путевого блокнота */}
-      <div className="pointer-events-none absolute inset-0 hidden lg:block" style={{ color: "rgba(34,26,19,0.55)" }}>
+      <div
+        className="pointer-events-none absolute inset-0 hidden lg:block"
+        style={{ color: "rgba(34,26,19,0.55)" }}
+      >
         <Птицы className="absolute left-[30%] top-[16%] w-16" />
         <Гранат className="absolute bottom-[14%] left-[3%] w-14" />
       </div>
@@ -82,17 +86,22 @@ export default function Hero({ цифры }: { цифры: Цифры }) {
           >
             {t("hero_sub")}
           </p>
-          <div className="fade-up mb-12 flex flex-wrap items-center gap-4" style={{ ["--delay" as string]: "0.62s" }}>
-            <a
-              href={APP_URL}
-              target="_blank"
-              rel="noreferrer"
-              className="group inline-flex items-center gap-3 rounded-full px-7 py-4 text-[15px] font-semibold text-white shadow-[0_14px_30px_-12px_rgba(154,59,34,0.7)] transition-transform hover:scale-[1.03]"
-              style={{ background: "var(--brick)" }}
-            >
-              {t("hero_cta")}
-              <span className="transition-transform group-hover:translate-x-1">→</span>
-            </a>
+          <div
+            className="fade-up mb-12 flex flex-wrap items-center gap-4"
+            style={{ ["--delay" as string]: "0.62s" }}
+          >
+            <Магнит>
+              <a
+                href={APP_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="group inline-flex items-center gap-3 rounded-full px-7 py-4 text-[15px] font-semibold text-white shadow-[0_14px_30px_-12px_rgba(154,59,34,0.7)] transition-transform hover:scale-[1.03]"
+                style={{ background: "var(--brick)" }}
+              >
+                {t("hero_cta")}
+                <span className="transition-transform group-hover:translate-x-1 rtl:rotate-180">→</span>
+              </a>
+            </Магнит>
             <a href="#demo" className="group inline-flex items-center gap-3 text-[15px] font-semibold">
               <span
                 className="flex h-12 w-12 items-center justify-center rounded-full border transition-colors group-hover:bg-[var(--ink)] group-hover:text-[var(--paper)]"
@@ -103,7 +112,10 @@ export default function Hero({ цифры }: { цифры: Цифры }) {
               {t("hero_watch")}
             </a>
           </div>
-          <div className="fade-up grid grid-cols-2 gap-3 sm:grid-cols-4" style={{ ["--delay" as string]: "0.75s" }}>
+          <div
+            className="fade-up grid grid-cols-2 gap-3 sm:grid-cols-4"
+            style={{ ["--delay" as string]: "0.75s" }}
+          >
             {доверие.map(([знак, заголовок, под]) => (
               <div
                 key={заголовок}
@@ -130,19 +142,28 @@ export default function Hero({ цифры }: { цифры: Цифры }) {
           className="relative mx-auto mb-10 aspect-[5/4] w-full max-w-[700px] lg:mb-0"
           style={{ perspective: "1400px" }}
         >
-          <div className="pointer-events-none absolute -left-10 -top-12 z-0 w-24" style={{ color: "rgba(34,26,19,0.6)" }}>
+          <div
+            className="pointer-events-none absolute -left-10 -top-12 z-0 w-24"
+            style={{ color: "rgba(34,26,19,0.6)" }}
+          >
             <Минарет className="w-full" />
             <p className="hand -mt-2 text-center text-xl" style={{ color: "var(--ink-soft)" }}>
               Kalon
             </p>
           </div>
-          <div className="pointer-events-none absolute -right-4 -top-24 z-0 w-40" style={{ color: "rgba(34,26,19,0.6)" }}>
+          <div
+            className="pointer-events-none absolute -right-4 -top-24 z-0 w-40"
+            style={{ color: "rgba(34,26,19,0.6)" }}
+          >
             <Купол className="w-full" />
             <p className="hand -mt-1 text-center text-xl" style={{ color: "var(--ink-soft)" }}>
               Gur-e-Amir
             </p>
           </div>
-          <div className="pointer-events-none absolute -bottom-12 -right-10 z-0 w-36" style={{ color: "rgba(34,26,19,0.55)" }}>
+          <div
+            className="pointer-events-none absolute -bottom-12 -right-10 z-0 w-36"
+            style={{ color: "rgba(34,26,19,0.55)" }}
+          >
             <Портал className="w-full" />
             <p className="hand -mt-1 text-center text-xl" style={{ color: "var(--ink-soft)" }}>
               Registan
@@ -159,13 +180,22 @@ export default function Hero({ цифры }: { цифры: Цифры }) {
               style={{ background: "linear-gradient(135deg,#fffaf2,#f1e4cf)" }}
             >
               {/* Корешок билета */}
-              <div className="relative flex w-[38%] flex-col justify-between border-r-2 border-dashed p-3 sm:w-[34%] sm:p-5" style={{ borderColor: "rgba(34,26,19,0.2)" }}>
+              <div
+                className="relative flex w-[38%] flex-col justify-between border-r-2 border-dashed p-3 sm:w-[34%] sm:p-5"
+                style={{ borderColor: "rgba(34,26,19,0.2)" }}
+              >
                 <div>
                   <Logo size={34} />
-                  <p className="serif mt-2 text-sm font-bold leading-tight sm:mt-3 sm:text-xl" style={{ color: "var(--brick)" }}>
+                  <p
+                    className="serif mt-2 text-sm font-bold leading-tight sm:mt-3 sm:text-xl"
+                    style={{ color: "var(--brick)" }}
+                  >
                     {t("pass_title")}
                   </p>
-                  <p className="mt-1 hidden text-[10px] leading-snug sm:block" style={{ color: "var(--ink-soft)" }}>
+                  <p
+                    className="mt-1 hidden text-[10px] leading-snug sm:block"
+                    style={{ color: "var(--ink-soft)" }}
+                  >
                     {t("pass_sub")}
                   </p>
                 </div>
@@ -182,20 +212,36 @@ export default function Hero({ цифры }: { цифры: Цифры }) {
                       />
                     ))}
                   </div>
-                  <p className="mt-1 font-mono text-[9px] tracking-widest" style={{ color: "var(--ink-soft)" }}>
+                  <p
+                    className="mt-1 font-mono text-[9px] tracking-widest"
+                    style={{ color: "var(--ink-soft)" }}
+                  >
                     HZ 2026 · UZB · 10 LANG
                   </p>
                 </div>
                 {/* Вырезы, как у настоящего билета */}
-                <span className="absolute -right-3 -top-3 h-6 w-6 rounded-full" style={{ background: "var(--paper)" }} />
-                <span className="absolute -bottom-3 -right-3 h-6 w-6 rounded-full" style={{ background: "var(--paper)" }} />
+                <span
+                  className="absolute -right-3 -top-3 h-6 w-6 rounded-full"
+                  style={{ background: "var(--paper)" }}
+                />
+                <span
+                  className="absolute -bottom-3 -right-3 h-6 w-6 rounded-full"
+                  style={{ background: "var(--paper)" }}
+                />
               </div>
               {/* Окно с Регистаном */}
               <div className="relative flex-1 overflow-hidden">
-                <div ref={фото} className="absolute inset-[-6%] transition-transform duration-300 ease-out" style={{ transform: "scale(1.1)" }}>
+                <div
+                  ref={фото}
+                  className="absolute inset-[-6%] transition-transform duration-300 ease-out"
+                  style={{ transform: "scale(1.1)" }}
+                >
                   <img src={РЕГИСТАН} alt="Registan, Samarkand" className="h-full w-full object-cover" />
                 </div>
-                <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(20,12,6,0.55), transparent 55%)" }} />
+                <div
+                  className="absolute inset-0"
+                  style={{ background: "linear-gradient(to top, rgba(20,12,6,0.55), transparent 55%)" }}
+                />
                 <p className="serif absolute bottom-4 left-5 text-2xl font-semibold text-white">Samarkand</p>
               </div>
             </div>
@@ -237,9 +283,12 @@ export default function Hero({ цифры }: { цифры: Цифры }) {
           ].map(([число, подпись]) => (
             <div key={String(подпись)} className="text-center">
               <p className="serif text-4xl font-semibold tabular-nums" style={{ color: "var(--tile)" }}>
-                {число}
+                <Счёт до={Number(число)} />
               </p>
-              <p className="text-xs font-medium uppercase tracking-[0.14em]" style={{ color: "var(--ink-soft)" }}>
+              <p
+                className="text-xs font-medium uppercase tracking-[0.14em]"
+                style={{ color: "var(--ink-soft)" }}
+              >
                 {подпись}
               </p>
             </div>
