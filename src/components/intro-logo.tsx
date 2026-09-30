@@ -14,12 +14,20 @@ import { маска, посадкаНаШапку } from "./intro-cinematic";
  *
  * Пропуска касанием нет: три секунды не успевают надоесть, а так знак
  * всегда долетает до шапки.
+ *
+ * Финал тот же, что у полной заставки: белый знак с неоновым свечением.
+ * Он есть в любом варианте — и при «уменьшить движение», где вместо
+ * анимации сразу стоит светящийся знак (задержки анимаций там не
+ * сокращаются, и раньше знак просто не успевал появиться).
  */
 
 /** Реперы времени, мс. */
 const ЗАЛИВКА = 700; // контур уже почти прорисован — знак наливается цветом
-const БЛИК = 1450;
-const ПОСАДКА = 2300; // знак летит в шапку и по дороге белеет, как логотип там
+const БЕЛЫЙ = 1250; // знак белеет и загорается неоном, как в полной заставке
+const БЛИК = 1700;
+const ПОСАДКА = 2600; // светящийся знак летит в шапку
+/** При «уменьшить движение» — столько стоит неподвижный светящийся знак. */
+const ТИХО_ДЕРЖАТЬ = 1200;
 /** Сколько ещё ждать шапку, если главная не успела отрисоваться. */
 const ЖДАТЬ_ШАПКУ = 1500;
 const УХОД = 700;
@@ -29,9 +37,12 @@ export default function IntroLogo({ onDone }: { onDone: () => void }) {
   const [уходит, setУходит] = useState(false);
   const [посадка, setПосадка] = useState<{ origin: string; transform: string } | null>(null);
   const [S, setS] = useState(160);
+  const [тихо, setТихо] = useState(false);
   const белыйRef = useRef<SVGSVGElement | null>(null);
   const старт = useRef(0);
   const завершено = useRef(false);
+  const тихоRef = useRef(false);
+  тихоRef.current = тихо;
 
   const финиш = useRef(() => {});
   финиш.current = () => {
@@ -41,7 +52,7 @@ export default function IntroLogo({ onDone }: { onDone: () => void }) {
     // движение» заставка короче — тогда просто растворяемся. Смотрим на
     // часы, а не на ход анимации: её браузер может начать чуть позже
     // таймера.
-    const проявился = performance.now() - старт.current >= БЛИК;
+    const проявился = тихоRef.current || performance.now() - старт.current >= БЛИК;
     const путь = проявился && белыйRef.current ? посадкаНаШапку(белыйRef.current) : null;
     if (путь) setПосадка(путь);
     setУходит(true);
@@ -55,7 +66,8 @@ export default function IntroLogo({ onDone }: { onDone: () => void }) {
 
     const мало = typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (мало) {
-      const t = window.setTimeout(() => финиш.current(), 600);
+      setТихо(true);
+      const t = window.setTimeout(() => финиш.current(), ТИХО_ДЕРЖАТЬ);
       return () => {
         window.clearTimeout(t);
         document.documentElement.classList.remove("intro-landing");
@@ -124,6 +136,28 @@ export default function IntroLogo({ onDone }: { onDone: () => void }) {
             />
           </div>
 
+          {/* Белое неоновое свечение — как у полной заставки; ложится поверх
+              бирюзового, и знак горит белым, а не голубым. */}
+          <div
+            className="absolute"
+            style={{
+              inset: -S * 0.3,
+              opacity: уходит ? 0 : тихо ? 1 : undefined,
+              transition: `opacity ${плавно}`,
+              animation: тихо ? "none" : `intro-white .7s ease ${сек(БЕЛЫЙ)} both`,
+            }}
+          >
+            <div
+              className="h-full w-full rounded-full"
+              style={{
+                background: "radial-gradient(circle, #ffffffd9 0%, #ffffff66 34%, transparent 66%)",
+                filter: "blur(28px)",
+                animation: тихо ? "none" : `intro-neon 2.4s ease-in-out ${сек(БЕЛЫЙ)} infinite`,
+                willChange: "transform, opacity",
+              }}
+            />
+          </div>
+
           {/* Знак в фирменных цветах — наливается после контура. */}
           <svg
             viewBox="0 0 100 100"
@@ -131,7 +165,10 @@ export default function IntroLogo({ onDone }: { onDone: () => void }) {
             style={{
               overflow: "visible",
               opacity: 0,
-              animation: `intro-fill .8s ease ${сек(ЗАЛИВКА)} both`,
+              // Цветной знак гаснет, когда загорается белый: его бирюзовая
+              // тень иначе подкрашивала белое неоновое свечение.
+              display: тихо ? "none" : undefined,
+              animation: `intro-fill .8s ease ${сек(ЗАЛИВКА)} both, intro-unfill .5s ease ${сек(БЕЛЫЙ + 300)} forwards`,
               filter: "drop-shadow(0 0 10px #2FD0C699)",
             }}
           >
@@ -149,15 +186,15 @@ export default function IntroLogo({ onDone }: { onDone: () => void }) {
             <path d={LOGO_SWOOSH} fill={`url(#${id}s)`} />
           </svg>
 
-          {/* Белый знак — таким он и сядет в шапку: проявляется в полёте. */}
+          {/* Белый светящийся знак — таким он и сядет в шапку. */}
           <svg
             ref={белыйRef}
             viewBox="0 0 100 100"
             className="absolute inset-0 h-full w-full"
             style={{
               overflow: "visible",
-              opacity: уходит && посадка ? 1 : 0,
-              transition: `opacity ${УХОД * 0.6}ms ease`,
+              opacity: тихо ? 1 : 0,
+              animation: тихо ? "none" : `intro-white .6s ease ${сек(БЕЛЫЙ)} both`,
             }}
           >
             <path
@@ -202,7 +239,10 @@ export default function IntroLogo({ onDone }: { onDone: () => void }) {
                 strokeDasharray: 1,
                 strokeDashoffset: 1,
                 filter: "drop-shadow(0 0 5px #2FD0C6cc)",
-                animation: "intro-draw 1s ease .15s forwards",
+                // Бирюзовый контур гаснет вместе с цветным знаком — дальше
+                // горит только белый неон.
+                display: тихо ? "none" : undefined,
+                animation: `intro-draw 1s ease .15s forwards, intro-unfill .5s ease ${сек(БЕЛЫЙ + 300)} forwards`,
               }}
             />
           </svg>

@@ -159,7 +159,7 @@ export function CardDeckBase({
           <button
             key={i}
             onClick={() => onSelect(i)}
-            className="relative shrink-0 overflow-hidden rounded-3xl text-left transition-all active:scale-95"
+            className="lazy-card relative shrink-0 overflow-hidden rounded-3xl text-left transition-all active:scale-95"
             style={{
               width: CARD_W,
               height: CARD_H,

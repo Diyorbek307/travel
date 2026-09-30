@@ -577,7 +577,7 @@ function ЛентаКрасивых({
           <button
             key={p.id}
             onClick={() => onPlace(p)}
-            className="relative h-56 w-44 flex-shrink-0 overflow-hidden rounded-2xl text-left shadow-sm transition-transform duration-150 active:scale-[0.98]"
+            className="lazy-card relative h-56 w-44 flex-shrink-0 overflow-hidden rounded-2xl text-left shadow-sm transition-transform duration-150 active:scale-[0.98]"
           >
             <img src={p.img} alt={p.name} loading="lazy" className="skel h-full w-full object-cover" />
             <span

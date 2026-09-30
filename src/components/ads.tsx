@@ -158,16 +158,23 @@ export function AdSpotlight({ isPremium, cities }: { isPremium: boolean; cities?
       {/* Рамка — отдельный слой под карточкой: так перелив идёт по краю,
           а содержимое остаётся неподвижным. */}
       <div
-        className="rounded-3xl p-[2px]"
+        className="relative overflow-hidden rounded-3xl p-[2px]"
         style={{
-          background: "linear-gradient(120deg,var(--accent-2),var(--accent),var(--accent-2))",
-          backgroundSize: "200% 100%",
-          animation: "ad-edge 6s linear infinite",
           // Мягкое свечение наружу: блок должен быть заметен боковым
           // зрением — на нём держится заработок приложения.
           boxShadow: "0 10px 30px var(--accent-2-soft), 0 2px 10px var(--accent-soft)",
         }}
       >
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-y-0 left-0 w-[200%]"
+          style={{
+            background:
+              "linear-gradient(90deg,var(--accent-2),var(--accent),var(--accent-2),var(--accent),var(--accent-2))",
+            animation: "ad-edge 6s linear infinite",
+            willChange: "transform",
+          }}
+        />
         <button
           onClick={() => перейти(ad)}
           className="relative w-full overflow-hidden rounded-[22px] text-left transition-all active:scale-[0.985]"

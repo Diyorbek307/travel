@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { ACCENT_FILL, BORDER, CREAM, GOLD, MUTED, SURFACE, TEXT, WHITE } from "@/lib/theme";
+import { ACCENT_FILL, BORDER, CREAM, MUTED, SURFACE, TEXT, WHITE } from "@/lib/theme";
 import { useT } from "@/components/lang-provider";
 import type { TKey } from "@/lib/i18n";
 import type { ПереводФото } from "@/lib/photo-translate";
@@ -162,7 +162,7 @@ export function ПереводчикФото({ режим = "translate" }: { р�
               className="absolute inset-0 flex flex-col items-center justify-center gap-2"
               style={{ background: "rgba(3,10,9,0.55)" }}
             >
-              <span className="photo-scan absolute inset-x-0 h-1" style={{ background: GOLD }} />
+              <span className="photo-scan" aria-hidden />
               <p className="text-sm font-bold text-white">{t(гид ? "ph_looking" : "ph_reading")}</p>
             </div>
           )}

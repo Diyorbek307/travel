@@ -331,9 +331,11 @@ body {
   }
 }
 
+/* Линия пути проявляется и гаснет. Раньше она ещё и «рисовалась»
+   (stroke-dashoffset), но это перерисовка SVG каждый кадр. */
 @keyframes silk-road {
-  0% {
-    stroke-dashoffset: 800;
+  0%,
+  100% {
     opacity: 0;
   }
   20% {
@@ -341,10 +343,6 @@ body {
   }
   80% {
     opacity: 0.4;
-  }
-  100% {
-    stroke-dashoffset: 0;
-    opacity: 0;
   }
 }
 
@@ -378,13 +376,15 @@ body {
   }
 }
 
+/* Свечение пульсирует прозрачностью готовой тени на отдельном слое:
+   анимация самой box-shadow перерисовывала карточку каждый кадр. */
 @keyframes glow-pulse {
   0%,
   100% {
-    box-shadow: 0 0 20px rgb(233 196 106 / 0.3);
+    opacity: 0.35;
   }
   50% {
-    box-shadow: 0 0 40px rgb(233 196 106 / 0.6), 0 0 60px rgb(15 179 172 / 0.3);
+    opacity: 1;
   }
 }
 
@@ -449,7 +449,18 @@ body {
   animation: card-float 4s ease-in-out infinite;
 }
 .glow-pulse {
+  position: relative;
+  box-shadow: 0 0 20px rgb(233 196 106 / 0.3);
+}
+.glow-pulse::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0 0 40px rgb(233 196 106 / 0.6), 0 0 60px rgb(15 179 172 / 0.3);
+  pointer-events: none;
   animation: glow-pulse 3s ease-in-out infinite;
+  will-change: opacity;
 }
 .star-twinkle {
   animation: star-twinkle 2.5s ease-in-out infinite;
@@ -468,7 +479,6 @@ body {
 }
 
 .silk-road-path {
-  stroke-dasharray: 800;
   animation: silk-road 6s ease-in-out infinite;
 }
 
@@ -607,12 +617,16 @@ button[aria-disabled="true"] {
 }
 
 /* Пока фото грузится — мягкий перелив вместо пустого прямоугольника.
-   Загрузилось — перелив выключается (класс .loaded ставит page.tsx),
-   иначе он бы крутился под каждой картинкой впустую. */
+   Загрузилось — перелив выключается (класс .loaded ставит page.tsx).
+   Перелив — это перерисовка каждый кадр, и бесконечным он быть не
+   может: фото с loading="lazy" за краем ленты («Красивые места») не
+   грузятся, пока до них не долистали, и шесть таких переливов съедали
+   половину кадров на главной в покое. Три прохода (~4 с) — потом
+   спокойный фон. */
 .skel:not(.loaded) {
   background: linear-gradient(100deg, var(--border) 20%, var(--surface) 50%, var(--border) 80%);
   background-size: 200% 100%;
-  animation: skel 1.3s ease-in-out infinite;
+  animation: skel 1.3s ease-in-out 3;
 }
 @keyframes skel {
   from {
@@ -621,6 +635,16 @@ button[aria-disabled="true"] {
   to {
     background-position: -50% 0;
   }
+}
+
+/* Карточка горизонтальной ленты: пока её не видно (за краем ленты или
+   ниже экрана), браузер не раскладывает и не рисует её содержимое. На
+   главной в лентах ~1000 элементов, а видно пять карточек — первый
+   показ вкладки раскладывал все и подвисал. Только для карточек с
+   заданными шириной и высотой: размер от содержимого не зависит, и
+   ничего не прыгает, когда карточка «оживает». */
+.lazy-card {
+  content-visibility: auto;
 }
 
 /* Индикатор активной вкладки скользит под кнопками нижнего меню. */
@@ -784,9 +808,12 @@ button[aria-disabled="true"] {
 
 /* Живая рамка партнёрского блока: перелив по краю, чтобы блок замечали
    боковым зрением, но ничто не мигало под текстом. */
+/* Перелив рамки рекламы: едет слой вдвое шире рамки (transform —
+   без перерисовки), а не фон (background-position — перерисовка
+   всего блока каждый кадр). */
 @keyframes ad-edge {
   to {
-    background-position: 200% 0;
+    transform: translateX(-50%);
   }
 }
 
@@ -991,6 +1018,12 @@ html.intro-landing [data-brand-logo] {
   }
 }
 
+@keyframes intro-unfill {
+  to {
+    opacity: 0;
+  }
+}
+
 /* Тихий белый пульс света за знаком — неон слегка «дышит» и смещается. */
 @keyframes intro-neon {
   0%,
@@ -1042,13 +1075,17 @@ html.intro-landing [data-brand-logo] {
 }
 
 /* Полоски «эквалайзера», пока телефон читает аудиогид. */
+/* Растут через scaleY от низа — анимация height пересчитывала раскладку
+   каждый кадр. */
 .eq-bar {
-  height: 40%;
+  height: 100%;
+  transform: scaleY(0.4);
+  transform-origin: bottom;
   animation: eq 0.9s ease-in-out infinite alternate;
 }
 @keyframes eq {
   to {
-    height: 100%;
+    transform: scaleY(1);
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -1227,42 +1264,67 @@ img.skel.loaded:not(.hero-in) {
   transform: rotate(12deg);
   animation: discount-shine 2.4s linear infinite;
   pointer-events: none;
+  will-change: translate;
 }
+/* Едет свойством translate (без перерисовки), а не left: путь от -60% до
+   130% ширины карточки — это 475% ширины самого блика (40%). */
 @keyframes discount-shine {
   to {
-    left: 130%;
+    translate: 475% 0;
   }
 }
 
 /* Переводчик по фото: золотая линия «сканирует» снимок, пока ИИ читает. */
+/* Слой во весь снимок едет вниз transform'ом, линия — его верхний край:
+   анимация top пересчитывала раскладку каждый кадр. */
 .photo-scan {
-  top: 0;
-  box-shadow: 0 0 18px 4px rgba(233, 196, 106, 0.7);
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
   animation: photo-scan 1.6s ease-in-out infinite alternate;
+  will-change: transform;
+}
+.photo-scan::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 4px;
+  background: #e9c46a;
+  box-shadow: 0 0 18px 4px rgba(233, 196, 106, 0.7);
 }
 @keyframes photo-scan {
   to {
-    top: calc(100% - 4px);
+    transform: translateY(calc(100% - 4px));
   }
 }
 @media (prefers-reduced-motion: reduce) {
   .photo-scan {
     animation: none;
-    top: 50%;
+    transform: translateY(50%);
   }
 }
 
 /* Подсветка цели в обучении: мягко «дышит», чтобы глаз её нашёл. */
-.tour-spot {
+/* «Дышит» отдельное кольцо прозрачностью. Раньше анимировался outline
+   самой рамки, у которой тень на 9999px, — и весь экран перерисовывался
+   каждый кадр, пока шло обучение. */
+.tour-spot::after {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  border-radius: 22px;
+  border: 6px solid rgba(233, 196, 106, 0.35);
+  opacity: 0;
   animation: tour-pulse 1.6s ease-in-out infinite;
+  will-change: opacity;
 }
 @keyframes tour-pulse {
   50% {
-    outline: 6px solid rgba(233, 196, 106, 0.35);
+    opacity: 1;
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .tour-spot {
+  .tour-spot::after {
     animation: none;
   }
 }

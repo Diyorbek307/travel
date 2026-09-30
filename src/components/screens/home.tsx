@@ -324,7 +324,7 @@ export function HomeScreen({
             <button
               key={h.id}
               onClick={() => onHotel(h)}
-              className="flex-shrink-0 relative rounded-3xl overflow-hidden text-left active:scale-95 transition-all"
+              className="lazy-card flex-shrink-0 relative rounded-3xl overflow-hidden text-left active:scale-95 transition-all"
               style={{ width: 188, height: 270, background: "#111", flexShrink: 0 }}
             >
               <img src={h.img} alt={h.name} className="absolute inset-0 w-full h-full object-cover" />
@@ -425,7 +425,7 @@ export function HomeScreen({
             <button
               key={r.id}
               onClick={() => onRestaurant(r)}
-              className="flex-shrink-0 relative rounded-3xl overflow-hidden text-left active:scale-95 transition-all"
+              className="lazy-card flex-shrink-0 relative rounded-3xl overflow-hidden text-left active:scale-95 transition-all"
               style={{ width: 172, height: 248 }}
             >
               <img src={r.img} alt={r.name} className="absolute inset-0 w-full h-full object-cover" />
