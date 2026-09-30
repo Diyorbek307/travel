@@ -64,24 +64,38 @@ export default function Finale() {
           </p>
         </div>
 
-        <div className="glass mt-20 flex flex-col items-start gap-4 rounded-3xl p-6 sm:flex-row sm:items-center">
-          <span className="text-3xl">🏨</span>
-          <div className="flex-1">
-            <p className="font-semibold">{t("fin_partners")}</p>
-            <p className="text-sm text-white/70">{t("fin_partners_sub")}</p>
+        {/* Сотрудничество — для всех, кто работает с туристами, а не
+            только для отелей и ресторанов. У заведений есть свой кабинет. */}
+        <div id="partners" className="glass mt-20 rounded-3xl p-6 sm:p-8">
+          <div className="flex flex-col items-start gap-5 lg:flex-row lg:items-center">
+            <span className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-white/15 text-3xl">
+              🤝
+            </span>
+            <div className="flex-1">
+              <p className="serif text-2xl font-semibold">{t("fin_partners")}</p>
+              <p className="mt-1 max-w-2xl text-sm leading-relaxed text-white/75">{t("fin_partners_sub")}</p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {(["fin_p_1", "fin_p_2", "fin_p_3", "fin_p_4"] as const).map((к) => (
+                  <span key={к} className="rounded-full border border-white/30 px-3 py-1 text-xs font-medium">
+                    {t(к)}
+                  </span>
+                ))}
+              </div>
+            </div>
+            <a
+              href={`${APP_URL}/admin`}
+              target="_blank"
+              rel="noreferrer"
+              className="whitespace-nowrap rounded-full px-6 py-3 text-sm font-semibold transition-transform hover:scale-[1.04]"
+              style={{ background: "var(--gold)", color: "#1c1606" }}
+            >
+              {t("fin_p_cta")} ↗
+            </a>
           </div>
-          <a
-            href={`${APP_URL}/admin`}
-            target="_blank"
-            rel="noreferrer"
-            className="rounded-full border border-white/50 px-5 py-2.5 text-sm font-semibold transition-colors hover:bg-white hover:text-black"
-          >
-            HelloUZ Partner ↗
-          </a>
         </div>
 
         <div className="mt-14 flex flex-col items-center justify-between gap-3 border-t border-white/15 pt-6 text-xs text-white/55 sm:flex-row">
-          <p>© {new Date().getFullYear()} HelloUZ · 🇺🇿 Made in Uzbekistan</p>
+          <p>© {new Date().getFullYear()} HelloUZ · Made in Uzbekistan</p>
           <p>{t("fin_credits")}</p>
         </div>
       </div>

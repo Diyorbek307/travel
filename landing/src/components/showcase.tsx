@@ -77,7 +77,7 @@ export default function Showcase() {
                 />
                 <div className="absolute left-6 top-6 text-white">
                   <p className="serif text-5xl font-semibold">Samarkand</p>
-                  <p className="mt-1 text-lg">Uzbekistan 🇺🇿</p>
+                  <p className="mt-1 text-lg">Uzbekistan</p>
                 </div>
                 <div className="glass absolute bottom-5 left-5 right-5 rounded-2xl p-4 text-white">
                   <p className="text-sm font-semibold">✨ {t("card1_t")}</p>

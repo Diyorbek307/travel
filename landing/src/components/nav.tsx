@@ -18,8 +18,8 @@ export default function Nav() {
   const ссылки = [
     ["#open", t("nav_open")],
     ["#cities", t("nav_cities")],
-    ["#know", t("nav_know")],
     ["#features", t("nav_features")],
+    ["#esim", t("nav_esim")],
     ["#quiz", t("nav_quiz")],
   ] as const;
 

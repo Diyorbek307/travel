@@ -11,6 +11,9 @@ import GlobeSection from "@/components/globe-section";
 import Manifesto from "@/components/manifesto";
 import OpenCountry from "@/components/open-country";
 import Essentials from "@/components/essentials";
+import InsideSection from "@/components/inside-section";
+import FreeSection from "@/components/free-section";
+import EsimSection from "@/components/esim-section";
 import { APP_URL } from "@/lib/i18n";
 
 // Цифры берём из живого приложения раз в час — никаких «500+» с потолка.
@@ -45,6 +48,9 @@ export default async function Home() {
       <Destinations />
       <Essentials />
       <Features />
+      <InsideSection />
+      <FreeSection />
+      <EsimSection />
       <GlobeSection />
       <Showcase />
       <Quiz />

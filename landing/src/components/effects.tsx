@@ -71,38 +71,84 @@ export function Заставка() {
   );
 }
 
-/** Свой курсор: точка и кольцо с запаздыванием; над ссылками кольцо растёт. */
+/**
+ * Свой курсор в цветах логотипа: светящаяся точка, за ней — «хвост
+ * кометы» из шести искр (бирюза переходит в золото), и кольцо с
+ * переливающейся бирюзово-золотой каймой, которое догоняет с запаздыванием.
+ * Над ссылкой кольцо растёт и наполняется светом, при нажатии — сжимается.
+ * Всё двигается transform в одном requestAnimationFrame; цикл засыпает,
+ * когда мышь стоит и всё догнало.
+ */
+const ХВОСТ = 6;
 export function Курсор() {
   const точка = useRef<HTMLDivElement>(null);
   const кольцо = useRef<HTMLDivElement>(null);
+  const масштаб = useRef<HTMLDivElement>(null);
+  const заливка = useRef<HTMLDivElement>(null);
+  const искры = useRef<(HTMLDivElement | null)[]>([]);
   const [есть, setЕсть] = useState(false);
   useEffect(() => {
     if (!window.matchMedia("(pointer: fine)").matches || ТИХО()) return;
     setЕсть(true);
     const мышь = { x: -100, y: -100 };
     const тень = { x: -100, y: -100 };
+    const хвост = Array.from({ length: ХВОСТ }, () => ({ x: -100, y: -100 }));
     let над = false;
+    let нажато = false;
+    let виден = true;
+    let кадр = 0;
+    const состояние = () => {
+      if (масштаб.current) масштаб.current.style.transform = `scale(${нажато ? 0.75 : над ? 1.9 : 1})`;
+      if (заливка.current) заливка.current.style.opacity = над ? "1" : "0";
+      if (точка.current) точка.current.style.opacity = виден ? (над ? "0" : "1") : "0";
+      if (кольцо.current) кольцо.current.style.opacity = виден ? "1" : "0";
+    };
+    const цикл = () => {
+      тень.x += (мышь.x - тень.x) * 0.16;
+      тень.y += (мышь.y - тень.y) * 0.16;
+      let пред = мышь;
+      let покой = Math.abs(мышь.x - тень.x) + Math.abs(мышь.y - тень.y) < 0.3;
+      хвост.forEach((т, i) => {
+        т.x += (пред.x - т.x) * 0.42;
+        т.y += (пред.y - т.y) * 0.42;
+        if (Math.abs(пред.x - т.x) + Math.abs(пред.y - т.y) > 0.3) покой = false;
+        const у = искры.current[i];
+        if (у) у.style.transform = `translate(${т.x}px,${т.y}px)`;
+        пред = т;
+      });
+      if (точка.current) точка.current.style.transform = `translate(${мышь.x}px,${мышь.y}px)`;
+      if (кольцо.current) кольцо.current.style.transform = `translate(${тень.x}px,${тень.y}px)`;
+      кадр = покой ? 0 : requestAnimationFrame(цикл);
+    };
+    const разбудить = () => {
+      if (!кадр) кадр = requestAnimationFrame(цикл);
+    };
     const при = (e: PointerEvent) => {
       мышь.x = e.clientX;
       мышь.y = e.clientY;
-      над = Boolean((e.target as HTMLElement)?.closest("a,button,[data-cursor]"));
-    };
-    let кадр = 0;
-    const цикл = () => {
-      тень.x += (мышь.x - тень.x) * 0.18;
-      тень.y += (мышь.y - тень.y) * 0.18;
-      if (точка.current) точка.current.style.transform = `translate(${мышь.x}px,${мышь.y}px)`;
-      if (кольцо.current) {
-        кольцо.current.style.transform = `translate(${тень.x}px,${тень.y}px) scale(${над ? 1.9 : 1})`;
-        кольцо.current.style.opacity = над ? "0.9" : "0.55";
+      const новое = Boolean((e.target as HTMLElement)?.closest("a,button,select,[data-cursor]"));
+      if (новое !== над || !виден) {
+        над = новое;
+        виден = true;
+        состояние();
       }
-      кадр = requestAnimationFrame(цикл);
+      разбудить();
     };
-    window.addEventListener("pointermove", при);
-    кадр = requestAnimationFrame(цикл);
+    const вниз = () => ((нажато = true), состояние());
+    const вверх = () => ((нажато = false), состояние());
+    const ушла = (e: MouseEvent) => {
+      if (!e.relatedTarget) ((виден = false), состояние());
+    };
+    window.addEventListener("pointermove", при, { passive: true });
+    window.addEventListener("pointerdown", вниз);
+    window.addEventListener("pointerup", вверх);
+    document.addEventListener("mouseout", ушла);
     document.documentElement.classList.add("own-cursor");
     return () => {
       window.removeEventListener("pointermove", при);
+      window.removeEventListener("pointerdown", вниз);
+      window.removeEventListener("pointerup", вверх);
+      document.removeEventListener("mouseout", ушла);
       cancelAnimationFrame(кадр);
       document.documentElement.classList.remove("own-cursor");
     };
@@ -110,16 +156,75 @@ export function Курсор() {
   if (!есть) return null;
   return (
     <>
+      {/* Хвост кометы: от бирюзы к золоту, всё меньше и прозрачнее */}
+      {Array.from({ length: ХВОСТ }, (_, i) => {
+        const р = 7 - i;
+        const к = i / (ХВОСТ - 1);
+        return (
+          <div
+            key={i}
+            ref={(у) => {
+              искры.current[i] = у;
+            }}
+            className="pointer-events-none fixed left-0 top-0 z-[89]"
+            style={{ willChange: "transform" }}
+          >
+            <div
+              className="rounded-full"
+              style={{
+                width: р,
+                height: р,
+                marginLeft: -р / 2,
+                marginTop: -р / 2,
+                opacity: 0.55 - к * 0.45,
+                background: `color-mix(in srgb, #0fb3ac ${Math.round((1 - к) * 100)}%, #e9c46a)`,
+                boxShadow: "0 0 8px rgba(47,208,198,0.6)",
+              }}
+            />
+          </div>
+        );
+      })}
       <div
         ref={кольцо}
-        className="pointer-events-none fixed left-0 top-0 z-[90] -ml-5 -mt-5 h-10 w-10 rounded-full border-2 transition-[opacity,scale] duration-200"
-        style={{ borderColor: "var(--accent-ink)", mixBlendMode: "multiply" }}
-      />
+        className="pointer-events-none fixed left-0 top-0 z-[90] transition-opacity duration-300"
+        style={{ willChange: "transform" }}
+      >
+        <div
+          ref={масштаб}
+          className="relative -ml-5 -mt-5 h-10 w-10 transition-transform duration-300 ease-out"
+        >
+          {/* Кайма: вращающийся конический градиент, вырезанный в кольцо */}
+          <div
+            className="cursor-ring absolute inset-0 rounded-full"
+            style={{
+              background: "conic-gradient(from 0deg, #0fb3ac, #e9c46a, #2fd0c6, #0a847e, #0fb3ac)",
+              WebkitMask: "radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 1.5px))",
+              mask: "radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 1.5px))",
+            }}
+          />
+          <div
+            ref={заливка}
+            className="absolute inset-0 rounded-full opacity-0 transition-opacity duration-300"
+            style={{
+              background: "radial-gradient(circle, rgba(233,196,106,0.28), rgba(15,179,172,0.14) 60%, transparent 72%)",
+              backdropFilter: "blur(1px)",
+            }}
+          />
+        </div>
+      </div>
       <div
         ref={точка}
-        className="pointer-events-none fixed left-0 top-0 z-[91] -ml-1 -mt-1 h-2 w-2 rounded-full"
-        style={{ background: "var(--accent-ink)" }}
-      />
+        className="pointer-events-none fixed left-0 top-0 z-[91] transition-opacity duration-200"
+        style={{ willChange: "transform" }}
+      >
+        <div
+          className="-ml-[5px] -mt-[5px] h-2.5 w-2.5 rounded-full"
+          style={{
+            background: "radial-gradient(circle at 35% 35%, #fff, #2fd0c6 45%, #0a847e)",
+            boxShadow: "0 0 10px rgba(47,208,198,0.9), 0 0 18px rgba(233,196,106,0.45)",
+          }}
+        />
+      </div>
     </>
   );
 }

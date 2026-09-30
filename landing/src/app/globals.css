@@ -273,6 +273,34 @@ body {
   animation: spin 60s linear infinite;
 }
 
+/* ── eSIM: полоски сигнала «наливаются», волны расходятся от телефона ── */
+.esim-bar {
+  animation: esim-bar 1.6s ease-in-out infinite;
+}
+@keyframes esim-bar {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+.esim-wave {
+  animation: esim-wave 3.6s ease-out infinite;
+  will-change: transform, opacity;
+}
+@keyframes esim-wave {
+  from {
+    transform: translate(-50%, -50%) scale(0.35);
+    opacity: 0.9;
+  }
+  to {
+    transform: translate(-50%, -50%) scale(1.25);
+    opacity: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .sketch path,
   .sketch line,
@@ -289,7 +317,9 @@ body {
   .text-shimmer,
   .aurora,
   .flag-slice,
-  .spin-slower {
+  .spin-slower,
+  .esim-bar,
+  .esim-wave {
     animation: none;
   }
   .line-mask > span,
@@ -318,6 +348,11 @@ body {
   to {
     fill-opacity: 1;
   }
+}
+
+/* Кайма курсора медленно переливается по кругу. */
+.cursor-ring {
+  animation: spin 3.5s linear infinite;
 }
 
 /* ── Свой курсор вместо системного (только мышь) ── */
