@@ -1,5 +1,6 @@
 "use client";
 
+import { КнопкаПоделиться } from "./share-button";
 import { СкидкаPremium, ЗначокСкидки } from "./premium-discount";
 import { КнопкаПереводаМеню } from "./photo-translator";
 import { useEffect, useRef, useState } from "react";
@@ -131,6 +132,13 @@ export function PlaceDetail({
             <polyline points="15 18 9 12 15 6" />
           </svg>
         </button>
+        <КнопкаПоделиться
+          вид="place"
+          id={place.id}
+          название={place.name}
+          className="absolute top-12 right-16 w-9 h-9 rounded-xl flex items-center justify-center backdrop-blur-sm"
+          style={{ ...glass }}
+        />
         <button
           onClick={() =>
             переключитьИзбранное({
@@ -399,6 +407,13 @@ export function HotelDetail({
             <polyline points="15 18 9 12 15 6" />
           </svg>
         </button>
+        <КнопкаПоделиться
+          вид="hotel"
+          id={hotel.id}
+          название={hotel.name}
+          className="absolute top-12 right-16 w-9 h-9 rounded-xl flex items-center justify-center backdrop-blur-sm"
+          style={{ ...glass }}
+        />
         <button
           onClick={() =>
             переключитьИзбранное({
@@ -666,6 +681,13 @@ export function RestaurantDetail({
             <polyline points="15 18 9 12 15 6" />
           </svg>
         </button>
+        <КнопкаПоделиться
+          вид="restaurant"
+          id={r.id}
+          название={r.name}
+          className="absolute top-12 right-16 w-9 h-9 rounded-xl flex items-center justify-center backdrop-blur-sm"
+          style={{ ...glass }}
+        />
         <button
           onClick={() =>
             переключитьИзбранное({

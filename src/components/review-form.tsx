@@ -1,5 +1,6 @@
 "use client";
 
+import { ПросьбаВойти } from "./auth-prompt";
 import { useEffect, useState } from "react";
 import { BORDER, GOLD, MUTED, TEXT, SURFACE, ON_GOLD } from "@/lib/theme";
 import { useT } from "@/components/lang-provider";
@@ -186,11 +187,7 @@ export default function ReviewForm({ placeId, placeName }: { placeId: string; pl
           style={{ background: "var(--cream)", border: `1px solid ${BORDER}`, color: TEXT }}
         />
 
-        {итог === "нужен-вход" && (
-          <p className="text-xs" style={{ color: "#c1603a" }}>
-            {t("rev_need_login")}
-          </p>
-        )}
+        {итог === "нужен-вход" && <ПросьбаВойти текст="rev_need_login" компактно />}
         {итог === "ок" && (
           <p className="text-xs" style={{ color: MUTED }}>
             {t("rev_thanks")}

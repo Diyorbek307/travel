@@ -1,5 +1,6 @@
 "use client";
 
+import { ПросьбаВойти } from "@/components/auth-prompt";
 import { кодСтраны, названиеСтраны, списокСтран } from "@/lib/countries";
 import { useRef, useState } from "react";
 import type { PublicUser } from "@/lib/types";
@@ -961,7 +962,9 @@ export function ProfileScreen({
               {isPremium && <Badge text="PREMIUM" color="var(--gold-ink)" />}
             </div>
           </div>
-          {!isPremium && (
+          {/* Гостю Premium не продаём: его не к чему привязать. Вход —
+              в плашке под шапкой. */}
+          {user && !isPremium && (
             <button
               onClick={() => setShowPremium(true)}
               className="px-3 py-1.5 rounded-xl text-[10px] font-bold"
@@ -971,6 +974,11 @@ export function ProfileScreen({
             </button>
           )}
         </div>
+        {!user && (
+          <div className="mb-3">
+            <ПросьбаВойти текст="guest_profile_hint" компактно />
+          </div>
+        )}
         <div className="flex gap-1.5">
           {TABS.map(([v, e, l]) => (
             <button

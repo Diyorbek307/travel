@@ -1,6 +1,7 @@
 "use client";
 
 import { ЖивоеОбучение } from "@/components/live-tour";
+import { гость, статьГостем, забытьГостя, ПАРАМЕТРЫ_ССЫЛКИ } from "@/lib/guest";
 import { ТуристProvider } from "@/components/tourist-provider";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import BottomNav from "@/components/bottom-nav";
@@ -150,6 +151,16 @@ function App() {
     return () => window.removeEventListener("hellouz:tour", открыть);
   }, []);
   const [user, setUser] = useState<PublicUser | null>(null);
+  /*
+   * Пришёл по ссылке на место, отель или аудиогид — его ждёт конкретная
+   * вещь, а не регистрация. Такого человека пускаем гостем сразу.
+   * Решаем при первом кадре: разбор адреса ниже потом его чистит.
+   */
+  const [поСсылке] = useState(
+    () =>
+      typeof window !== "undefined" &&
+      ПАРАМЕТРЫ_ССЫЛКИ.some((п) => new URLSearchParams(window.location.search).has(п)),
+  );
   // Приложение открывается на HelloUZ — сетке разделов: за ней человек и
   // приходит (город, где поесть, где жить). Главная — на своей вкладке.
   const [tab, setTab] = useState<Tab>(СТАРТ);
@@ -249,6 +260,19 @@ function App() {
 
   // Кто вошёл. Сессия живёт три месяца и продлевается при каждом
   // запуске, поэтому постоянный пользователь пароль больше не вводит.
+  // Без аккаунта: гость и пришедший по ссылке — сразу в приложение,
+  // новичок — на выбор языка и знакомство.
+  const безАккаунта = (): Phase => {
+    if (поСсылке) статьГостем();
+    return гость() ? "app" : первыйЭкран();
+  };
+  // Вход и регистрация по просьбе из брони, отзыва или профиля гостя.
+  useEffect(() => {
+    const открыть = (e: Event) =>
+      setPhase((e as CustomEvent<string>).detail === "register" ? "register" : "login");
+    window.addEventListener("hellouz:auth", открыть);
+    return () => window.removeEventListener("hellouz:auth", открыть);
+  }, []);
   useEffect(() => {
     let cancelled = false;
     fetch("/api/auth/me")
@@ -259,11 +283,11 @@ function App() {
           setUser(d.user);
           setPhase("app");
         } else {
-          setPhase(первыйЭкран());
+          setPhase(безАккаунта());
         }
       })
       .catch(() => {
-        if (!cancelled) setPhase(первыйЭкран());
+        if (!cancelled) setPhase(безАккаунта());
       });
     return () => {
       cancelled = true;
@@ -397,6 +421,15 @@ function App() {
       setСсылкаЖдёт(открыть);
       п.delete("open");
     }
+    // «Поделиться» ведёт на «/?place=<id>» (или hotel, restaurant).
+    let запись = false;
+    for (const вид of ["place", "hotel", "restaurant"] as const) {
+      const номер = п.get(вид);
+      if (!номер) continue;
+      setСсылкаЖдёт(`${вид}:${номер}`);
+      п.delete(вид);
+      запись = true;
+    }
 
     if (id) {
       setКодЗаписи(id);
@@ -405,7 +438,7 @@ function App() {
     } else if (вкладка && (вкладки as string[]).includes(вкладка)) {
       setTab(вкладка as Tab);
     }
-    if (!id && !вкладка && !открыть) return;
+    if (!id && !вкладка && !открыть && !запись) return;
 
     п.delete("tab");
     const хвост = п.toString();
@@ -471,6 +504,7 @@ function App() {
   const logout = async () => {
     await fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
     localStorage.removeItem(ВХОДИЛ);
+    забытьГостя();
     setUser(null);
     setPhase("splash");
     setTab(СТАРТ);
@@ -498,7 +532,7 @@ function App() {
     if (showTrip) return setShowTrip(false), true;
     if (detail) return setDetail(null), true;
     if (tab === "explore" && разделОбзора) return setРазделОбзора(undefined), true;
-    if (phase === "register" || phase === "login") return setPhase("splash"), true;
+    if (phase === "register" || phase === "login") return setPhase(гость() ? "app" : "splash"), true;
     if (phase === "interests") return setPhase("app"), true;
     if (phase === "tour") return setPhase("lang"), true;
     // «Назад» на экране уведомлений — то же, что «Не сейчас».
@@ -545,14 +579,22 @@ function App() {
 
           {phase === "splash" && (
             <div className="phase-in absolute inset-0 z-40">
-              <SplashScreen onStart={() => setPhase("register")} onLogin={() => setPhase("login")} />
+              <SplashScreen
+                onStart={() => {
+                  // «Начать» — сразу в приложение, без формы: аккаунт
+                  // попросим, только когда он понадобится.
+                  статьГостем();
+                  setPhase("app");
+                }}
+                onLogin={() => setPhase("login")}
+              />
             </div>
           )}
 
           {phase === "register" && (
             <div className="phase-in absolute inset-0 z-40">
               <RegisterScreen
-                onBack={() => setPhase("splash")}
+                onBack={() => setPhase(гость() ? "app" : "splash")}
                 onDone={(u) => {
                   setUser(u);
                   // Сюда попадаем уже после подтверждения почты: сессия
@@ -566,7 +608,7 @@ function App() {
           {phase === "login" && (
             <div className="phase-in absolute inset-0 z-40">
               <LoginScreen
-                onBack={() => setPhase("splash")}
+                onBack={() => setPhase(гость() ? "app" : "splash")}
                 onRegister={() => setPhase("register")}
                 onDone={(u) => {
                   setUser(u);

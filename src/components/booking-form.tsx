@@ -1,5 +1,6 @@
 "use client";
 
+import { ПросьбаВойти } from "./auth-prompt";
 import { useState } from "react";
 import { BORDER, GOLD, GREEN, MUTED, TEXT, SURFACE, ON_GOLD } from "@/lib/theme";
 import { useT } from "@/components/lang-provider";
@@ -224,11 +225,7 @@ export default function BookingForm({
         />
       </label>
 
-      {итог === "нужен-вход" && (
-        <p className="text-xs" style={{ color: "#c1603a" }}>
-          {t("bk_need_login")}
-        </p>
-      )}
+      {итог === "нужен-вход" && <ПросьбаВойти текст="bk_need_login" компактно />}
       {итог === "отказ" && (
         <p className="text-xs" style={{ color: "#c1603a" }}>
           {t("bk_rejected")}

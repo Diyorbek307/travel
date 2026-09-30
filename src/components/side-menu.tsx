@@ -1,4 +1,5 @@
 import type { PublicUser, Tab } from "@/lib/types";
+import { открытьВход } from "@/lib/guest";
 import { названиеСтраны } from "@/lib/countries";
 import { useT } from "@/components/lang-provider";
 import type { TKey } from "@/lib/i18n";
@@ -47,7 +48,7 @@ export function SideMenu({
     ["🆘", "menu_emergency", "profile"],
     ["🎓", "s_tour", null],
   ];
-  const имя = user ? `${user.firstName} ${user.lastName}`.trim() : "—";
+  const имя = user ? `${user.firstName} ${user.lastName}`.trim() : t("guest_name");
   // Страна хранится кодом (UZ) — показываем название на языке интерфейса.
   const откуда = названиеСтраны(user?.country, lang);
   return (
@@ -228,16 +229,29 @@ export function SideMenu({
             <p className="text-[10px]" style={{ color: MUTED }}>
               HelloUZ v2.4.1 · 🇺🇿 {t("menu_made")}
             </p>
-            <button
-              onClick={() => {
-                onClose();
-                onLogout();
-              }}
-              className="text-[10px] font-semibold"
-              style={{ color: MUTED }}
-            >
-              🚪 {t("prof_logout")}
-            </button>
+            {user ? (
+              <button
+                onClick={() => {
+                  onClose();
+                  onLogout();
+                }}
+                className="text-[10px] font-semibold"
+                style={{ color: MUTED }}
+              >
+                🚪 {t("prof_logout")}
+              </button>
+            ) : (
+              <button
+                onClick={() => {
+                  onClose();
+                  открытьВход("login");
+                }}
+                className="text-[11px] font-bold"
+                style={{ color: GREEN }}
+              >
+                👤 {t("guest_login")}
+              </button>
+            )}
           </div>
         </div>
       </div>

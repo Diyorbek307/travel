@@ -1,5 +1,6 @@
 "use client";
 
+import { ПросьбаВойти } from "./auth-prompt";
 import { useEffect, useState } from "react";
 import { BORDER, GREEN, MUTED, TEXT, SURFACE } from "@/lib/theme";
 import { useT } from "@/components/lang-provider";
@@ -66,9 +67,9 @@ export default function MyBookings() {
       )}
 
       {!загрузка && нуженВход && (
-        <p className="py-10 text-center text-sm" style={{ color: MUTED }}>
-          {t("bk_login_to_see")}
-        </p>
+        <div className="py-6">
+          <ПросьбаВойти текст="bk_login_to_see" />
+        </div>
       )}
 
       {!загрузка && !нуженВход && брони.length === 0 && (
