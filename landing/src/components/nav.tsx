@@ -36,7 +36,9 @@ export default function Nav() {
             Hello<span style={{ color: "var(--accent)" }}>UZ</span>
           </span>
         </a>
-        <nav className="ml-auto hidden items-center gap-6 text-sm font-medium lg:flex">
+        {/* Пять пунктов на 10 языках — места хватает только от 1280px;
+            уже — навигация прокруткой, пункты не переносятся. */}
+        <nav className="ml-auto hidden items-center gap-6 whitespace-nowrap text-sm font-medium xl:flex">
           {ссылки.map(([href, текст]) => (
             <a key={href} href={href} className="group relative py-1">
               {текст}
@@ -47,7 +49,7 @@ export default function Nav() {
             </a>
           ))}
         </nav>
-        <div className="ml-auto flex items-center gap-2 lg:ml-0">
+        <div className="ml-auto flex items-center gap-2 xl:ml-0">
           {/* Все 10 языков приложения; по умолчанию — язык устройства. */}
           <label className="relative flex items-center">
             <span className="sr-only">Language</span>
@@ -69,7 +71,7 @@ export default function Nav() {
             href={APP_URL}
             target="_blank"
             rel="noreferrer"
-            className="hidden rounded-full px-5 py-2.5 text-sm font-semibold text-white transition-transform hover:scale-[1.04] sm:inline-block"
+            className="hidden whitespace-nowrap rounded-full px-5 py-2.5 text-sm font-semibold text-white transition-transform hover:scale-[1.04] sm:inline-block"
             style={{ background: "var(--accent-ink)" }}
           >
             {t("open_app")}
