@@ -1,5 +1,6 @@
 "use client";
 
+import { useЛёгкийРежим } from "@/lib/lite";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ADS } from "@/data/content";
 import { useAppContent } from "./content-provider";
@@ -93,10 +94,11 @@ function Пометка({ тёмный = true }: { тёмный?: boolean }) {
  * и видео заполняют его целиком, эмодзи ложится по центру.
  */
 function МедиаРекламы({ ad }: { ad: Креатив }) {
+  const лёгкий = useЛёгкийРежим();
   if (ad.imageUrl) {
     return <img src={ad.imageUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />;
   }
-  if (ad.videoUrl) {
+  if (ad.videoUrl && !лёгкий) {
     return (
       <video
         src={ad.videoUrl}
@@ -320,7 +322,11 @@ export function AdInterstitial({
   // он отбрасывает объявления без ссылки перехода, а видео-рекламе она
   // не обязательна — ролик может просто играть, без клика по сайту.
   const { ADS: live } = useAppContent();
+  // Полноэкранный ролик на слабой сети — это минута ожидания чёрного
+  // экрана за чужой счёт трафика. В лёгком режиме его не показываем.
+  const лёгкий = useЛёгкийРежим();
   const ролики = useMemo(() => {
+    if (лёгкий) return [];
     // Только настоящие видеофайлы (загруженные mp4). Ссылки YouTube
     // исключаем: на iPhone они не запускаются сами и грузят тяжёлый
     // плеер — вместо рекламы человек видит чёрный экран с кнопкой.
@@ -330,7 +336,7 @@ export function AdInterstitial({
     );
     // По городу ничего не нашлось — показываем любой ролик, а не пусто.
     return поГороду.length ? поГороду : свидео;
-  }, [live, cities]);
+  }, [live, cities, лёгкий]);
   const [политика, setПолитика] = useState<AdPolicy | null>(null);
   const [текущее, setТекущее] = useState<Креатив | null>(null);
   const [осталось, setОсталось] = useState(0);

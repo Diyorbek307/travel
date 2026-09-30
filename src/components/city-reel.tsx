@@ -1,5 +1,6 @@
 "use client";
 
+import { useЛёгкийРежим } from "@/lib/lite";
 import { useEffect, useRef, useState } from "react";
 import YouTubeBg from "./youtube-bg";
 
@@ -22,8 +23,8 @@ import YouTubeBg from "./youtube-bg";
 const ДЕРЖАТЬ = 2400;
 
 export default function CityReel({
-  кадры,
-  видео,
+  кадры: всеКадры,
+  видео: ролик,
   alt,
   className,
   позиция,
@@ -35,6 +36,10 @@ export default function CityReel({
   /** Какую часть кадра держать в окне (object-position): «center 30%». */
   позиция?: string;
 }) {
+  // Лёгкий режим: ни ролика, ни лишних кадров — один снимок.
+  const лёгкий = useЛёгкийРежим();
+  const видео = лёгкий ? undefined : ролик;
+  const кадры = лёгкий ? всеКадры.slice(0, 1) : всеКадры;
   const [кадр, setКадр] = useState(0);
   const [виден, setВиден] = useState(false);
   // Реально ли ролик играет. Если автозапуск заблокирован (энергосбережение

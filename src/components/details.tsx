@@ -1,5 +1,6 @@
 "use client";
 
+import { СтатусОткрыто } from "./open-status";
 import { КнопкаПоделиться } from "./share-button";
 import { СкидкаPremium, ЗначокСкидки } from "./premium-discount";
 import { КнопкаПереводаМеню } from "./photo-translator";
@@ -215,6 +216,9 @@ export function PlaceDetail({
               </p>
             </div>
           ))}
+        </div>
+        <div className="-mt-2 mb-3 px-1">
+          <СтатусОткрыто часы={place.hours} крупно />
         </div>
         <div className="bg-white rounded-2xl p-4 mb-3 shadow-sm border" style={{ borderColor: BORDER }}>
           <p className="font-bold text-sm mb-2" style={{ color: TEXT }}>
@@ -754,6 +758,9 @@ export function RestaurantDetail({
               </p>
             </div>
           ))}
+        </div>
+        <div className="-mt-2 mb-3 px-1">
+          <СтатусОткрыто часы={r.open} крупно />
         </div>
         <div className="bg-white rounded-2xl p-4 mb-3 shadow-sm border" style={{ borderColor: BORDER }}>
           <p className="font-bold text-sm mb-2" style={{ color: TEXT }}>

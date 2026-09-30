@@ -28,6 +28,8 @@ export interface Настройки {
    * тема светлая.
    */
   themeChosen: boolean;
+  /** Экономия трафика: «auto» — по сети телефона (см. lib/lite). */
+  saveData: "auto" | "on" | "off";
 }
 
 const ПОУМОЛЧАНИЮ: Настройки = {
@@ -37,6 +39,7 @@ const ПОУМОЛЧАНИЮ: Настройки = {
   currency: "USD",
   interests: [],
   themeChosen: false,
+  saveData: "auto",
 };
 
 const КЛЮЧ = "uzup.settings";

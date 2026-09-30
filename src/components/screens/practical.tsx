@@ -5,6 +5,7 @@ import { BORDER, CREAM, GREEN, MUTED, TEXT, ACCENT_SOFT, мягко } from "@/li
 import { useCurrency, СИМВОЛЫ, ГЛАВНЫЕ } from "@/components/currency-provider";
 import { useT } from "@/components/lang-provider";
 import { ПАМЯТКИ } from "@/data/guides";
+import { Разговорник } from "@/components/phrasebook";
 
 export function CurrencyConverter() {
   const { rates, loading, updated } = useCurrency();
@@ -278,20 +279,23 @@ export function PracticalScreen({ onBack }: { onBack: () => void }) {
               </button>
               {раскрыта && (
                 <div className="px-4 pb-4 border-t" style={{ borderColor: BORDER }}>
-                  <ul className="space-y-2 mt-3">
-                    {s.пункты.map((пункт, j) => (
-                      <li key={j} className="flex items-start gap-2.5">
-                        <div
-                          className="w-1.5 h-1.5 rounded-full flex-shrink-0 mt-1.5"
-                          style={{ background: s.color }}
-                        />
-                        <p className="text-xs leading-relaxed" style={{ color: TEXT }}>
-                          {пункт[lang]}
-                        </p>
-                      </li>
-                    ))}
-                  </ul>
+                  {s.пункты.length > 0 && (
+                    <ul className="space-y-2 mt-3">
+                      {s.пункты.map((пункт, j) => (
+                        <li key={j} className="flex items-start gap-2.5">
+                          <div
+                            className="w-1.5 h-1.5 rounded-full flex-shrink-0 mt-1.5"
+                            style={{ background: s.color }}
+                          />
+                          <p className="text-xs leading-relaxed" style={{ color: TEXT }}>
+                            {пункт[lang]}
+                          </p>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                   {s.виджет === "поезд" && <ПродажаБилетов />}
+                  {s.виджет === "разговорник" && <Разговорник />}
                   {s.ссылки && (
                     <div className="mt-3 flex flex-wrap gap-2">
                       {s.ссылки.map((с) => (

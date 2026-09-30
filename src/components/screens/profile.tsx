@@ -534,6 +534,35 @@ export function SettingsView({
           }
         />
         <Row
+          icon="📶"
+          label={t("s_lite")}
+          sub={t("s_lite_sub")}
+          right={
+            <div className="flex rounded-lg overflow-hidden border" style={{ borderColor: BORDER }}>
+              {(
+                [
+                  ["auto", t("s_lite_auto")],
+                  ["on", t("s_on")],
+                  ["off", t("s_off")],
+                ] as const
+              ).map(([v, ярлык]) => (
+                <button
+                  key={v}
+                  onClick={() => задатьНастройку("saveData", v)}
+                  className="px-2 py-1 text-[10px] font-bold"
+                  style={
+                    нст.saveData === v
+                      ? { background: ACCENT_FILL, color: WHITE }
+                      : { background: CREAM, color: MUTED }
+                  }
+                >
+                  {ярлык}
+                </button>
+              ))}
+            </div>
+          }
+        />
+        <Row
           icon="🎵"
           label={t("s_autoplay")}
           sub={t("s_autoplay_sub")}

@@ -1,5 +1,6 @@
 "use client";
 
+import { лёгкийСейчас } from "@/lib/lite";
 import { ЖивоеОбучение } from "@/components/live-tour";
 import { гость, статьГостем, забытьГостя, ПАРАМЕТРЫ_ССЫЛКИ } from "@/lib/guest";
 import { ТуристProvider } from "@/components/tourist-provider";
@@ -222,7 +223,9 @@ function App() {
   const [заставка, setЗаставка] = useState<"полная" | "короткая" | null>(null);
   const [introDone, setIntroDone] = useState(false);
   useLayoutEffect(() => {
-    setЗаставка(входил() ? "короткая" : "полная");
+    // Пролёт над городами — 9 секунд и несколько мегабайт видео. Тому, кто
+    // пришёл по ссылке на место, и на слабой сети — короткая заставка.
+    setЗаставка(входил() || поСсылке || лёгкийСейчас() ? "короткая" : "полная");
   }, []);
   // Отметка «уже входил» живёт, пока человек в аккаунте.
   useEffect(() => {

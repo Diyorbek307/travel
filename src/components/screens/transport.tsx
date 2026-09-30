@@ -1,5 +1,6 @@
 "use client";
 
+import { useЛёгкийРежим } from "@/lib/lite";
 import { useState } from "react";
 import { ГОРОДА } from "@/data/geo";
 import { useДеньги } from "@/lib/money";
@@ -134,6 +135,7 @@ export function TransportScreen({ onBack, isPremium }: { onBack: () => void; isP
   // бирюзовый фон, без чужой кнопки «play».
   const видеоШапки = ВИДЕО[fromCity] ?? ФОН_ВИДЕО;
   const [видеоOk, setВидеоOk] = useState(false);
+  const лёгкий = useЛёгкийРежим();
   const TABS: [typeof mode, string, TKey][] = [
     ["trains", "🚄", "tr_trains"],
     ["flights", "✈️", "tr_flights"],
@@ -180,21 +182,23 @@ export function TransportScreen({ onBack, isPremium }: { onBack: () => void; isP
       <div className="relative overflow-hidden px-4 pt-14 pb-4" style={{ background: ACCENT_FILL }}>
         {/* Живой фон города. Зелёная плёнка поверх держит фирменный цвет и
             читаемость белого текста в любой теме. */}
-        <video
-          key={видеоШапки}
-          src={видеоШапки}
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="auto"
-          controls={false}
-          disablePictureInPicture
-          onLoadStart={() => setВидеоOk(false)}
-          onPlaying={() => setВидеоOk(true)}
-          className="absolute inset-0 h-full w-full object-cover"
-          style={{ opacity: видеоOk ? 0.9 : 0, transition: "opacity 1s ease" }}
-        />
+        {!лёгкий && (
+          <video
+            key={видеоШапки}
+            src={видеоШапки}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            controls={false}
+            disablePictureInPicture
+            onLoadStart={() => setВидеоOk(false)}
+            onPlaying={() => setВидеоOk(true)}
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{ opacity: видеоOk ? 0.9 : 0, transition: "opacity 1s ease" }}
+          />
+        )}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{ background: "linear-gradient(180deg, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.5) 100%)" }}

@@ -42,10 +42,29 @@ export interface Памятка {
   пункты: Тексты[];
   ссылки?: Ссылка[];
   /** Живой помощник внутри памятки. */
-  виджет?: "поезд";
+  виджет?: "поезд" | "разговорник";
 }
 
 export const ПАМЯТКИ: Памятка[] = [
+  {
+    id: "phrasebook",
+    icon: "🗣️",
+    color: "#D0802A",
+    заголовок: т(
+      "Phrasebook with audio",
+      "Разговорник с озвучкой",
+      "Ovozli soʻzlashgich",
+      "有声常用语",
+      "음성 회화집",
+      "Sprachführer mit Ton",
+      "Guide de conversation audio",
+      "音声つき会話帳",
+      "Sesli konuşma kılavuzu",
+      "كتيّب عبارات بالصوت",
+    ),
+    пункты: [],
+    виджет: "разговорник",
+  },
   {
     id: "registration",
     icon: "🪪",

@@ -33,6 +33,8 @@ import { ВИДЕО, ФОН_ВИДЕО, кадрыГорода } from "@/data/ci
 import { AdInline } from "@/components/ads";
 import AiGuide from "@/components/ai-guide";
 import { ПереводчикФото, useФотоИИ } from "@/components/photo-translator";
+import { СтатусОткрыто } from "@/components/open-status";
+import { открытоСейчас } from "@/lib/open-now";
 import Туризм, { ФлагУз } from "@/components/tourism";
 
 /**
@@ -1101,14 +1103,18 @@ function Чипы<T extends string>({
   варианты,
   выбран,
   onВыбор,
+  перед,
 }: {
   варианты: { значение: T; подпись: TKey }[];
   выбран: T;
   onВыбор: (v: T) => void;
+  /** Что поставить в начало ряда — например, выбор сортировки. */
+  перед?: React.ReactNode;
 }) {
   const { t } = useT();
   return (
-    <div className="-mx-4 mb-3 flex gap-2 overflow-x-auto px-4 hide-scroll">
+    <div className="-mx-4 mb-3 flex items-center gap-2 overflow-x-auto px-4 hide-scroll">
+      {перед}
       {варианты.map((в) => (
         <button
           key={в.значение}
@@ -1339,6 +1345,66 @@ const ВИДЫ_ГОСТИНИЦ: { значение: HotelKind | "all"; подп
   { значение: "hostel", подпись: "hk_hostels" },
 ];
 
+type Порядок = "рек" | "дешевле" | "дороже" | "рейтинг";
+
+const ПОРЯДКИ: { значение: Порядок; подпись: TKey }[] = [
+  { значение: "рек", подпись: "sort_recommended" },
+  { значение: "дешевле", подпись: "sort_cheaper" },
+  { значение: "дороже", подпись: "sort_pricier" },
+  { значение: "рейтинг", подпись: "sort_rating" },
+];
+
+/** Цена из строки карточки: «$89» → 89, «$5–15» → 5. Нет цифр — null. */
+function числоЦены(цена: string): number | null {
+  const м = /\d+(?:[.,]\d+)?/.exec(цена.replace(/\s/g, ""));
+  return м ? parseFloat(м[0].replace(",", ".")) : null;
+}
+
+/** Сортировка списка. Без цены — в конце: не делаем вид, что это дёшево. */
+function упорядочить<T extends { price: string; rating: number }>(список: T[], порядок: Порядок): T[] {
+  if (порядок === "рек") return список;
+  const копия = [...список];
+  if (порядок === "рейтинг") return копия.sort((a, b) => b.rating - a.rating);
+  const знак = порядок === "дешевле" ? 1 : -1;
+  return копия.sort((a, b) => {
+    const ца = числоЦены(a.price);
+    const цб = числоЦены(b.price);
+    if (ца === null) return цб === null ? 0 : 1;
+    if (цб === null) return -1;
+    return (ца - цб) * знак;
+  });
+}
+
+/** Выпадающий список «Сначала …» — компактно, рядом с чипами. */
+function ВыборПорядка({ порядок, onПорядок }: { порядок: Порядок; onПорядок: (п: Порядок) => void }) {
+  const { t } = useT();
+  return (
+    <label className="flex flex-shrink-0 items-center gap-1.5 text-xs font-semibold" style={{ color: MUTED }}>
+      ↕
+      <select
+        value={порядок}
+        onChange={(e) => onПорядок(e.target.value as Порядок)}
+        aria-label={t("sort_label")}
+        className="rounded-full border px-2.5 py-1.5 text-xs font-semibold outline-none"
+        style={{ background: SURFACE, color: TEXT, borderColor: BORDER }}
+      >
+        {ПОРЯДКИ.map((п) => (
+          <option key={п.значение} value={п.значение}>
+            {t(п.подпись)}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
+/** Бюджет за ночь в долларах: цены в карточках гостиниц — в $. */
+const БЮДЖЕТЫ: { значение: string; подпись: TKey; до: number }[] = [
+  { значение: "any", подпись: "budget_any", до: Infinity },
+  { значение: "50", подпись: "budget_50", до: 50 },
+  { значение: "100", подпись: "budget_100", до: 100 },
+];
+
 function СписокОтелей({
   отели,
   onHotel,
@@ -1351,12 +1417,26 @@ function СписокОтелей({
   const { t, трК } = useT();
   const дг = useДеньги();
   const [вид, setВид] = useState<HotelKind | "all">("all");
+  const [порядок, setПорядок] = useState<Порядок>("рек");
+  const [бюджет, setБюджет] = useState("any");
+  const потолок = БЮДЖЕТЫ.find((б) => б.значение === бюджет)?.до ?? Infinity;
   // Без поля «вид» — обычный отель: так записи, заведённые до появления
   // видов, не пропадают из фильтра «Отели».
-  const список = вид === "all" ? отели : отели.filter((h) => (h.kind ?? "hotel") === вид);
+  const список = упорядочить(
+    отели
+      .filter((h) => вид === "all" || (h.kind ?? "hotel") === вид)
+      .filter((h) => потолок === Infinity || (числоЦены(h.price) ?? Infinity) <= потолок),
+    порядок,
+  );
   return (
     <>
       <Чипы варианты={ВИДЫ_ГОСТИНИЦ} выбран={вид} onВыбор={setВид} />
+      <Чипы
+        варианты={БЮДЖЕТЫ}
+        выбран={бюджет}
+        onВыбор={setБюджет}
+        перед={<ВыборПорядка порядок={порядок} onПорядок={setПорядок} />}
+      />
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         {список.length === 0 && <Пусто сброс={сброс} />}
         {список.map((h, i) => (
@@ -1429,42 +1509,60 @@ function СписокРесторанов({
 }) {
   const { трК } = useT();
   const дг = useДеньги();
+  const [толькоОткрытые, setТолькоОткрытые] = useState<"all" | "open">("all");
+  const [порядок, setПорядок] = useState<Порядок>("рек");
+  const список = упорядочить(
+    толькоОткрытые === "open" ? рестораны.filter((r) => открытоСейчас(r.open)?.открыто) : рестораны,
+    порядок,
+  );
   return (
-    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-      {рестораны.length === 0 && <Пусто сброс={сброс} />}
-      {рестораны.map((r, i) => (
-        <button
-          key={r.id}
-          onClick={() => onRestaurant(r)}
-          style={{ borderColor: BORDER, animationDelay: `${Math.min(i, 10) * 40}ms` }}
-          className="tile-in w-full flex gap-3 bg-white rounded-2xl overflow-hidden shadow-sm text-left border active:scale-[0.98]"
-        >
-          <div className="w-24 flex-shrink-0 bg-gray-100">
-            <img
-              src={r.img}
-              alt={r.name}
-              className="skel w-full h-full object-cover"
-              style={{ height: 96 }}
-            />
-          </div>
-          <div className="flex-1 py-3 pr-3 min-w-0">
-            <Badge text={r.cuisine} color={"#C1603A"} />
-            <p className="font-bold text-sm leading-tight mt-1" style={{ color: TEXT }}>
-              {r.name}
-            </p>
-            <p className="text-[10px] mt-0.5" style={{ color: MUTED }}>
-              {трК(r.city)} · {r.open}
-            </p>
-            <div className="flex items-center justify-between mt-2">
-              <StarRow rating={r.rating} />
-              <span className="text-xs font-bold" style={{ color: "#C1603A" }}>
-                {дг.цена(r.price)}
-              </span>
+    <>
+      <Чипы
+        варианты={[
+          { значение: "all" as const, подпись: "common_all" },
+          { значение: "open" as const, подпись: "open_now" },
+        ]}
+        выбран={толькоОткрытые}
+        onВыбор={setТолькоОткрытые}
+        перед={<ВыборПорядка порядок={порядок} onПорядок={setПорядок} />}
+      />
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        {список.length === 0 && <Пусто сброс={сброс} />}
+        {список.map((r, i) => (
+          <button
+            key={r.id}
+            onClick={() => onRestaurant(r)}
+            style={{ borderColor: BORDER, animationDelay: `${Math.min(i, 10) * 40}ms` }}
+            className="tile-in w-full flex gap-3 bg-white rounded-2xl overflow-hidden shadow-sm text-left border active:scale-[0.98]"
+          >
+            <div className="w-24 flex-shrink-0 bg-gray-100">
+              <img
+                src={r.img}
+                alt={r.name}
+                className="skel w-full h-full object-cover"
+                style={{ height: 96 }}
+              />
             </div>
-          </div>
-        </button>
-      ))}
-    </div>
+            <div className="flex-1 py-3 pr-3 min-w-0">
+              <Badge text={r.cuisine} color={"#C1603A"} />
+              <p className="font-bold text-sm leading-tight mt-1" style={{ color: TEXT }}>
+                {r.name}
+              </p>
+              <p className="text-[10px] mt-0.5" style={{ color: MUTED }}>
+                {трК(r.city)} · {r.open}
+              </p>
+              <СтатусОткрыто часы={r.open} />
+              <div className="flex items-center justify-between mt-2">
+                <StarRow rating={r.rating} />
+                <span className="text-xs font-bold" style={{ color: "#C1603A" }}>
+                  {дг.цена(r.price)}
+                </span>
+              </div>
+            </div>
+          </button>
+        ))}
+      </div>
+    </>
   );
 }
 
