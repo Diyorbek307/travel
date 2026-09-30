@@ -85,7 +85,7 @@ function входил(): boolean {
 function запомнитьВход(да: boolean): void {
   try {
     if (да) localStorage.setItem(ВХОДИЛ, "1");
-    else запомнитьВход(false);
+    else localStorage.removeItem(ВХОДИЛ);
   } catch {}
 }
 
@@ -145,7 +145,17 @@ function App() {
       было = true;
     }
     if (было) return;
-    const id = setTimeout(() => setЖивойТур(true), 1500);
+    const id = setTimeout(() => {
+      setЖивойТур(true);
+      // Отмечаем сразу при показе, а не по «Готово»: кто закрыл вкладку
+      // или обновил страницу посреди обучения, не должен видеть его снова.
+      // Повторить можно в настройках.
+      try {
+        localStorage.setItem("uzup.liveTour", "1");
+      } catch {
+        // приватный режим — покажем ещё раз, не беда
+      }
+    }, 1500);
     return () => clearTimeout(id);
   }, [phase]);
   useEffect(() => {
@@ -846,14 +856,7 @@ function App() {
                     setРазделОбзора(undefined);
                     setTab(t);
                   }}
-                  onDone={() => {
-                    setЖивойТур(false);
-                    try {
-                      localStorage.setItem("uzup.liveTour", "1");
-                    } catch {
-                      // приватный режим — покажем ещё раз, не беда
-                    }
-                  }}
+                  onDone={() => setЖивойТур(false)}
                 />
               )}
               {/* Предложение включить уведомления: само решает, пора ли. */}

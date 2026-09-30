@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ACCENT_FILL, BORDER, GOLD, MUTED, ON_GOLD, SURFACE, TEXT, WHITE } from "@/lib/theme";
 import { useT } from "@/components/lang-provider";
 import type { TKey } from "@/lib/i18n";
@@ -56,7 +56,7 @@ export function ОбучениеДети({ onDone }: { onDone: () => void }) {
 
   return (
     <div className="relative flex h-full flex-col overflow-hidden" style={{ background: ФОН_ВИДЕО }}>
-      <ДетиВидео src={шаг.видео} />
+      <ВидеоШагов n={n} />
 
       <div className="relative z-10 mt-14 flex justify-center px-8">
         <div
@@ -122,6 +122,51 @@ export function ОбучениеДети({ onDone }: { onDone: () => void }) {
         </div>
       </div>
     </div>
+  );
+}
+
+/**
+ * Видео всех шагов сразу, одно над другим; видно и играет только
+ * текущее. Раньше на каждое «Продолжить» ролик создавался заново:
+ * мелькал чужой кадр-заставка, потом ждали загрузку — выглядело как
+ * подвисание. Три ролика по ~250 КБ грузятся заранее, смена — мгновенная.
+ */
+function ВидеоШагов({ n }: { n: number }) {
+  const ролики = useRef<(HTMLVideoElement | null)[]>([]);
+  const [спокойно, setСпокойно] = useState(false);
+  useEffect(() => {
+    setСпокойно(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  }, []);
+  useEffect(() => {
+    ролики.current.forEach((в, i) => {
+      if (!в) return;
+      if (i === n) {
+        в.currentTime = 0;
+        в.play().catch(() => {});
+      } else в.pause();
+    });
+  }, [n, спокойно]);
+  if (спокойно) return <ДетиВидео src={ШАГИ[n].видео} />;
+  return (
+    <>
+      {ШАГИ.map((ш, i) => (
+        <video
+          key={ш.видео}
+          ref={(в) => {
+            ролики.current[i] = в;
+          }}
+          src={ш.видео}
+          autoPlay={i === 0}
+          muted
+          loop
+          playsInline
+          preload="auto"
+          aria-hidden
+          className="absolute inset-0 h-full w-full object-contain object-top transition-opacity duration-300"
+          style={{ opacity: i === n ? 1 : 0 }}
+        />
+      ))}
+    </>
   );
 }
 

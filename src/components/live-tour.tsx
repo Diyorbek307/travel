@@ -48,27 +48,42 @@ export function ЖивоеОбучение({ onTab, onDone }: { onTab: (t: Tab) 
   const измерить = useCallback(() => {
     const el = найти(шаг.цель);
     const коробка = корень.current?.parentElement?.getBoundingClientRect();
-    if (!el || !коробка) return setРамка(null);
+    if (!el || !коробка) return;
     const r = el.getBoundingClientRect();
-    setРамка({ top: r.top - коробка.top, left: r.left - коробка.left, width: r.width, height: r.height });
+    const новая = { top: r.top - коробка.top, left: r.left - коробка.left, width: r.width, height: r.height };
+    // Без лишних перерисовок: замер идёт каждый кадр, а рамка стоит.
+    setРамка((с) =>
+      с && с.top === новая.top && с.left === новая.left && с.width === новая.width && с.height === новая.height
+        ? с
+        : новая,
+    );
   }, [шаг.цель]);
 
-  // Переход к шагу: нужная вкладка, прокрутка к цели, замер.
+  // Переход к шагу. Раньше рамка сбрасывалась, экран темнел целиком, и
+  // только через полсекунды-секунду окно появлялось снова — «Продолжить»
+  // ощущалось как подвисание. Теперь старая рамка остаётся и плавно
+  // переезжает: вкладку переключаем сразу, цель ищем каждый кадр, пока
+  // она не отрисуется, и прокручиваем к ней, только если её не видно.
   useEffect(() => {
-    setРамка(null);
     if (шаг.вкладка) onTab(шаг.вкладка);
-    const t1 = setTimeout(
-      () => найти(шаг.цель)?.scrollIntoView({ block: "center", behavior: "smooth" }),
-      450,
-    );
-    const t2 = setTimeout(измерить, 900);
-    // Контрольный замер, когда плавная прокрутка точно закончилась.
-    const t3 = setTimeout(измерить, 1500);
-    return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
-      clearTimeout(t3);
+    const старт = performance.now();
+    let прокрутили = false;
+    let кадр = 0;
+    const тик = (сейчас: number) => {
+      const el = найти(шаг.цель);
+      if (el && !прокрутили) {
+        прокрутили = true;
+        const r = el.getBoundingClientRect();
+        if (r.top < 60 || r.bottom > window.innerHeight - 60) {
+          el.scrollIntoView({ block: "center", behavior: "smooth" });
+        }
+      }
+      измерить();
+      // Секунды хватает и на смену вкладки, и на плавную прокрутку.
+      if (сейчас - старт < 1000) кадр = requestAnimationFrame(тик);
     };
+    кадр = requestAnimationFrame(тик);
+    return () => cancelAnimationFrame(кадр);
     // onTab меняется на каждый рендер страницы — шаг решает сам n.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [n]);
