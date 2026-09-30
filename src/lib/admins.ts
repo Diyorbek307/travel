@@ -43,6 +43,8 @@ export interface AdminAccount {
   заведение?: ЗаведениеСотрудника;
   /** Заблокирован: запись есть, но войти нельзя. */
   disabled: boolean;
+  /** Входы, выданные раньше, недействительны (ставится сменой пароля). */
+  sessionsFrom?: string | null;
   createdAt: string;
   lastSeenAt: string | null;
 }
@@ -143,7 +145,7 @@ export async function setAdminPassword(id: string, password: string): Promise<bo
     const i = список.findIndex((a) => a.id === id);
     if (i === -1) return [список, false];
     const копия = [...список];
-    копия[i] = { ...копия[i], passwordHash };
+    копия[i] = { ...копия[i], passwordHash, sessionsFrom: new Date().toISOString() };
     return [копия, true];
   });
 }

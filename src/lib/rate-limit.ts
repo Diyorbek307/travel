@@ -48,13 +48,26 @@ export function подЛимитом(ключ: string, лимит: number, ок�
 /**
  * IP клиента из заголовков.
  *
- * За Render (и любым обратным прокси) настоящий адрес приходит в
- * `x-forwarded-for` — первым в списке. Прямого соединения у приложения
- * нет, поэтому берём его; если заголовка нет, ограничиваем всех разом
- * под общим ключом, что тоже безопасно (лишь строже).
+ * Первое значение `x-forwarded-for` брать нельзя: его присылает сам
+ * клиент, а прокси лишь дописывают свои адреса в конец. Проверено на
+ * боевом стенде: подставив в каждый запрос новый «свой» адрес, лимит
+ * входа обнулялся — перебор без ограничений.
+ *
+ * Поэтому сначала заголовки, которые ставит край сети и которые клиент
+ * подделать не может: Cloudflare перед Render пишет настоящий адрес в
+ * `cf-connecting-ip` (присланный клиентом затирает), Render — в
+ * `true-client-ip`. `x-forwarded-for` остаётся запасным — для запуска
+ * без Cloudflare, например на машине разработчика.
  */
 export function ipЗапроса(req: Request): string {
-  const forwarded = req.headers.get("x-forwarded-for");
+  return ipИзЗаголовков(req.headers);
+}
+
+/** То же для server actions, где вместо запроса есть только заголовки. */
+export function ipИзЗаголовков(h: Headers): string {
+  const край = h.get("cf-connecting-ip") ?? h.get("true-client-ip");
+  if (край) return край.trim();
+  const forwarded = h.get("x-forwarded-for");
   if (forwarded) return forwarded.split(",")[0].trim();
-  return req.headers.get("x-real-ip") ?? "unknown";
+  return h.get("x-real-ip") ?? "unknown";
 }

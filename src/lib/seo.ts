@@ -273,3 +273,19 @@ export function всеСтраницы(c: Content): { вид: ВидСтрани
     ...c.restaurants.filter((x) => видно(x.status)).map((x) => ({ вид: "restaurant" as const, id: x.id })),
   ];
 }
+
+/**
+ * JSON для <script type="application/ld+json">. JSON.stringify не
+ * экранирует «<», и строка «</script><script>…» в описании закрыла бы
+ * блок и выполнилась у каждого посетителя. Описание своей карточки
+ * правит сотрудник заведения — человек со стороны, поэтому экранируем
+ * всё, что браузер может принять за разметку.
+ */
+export function вСкрипт(данные: unknown): string {
+  return JSON.stringify(данные).replace(ОПАСНЫЕ, (с) => ОБРАТНЫЙ_СЛЭШ + "u" + с.charCodeAt(0).toString(16).padStart(4, "0"));
+}
+
+// Собраны из кодов символов, а не литералами: U+2028 и U+2029 в исходнике
+// выглядят как переводы строки и легко ломаются при правке.
+const ОБРАТНЫЙ_СЛЭШ = String.fromCharCode(92);
+const ОПАСНЫЕ = new RegExp("[<>&" + String.fromCharCode(0x2028, 0x2029) + "]", "g");

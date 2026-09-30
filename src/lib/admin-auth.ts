@@ -101,6 +101,8 @@ export async function currentAdmin(): Promise<AdminSession | null> {
   // до конца смены.
   const запись = await findAdminById(id);
   if (!запись || запись.disabled) return null;
+  // Пароль сменили после выдачи токена — старая смена закрыта.
+  if (запись.sessionsFrom && Number(expires) - TTL_MS < new Date(запись.sessionsFrom).getTime()) return null;
   return { id, role: запись.role, заведение: запись.заведение };
 }
 

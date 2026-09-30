@@ -1,11 +1,16 @@
 import { NextResponse } from "next/server";
 import { createVerification, findByEmail, ждатьДоОтправки } from "@/lib/users";
 import { sendMail, письмоСКодом } from "@/lib/mail";
+import { ipЗапроса, подЛимитом } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 
 /** Новый код взамен потерянного. Прежний перестаёт работать. */
 export async function POST(request: Request) {
+  // Пауза ниже — на один адрес. Без лимита по IP можно было обойти
+  // её, перебирая адреса, и слать письма всем неподтверждённым подряд.
+  if (!подЛимитом(`resend:${ipЗапроса(request)}`, 5, 10 * 60_000))
+    return NextResponse.json({ error: "too_many" }, { status: 429 });
   let body: Record<string, unknown>;
   try {
     body = await request.json();

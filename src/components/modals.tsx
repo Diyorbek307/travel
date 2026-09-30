@@ -338,7 +338,7 @@ export function PremiumModal({ onClose }: { onClose: () => void }) {
       const r = await fetch("/api/pay", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: ЦЕНА[plan], plan }),
+        body: JSON.stringify({ plan }),
       });
       const d = await r.json();
       if (d.available && d.url) {

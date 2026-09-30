@@ -5,6 +5,9 @@ import { какиеСистемы, ссылкаОплаты, type Система
 
 export const dynamic = "force-dynamic";
 
+/** Цены Premium в сумах — те же, что в окне Premium приложения. */
+const ЦЕНА_PREMIUM = { month: 39_000, year: 349_000 } as const;
+
 /**
  * Ссылка на оплату.
  *
@@ -33,12 +36,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ available: false, systems: [] });
   }
 
-  // Сумма приходит от приложения, но верхнюю границу держим на сервере:
-  // подделанное огромное значение не должно уйти на страницу оплаты.
-  const сумма = Number(body.amount);
-  if (!Number.isFinite(сумма) || сумма < 1000 || сумма > 100_000_000) {
-    return NextResponse.json({ error: "amount_invalid" }, { status: 400 });
-  }
+  // Цену назначает сервер по тарифу. Раньше сумма приходила из браузера
+  // с одной лишь верхней границей: поправив запрос, можно было оплатить
+  // тысячу сумов и показать администратору «оплату Premium».
+  // hasOwn, а не просто индекс: «constructor» или «__proto__» нашлись бы
+  // в прототипе объекта.
+  const план = typeof body.plan === "string" && Object.hasOwn(ЦЕНА_PREMIUM, body.plan) ? body.plan : null;
+  const сумма = план ? ЦЕНА_PREMIUM[план as keyof typeof ЦЕНА_PREMIUM] : 0;
+  if (!сумма) return NextResponse.json({ error: "plan_invalid" }, { status: 400 });
 
   const order = `uzup-${Date.now()}-${randomBytes(4).toString("hex")}`;
   const url = ссылкаОплаты(система, сумма, order);

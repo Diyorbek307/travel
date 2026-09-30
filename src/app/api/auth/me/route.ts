@@ -3,14 +3,13 @@ import { cookies } from "next/headers";
 import { savePhoto, deletePhoto, фотоГодится } from "@/lib/photos";
 import {
   deleteUser,
-  findById,
   makeSession,
   updateUser,
   publicUser,
-  readSession,
   SESSION_COOKIE,
   SESSION_TTL_MS,
   touchUser,
+  userBySession,
 } from "@/lib/users";
 
 export const dynamic = "force-dynamic";
@@ -25,10 +24,7 @@ export const dynamic = "force-dynamic";
  */
 export async function GET() {
   const token = (await cookies()).get(SESSION_COOKIE)?.value;
-  const userId = readSession(token);
-  if (!userId) return NextResponse.json({ user: null }, { headers: { "Cache-Control": "no-store" } });
-
-  const user = await findById(userId);
+  const user = await userBySession(token);
   // Неподтверждённая почта — не вход, как и в остальных маршрутах.
   if (!user?.emailVerified) {
     return NextResponse.json({ user: null }, { headers: { "Cache-Control": "no-store" } });
@@ -49,8 +45,7 @@ export async function GET() {
 
 /** Правка своего профиля: имя, фамилия, страна, телефон. */
 export async function PATCH(request: Request) {
-  const token = (await cookies()).get(SESSION_COOKIE)?.value;
-  const userId = readSession(token);
+  const userId = (await userBySession((await cookies()).get(SESSION_COOKIE)?.value))?.id;
   if (!userId) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   let body: Record<string, unknown>;
@@ -84,8 +79,7 @@ export async function PATCH(request: Request) {
 
 /** Удаление своего аккаунта. Заодно гасим сессию. */
 export async function DELETE() {
-  const token = (await cookies()).get(SESSION_COOKIE)?.value;
-  const userId = readSession(token);
+  const userId = (await userBySession((await cookies()).get(SESSION_COOKIE)?.value))?.id;
   if (!userId) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   await deleteUser(userId);

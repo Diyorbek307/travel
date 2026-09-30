@@ -1,4 +1,4 @@
-import nodemailer from "nodemailer";
+import nodemailer, { type Transporter } from "nodemailer";
 import { httpПровайдер, отправитьПоHttp, проверитьHttp } from "./mail-http";
 
 /**
@@ -56,14 +56,14 @@ export function mailWorking(): boolean {
   return последняяОтправка !== false;
 }
 
-let transport: nodemailer.Transporter | null = null;
+let transport: Transporter | null = null;
 
 /** Заданы ли переменные SMTP — отдельно от почты по HTTPS. */
 function smtpНастроен(): boolean {
   return Boolean(HOST && USER && PASS);
 }
 
-function getTransport(): nodemailer.Transporter | null {
+function getTransport(): Transporter | null {
   if (!smtpНастроен()) return null;
   if (transport) return transport;
   transport = nodemailer.createTransport({

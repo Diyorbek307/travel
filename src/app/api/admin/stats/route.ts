@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { кодСтраны } from "@/lib/countries";
-import { isAuthenticated } from "@/lib/admin-auth";
+import { отказЕслиНи } from "@/lib/admin-auth";
 import { listBookings, listReviews, listThreads } from "@/lib/community";
 import { listUsers } from "@/lib/users";
 import { readContent } from "@/lib/store";
@@ -21,9 +21,11 @@ const МЕСЯЦЫ = ["Янв", "Фев", "Мар", "Апр", "Май", "Июн"
  * принимают решения.
  */
 export async function GET() {
-  if (!(await isAuthenticated())) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
+  // Общие цифры — для команды. Кабинету заведения (роль venue) они не
+  // положены: раньше хватало любого входа, и ресторан видел базу
+  // пользователей и брони всех остальных.
+  const отказ = await отказЕслиНи("content", "operations", "users", "money");
+  if (отказ) return отказ;
 
   const [users, брони, отзывы, ветки, контент] = await Promise.all([
     listUsers(),

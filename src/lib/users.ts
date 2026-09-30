@@ -50,6 +50,13 @@ export interface User {
    * позже остальных, поэтому у старых записей его может не быть.
    */
   premiumUntil?: string | null;
+  /**
+   * Сессии, выданные раньше этого момента, недействительны. Ставится при
+   * смене пароля: подпись у старой куки честная, и без этой отметки
+   * украденная сессия пережила бы смену пароля — а /api/auth/me ещё и
+   * продлевает её при каждом заходе.
+   */
+  sessionsFrom?: string | null;
   createdAt: string;
   lastSeenAt: string;
 }
@@ -117,18 +124,37 @@ export function makeSession(userId: string): string {
 }
 
 export function readSession(token: string | undefined): string | null {
+  return разобратьСессию(token)?.userId ?? null;
+}
+
+function разобратьСессию(token: string | undefined): { userId: string; выдана: number } | null {
   if (!token) return null;
   const parts = token.split(".");
   if (parts.length !== 3) return null;
 
   const [userId, expires, signature] = parts;
-  if (Number(expires) < Date.now()) return null;
+  const срок = Number(expires);
+  if (!Number.isFinite(срок) || срок < Date.now()) return null;
 
   const expected = sign(`${userId}.${expires}`);
   if (signature.length !== expected.length) return null;
   if (!timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) return null;
 
-  return userId;
+  return { userId, выдана: срок - SESSION_TTL_MS };
+}
+
+/**
+ * Хозяин сессии — с проверкой, что её не отозвали сменой пароля.
+ * Подтверждённость почты здесь не проверяем: удалить аккаунт или
+ * поправить профиль можно и до подтверждения.
+ */
+export async function userBySession(token: string | undefined): Promise<User | null> {
+  const с = разобратьСессию(token);
+  if (!с) return null;
+  const user = await findById(с.userId);
+  if (!user) return null;
+  if (user.sessionsFrom && с.выдана < new Date(user.sessionsFrom).getTime()) return null;
+  return user;
 }
 
 /* ------------------------------------------------------------------ */
@@ -490,7 +516,9 @@ export async function applyReset(token: string, password: string): Promise<boole
     const ui = users.findIndex((u) => u.id === userId);
     if (ui === -1) return [users, false];
     const копия = [...users];
-    копия[ui] = { ...копия[ui], passwordHash };
+    // Новый пароль гасит все прежние входы — в том числе чужой, из-за
+    // которого пароль, возможно, и меняют.
+    копия[ui] = { ...копия[ui], passwordHash, sessionsFrom: new Date().toISOString() };
     return [копия, true];
   });
 }

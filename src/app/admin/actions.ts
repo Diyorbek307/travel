@@ -4,7 +4,7 @@ import { cookies, headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { ADMIN_COOKIE, ROOT_ID, checkPassword, makeToken } from "@/lib/admin-auth";
 import { authenticateAdmin, touchAdmin, нормЛогин, ЛОГИН_ВЛАДЕЛЬЦА } from "@/lib/admins";
-import { подЛимитом } from "@/lib/rate-limit";
+import { ipИзЗаголовков, подЛимитом } from "@/lib/rate-limit";
 
 export interface LoginResult {
   ok: boolean;
@@ -14,7 +14,7 @@ export interface LoginResult {
 export async function login(_prev: LoginResult | null, formData: FormData): Promise<LoginResult> {
   // Тормоз против перебора: вход ограничиваем жёстче обычного — восемь
   // попыток в минуту с адреса.
-  const ip = (await headers()).get("x-forwarded-for")?.split(",")[0].trim() ?? "unknown";
+  const ip = ipИзЗаголовков(await headers());
   if (!подЛимитом(`admin-login:${ip}`, 8, 60_000)) {
     return { ok: false, message: "Слишком много попыток. Подождите минуту." };
   }

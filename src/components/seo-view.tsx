@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { LOCALE_META, LOCALES } from "@/lib/i18n";
 import { МЕСТА } from "@/data/geo";
-import { адресСтраницы, метаданные, разметка, страница, языкИз, ТЕКСТЫ, type ВидСтраницы } from "@/lib/seo";
+import { адресСтраницы, вСкрипт, метаданные, разметка, страница, языкИз, ТЕКСТЫ, type ВидСтраницы } from "@/lib/seo";
 
 /**
  * Серверная страница записи — то, что видят поисковик и превью ссылки
@@ -48,7 +48,7 @@ export async function СтраницаЗаписи({
     >
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(разметка(с, гео)) }}
+        dangerouslySetInnerHTML={{ __html: вСкрипт(разметка(с, гео)) }}
       />
       <div className="relative h-72 overflow-hidden sm:h-96">
         {с.фото[0] && <img src={с.фото[0]} alt={с.имя} className="h-full w-full object-cover" />}

@@ -36,9 +36,13 @@ const SECURITY_HEADERS = [
 // Чужой сайт открыть нас в iframe не может — это защита от кликджекинга.
 // Своё встраивание одно: превью приложения в панели, поэтому 'self', а
 // не полный запрет.
+// Кроме рамок, в той же политике — два запрета, которые ничего не
+// ломают: плагины (object/embed) не нужны никому, а подмена <base>
+// перенаправила бы все относительные ссылки и скрипты на чужой сайт.
+const БАЗА_CSP = "object-src 'none'; base-uri 'self'";
 const ТОЛЬКО_СВОИ = [
   { key: "X-Frame-Options", value: "SAMEORIGIN" },
-  { key: "Content-Security-Policy", value: "frame-ancestors 'self'" },
+  { key: "Content-Security-Policy", value: `frame-ancestors 'self'; ${БАЗА_CSP}` },
 ];
 
 // Исключение — лендинг: он показывает живое приложение в рамке телефона.
@@ -48,19 +52,23 @@ const ТОЛЬКО_СВОИ = [
 // Админку лендингу не открываем никогда.
 const ЛЕНДИНГ = process.env.LANDING_ORIGIN?.replace(/\/$/, "");
 const ДЛЯ_ПРИЛОЖЕНИЯ = ЛЕНДИНГ
-  ? [{ key: "Content-Security-Policy", value: `frame-ancestors 'self' ${ЛЕНДИНГ}` }]
+  ? [{ key: "Content-Security-Policy", value: `frame-ancestors 'self' ${ЛЕНДИНГ}; ${БАЗА_CSP}` }]
   : ТОЛЬКО_СВОИ;
 
 const nextConfig: NextConfig = {
   eslint: { ignoreDuringBuilds: true },
+  // Не сообщать наружу, на чём сделан сайт: подсказка для перебора
+  // известных уязвимостей конкретного фреймворка.
+  poweredByHeader: false,
   env: { NEXT_PUBLIC_BUILD_ID: BUILD_ID },
   async headers() {
     // Совпавшие правила сливаются, и одноимённый заголовок берётся из
     // последнего — поэтому строгое правило админки идёт в конце.
     return [
       { source: "/:path*", headers: [...SECURITY_HEADERS, ...ДЛЯ_ПРИЛОЖЕНИЯ] },
-      { source: "/admin/:path*", headers: ТОЛЬКО_СВОИ },
-      { source: "/admin", headers: ТОЛЬКО_СВОИ },
+      // Админку поисковикам не показываем: ни страницу входа, ни разделы.
+      { source: "/admin/:path*", headers: [...ТОЛЬКО_СВОИ, { key: "X-Robots-Tag", value: "noindex, nofollow" }] },
+      { source: "/admin", headers: [...ТОЛЬКО_СВОИ, { key: "X-Robots-Tag", value: "noindex, nofollow" }] },
     ];
   },
 };
