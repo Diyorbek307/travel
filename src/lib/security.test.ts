@@ -42,7 +42,7 @@ const пауза = (мс: number) => new Promise((r) => setTimeout(r, мс));
 
 describe("отзыв сессий сменой пароля", () => {
   it("старая сессия после сброса пароля не работает, новая — работает", async () => {
-    const u = await users.createUser({
+    const создан = await users.createUser({
       email: "sec@test.uz",
       password: "Пароль123!",
       firstName: "Тест",
@@ -51,6 +51,8 @@ describe("отзыв сессий сменой пароля", () => {
       country: "",
       phone: "",
     });
+    if (создан === "email_taken") throw new Error("почта уже занята");
+    const u = создан;
     const старая = users.makeSession(u.id);
     expect((await users.userBySession(старая))?.id).toBe(u.id);
 

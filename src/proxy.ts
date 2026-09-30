@@ -15,7 +15,7 @@ const ПОТОЛКИ: [RegExp, number][] = [
 ];
 const ОБЫЧНЫЙ = 1024 * 1024;
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   if (request.method === "GET" || request.method === "HEAD") return NextResponse.next();
 
   const длина = Number(request.headers.get("content-length") ?? 0);

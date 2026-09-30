@@ -56,7 +56,6 @@ const ДЛЯ_ПРИЛОЖЕНИЯ = ЛЕНДИНГ
   : ТОЛЬКО_СВОИ;
 
 const nextConfig: NextConfig = {
-  eslint: { ignoreDuringBuilds: true },
   // Не сообщать наружу, на чём сделан сайт: подсказка для перебора
   // известных уязвимостей конкретного фреймворка.
   poweredByHeader: false,

@@ -21,7 +21,10 @@ const ЗАГОЛОВКИ = [
 const nextConfig: NextConfig = {
   // three собирается из исходников — Next должен его транспилировать.
   transpilePackages: ["three"],
-  eslint: { ignoreDuringBuilds: true },
+  // Лендинг живёт внутри репозитория приложения, и у обоих свой
+  // package-lock. Без явного корня Turbopack берёт папку приложения и
+  // может подтянуть модули не из того node_modules.
+  turbopack: { root: import.meta.dirname },
   poweredByHeader: false,
   async headers() {
     return [{ source: "/:path*", headers: ЗАГОЛОВКИ }];
