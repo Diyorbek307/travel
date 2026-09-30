@@ -1,5 +1,6 @@
 "use client";
 
+import { МагазинEsim } from "@/components/esim-shop";
 import { useMemo, useState } from "react";
 import { BORDER, CREAM, GREEN, MUTED, TEXT, ACCENT_SOFT, мягко } from "@/lib/theme";
 import { useCurrency, СИМВОЛЫ, ГЛАВНЫЕ } from "@/components/currency-provider";
@@ -203,9 +204,10 @@ function ПродажаБилетов() {
 
 // Экран «Полезное»
 
-export function PracticalScreen({ onBack }: { onBack: () => void }) {
+export function PracticalScreen({ onBack, раскрыть }: { onBack: () => void; раскрыть?: string }) {
   const { t, lang } = useT();
-  const [open, setOpen] = useState<string | null>(ПАМЯТКИ[0].id);
+  // «раскрыть» — сразу нужная памятка: например, «Связь» после оплаты eSIM.
+  const [open, setOpen] = useState<string | null>(раскрыть ?? ПАМЯТКИ[0].id);
   return (
     <div className="flex flex-col h-full animate-slide-up" style={{ background: CREAM }}>
       <div className="bg-white px-4 pt-14 pb-4 border-b" style={{ borderColor: BORDER }}>
@@ -296,6 +298,7 @@ export function PracticalScreen({ onBack }: { onBack: () => void }) {
                   )}
                   {s.виджет === "поезд" && <ПродажаБилетов />}
                   {s.виджет === "разговорник" && <Разговорник />}
+                  {s.виджет === "esim" && <МагазинEsim />}
                   {s.ссылки && (
                     <div className="mt-3 flex flex-wrap gap-2">
                       {s.ссылки.map((с) => (

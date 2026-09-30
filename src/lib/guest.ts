@@ -40,4 +40,4 @@ export function открытьВход(что: "login" | "register" = "login"): 
 }
 
 /** Ссылки, по которым человек пришёл к конкретной вещи, а не «в приложение». */
-export const ПАРАМЕТРЫ_ССЫЛКИ = ["place", "hotel", "restaurant", "audio", "open", "trip"] as const;
+export const ПАРАМЕТРЫ_ССЫЛКИ = ["place", "hotel", "restaurant", "audio", "open", "trip", "esim"] as const;

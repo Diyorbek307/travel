@@ -35,6 +35,7 @@ import AccessControl from "./components/AccessControl";
 import Staff from "./components/Staff";
 import Translations from "./components/Translations";
 import MyVenue from "./components/MyVenue";
+import EsimOrders from "./components/EsimOrders";
 import { можетРаздел, ROLE_META } from "@/lib/admin-roles";
 import { МеняКонтекст, type Меня } from "./context/MeContext";
 import { Иконка, type ИмяИконки } from "./icons";
@@ -105,7 +106,10 @@ const NAV_GROUPS: {
   },
   {
     label: "Монетизация",
-    items: [{ id: "ads", label: "Реклама", icon: "ads" }],
+    items: [
+      { id: "ads", label: "Реклама", icon: "ads" },
+      { id: "esim", label: "eSIM", icon: "esim" },
+    ],
   },
   {
     label: "Инструменты",
@@ -219,6 +223,7 @@ export default function AdminShell() {
     staff: <Staff />,
     translations: <Translations />,
     myvenue: <MyVenue />,
+    esim: <EsimOrders />,
   };
 
   const sidebarWidth = sidebarCollapsed ? "56px" : "224px";

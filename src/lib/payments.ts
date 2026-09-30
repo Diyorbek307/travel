@@ -52,11 +52,11 @@ export function какиеСистемы(): Система[] {
  * произвольные поля заказа. Поле order доедет обратно, когда подключим
  * проверку платежей, — по нему станет ясно, чей это платёж.
  */
-export function paymeСсылка(сумма: number, order: string): string | null {
+export function paymeСсылка(сумма: number, order: string, куда?: string): string | null {
   const merchant = process.env.PAYME_MERCHANT_ID;
   if (!merchant) return null;
 
-  const части = [`m=${merchant}`, `ac.order=${order}`, `a=${вТийины(сумма)}`, "c=" + возврат()];
+  const части = [`m=${merchant}`, `ac.order=${order}`, `a=${вТийины(сумма)}`, "c=" + (куда ?? возврат())];
   const строка = части.join(";");
   // Base64 без переносов: Payme читает её как единый хвост адреса.
   const код = Buffer.from(строка, "utf8").toString("base64");
@@ -69,7 +69,7 @@ export function paymeСсылка(сумма: number, order: string): string | n
  * У Click параметры идут обычной строкой запроса. Нужны идентификаторы
  * продавца и услуги — их выдают в кабинете вместе с договором.
  */
-export function clickСсылка(сумма: number, order: string): string | null {
+export function clickСсылка(сумма: number, order: string, куда?: string): string | null {
   const merchant = process.env.CLICK_MERCHANT_ID;
   const service = process.env.CLICK_SERVICE_ID;
   if (!merchant || !service) return null;
@@ -79,18 +79,18 @@ export function clickСсылка(сумма: number, order: string): string | n
     merchant_id: merchant,
     amount: String(сумма),
     transaction_param: order,
-    return_url: возврат(),
+    return_url: куда ?? возврат(),
   });
   return `https://my.click.uz/services/pay?${п.toString()}`;
 }
 
 /** Куда вернуть человека после оплаты — на сам сайт. */
-function возврат(): string {
+export function возврат(): string {
   return (
     process.env.APP_BASE_URL || process.env.RENDER_EXTERNAL_URL || "https://uzbekistan-travel.onrender.com"
   );
 }
 
-export function ссылкаОплаты(система: Система, сумма: number, order: string): string | null {
-  return система === "payme" ? paymeСсылка(сумма, order) : clickСсылка(сумма, order);
+export function ссылкаОплаты(система: Система, сумма: number, order: string, куда?: string): string | null {
+  return система === "payme" ? paymeСсылка(сумма, order, куда) : clickСсылка(сумма, order, куда);
 }

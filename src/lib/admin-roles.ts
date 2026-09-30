@@ -102,6 +102,7 @@ const РАЗДЕЛ_ДОСТУП: Record<string, AdminRole[]> = {
   push: ["owner", "editor"],
   // Монетизация и сотрудники — владелец.
   ads: ["owner"],
+  esim: ["owner"],
   staff: ["owner"],
 };
 

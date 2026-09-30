@@ -1,5 +1,6 @@
 "use client";
 
+import { запомнитьЗаказEsim } from "@/components/esim-shop";
 import { разобратьКод, заменитьМаршрут, текущийМаршрут } from "@/lib/trip";
 import { лёгкийСейчас } from "@/lib/lite";
 import { ЖивоеОбучение } from "@/components/live-tour";
@@ -194,6 +195,7 @@ function App() {
   const [searchQuery, setSearchQuery] = useState(""); // предзаполнение поиска (напр. клик по городу)
   const [showNotifs, setShowNotifs] = useState(false);
   const [showPractical, setShowPractical] = useState(false);
+  const [раскрытьПамятку, setРаскрытьПамятку] = useState<string | undefined>(undefined);
   const [showTransport, setShowTransport] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [showPremium, setShowPremium] = useState(false);
@@ -428,6 +430,14 @@ function App() {
       setСсылкаЖдёт(открыть);
       п.delete("open");
     }
+    // Возврат с оплаты eSIM: «/?esim=<номер заказа>» — открываем «Связь».
+    const есим = п.get("esim");
+    if (есим) {
+      запомнитьЗаказEsim(есим);
+      setРаскрытьПамятку("internet");
+      setShowPractical(true);
+      п.delete("esim");
+    }
     // Присланный план поездки: «/?trip=<код>».
     const план = п.get("trip");
     if (план) {
@@ -435,7 +445,7 @@ function App() {
       п.delete("trip");
     }
     // «Поделиться» ведёт на «/?place=<id>» (или hotel, restaurant).
-    let запись = !!план;
+    let запись = !!план || !!есим;
     for (const вид of ["place", "hotel", "restaurant"] as const) {
       const номер = п.get(вид);
       if (!номер) continue;
@@ -712,7 +722,13 @@ function App() {
                 />
               </Слой>
               <Слой открыт={showPractical} className="overlay-screen absolute inset-0 z-40">
-                <PracticalScreen onBack={() => setShowPractical(false)} />
+                <PracticalScreen
+                  раскрыть={раскрытьПамятку}
+                  onBack={() => {
+                    setShowPractical(false);
+                    setРаскрытьПамятку(undefined);
+                  }}
+                />
               </Слой>
               <Слой открыт={showTransport} className="overlay-screen device-safe-top absolute inset-0 z-40">
                 <TransportScreen onBack={() => setShowTransport(false)} isPremium={isPremium} />

@@ -59,6 +59,24 @@ services:
       - key: VAPID_SUBJECT
         sync: false
 
+      # Оплата и eSIM. Секретные ключи Payme/Click нужны, чтобы платёжная
+      # система сама подтверждала оплату; без подтверждения eSIM не выдаётся.
+      # Адреса для кабинетов Payme и Click — в админке, раздел «eSIM».
+      - key: PAYME_MERCHANT_ID
+        sync: false
+      - key: PAYME_KEY
+        sync: false
+      - key: CLICK_MERCHANT_ID
+        sync: false
+      - key: CLICK_SERVICE_ID
+        sync: false
+      - key: CLICK_SECRET
+        sync: false
+      - key: AIRALO_CLIENT_ID
+        sync: false
+      - key: AIRALO_CLIENT_SECRET
+        sync: false
+
       # Адрес лендинга (например https://hellouz.uz): ему разрешено
       # показывать приложение в рамке «живого демо». Админку — никогда.
       - key: LANDING_ORIGIN
