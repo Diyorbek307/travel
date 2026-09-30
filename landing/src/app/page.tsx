@@ -9,6 +9,8 @@ import Finale from "@/components/finale";
 import PortalSection from "@/components/portal-section";
 import GlobeSection from "@/components/globe-section";
 import Manifesto from "@/components/manifesto";
+import OpenCountry from "@/components/open-country";
+import Essentials from "@/components/essentials";
 import { APP_URL } from "@/lib/i18n";
 
 // Цифры берём из живого приложения раз в час — никаких «500+» с потолка.
@@ -39,7 +41,9 @@ export default async function Home() {
       <Marquee />
       <Manifesto />
       <PortalSection />
+      <OpenCountry />
       <Destinations />
+      <Essentials />
       <Features />
       <GlobeSection />
       <Showcase />

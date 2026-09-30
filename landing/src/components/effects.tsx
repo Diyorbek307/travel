@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Logo from "./logo";
+import { useЯзык } from "@/lib/i18n";
 
 /**
  * Эффекты лендинга: заставка, курсор, «магнитные» кнопки, счёт цифр.
@@ -112,12 +113,12 @@ export function Курсор() {
       <div
         ref={кольцо}
         className="pointer-events-none fixed left-0 top-0 z-[90] -ml-5 -mt-5 h-10 w-10 rounded-full border-2 transition-[opacity,scale] duration-200"
-        style={{ borderColor: "var(--brick)", mixBlendMode: "multiply" }}
+        style={{ borderColor: "var(--accent-ink)", mixBlendMode: "multiply" }}
       />
       <div
         ref={точка}
         className="pointer-events-none fixed left-0 top-0 z-[91] -ml-1 -mt-1 h-2 w-2 rounded-full"
-        style={{ background: "var(--brick)" }}
+        style={{ background: "var(--accent-ink)" }}
       />
     </>
   );
@@ -147,9 +148,12 @@ export function Магнит({ children, сила = 0.3 }: { children: React.Rea
 }
 
 /** Число «набегает» от нуля, когда попадает в кадр. */
-export function Счёт({ до }: { до: number }) {
+export function Счёт({ до, знаков = 0 }: { до: number; знаков?: number }) {
   const ref = useRef<HTMLSpanElement>(null);
   const [n, setN] = useState(0);
+  // Формат по языку лендинга: 8,2 по-русски, 8.2 по-английски.
+  const { язык } = useЯзык();
+  const формат = new Intl.NumberFormat(`${язык}-u-nu-latn`, { minimumFractionDigits: знаков, maximumFractionDigits: знаков });
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
@@ -160,15 +164,76 @@ export function Счёт({ до }: { до: number }) {
       const старт = performance.now();
       const шаг = (t: number) => {
         const п = Math.min(1, (t - старт) / 1600);
-        setN(Math.round((1 - Math.pow(1 - п, 4)) * до));
+        const м = 10 ** знаков;
+        setN(Math.round((1 - Math.pow(1 - п, 4)) * до * м) / м);
         if (п < 1) requestAnimationFrame(шаг);
       };
       requestAnimationFrame(шаг);
     });
     наб.observe(el);
     return () => наб.disconnect();
-  }, [до]);
-  return <span ref={ref}>{n}</span>;
+  }, [до, знаков]);
+  return <span ref={ref}>{формат.format(n)}</span>;
+}
+
+/** Тонкая полоса прочитанного сверху страницы: бирюза переходит в золото. */
+export function Прогресс() {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    let кадр = 0;
+    const при = () => {
+      cancelAnimationFrame(кадр);
+      кадр = requestAnimationFrame(() => {
+        const h = document.documentElement.scrollHeight - window.innerHeight;
+        if (ref.current) ref.current.style.transform = `scaleX(${h > 0 ? window.scrollY / h : 0})`;
+      });
+    };
+    при();
+    window.addEventListener("scroll", при, { passive: true });
+    window.addEventListener("resize", при);
+    return () => {
+      window.removeEventListener("scroll", при);
+      window.removeEventListener("resize", при);
+      cancelAnimationFrame(кадр);
+    };
+  }, []);
+  return (
+    <div className="pointer-events-none fixed inset-x-0 top-0 z-[60] h-[3px]">
+      <div
+        ref={ref}
+        className="h-full origin-left rtl:origin-right"
+        style={{ transform: "scaleX(0)", background: "linear-gradient(90deg,var(--accent),var(--gold))" }}
+      />
+    </div>
+  );
+}
+
+/**
+ * Карточка с «фонариком»: мягкое бирюзовое пятно идёт за курсором.
+ * Координаты пишем в CSS-переменные, без перерисовки React.
+ */
+export function Фонарик({
+  children,
+  className = "",
+  style,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  style?: React.CSSProperties;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const двигать = (e: React.PointerEvent) => {
+    const el = ref.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    el.style.setProperty("--mx", `${e.clientX - r.left}px`);
+    el.style.setProperty("--my", `${e.clientY - r.top}px`);
+  };
+  return (
+    <div ref={ref} onPointerMove={двигать} className={`spotlight ${className}`} style={style}>
+      {children}
+    </div>
+  );
 }
 
 /**
@@ -208,7 +273,7 @@ export function Манифест({ текст, акцент }: { текст: str
           <span
             key={i}
             className="transition-colors duration-300"
-            style={{ color: горит ? (особое ? "var(--brick)" : "var(--ink)") : "rgba(34,26,19,0.14)" }}
+            style={{ color: горит ? (особое ? "var(--accent-ink)" : "var(--ink)") : "rgba(13,23,21,0.14)" }}
           >
             {с}{" "}
           </span>

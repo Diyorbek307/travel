@@ -62,7 +62,7 @@ export default function PortalSection() {
         >
           <p
             className="mb-3 text-xs font-semibold uppercase tracking-[0.3em]"
-            style={{ color: "var(--brick)" }}
+            style={{ color: "var(--accent-ink)" }}
           >
             {t("portal_kicker")}
           </p>
@@ -108,7 +108,7 @@ export default function PortalSection() {
             <path
               d="M0,100 V42 C0,20 22,6 50,0 C78,6 100,20 100,42 V100"
               fill="none"
-              stroke="#0e8f88"
+              stroke="#0fb3ac"
               strokeWidth="1.2"
               vectorEffect="non-scaling-stroke"
             />

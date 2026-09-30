@@ -180,7 +180,7 @@ export default function Quiz() {
       <Reveal>
         <div
           className="mx-auto max-w-6xl rounded-[36px] border px-6 py-12 sm:px-12"
-          style={{ borderColor: "var(--line)", background: "linear-gradient(135deg,#fffaf2,#f3e3cc)" }}
+          style={{ borderColor: "var(--line)", background: "linear-gradient(135deg,#ffffff,#e3f4f2)" }}
         >
           <h2 className="serif mb-3 text-[clamp(2rem,4vw,3rem)] font-semibold leading-tight">
             {t("quiz_title")}
@@ -222,7 +222,7 @@ export default function Quiz() {
                     className="rounded-2xl border bg-white/70 p-4"
                     style={{ borderColor: "var(--line)" }}
                   >
-                    <p className="hand mb-1 text-2xl" style={{ color: "var(--brick)" }}>
+                    <p className="hand mb-1 text-2xl" style={{ color: "var(--accent-ink)" }}>
                       {t("quiz_day")} {d + 1}
                     </p>
                     <ul className="space-y-1 text-sm">
@@ -239,8 +239,8 @@ export default function Quiz() {
                 href={`${APP_URL}/?trip=${encodeURIComponent(код ?? "")}`}
                 target="_blank"
                 rel="noreferrer"
-                className="mt-6 inline-flex items-center gap-3 rounded-full px-7 py-4 text-[15px] font-semibold text-white shadow-[0_14px_30px_-12px_rgba(154,59,34,0.7)] transition-transform hover:scale-[1.03]"
-                style={{ background: "var(--brick)" }}
+                className="mt-6 inline-flex items-center gap-3 rounded-full px-7 py-4 text-[15px] font-semibold text-white shadow-[0_14px_30px_-12px_rgba(14,166,159,0.55)] transition-transform hover:scale-[1.03]"
+                style={{ background: "var(--accent-ink)" }}
               >
                 {t("quiz_open")} ↗
               </a>

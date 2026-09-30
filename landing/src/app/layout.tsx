@@ -3,7 +3,7 @@ import { Caveat, Oswald, Playfair_Display, Rubik } from "next/font/google";
 import "./globals.css";
 import SmoothScroll from "@/components/smooth-scroll";
 import { ЯзыкProvider } from "@/lib/i18n";
-import { Заставка, Курсор } from "@/components/effects";
+import { Заставка, Курсор, Прогресс } from "@/components/effects";
 
 // Rubik — как в приложении и на логотипе; антиква — для заголовков,
 // рукописный — для подписей к наброскам, узкий — для названий городов.
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#fbf6ef",
+  themeColor: "#f4f7f7",
   width: "device-width",
   initialScale: 1,
 };
@@ -47,6 +47,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <SmoothScroll />
         <Курсор />
+        <Прогресс />
         <ЯзыкProvider>
           <Заставка />
           {children}

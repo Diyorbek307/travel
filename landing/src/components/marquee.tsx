@@ -20,7 +20,7 @@ function Изразец() {
       className="h-3 w-full"
       style={{
         background:
-          "repeating-linear-gradient(135deg, var(--tile) 0 8px, transparent 8px 16px), repeating-linear-gradient(45deg, var(--gold) 0 4px, transparent 4px 16px)",
+          "repeating-linear-gradient(135deg, var(--accent) 0 8px, transparent 8px 16px), repeating-linear-gradient(45deg, var(--gold) 0 4px, transparent 4px 16px)",
         opacity: 0.55,
       }}
     />
@@ -40,7 +40,7 @@ export default function Marquee() {
               className="serif flex items-center gap-8 px-8 text-4xl font-semibold italic sm:text-5xl"
             >
               {с}
-              <span className="text-2xl not-italic" style={{ color: "var(--tile-light)" }}>
+              <span className="text-2xl not-italic" style={{ color: "var(--accent-light)" }}>
                 ✦
               </span>
             </span>

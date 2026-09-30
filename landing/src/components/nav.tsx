@@ -16,37 +16,38 @@ export default function Nav() {
   }, []);
 
   const ссылки = [
+    ["#open", t("nav_open")],
     ["#cities", t("nav_cities")],
+    ["#know", t("nav_know")],
     ["#features", t("nav_features")],
-    ["#demo", t("nav_demo")],
     ["#quiz", t("nav_quiz")],
   ] as const;
 
   return (
     <header
       className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
-        прокручено ? "glass-light py-2.5 shadow-[0_8px_30px_-20px_rgba(34,26,19,0.5)]" : "py-5"
+        прокручено ? "glass-light py-2.5 shadow-[0_8px_30px_-20px_rgba(13,23,21,0.5)]" : "py-5"
       }`}
     >
       <div className="mx-auto flex max-w-7xl items-center gap-6 px-5 sm:px-8">
         <a href="#top" className="flex items-center gap-2.5">
           <Logo size={36} />
           <span className="text-xl font-semibold tracking-tight">
-            Hello<span style={{ color: "var(--tile)" }}>UZ</span>
+            Hello<span style={{ color: "var(--accent)" }}>UZ</span>
           </span>
         </a>
-        <nav className="ml-auto hidden items-center gap-7 text-sm font-medium md:flex">
+        <nav className="ml-auto hidden items-center gap-6 text-sm font-medium lg:flex">
           {ссылки.map(([href, текст]) => (
             <a key={href} href={href} className="group relative py-1">
               {текст}
               <span
                 className="absolute inset-x-0 -bottom-0.5 h-px origin-left scale-x-0 transition-transform duration-300 group-hover:scale-x-100"
-                style={{ background: "var(--brick)" }}
+                style={{ background: "var(--accent-ink)" }}
               />
             </a>
           ))}
         </nav>
-        <div className="ml-auto flex items-center gap-2 md:ml-0">
+        <div className="ml-auto flex items-center gap-2 lg:ml-0">
           {/* Все 10 языков приложения; по умолчанию — язык устройства. */}
           <label className="relative flex items-center">
             <span className="sr-only">Language</span>
@@ -69,7 +70,7 @@ export default function Nav() {
             target="_blank"
             rel="noreferrer"
             className="hidden rounded-full px-5 py-2.5 text-sm font-semibold text-white transition-transform hover:scale-[1.04] sm:inline-block"
-            style={{ background: "var(--brick)" }}
+            style={{ background: "var(--accent-ink)" }}
           >
             {t("open_app")}
           </a>

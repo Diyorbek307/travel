@@ -171,15 +171,15 @@ function Силуэт({ вариант }: { вариант: number }) {
       className="absolute inset-x-0 bottom-0 h-40 w-full"
       aria-hidden
     >
-      <path d={пути[вариант % 3]} fill="rgba(20,32,31,0.88)" />
+      <path d={пути[вариант % 3]} fill="rgba(6,52,48,0.9)" />
     </svg>
   );
 }
 
 const ГРАДИЕНТЫ = [
-  "linear-gradient(180deg,#f4c8b0 0%,#e9a58a 55%,#b86d57 100%)",
-  "linear-gradient(180deg,#f7dca8 0%,#eeb77c 55%,#c47e4f 100%)",
-  "linear-gradient(180deg,#bfe3dc 0%,#7cc3b9 55%,#3f8f86 100%)",
+  "linear-gradient(180deg,#d4f5f1 0%,#72d8cf 55%,#0e9f98 100%)",
+  "linear-gradient(180deg,#fdf1cf 0%,#f0d185 55%,#c99f3f 100%)",
+  "linear-gradient(180deg,#dcefff 0%,#8ec5e6 55%,#2f7ea6 100%)",
 ];
 
 export default function Features() {
@@ -193,13 +193,13 @@ export default function Features() {
     <section id="features" className="paper-grain px-3 py-20 sm:px-6 sm:py-28">
       <div
         className="mx-auto max-w-7xl overflow-hidden rounded-[36px] px-6 py-14 sm:px-12 sm:py-20"
-        style={{ background: "var(--night)", color: "var(--paper)" }}
+        style={{ background: "linear-gradient(145deg, var(--accent-deep), var(--night) 65%)", color: "var(--paper)" }}
       >
         <div className="grid gap-12 lg:grid-cols-[0.9fr_1.6fr]">
           <Reveal>
             <p
               className="mb-5 text-xs font-semibold uppercase tracking-[0.25em]"
-              style={{ color: "var(--tile-light)" }}
+              style={{ color: "var(--accent-light)" }}
             >
               {t("feat_kicker")}
             </p>
@@ -214,7 +214,7 @@ export default function Features() {
                   className="rounded-full px-3.5 py-1.5 text-xs font-medium transition-transform hover:-translate-y-0.5"
                   style={
                     n % 3 === 0
-                      ? { background: "rgba(244,200,176,0.9)", color: "var(--ink)" }
+                      ? { background: "rgba(233,196,106,0.95)", color: "var(--ink)" }
                       : n % 3 === 1
                       ? { border: "1px solid rgba(255,255,255,0.3)" }
                       : { background: "rgba(255,255,255,0.1)" }
@@ -237,7 +237,7 @@ export default function Features() {
                 >
                   <span className="mb-3 text-2xl">{к.знак}</span>
                   <h3 className="serif mb-3 text-2xl font-semibold">{к.заголовок}</h3>
-                  <p className="text-[13px] leading-relaxed" style={{ color: "rgba(34,26,19,0.78)" }}>
+                  <p className="text-[13px] leading-relaxed" style={{ color: "rgba(13,23,21,0.78)" }}>
                     {к.текст}
                   </p>
                   <div className="transition-transform duration-700 group-hover:translate-y-2">

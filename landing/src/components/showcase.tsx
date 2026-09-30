@@ -31,7 +31,7 @@ export default function Showcase() {
   }, []);
 
   return (
-    <section id="demo" className="relative overflow-hidden py-24 sm:py-32" style={{ background: "#2a1a12" }}>
+    <section id="demo" className="relative overflow-hidden py-24 sm:py-32" style={{ background: "#062a27" }}>
       <img
         src={фото("1664602078796-68ee76b3fc59", 1920)}
         alt=""
@@ -41,7 +41,7 @@ export default function Showcase() {
         className="absolute inset-0"
         style={{
           background:
-            "linear-gradient(180deg, rgba(42,26,18,0.55), rgba(42,26,18,0.35) 40%, rgba(20,12,8,0.85))",
+            "linear-gradient(180deg, rgba(4,32,30,0.55), rgba(4,32,30,0.35) 40%, rgba(3,22,20,0.88))",
         }}
       />
 
@@ -73,7 +73,7 @@ export default function Showcase() {
                 />
                 <div
                   className="absolute inset-0"
-                  style={{ background: "linear-gradient(to top, rgba(20,12,8,0.85), transparent 50%)" }}
+                  style={{ background: "linear-gradient(to top, rgba(3,22,20,0.88), transparent 50%)" }}
                 />
                 <div className="absolute left-6 top-6 text-white">
                   <p className="serif text-5xl font-semibold">Samarkand</p>

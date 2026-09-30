@@ -1,27 +1,30 @@
 @import "tailwindcss";
 
 /*
- * Лендинг HelloUZ: тёплая бумага, кирпич и бирюза изразцов.
+ * Лендинг HelloUZ в цветах светлой темы приложения.
  *
- * Образ — как у лучших туристических лендингов: светлый кремовый фон,
- * крупная антиква, карандашные наброски памятников и живые фото. Бирюза —
- * цвет куполов Самарканда и бренда HelloUZ, кирпич — жжёная глина стен.
+ * Фон, текст и бирюза — те же, что в src/app/globals.css приложения:
+ * человек переходит с сайта в приложение и попадает «в тот же дом».
+ * Золото логотипа — второй акцент, точечно. Бирюзу для мелкого текста
+ * берём глубже (--accent-ink): светлая #0fb3ac на светлом фоне не читается.
  */
 
 :root {
-  --paper: #fbf6ef;
-  --cream: #f4ebdd;
-  --sand: #e9dcc6;
-  --ink: #221a13;
-  --ink-soft: #6c5b4c;
-  --brick: #9a3b22;
-  --brick-deep: #7c2d18;
-  --tile: #0e8f88;
-  --tile-light: #2fd0c6;
-  --gold: #d9a93d;
-  --night: #14201f;
-  --night-soft: #1e2d2b;
-  --line: rgba(34, 26, 19, 0.12);
+  --paper: #f4f7f7;
+  --cream: #eaf4f3;
+  --sand: #d7ecea;
+  --ink: #0d1715;
+  --ink-soft: #587470;
+  --accent: #0fb3ac;
+  --accent-fill: #0ea69f;
+  --accent-ink: #0a847e;
+  --accent-deep: #07685f;
+  --accent-light: #2fd0c6;
+  --gold: #e9c46a;
+  --gold-ink: #8a6814;
+  --night: #062a27;
+  --night-soft: #0b3b37;
+  --line: rgba(13, 23, 21, 0.1);
 }
 
 html {
@@ -53,8 +56,8 @@ body {
 /* ── Бумага: едва заметное зерно, чтобы кремовый не был пластиком ── */
 .paper-grain {
   background-color: var(--paper);
-  background-image: radial-gradient(circle at 20% 10%, rgba(217, 169, 61, 0.1), transparent 45%),
-    radial-gradient(circle at 85% 30%, rgba(14, 143, 136, 0.08), transparent 40%),
+  background-image: radial-gradient(circle at 20% 10%, rgba(233, 196, 106, 0.14), transparent 45%),
+    radial-gradient(circle at 85% 30%, rgba(15, 179, 172, 0.12), transparent 40%),
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.06'/%3E%3C/svg%3E");
 }
 
@@ -162,7 +165,7 @@ body {
   -webkit-backdrop-filter: blur(18px) saturate(1.2);
 }
 .glass-light {
-  background: rgba(251, 246, 239, 0.72);
+  background: rgba(255, 255, 255, 0.72);
   border: 1px solid rgba(255, 255, 255, 0.6);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
@@ -199,6 +202,77 @@ body {
   }
 }
 
+/* ── Переливающийся текст: бирюза → золото → бирюза ── */
+.text-shimmer {
+  background: linear-gradient(100deg, var(--accent-deep), var(--accent) 30%, var(--gold) 50%, var(--accent) 70%, var(--accent-deep));
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 7s linear infinite;
+}
+@keyframes shimmer {
+  to {
+    background-position: -250% 0;
+  }
+}
+
+/* ── «Северное сияние» за первым экраном: два мягких пятна плывут ── */
+.aurora {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(70px);
+  opacity: 0.55;
+  animation: aurora 18s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+@keyframes aurora {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(6%, 8%, 0) scale(1.15);
+  }
+  100% {
+    transform: translate3d(-5%, -4%, 0) scale(0.95);
+  }
+}
+
+/* ── Карточка с фонариком за курсором (см. Фонарик в effects.tsx) ── */
+.spotlight {
+  position: relative;
+  isolation: isolate;
+}
+.spotlight::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(260px circle at var(--mx, -300px) var(--my, -300px), rgba(15, 179, 172, 0.16), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: -1;
+}
+.spotlight:hover::before {
+  opacity: 1;
+}
+
+/* ── Флаг колышется: полоски-срезы качаются со сдвигом фазы ── */
+.flag-slice {
+  animation: wave 2.8s ease-in-out infinite;
+}
+@keyframes wave {
+  50% {
+    transform: translateY(var(--amp, 6px));
+    filter: brightness(1.08);
+  }
+}
+
+/* ── Восьмиконечная звезда-гирих медленно вращается ── */
+.spin-slower {
+  animation: spin 60s linear infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .sketch path,
   .sketch line,
@@ -211,7 +285,11 @@ body {
   .kenburns,
   .spin-slow,
   .float,
-  .shine-sweep::after {
+  .shine-sweep::after,
+  .text-shimmer,
+  .aurora,
+  .flag-slice,
+  .spin-slower {
     animation: none;
   }
   .line-mask > span,
