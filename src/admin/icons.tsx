@@ -25,6 +25,7 @@ export type ИмяИконки =
   | "audio"
   | "cities"
   | "translations"
+  | "myvenue"
   | "push"
   | "users"
   | "reviews"
@@ -145,6 +146,12 @@ const ФИГУРЫ: Record<ИмяИконки, React.ReactNode> = {
     <>
       <rect x="6" y="2" width="12" height="20" rx="2.5" />
       <path d="M10.5 18.5h3" />
+    </>
+  ),
+  myvenue: (
+    <>
+      <path d="M3 21h18M5 21V9l7-5 7 5v12" />
+      <path d="M9 21v-6h6v6" />
     </>
   ),
   translations: (

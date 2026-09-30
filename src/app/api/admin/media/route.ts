@@ -1,15 +1,16 @@
 import { NextResponse } from "next/server";
-import { отказЕсли } from "@/lib/admin-auth";
+import { отказЕслиНи } from "@/lib/admin-auth";
 import { сохранитьФото } from "@/lib/media";
 
 export const dynamic = "force-dynamic";
 
 /**
- * Загрузка фотографии из панели. Может тот, кто правит содержимое.
+ * Загрузка фотографии из панели. Может тот, кто правит содержимое, и
+ * кабинет заведения — для фото своей карточки.
  * Принимает data-URL картинки, возвращает короткую ссылку на неё.
  */
 export async function POST(request: Request) {
-  const нет = await отказЕсли("content");
+  const нет = await отказЕслиНи("content", "venue");
   if (нет) return нет;
 
   const body = (await request.json().catch(() => null)) as { dataUrl?: unknown } | null;

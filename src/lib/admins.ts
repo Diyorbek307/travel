@@ -26,6 +26,11 @@ const FILE = path.join(DATA_DIR, "admins.json");
 /** Логин `admin` закреплён за мастер-входом по переменной окружения. */
 export const ЛОГИН_ВЛАДЕЛЬЦА = "admin";
 
+export interface ЗаведениеСотрудника {
+  вид: "hotel" | "restaurant";
+  id: string;
+}
+
 export interface AdminAccount {
   id: string;
   /** Логин: латиница в нижнем регистре, по нему входят. */
@@ -34,6 +39,8 @@ export interface AdminAccount {
   name: string;
   passwordHash: string;
   role: AdminRole;
+  /** Для роли «Заведение»: чья это учётная запись. */
+  заведение?: ЗаведениеСотрудника;
   /** Заблокирован: запись есть, но войти нельзя. */
   disabled: boolean;
   createdAt: string;
@@ -81,6 +88,7 @@ export async function createAdmin(input: {
   name: string;
   password: string;
   role: AdminRole;
+  заведение?: ЗаведениеСотрудника;
 }): Promise<CreateResult> {
   const username = нормЛогин(input.username);
   if (!логинГоден(username)) return { ok: false, error: "bad_username" };
@@ -101,6 +109,7 @@ export async function createAdmin(input: {
       name: input.name.trim().slice(0, 60) || username,
       passwordHash,
       role: input.role,
+      ...(input.role === "venue" && input.заведение ? { заведение: input.заведение } : {}),
       disabled: false,
       createdAt: now,
       lastSeenAt: null,
@@ -112,7 +121,7 @@ export async function createAdmin(input: {
 /** Меняет имя, роль и блокировку. Пароль — отдельным путём. */
 export async function updateAdmin(
   id: string,
-  fields: Partial<Pick<AdminAccount, "name" | "role" | "disabled">>,
+  fields: Partial<Pick<AdminAccount, "name" | "role" | "disabled" | "заведение">>,
 ): Promise<PublicAdmin | null> {
   return хранилище.update<PublicAdmin | null>((список) => {
     const i = список.findIndex((a) => a.id === id);
@@ -122,6 +131,7 @@ export async function updateAdmin(
     if (typeof fields.name === "string") чистые.name = fields.name.trim().slice(0, 60) || копия[i].name;
     if (fields.role) чистые.role = fields.role;
     if (typeof fields.disabled === "boolean") чистые.disabled = fields.disabled;
+    if (fields.заведение) чистые.заведение = fields.заведение;
     копия[i] = { ...копия[i], ...чистые };
     return [копия, publicAdmin(копия[i])];
   });

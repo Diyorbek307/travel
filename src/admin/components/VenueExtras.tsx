@@ -142,7 +142,10 @@ export default function VenueExtras({
   запись,
   onSave,
   onClose,
+  кабинет = false,
 }: {
+  /** Открыт из кабинета заведения: скидку Premium решает платформа, её не показываем. */
+  кабинет?: boolean;
   вид: Вид;
   запись: Подробности & {
     id: string;
@@ -218,10 +221,11 @@ export default function VenueExtras({
       // Пустой диапазон не сохраняем: без него шапка карточки осталась бы с дырой.
       if (цены.trim()) изменения.price = цены.trim();
     }
-    if (вид !== "place") {
+    if (вид !== "place" && !кабинет) {
       // Скидка — 0…50 %: больше похоже на опечатку, чем на щедрость.
       const n = Number(скидка);
-      изменения.premiumDiscount = скидка === "" || !Number.isFinite(n) ? 0 : Math.max(0, Math.min(50, Math.round(n)));
+      изменения.premiumDiscount =
+        скидка === "" || !Number.isFinite(n) ? 0 : Math.max(0, Math.min(50, Math.round(n)));
     }
     if (вид === "place") {
       изменения.tickets = билеты.filter((б) => б.name.trim() && б.price.trim());
@@ -271,7 +275,7 @@ export default function VenueExtras({
         <Заголовок>Фотографии</Заголовок>
 
         <ГалереяФото label="ПЕРВОЕ ФОТО — ОБЛОЖКА В СПИСКАХ И КАРТОЧКЕ" values={фото} onChange={setФото} />
-        {вид !== "place" && (
+        {вид !== "place" && !кабинет && (
           <>
             <Заголовок>Скидка для Premium</Заголовок>
             <div className="max-w-xs">

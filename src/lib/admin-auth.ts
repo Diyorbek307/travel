@@ -1,4 +1,5 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
+import type { ЗаведениеСотрудника } from "./admins";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { требуетсяСекрет, вПродакшене } from "./secrets";
@@ -34,6 +35,8 @@ export const ROOT_ID = "root";
 export interface AdminSession {
   id: string;
   role: AdminRole;
+  /** Роль «Заведение»: какое именно (из хранилища, не из куки). */
+  заведение?: ЗаведениеСотрудника;
 }
 
 function secret(): string {
@@ -98,7 +101,7 @@ export async function currentAdmin(): Promise<AdminSession | null> {
   // до конца смены.
   const запись = await findAdminById(id);
   if (!запись || запись.disabled) return null;
-  return { id, role: запись.role };
+  return { id, role: запись.role, заведение: запись.заведение };
 }
 
 function rольOk(x: string): x is AdminRole {
@@ -118,6 +121,16 @@ export async function разрешено(домен: Домен): Promise<AdminS
   const admin = await currentAdmin();
   if (!admin) return null;
   return можетДомен(admin.role, домен) ? admin : null;
+}
+
+/** Как отказЕсли, но пускает, если есть хотя бы один из доменов. */
+export async function отказЕслиНи(...домены: Домен[]): Promise<NextResponse | null> {
+  const admin = await currentAdmin();
+  if (!admin) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  if (!домены.some((д) => можетДомен(admin.role, д))) {
+    return NextResponse.json({ error: "forbidden" }, { status: 403 });
+  }
+  return null;
 }
 
 /**

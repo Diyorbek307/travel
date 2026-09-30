@@ -2,7 +2,7 @@
 
 import { ПросьбаВойти } from "./auth-prompt";
 import { useEffect, useState } from "react";
-import { BORDER, GOLD, MUTED, TEXT, SURFACE, ON_GOLD } from "@/lib/theme";
+import { ACCENT_SOFT, BORDER, GOLD, GREEN, MUTED, TEXT, SURFACE, ON_GOLD } from "@/lib/theme";
 import { useT } from "@/components/lang-provider";
 import { датаСловами } from "@/lib/i18n";
 
@@ -25,6 +25,8 @@ interface Review {
   status?: "published" | "hidden";
   /** Имя автора. У отзывов, оставленных до его сохранения, отсутствует. */
   userName?: string;
+  /** Ответ заведения из его кабинета. */
+  reply?: { text: string; at: string };
 }
 
 /*
@@ -227,6 +229,16 @@ export default function ReviewForm({ placeId, placeName }: { placeId: string; pl
                 <p className="text-sm leading-relaxed" style={{ color: TEXT }}>
                   {r.text}
                 </p>
+              )}
+              {r.reply && (
+                <div className="mt-2 rounded-xl p-2.5" style={{ background: ACCENT_SOFT }}>
+                  <p className="text-[11px] font-bold" style={{ color: GREEN }}>
+                    💬 {t("rev_reply")}
+                  </p>
+                  <p className="mt-0.5 text-sm leading-relaxed" style={{ color: TEXT }}>
+                    {r.reply.text}
+                  </p>
+                </div>
               )}
             </li>
           ))}

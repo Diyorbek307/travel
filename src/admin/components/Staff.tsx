@@ -18,9 +18,73 @@ interface Аккаунт {
   username: string;
   name: string;
   role: AdminRole;
+  заведение?: Заведение;
   disabled: boolean;
   createdAt: string;
   lastSeenAt: string | null;
+}
+
+const поле = {
+  background: "var(--color-surface)",
+  border: "1px solid var(--color-border)",
+  color: "var(--color-text)",
+  fontFamily: "var(--font-body)",
+} as const;
+
+type Заведение = { вид: "hotel" | "restaurant"; id: string };
+type Запись = { id: string; name: string; city: string };
+type Вариант = Заведение & { name: string; city: string };
+
+/** Отели и рестораны из содержимого — для привязки роли «Заведение». */
+function useЗаведения(): Вариант[] {
+  const [список, setСписок] = useState<Вариант[]>([]);
+  useEffect(() => {
+    fetch("/api/content")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((c: { hotels?: Запись[]; restaurants?: Запись[] } | null) => {
+        if (!c) return;
+        setСписок([
+          ...(c.hotels ?? []).map((h) => ({ вид: "hotel" as const, id: h.id, name: h.name, city: h.city })),
+          ...(c.restaurants ?? []).map((r) => ({
+            вид: "restaurant" as const,
+            id: r.id,
+            name: r.name,
+            city: r.city,
+          })),
+        ]);
+      })
+      .catch(() => undefined);
+  }, []);
+  return список;
+}
+
+function ВыборЗаведения({
+  варианты,
+  значение,
+  onChange,
+}: {
+  варианты: Вариант[];
+  значение: Заведение | null;
+  onChange: (з: Заведение | null) => void;
+}) {
+  return (
+    <select
+      value={значение ? `${значение.вид}:${значение.id}` : ""}
+      onChange={(e) => {
+        const [вид, ...id] = e.target.value.split(":");
+        onChange(вид ? { вид: вид as Заведение["вид"], id: id.join(":") } : null);
+      }}
+      className="w-full rounded-lg px-3 py-2 text-sm outline-none"
+      style={поле}
+    >
+      <option value="">— выберите отель или ресторан —</option>
+      {варианты.map((в) => (
+        <option key={`${в.вид}:${в.id}`} value={`${в.вид}:${в.id}`}>
+          {в.вид === "hotel" ? "🏨" : "🍽️"} {в.name} · {в.city}
+        </option>
+      ))}
+    </select>
+  );
 }
 
 const ОШИБКИ: Record<string, string> = {
@@ -30,6 +94,7 @@ const ОШИБКИ: Record<string, string> = {
   weak_password: "Пароль не короче 8 знаков",
   bad_role: "Неизвестная роль",
   not_found: "Запись не найдена",
+  venue_required: "Для роли «Заведение» выберите отель или ресторан",
 };
 
 function когда(iso: string | null): string {
@@ -56,6 +121,7 @@ const РОЛЬ_ЦВЕТ: Record<AdminRole, "amber" | "teal" | "dim"> = {
   owner: "amber",
   editor: "teal",
   support: "dim",
+  venue: "amber",
 };
 
 export default function Staff() {
@@ -66,6 +132,12 @@ export default function Staff() {
 
   // Форма создания.
   const [нов, setНов] = useState({ username: "", name: "", password: "", role: "editor" as AdminRole });
+  const [новЗаведение, setНовЗаведение] = useState<Заведение | null>(null);
+  // Выбранному сотруднику назначают роль «Заведение» — сначала выбор заведения.
+  const [ждётЗаведение, setЖдётЗаведение] = useState<Заведение | null | undefined>(undefined);
+  const заведения = useЗаведения();
+  const названиеЗаведения = (з?: Заведение) =>
+    з ? заведения.find((в) => в.вид === з.вид && в.id === з.id)?.name ?? з.id : "";
   // Смена пароля выбранному.
   const [новыйПароль, setНовыйПароль] = useState("");
 
@@ -116,8 +188,19 @@ export default function Staff() {
       setОшибка("Заполните логин и пароль (от 8 знаков).");
       return;
     }
-    const ok = await послать({ action: "create", ...нов });
-    if (ok) setНов({ username: "", name: "", password: "", role: "editor" });
+    if (нов.role === "venue" && !новЗаведение) {
+      setОшибка(ОШИБКИ.venue_required);
+      return;
+    }
+    const ok = await послать({
+      action: "create",
+      ...нов,
+      ...(нов.role === "venue" ? { заведение: новЗаведение } : {}),
+    });
+    if (ok) {
+      setНов({ username: "", name: "", password: "", role: "editor" });
+      setНовЗаведение(null);
+    }
   }
 
   async function сменитьРоль(id: string, role: AdminRole) {
@@ -149,13 +232,6 @@ export default function Staff() {
       setОшибка("Нет связи с сервером.");
     }
   }
-
-  const поле = {
-    background: "var(--color-surface)",
-    border: "1px solid var(--color-border)",
-    color: "var(--color-text)",
-    fontFamily: "var(--font-body)",
-  } as const;
 
   return (
     <div className="p-4 sm:p-7">
@@ -291,7 +367,12 @@ export default function Staff() {
                   return (
                     <button
                       key={r}
-                      onClick={() => !on && сменитьРоль(выбранный.id, r)}
+                      onClick={() => {
+                        if (on) return;
+                        // «Заведение» без заведения — пустой кабинет: сперва выбор.
+                        if (r === "venue") setЖдётЗаведение(null);
+                        else сменитьРоль(выбранный.id, r);
+                      }}
                       className="text-left rounded-lg px-3 py-2 text-sm transition-all cursor-pointer"
                       style={{
                         background: on
@@ -313,6 +394,52 @@ export default function Staff() {
                   );
                 })}
               </div>
+
+              {(ждётЗаведение !== undefined || выбранный.role === "venue") && (
+                <div className="mb-5">
+                  <SectionTitle>Заведение</SectionTitle>
+                  {выбранный.role === "venue" && ждётЗаведение === undefined ? (
+                    <div className="flex items-center gap-2 text-sm" style={{ color: "var(--color-text)" }}>
+                      <span className="flex-1">{названиеЗаведения(выбранный.заведение) || "не выбрано"}</span>
+                      <Btn
+                        small
+                        variant="ghost"
+                        onClick={() => setЖдётЗаведение(выбранный.заведение ?? null)}
+                      >
+                        Сменить
+                      </Btn>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col gap-2">
+                      <ВыборЗаведения
+                        варианты={заведения}
+                        значение={ждётЗаведение ?? null}
+                        onChange={setЖдётЗаведение}
+                      />
+                      <div className="flex gap-2">
+                        <Btn
+                          small
+                          onClick={async () => {
+                            if (!ждётЗаведение) return setОшибка(ОШИБКИ.venue_required);
+                            const ok = await послать({
+                              action: "update",
+                              id: выбранный.id,
+                              role: "venue",
+                              заведение: ждётЗаведение,
+                            });
+                            if (ok) setЖдётЗаведение(undefined);
+                          }}
+                        >
+                          Назначить
+                        </Btn>
+                        <Btn small variant="ghost" onClick={() => setЖдётЗаведение(undefined)}>
+                          Отмена
+                        </Btn>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
 
               <SectionTitle>Новый пароль</SectionTitle>
               <div className="flex gap-2 mb-5">
@@ -442,6 +569,20 @@ export default function Staff() {
                     })}
                   </div>
                 </div>
+                {нов.role === "venue" && (
+                  <div>
+                    <label
+                      className="text-xs block mb-1"
+                      style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}
+                    >
+                      ЗАВЕДЕНИЕ
+                    </label>
+                    <ВыборЗаведения варианты={заведения} значение={новЗаведение} onChange={setНовЗаведение} />
+                    <p className="mt-1 text-xs" style={{ color: "var(--color-muted)" }}>
+                      Сотрудник заведения увидит только его карточку, брони и отзывы.
+                    </p>
+                  </div>
+                )}
                 <Btn onClick={создать}>Завести запись</Btn>
               </div>
             </div>

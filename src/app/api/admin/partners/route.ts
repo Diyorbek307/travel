@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { отказЕсли } from "@/lib/admin-auth";
+import { currentAdmin } from "@/lib/admin-auth";
+import { можетДомен } from "@/lib/admin-roles";
 import { readContent } from "@/lib/store";
 import {
   адресГодится,
@@ -31,15 +32,31 @@ function разобрать(body: unknown): { вид: ВидЗаведения; 
   return { вид, id };
 }
 
+/**
+ * Кто может трогать подключение этого заведения: редактор содержимого —
+ * любого, кабинет заведения — только своего. Возвращает отказ или null.
+ */
+async function отказДля(цель: { вид: ВидЗаведения; id: string } | null): Promise<NextResponse | null> {
+  const admin = await currentAdmin();
+  if (!admin) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  if (можетДомен(admin.role, "content")) return null;
+  const своё =
+    admin.role === "venue" && цель && admin.заведение?.вид === цель.вид && admin.заведение.id === цель.id;
+  return своё ? null : NextResponse.json({ error: "forbidden" }, { status: 403 });
+}
+
 export async function GET(request: Request) {
-  const нет = await отказЕсли("content");
-  if (нет) return нет;
   // С ?kind=&id= — ещё и состояние приёма «система присылает сама».
   const q = new URL(request.url).searchParams;
   const цель = разобрать({ kind: q.get("kind"), id: q.get("id") });
+  const нет = await отказДля(цель);
+  if (нет) return нет;
+  // Список всех подключений — только панели; кабинету — лишь его приём.
+  const admin = await currentAdmin();
+  const всё = admin ? можетДомен(admin.role, "content") : false;
   return NextResponse.json(
     {
-      подключения: await списокПодключений(),
+      ...(всё ? { подключения: await списокПодключений() } : {}),
       ...(цель ? { приём: await состояниеПриёма(цель.вид, цель.id) } : {}),
     },
     { headers: { "Cache-Control": "no-store" } },
@@ -52,10 +69,10 @@ export async function GET(request: Request) {
  * в этом ответе.
  */
 export async function PATCH(request: Request) {
-  const нет = await отказЕсли("content");
-  if (нет) return нет;
   const body = (await request.json().catch(() => null)) as Record<string, unknown> | null;
   const цель = разобрать(body);
+  const нет = await отказДля(цель);
+  if (нет) return нет;
   if (!цель || !body) return NextResponse.json({ error: "bad_request" }, { status: 400 });
   if (body.action === "revoke") {
     await отозватьКлючПриёма(цель.вид, цель.id);
@@ -68,10 +85,10 @@ export async function PATCH(request: Request) {
 
 /** Сохранить адрес и ключ. Ключ можно не присылать — тогда остаётся прежний. */
 export async function PUT(request: Request) {
-  const нет = await отказЕсли("content");
-  if (нет) return нет;
   const body = (await request.json().catch(() => null)) as Record<string, unknown> | null;
   const цель = разобрать(body);
+  const нет = await отказДля(цель);
+  if (нет) return нет;
   if (!цель || !body) return NextResponse.json({ error: "bad_request" }, { status: 400 });
 
   const baseUrl = typeof body.baseUrl === "string" ? body.baseUrl.trim() : "";
@@ -89,9 +106,9 @@ export async function PUT(request: Request) {
 }
 
 export async function DELETE(request: Request) {
-  const нет = await отказЕсли("content");
-  if (нет) return нет;
   const цель = разобрать(await request.json().catch(() => null));
+  const нет = await отказДля(цель);
+  if (нет) return нет;
   if (!цель) return NextResponse.json({ error: "bad_request" }, { status: 400 });
   await удалитьСекрет(цель.вид, цель.id);
   return NextResponse.json({ ok: true });
@@ -99,9 +116,9 @@ export async function DELETE(request: Request) {
 
 /** «Проверить связь»: спрашиваем наличие на завтра и показываем, что пришло. */
 export async function POST(request: Request) {
-  const нет = await отказЕсли("content");
-  if (нет) return нет;
   const цель = разобрать(await request.json().catch(() => null));
+  const нет = await отказДля(цель);
+  if (нет) return нет;
   if (!цель) return NextResponse.json({ error: "bad_request" }, { status: 400 });
 
   const content = await readContent();

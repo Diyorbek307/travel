@@ -14,9 +14,13 @@
  *  - Редактор   — содержимое: города, места, отели, рестораны, события,
  *                 аудиогиды, туры, направления; плюс превью и тема.
  *  - Поддержка  — операции: SOS, брони, чат, отзывы, пользователи.
+ *  - Заведение  — сам отель или ресторан: правит только свою карточку,
+ *                 видит свои брони и отвечает на свои отзывы. Ни одного
+ *                 общего домена у него нет — чужого он не увидит даже
+ *                 прямым запросом.
  */
 
-export type AdminRole = "owner" | "editor" | "support";
+export type AdminRole = "owner" | "editor" | "support" | "venue";
 
 export const ROLE_META: Record<AdminRole, { label: string; desc: string; color: string }> = {
   owner: {
@@ -34,12 +38,17 @@ export const ROLE_META: Record<AdminRole, { label: string; desc: string; color: 
     desc: "Операции: SOS, брони, чат, отзывы, пользователи",
     color: "#7a8fff",
   },
+  venue: {
+    label: "Заведение",
+    desc: "Кабинет одного отеля или ресторана: карточка, брони, отзывы",
+    color: "#e0a526",
+  },
 };
 
-export const ВСЕ_РОЛИ: AdminRole[] = ["owner", "editor", "support"];
+export const ВСЕ_РОЛИ: AdminRole[] = ["owner", "editor", "support", "venue"];
 
 export function рольСуществует(x: string): x is AdminRole {
-  return x === "owner" || x === "editor" || x === "support";
+  return x === "owner" || x === "editor" || x === "support" || x === "venue";
 }
 
 /**
@@ -47,12 +56,13 @@ export function рольСуществует(x: string): x is AdminRole {
  * может быть узким («Отели»), но за ним стоит домен («content»), и
  * проверять на сервере удобнее домен: их пять, а не тридцать.
  */
-export type Домен = "content" | "operations" | "users" | "money" | "staff";
+export type Домен = "content" | "operations" | "users" | "money" | "staff" | "venue";
 
 const РОЛЬ_ДОМЕНЫ: Record<AdminRole, Домен[]> = {
   owner: ["content", "operations", "users", "money", "staff"],
   editor: ["content"],
   support: ["operations", "users"],
+  venue: ["venue"],
 };
 
 export function можетДомен(role: AdminRole, домен: Домен): boolean {
@@ -68,7 +78,9 @@ const РАЗДЕЛ_ДОСТУП: Record<string, AdminRole[]> = {
   // Все три роли — общий вход и обзор.
   dashboard: ["owner", "editor", "support"],
   preview: ["owner", "editor", "support"],
-  settings: ["owner", "editor", "support"],
+  settings: ["owner", "editor", "support", "venue"],
+  // Кабинет заведения — только самому заведению.
+  myvenue: ["venue"],
   // Операции — поддержка.
   sos: ["owner", "support"],
   bookings: ["owner", "support"],

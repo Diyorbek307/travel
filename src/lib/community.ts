@@ -233,6 +233,8 @@ export interface Review {
   text: string;
   status: ReviewStatus;
   createdAt: string;
+  /** Ответ заведения — из его кабинета. */
+  reply?: { text: string; at: string };
 }
 
 const отзывы = создатьХранилище<Review[]>(path.join(DATA_DIR, "reviews.json"), () => []);
@@ -265,6 +267,22 @@ export async function createReview(input: Omit<Review, "id" | "status" | "create
     // его обходили бы простой повторной отправкой.
     const итог = прежний?.status === "hidden" ? { ...отзыв, status: "hidden" as const } : отзыв;
     return [[...без, итог], итог];
+  });
+}
+
+/**
+ * Ответ заведения на отзыв о нём. Пустой текст — убрать ответ.
+ * false — отзыва нет или он о другом заведении: чужие отзывы не трогаем.
+ */
+export async function setReviewReply(reviewId: string, placeId: string, text: string): Promise<boolean> {
+  const чистый = text.trim().slice(0, 1000);
+  return отзывы.update<boolean>((все) => {
+    const i = все.findIndex((r) => r.id === reviewId && r.placeId === placeId);
+    if (i === -1) return [все, false];
+    const копия = [...все];
+    const { reply: _старый, ...без } = копия[i];
+    копия[i] = чистый ? { ...без, reply: { text: чистый, at: new Date().toISOString() } } : без;
+    return [копия, true];
   });
 }
 

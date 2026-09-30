@@ -34,6 +34,7 @@ import Integrations from "./components/Integrations";
 import AccessControl from "./components/AccessControl";
 import Staff from "./components/Staff";
 import Translations from "./components/Translations";
+import MyVenue from "./components/MyVenue";
 import { можетРаздел, ROLE_META } from "@/lib/admin-roles";
 import { МеняКонтекст, type Меня } from "./context/MeContext";
 import { Иконка, type ИмяИконки } from "./icons";
@@ -67,6 +68,10 @@ const NAV_GROUPS: {
   label: string;
   items: { id: string; label: string; icon: ИмяИконки; badge?: boolean }[];
 }[] = [
+  {
+    label: "Заведение",
+    items: [{ id: "myvenue", label: "Моё заведение", icon: "myvenue" }],
+  },
   {
     label: "Операции",
     items: [
@@ -145,7 +150,12 @@ export default function AdminShell() {
   // открыт всем. Иначе поддержка, открывшая ссылку на «Города», застряла
   // бы на пустом экране.
   useEffect(() => {
-    if (me && !можетРаздел(me.role, active)) setActive("dashboard");
+    // Не дашборд, а первый доступный раздел: у кабинета заведения
+    // дашборда нет, и он крутился бы в пустоте.
+    if (me && !можетРаздел(me.role, active)) {
+      const первый = NAV_GROUPS.flatMap((g) => g.items).find((i) => можетРаздел(me.role, i.id));
+      setActive(первый?.id ?? "settings");
+    }
   }, [me, active]);
   /*
    * На телефоне боковая панель шириной 224 пикселя оставляла контенту
@@ -208,6 +218,7 @@ export default function AdminShell() {
     access: <AccessControl />,
     staff: <Staff />,
     translations: <Translations />,
+    myvenue: <MyVenue />,
   };
 
   const sidebarWidth = sidebarCollapsed ? "56px" : "224px";
