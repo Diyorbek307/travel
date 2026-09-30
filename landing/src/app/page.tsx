@@ -3,7 +3,9 @@ import Hero, { type Цифры } from "@/components/hero";
 import Marquee from "@/components/marquee";
 import Destinations from "@/components/destinations";
 import Features from "@/components/features";
-import Showcase from "@/components/showcase";
+import TourSection from "@/components/tour-section";
+import StartSection from "@/components/start-section";
+import FaqSection from "@/components/faq-section";
 import Quiz from "@/components/quiz";
 import Finale from "@/components/finale";
 import MosaicSection from "@/components/mosaic-section";
@@ -49,11 +51,13 @@ export default async function Home() {
       <Essentials />
       <Features />
       <InsideSection />
+      <TourSection />
       <FreeSection />
       <EsimSection />
+      <StartSection />
       <GlobeSection />
-      <Showcase />
       <Quiz />
+      <FaqSection />
       <Finale />
     </main>
   );
