@@ -837,6 +837,11 @@ function App() {
                     }}
                     onNotifs={() => setShowNotifs(true)}
                     onPractical={() => setShowPractical(true)}
+                    onEsim={() => {
+                      // Магазин eSIM — внутри памятки «Связь»: открываем её сразу.
+                      setРаскрытьПамятку("internet");
+                      setShowPractical(true);
+                    }}
                     onTransport={() => setShowTransport(true)}
                     onMenu={() => setShowMenu(true)}
                     onLogout={logout}
@@ -896,6 +901,7 @@ interface ScreenProps {
   onSearch: (q?: string) => void;
   onNotifs: () => void;
   onPractical: () => void;
+  onEsim: () => void;
   onTransport: () => void;
   onMenu: () => void;
   onLogout: () => void;
@@ -961,6 +967,7 @@ function ЭкранВкладки({ tab, ...p }: ScreenProps) {
           onMenu={p.onMenu}
           onExplore={p.onExplore}
           onTransport={p.onTransport}
+          onEsim={p.onEsim}
           onToast={p.onToast}
           isPremium={p.isPremium}
         />
@@ -980,6 +987,7 @@ function ЭкранВкладки({ tab, ...p }: ScreenProps) {
           onTab={p.onTab}
           onTransport={p.onTransport}
           onPractical={p.onPractical}
+          onEsim={p.onEsim}
         />
       );
     case "map":

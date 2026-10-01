@@ -14,6 +14,8 @@ import {
   GLOW,
   контрастныйТекст,
   ON_GOLD,
+  SURFACE,
+  BORDER,
 } from "@/lib/theme";
 import { useAppContent } from "@/components/content-provider";
 import { useT } from "@/components/lang-provider";
@@ -44,6 +46,7 @@ export function HomeScreen({
   onMenu,
   onExplore,
   onTransport,
+  onEsim,
   onToast,
   isPremium,
 }: {
@@ -55,6 +58,7 @@ export function HomeScreen({
   onMenu: () => void;
   onExplore: (р?: РазделОбзора) => void;
   onTransport: () => void;
+  onEsim: () => void;
   onToast: (m: string) => void;
   isPremium: boolean;
 }) {
@@ -276,6 +280,32 @@ export function HomeScreen({
             stroke="white"
             strokeWidth="2.5"
           >
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </button>
+
+        {/* Связь — второе, что нужно сразу после прилёта. Светлая карточка,
+            чтобы не сливаться с транспортом. */}
+        <button
+          onClick={onEsim}
+          className="mt-2.5 w-full flex items-center gap-3 px-4 py-3 rounded-2xl border active:scale-[0.98] transition-all"
+          style={{ background: SURFACE, borderColor: BORDER }}
+        >
+          <div
+            className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+            style={{ background: "rgba(233,196,106,0.22)" }}
+          >
+            📶
+          </div>
+          <div className="flex-1 text-left">
+            <p className="font-bold text-sm" style={{ color: TEXT }}>
+              {t("ex_esim")}
+            </p>
+            <p className="text-[10px]" style={{ color: MUTED }}>
+              {t("ex_esim_sub")}
+            </p>
+          </div>
+          <svg className="rtl-flip" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={MUTED} strokeWidth="2.5">
             <polyline points="9 18 15 12 9 6" />
           </svg>
         </button>

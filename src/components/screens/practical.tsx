@@ -1,7 +1,7 @@
 "use client";
 
 import { МагазинEsim } from "@/components/esim-shop";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { BORDER, CREAM, GREEN, MUTED, TEXT, ACCENT_SOFT, мягко } from "@/lib/theme";
 import { useCurrency, СИМВОЛЫ, ГЛАВНЫЕ } from "@/components/currency-provider";
 import { useT } from "@/components/lang-provider";
@@ -208,6 +208,17 @@ export function PracticalScreen({ onBack, раскрыть }: { onBack: () => vo
   const { t, lang } = useT();
   // «раскрыть» — сразу нужная памятка: например, «Связь» после оплаты eSIM.
   const [open, setOpen] = useState<string | null>(раскрыть ?? ПАМЯТКИ[0].id);
+  // Памятку, открытую снаружи (eSIM → «Связь»), ещё и показываем: она
+  // шестая в списке, под конвертером валют, — сама в кадр не попадёт.
+  // Ждём, пока экран въедет, иначе прокрутка считается от старой позиции.
+  useEffect(() => {
+    if (!раскрыть) return;
+    const id = setTimeout(
+      () => document.getElementById(`pamyatka-${раскрыть}`)?.scrollIntoView({ block: "start", behavior: "smooth" }),
+      350,
+    );
+    return () => clearTimeout(id);
+  }, [раскрыть]);
   return (
     <div className="flex flex-col h-full animate-slide-up" style={{ background: CREAM }}>
       <div className="bg-white px-4 pt-14 pb-4 border-b" style={{ borderColor: BORDER }}>
@@ -247,7 +258,8 @@ export function PracticalScreen({ onBack, раскрыть }: { onBack: () => vo
           return (
             <div
               key={s.id}
-              className="bg-white rounded-2xl overflow-hidden shadow-sm border"
+              id={`pamyatka-${s.id}`}
+              className="scroll-mt-3 bg-white rounded-2xl overflow-hidden shadow-sm border"
               style={{ borderColor: BORDER }}
             >
               <button

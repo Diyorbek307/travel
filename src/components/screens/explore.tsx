@@ -91,6 +91,7 @@ export function ExploreScreen({
   onTab,
   onTransport,
   onPractical,
+  onEsim,
 }: {
   onPlace: (p: Place) => void;
   onHotel: (h: Hotel) => void;
@@ -105,6 +106,8 @@ export function ExploreScreen({
   onTab: (t: Tab) => void;
   onTransport: () => void;
   onPractical: () => void;
+  /** «Полезное», сразу раскрытое на «Связи» — там магазин eSIM. */
+  onEsim: () => void;
 }) {
   const { CITIES, HOTELS, PLACES, POPULAR_CITIES, RESTAURANTS, ROUTES } = useAppContent();
   const { t, трК, lang } = useT();
@@ -206,6 +209,9 @@ export function ExploreScreen({
       { ключ: "ai", заголовок: t("ex_ai"), под: t("ex_ai_sub"), go: () => onРаздел("ai") },
       { ключ: "routes", заголовок: t("home_routes"), под: t("ex_routes_sub"), go: () => onTab("map") },
       { ключ: "tips", заголовок: t("ex_tips"), под: t("home_practical_sub"), go: onPractical },
+      // Магазин eSIM живёт в «Полезном» → «Связь». Отдельная плитка — потому
+      // что внутри памятки его не находили.
+      { ключ: "esim", заголовок: t("ex_esim"), под: t("ex_esim_sub"), go: onEsim },
       // Заглушка на будущее: настоящей 3D/VR-реконструкции городов ещё нет,
       // но место в конце сетки зарезервировано — когда она появится, здесь
       // достаточно будет заменить скоро на go с настоящим разделом.
@@ -230,6 +236,35 @@ export function ExploreScreen({
     const по = (ключ: string) => плитки.find((п) => п.ключ === ключ)!;
     // Сквозной номер для «лесенки» появления через все группы.
     let порядок = 0;
+    const заголовокГруппы = (ключ: TKey, метка: string) => (
+      <h2
+        className="mb-2.5 flex items-center gap-2 text-base font-bold"
+        style={{ color: TEXT, fontFamily: "var(--font-heading)" }}
+      >
+        {/* Цветная метка группы — того же цвета, что свечение в её плитках. */}
+        <span className="h-4 w-1 rounded-full" style={{ background: метка }} />
+        {t(ключ)}
+      </h2>
+    );
+    const группа = (г: (typeof ГРУППЫ)[number], номерГруппы: number) => (
+      <section key={г.заголовок} className="mb-5" data-tour={номерГруппы === 0 ? "tiles" : undefined}>
+        {заголовокГруппы(г.заголовок, г.метка)}
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+          {г.ключи.map((ключ, i) => (
+            <Плитка
+              key={ключ}
+              плитка={по(ключ)}
+              номер={порядок++}
+              lang={lang}
+              // Нечётная последняя плитка на телефоне — во всю ширину,
+              // иначе рядом с ней зияла бы дыра.
+              широкая={г.ключи.length % 2 === 1 && i === г.ключи.length - 1}
+              тон={г.тон}
+            />
+          ))}
+        </div>
+      </section>
+    );
     return (
       <div className="flex flex-col h-full" style={{ background: CREAM }}>
         <Шапка
@@ -243,44 +278,30 @@ export function ExploreScreen({
           {чипыГородов}
         </Шапка>
         <div className="flex-1 overflow-y-auto hide-scroll p-4">
-          <КарточкаИИ onClick={по("ai").go} />
-          <БаннерТуризм onClick={() => onРаздел("tourism")} />
-          <КакПользоваться />
-          <ЛентаКрасивых места={красивые} onPlace={onPlace} onВсе={() => onРаздел("scenic")} />
           {/*
+            Порядок — по тому, что турист ищет чаще: сперва ИИ-гид и что
+            посмотреть, рядом лента красивых мест, дальше жильё и еда, потом
+            дорога со связью, помощники с камерой. Справочное — о стране и о
+            том, как пользоваться приложением, — ниже, а «скоро» — в самом
+            конце: оно не должно отнимать место у работающего.
+
             Двенадцать одинаковых плиток подряд глаз не различает, поэтому
-            они разложены по смыслу: что посмотреть, где жить, как ехать.
-            Две колонки на телефоне и планшете (при трёх в группе из четырёх
-            одна плитка висела бы в ряду одна), четыре — на широком экране.
-            Раздел, где в выбранном городе пусто, приглушён, но нажимается —
-            внутри можно сразу сменить город.
+            они разложены по смыслу. Две колонки на телефоне и планшете,
+            четыре — на широком экране. Раздел, где в выбранном городе
+            пусто, приглушён, но нажимается — внутри можно сменить город.
           */}
-          {ГРУППЫ.map((г, номерГруппы) => (
-            <section key={г.заголовок} className="mb-5" data-tour={номерГруппы === 0 ? "tiles" : undefined}>
-              <h2
-                className="mb-2.5 flex items-center gap-2 text-base font-bold"
-                style={{ color: TEXT, fontFamily: "var(--font-heading)" }}
-              >
-                {/* Цветная метка группы — того же цвета, что свечение в её плитках. */}
-                <span className="h-4 w-1 rounded-full" style={{ background: г.метка }} />
-                {t(г.заголовок)}
-              </h2>
-              <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-                {г.ключи.map((ключ, i) => (
-                  <Плитка
-                    key={ключ}
-                    плитка={по(ключ)}
-                    номер={порядок++}
-                    lang={lang}
-                    // Нечётная последняя плитка на телефоне — во всю ширину,
-                    // иначе рядом с ней зияла бы дыра.
-                    широкая={г.ключи.length % 2 === 1 && i === г.ключи.length - 1}
-                    тон={г.тон}
-                  />
-                ))}
-              </div>
-            </section>
-          ))}
+          <КарточкаИИ onClick={по("ai").go} />
+          {группа(ГРУППЫ[0], 0)}
+          <ЛентаКрасивых места={красивые} onPlace={onPlace} onВсе={() => onРаздел("scenic")} />
+          {ГРУППЫ.slice(1, 4).map((г, i) => группа(г, i + 1))}
+
+          <section className="mb-5">
+            {заголовокГруппы("ex_group_info", "var(--muted)")}
+            <БаннерТуризм onClick={() => onРаздел("tourism")} />
+            <КакПользоваться />
+          </section>
+
+          {группа(ГРУППЫ[4], 4)}
 
           <div className="mt-4">
             <AdInline isPremium={isPremium} cities={город ? [город] : рядом ? [рядом] : undefined} />
@@ -381,7 +402,7 @@ const ГРУППЫ: { заголовок: TKey; ключи: string[]; тон: st
   },
   {
     заголовок: "ex_group_road",
-    ключи: ["cities", "transport", "tips"],
+    ключи: ["transport", "esim", "tips", "cities"],
     тон: "rgba(96, 165, 250, 0.14)",
     метка: "#60A5FA",
   },
@@ -828,11 +849,12 @@ function ИллюстрацияVR({ широкая }: { широкая: boolean 
 /** Плитки, у которых есть живая версия — видео в public/videos/tiles. */
 const ЖИВЫЕ_ПЛИТКИ = new Set(["museums", "places", "restaurants", "bars", "routes", "excursions", "hotels"]);
 /** Плитки с иллюстрацией-SVG вместо картинки из public/tiles. */
-const РИСОВАННЫЕ = new Set(["photo", "translate", "vr"]);
+const РИСОВАННЫЕ = new Set(["photo", "translate", "vr", "esim"]);
 
 function ИллюстрацияСкоро({ ключ, широкая }: { ключ: string; широкая: boolean }) {
   if (ключ === "photo") return <ИллюстрацияФото широкая={широкая} />;
   if (ключ === "translate") return <ИллюстрацияПереводчик широкая={широкая} />;
+  if (ключ === "esim") return <ИллюстрацияEsim широкая={широкая} />;
   return <ИллюстрацияVR широкая={широкая} />;
 }
 
@@ -900,6 +922,41 @@ function ИллюстрацияФото({ широкая }: { широкая: bo
         <path d="M99 44 a18 18 0 0 1 0 28" opacity="0.7" />
         <path d="M106 38 a26 26 0 0 1 0 40" opacity="0.45" />
       </g>
+    </СвгСкоро>
+  );
+}
+
+/**
+ * eSIM: бирюзовая сим-карта с золотым чипом, над ней — волны сигнала.
+ */
+function ИллюстрацияEsim({ широкая }: { широкая: boolean }) {
+  const id = useId().replace(/:/g, "");
+  return (
+    <СвгСкоро широкая={широкая}>
+      <defs>
+        <linearGradient id={`${id}c`} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#2FD0C6" />
+          <stop offset="0.55" stopColor="#0FB3AC" />
+          <stop offset="1" stopColor="#07685F" />
+        </linearGradient>
+      </defs>
+      {/* Карта со срезанным углом, как у настоящей SIM. */}
+      <path d="M20 30 h38 l14 14 v42 a6 6 0 0 1 -6 6 h-46 a6 6 0 0 1 -6 -6 v-50 a6 6 0 0 1 6 -6 Z" fill={`url(#${id}c)`} />
+      <path d="M26 38 h28" stroke="#ffffff" strokeOpacity="0.35" strokeWidth="3" strokeLinecap="round" />
+      {/* Чип. */}
+      <rect x="28" y="52" width="30" height="24" rx="5" fill={GOLD} />
+      <g stroke="#B8892F" strokeWidth="1.6">
+        <path d="M43 52 v24" />
+        <path d="M28 60 h30" />
+        <path d="M28 68 h30" />
+      </g>
+      {/* Сигнал. */}
+      <g fill="none" stroke={GOLD} strokeWidth="3" strokeLinecap="round">
+        <path d="M84 52 a10 10 0 0 1 14 0" />
+        <path d="M78 45 a19 19 0 0 1 26 0" opacity="0.7" />
+        <path d="M72 38 a28 28 0 0 1 38 0" opacity="0.45" />
+      </g>
+      <circle cx="91" cy="59" r="3.5" fill={GOLD} />
     </СвгСкоро>
   );
 }

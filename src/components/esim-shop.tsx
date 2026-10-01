@@ -156,6 +156,19 @@ export function МагазинEsim() {
         </div>
       )}
 
+      {/* Ключи Airalo ещё не заданы — магазин не молчит, а говорит, что
+          скоро откроется: иначе раздел выглядел пустым и его не находили. */}
+      {пакеты && пакеты.length === 0 && (
+        <div className="rounded-xl p-3" style={{ background: ACCENT_SOFT }}>
+          <p className="text-sm font-bold" style={{ color: TEXT }}>
+            📲 {t("esim_title")}
+          </p>
+          <p className="mt-1 text-[11px] leading-snug" style={{ color: MUTED }}>
+            {t("esim_soon")}
+          </p>
+        </div>
+      )}
+
       {пакеты && пакеты.length > 0 && (
         <div className="rounded-xl p-3" style={{ background: ACCENT_SOFT }}>
           <p className="text-sm font-bold" style={{ color: TEXT }}>
