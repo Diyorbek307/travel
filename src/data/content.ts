@@ -16,7 +16,7 @@ export const PLACES: Place[] = [
   { id:"ikhon", name:"Ичан-Кала",                city:"Хива",      type:"Старый город", rating:4.9, reviews:9441,  distance:"0 км",   entry:"$12",       hours:"Всегда",      audio:true,  qr:true,  img:"https://images.unsplash.com/photo-1654861857666-1e8c438cbe4a?w=700&h=480&fit=crop&auto=format",  desc:"Внутренний обнесённый стеной город Хивы — живой музей, застывший во времени. Объект Всемирного наследия ЮНЕСКО." },
   { id:"kalon", name:"Минарет Калян",            city:"Бухара",    type:"Мечеть",       rating:4.8, reviews:7103,  distance:"0.2 км", entry:"Бесплатно", hours:"Всегда",      audio:true,  qr:true,  img:"https://images.unsplash.com/photo-1719995153986-63e529a32585?w=700&h=480&fit=crop&auto=format",  desc:"«Башня смерти» — 800-летний минарет, который даже Чингисхан отказался разрушить." },
   { id:"gur",   name:"Гур-э-Амир",              city:"Самарканд", type:"Мавзолей",     rating:4.8, reviews:5920,  distance:"0.6 км", entry:"$5",        hours:"08:00–18:00", audio:true,  qr:true,  img:"https://images.unsplash.com/photo-1728029062560-4b0e2b958885?w=700&h=480&fit=crop&auto=format",  desc:"Мавзолей Тамерлана — шедевр тимуридской архитектуры с бирюзовым куполом высотой 34 метра." },
-  { id:"chrvk", name:"Чарвакское водохранилище", city:"Чарвак",    type:"Природа",      rating:4.9, reviews:4210,  distance:"60 км",  entry:"Бесплатно", hours:"Всегда",      audio:false, qr:false, img:"https://images.unsplash.com/photo-1728281711729-a3b3424e6c1e?w=700&h=480&fit=crop&auto=format",  desc:"Живописное горное озеро в 80 км от Ташкента — идеально для пляжного отдыха и активного туризма." },
+  { id:"chrvk", name:"Чарвакское водохранилище", city:"Чарвак",    type:"Природа",      rating:4.9, reviews:4210,  distance:"60 км",  entry:"Бесплатно", hours:"Всегда",      audio:false, qr:false, img:"/scenic/charvak-1.webp",  desc:"Живописное горное озеро в 80 км от Ташкента — идеально для пляжного отдыха и активного туризма." },
   { id:"tash",  name:"Площадь Мустакиллик",     city:"Ташкент",   type:"Площадь",      rating:4.6, reviews:3540,  distance:"1.0 км", entry:"Бесплатно", hours:"Всегда",      audio:false, qr:false, img:"https://images.unsplash.com/photo-1622030797403-fa221ce5d208?w=700&h=480&fit=crop&auto=format",  desc:"Главная площадь Ташкента — символ независимости Узбекистана, обрамлённый парками и фонтанами." },
   { id:"bibi",  name:"Мечеть Биби-Ханым",       city:"Самарканд", type:"Мечеть",       rating:4.7, reviews:6240,  distance:"0.9 км", entry:"$4",        hours:"08:00–18:00", audio:true,  qr:true,  img:"https://images.unsplash.com/photo-1664602078796-68ee76b3fc59?w=700&h=480&fit=crop&auto=format",  desc:"Грандиозная соборная мечеть Тамерлана, построенная в 1399–1404 гг. Когда-то крупнейшая мечеть в исламском мире." },
   { id:"ulug",  name:"Обсерватория Улугбека",   city:"Самарканд", type:"Музей",        rating:4.6, reviews:3820,  distance:"3.5 км", entry:"$3",        hours:"09:00–18:00", audio:true,  qr:false, img:"https://images.unsplash.com/photo-1728029062560-4b0e2b958885?w=700&h=480&fit=crop&auto=format",  desc:"Астрономическая обсерватория XV в. — Улугбек составил здесь звёздный каталог, опередив Европу на 150 лет." },
@@ -41,15 +41,15 @@ export const PLACES: Place[] = [
   // Места и музеи во всех городах — настоящие и известные; цены и часы примерные.
   { id:"xkhiv", name:"Музей в медресе Мухаммад Рахим-хана", city:"Хива", type:"Музей", rating:4.5, reviews:980, distance:"0.3 км", entry:"$12", hours:"09:00–18:00", audio:false, qr:false, img:"https://images.unsplash.com/photo-1728029062560-4b0e2b958885?w=700&h=480&fit=crop&auto=format", desc:"Внутри Ичан-Калы: история Хивинского ханства, троны, одежда и оружие ханского двора. Вход — по общему билету Ичан-Калы." },
   { id:"xsito", name:"Дворец Ситораи Мохи-Хоса", city:"Бухара", type:"Музей", rating:4.6, reviews:2310, distance:"4 км", entry:"$5", hours:"09:00–17:00", audio:true, qr:false, img:"https://images.unsplash.com/photo-1653023102302-247f5f0fbdd1?w=700&h=480&fit=crop&auto=format", desc:"Летний дворец последнего эмира Бухары: европейские залы с восточной резьбой, коллекция сюзане и фарфора, павлины в саду." },
-  { id:"xmizd", name:"Некрополь Миздахкан", city:"Нукус", type:"История", rating:4.6, reviews:740, distance:"20 км", entry:"$2", hours:"Всегда", audio:false, qr:false, img:"https://images.unsplash.com/photo-1728281711729-a3b3424e6c1e?w=700&h=480&fit=crop&auto=format", desc:"Холм с мавзолеями от IV века до наших дней у Ходжейли. По легенде, здесь похоронен Адам, а часы мира отсчитывают кирпичи." },
+  { id:"xmizd", name:"Некрополь Миздахкан", city:"Нукус", type:"История", rating:4.6, reviews:740, distance:"20 км", entry:"$2", hours:"Всегда", audio:false, qr:false, img:"/scenic/mizdakhan-1.webp", desc:"Холм с мавзолеями от IV века до наших дней у Ходжейли. По легенде, здесь похоронен Адам, а часы мира отсчитывают кирпичи." },
   { id:"xyodg", name:"Шёлковая фабрика «Ёдгорлик»", city:"Фергана", type:"История", rating:4.8, reviews:1650, distance:"20 км", entry:"Бесплатно", hours:"08:00–17:00", audio:false, qr:false, img:"https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=700&h=480&fit=crop&auto=format", desc:"В Маргилане на глазах у гостей красят и ткут икат вручную — от кокона до готовой ткани. Можно купить шёлк у мастеров." },
   { id:"xrish", name:"Керамика Риштана", city:"Фергана", type:"Музей", rating:4.7, reviews:890, distance:"55 км", entry:"Бесплатно", hours:"09:00–18:00", audio:false, qr:false, img:"https://images.unsplash.com/photo-1719995153986-63e529a32585?w=700&h=480&fit=crop&auto=format", desc:"Дом-мастерская керамиста в Риштане, где пятьсот лет делают синюю посуду с глазурью ишкор. Покажут гончарный круг и печь." },
   { id:"xkhud", name:"Дворец Худояр-хана", city:"Фергана", type:"История", rating:4.6, reviews:1380, distance:"90 км", entry:"$3", hours:"09:00–18:00", audio:true, qr:false, img:"https://images.unsplash.com/photo-1654861857666-1e8c438cbe4a?w=700&h=480&fit=crop&auto=format", desc:"Дворец последнего кокандского хана с изразцовым порталом. Внутри — музей Кокандского ханства." },
-  { id:"xakhs", name:"Городище Ахсикент", city:"Наманган", type:"История", rating:4.4, reviews:410, distance:"25 км", entry:"Бесплатно", hours:"Всегда", audio:false, qr:false, img:"https://images.unsplash.com/photo-1728281711729-a3b3424e6c1e?w=700&h=480&fit=crop&auto=format", desc:"Руины столицы Ферганской долины X–XIII веков на берегу Сырдарьи. Раскопы, остатки стен и вид на реку." },
+  { id:"xakhs", name:"Городище Ахсикент", city:"Наманган", type:"История", rating:4.4, reviews:410, distance:"25 км", entry:"Бесплатно", hours:"Всегда", audio:false, qr:false, img:"/scenic/akhsikent-1.webp", desc:"Руины столицы Ферганской долины X–XIII веков на берегу Сырдарьи. Раскопы, остатки стен и вид на реку.", credits:"Фото: Ziqo — Wikimedia Commons, CC BY-SA 4.0" },
   { id:"xotav", name:"Мечеть Ота-Валихон-тура", city:"Наманган", type:"Мечеть", rating:4.6, reviews:620, distance:"1.2 км", entry:"Бесплатно", hours:"06:00–20:00", audio:false, qr:false, img:"https://images.unsplash.com/photo-1571401835393-8c5f35328320?w=700&h=480&fit=crop&auto=format", desc:"Мечеть начала XX века с бирюзовыми куполами — самая узнаваемая постройка Намангана." },
   { id:"xbabm", name:"Литературный музей Бабура", city:"Андижан", type:"Музей", rating:4.6, reviews:780, distance:"0.8 км", entry:"$2", hours:"09:00–17:00", audio:true, qr:false, img:"https://images.unsplash.com/photo-1728029062560-4b0e2b958885?w=700&h=480&fit=crop&auto=format", desc:"В старом медресе, на месте, где рос основатель империи Великих Моголов. Рукописи «Бабур-наме» и история его походов." },
   { id:"xandj", name:"Джума-мечеть Андижана", city:"Андижан", type:"Мечеть", rating:4.5, reviews:540, distance:"1.5 км", entry:"Бесплатно", hours:"06:00–20:00", audio:false, qr:false, img:"https://images.unsplash.com/photo-1571401835393-8c5f35328320?w=700&h=480&fit=crop&auto=format", desc:"Большая пятничная мечеть XIX века со двором и медресе — одна из немногих уцелевших после землетрясения 1902 года." },
-  { id:"xfaya", name:"Буддийский монастырь Фаяз-тепа", city:"Термез", type:"История", rating:4.7, reviews:690, distance:"12 км", entry:"$3", hours:"09:00–18:00", audio:true, qr:false, img:"https://images.unsplash.com/photo-1728281711729-a3b3424e6c1e?w=700&h=480&fit=crop&auto=format", desc:"Монастырь I–III веков: ступа, кельи и трапезная. Отсюда буддизм шёл по Шёлковому пути дальше в Китай." },
+  { id:"xfaya", name:"Буддийский монастырь Фаяз-тепа", city:"Термез", type:"История", rating:4.7, reviews:690, distance:"12 км", entry:"$3", hours:"09:00–18:00", audio:true, qr:false, img:"/scenic/fayaz-1.webp", desc:"Монастырь I–III веков: ступа, кельи и трапезная. Отсюда буддизм шёл по Шёлковому пути дальше в Китай." },
   { id:"xterm", name:"Археологический музей Термеза", city:"Термез", type:"Музей", rating:4.8, reviews:1120, distance:"1 км", entry:"$4", hours:"09:00–17:00", audio:true, qr:false, img:"https://images.unsplash.com/photo-1728029062560-4b0e2b958885?w=700&h=480&fit=crop&auto=format", desc:"Лучшая в стране коллекция буддийского искусства: статуи Будды, фрески и монеты Кушанского царства." },
   { id:"xhaki", name:"Мавзолей аль-Хакима ат-Термези", city:"Термез", type:"Мавзолей", rating:4.7, reviews:960, distance:"8 км", entry:"$2", hours:"08:00–18:00", audio:false, qr:false, img:"https://images.unsplash.com/photo-1664602078796-68ee76b3fc59?w=700&h=480&fit=crop&auto=format", desc:"Усыпальница суфия IX века с резной терракотой — место паломничества на берегу Амударьи." },
   { id:"xkokg", name:"Мечеть Кок-Гумбаз", city:"Карши", type:"Мечеть", rating:4.6, reviews:450, distance:"0.6 км", entry:"Бесплатно", hours:"06:00–20:00", audio:false, qr:false, img:"https://images.unsplash.com/photo-1571401835393-8c5f35328320?w=700&h=480&fit=crop&auto=format", desc:"Пятничная мечеть XVI века с синим куполом, построенная при Абдулла-хане. Центр старого Карши." },
@@ -80,7 +80,7 @@ export const PLACES: Place[] = [
 export const POPULAR_CITIES = [
   { name:"Самарканд", sub:"Город легенд и истории",   rating:4.9, img:"https://images.unsplash.com/photo-1664602078796-68ee76b3fc59?w=500&h=380&fit=crop&auto=format" },
   { name:"Бухара",    sub:"Древний город мира",        rating:4.8, img:"https://images.unsplash.com/photo-1653023102302-247f5f0fbdd1?w=500&h=380&fit=crop&auto=format" },
-  { name:"Чарвак",    sub:"Природа и отдых",           rating:4.9, img:"https://images.unsplash.com/photo-1728281711729-a3b3424e6c1e?w=500&h=380&fit=crop&auto=format" },
+  { name:"Чарвак",    sub:"Природа и отдых",           rating:4.9, img:"/scenic/charvak-2.webp" },
   { name:"Хива",      sub:"Жемчужина Хорезма",         rating:4.8, img:"https://images.unsplash.com/photo-1654861857666-1e8c438cbe4a?w=500&h=380&fit=crop&auto=format" },
 ];
 
@@ -221,6 +221,26 @@ export const WEATHER: Record<string,{temp:string;icon:string;cond:string;wind:st
   "Наманган":  {temp:"31",icon:"☀️",cond:"Ясно",        wind:"5 км/ч", feels:"30"},
   "Андижан":   {temp:"30",icon:"☀️",cond:"Ясно",        wind:"6 км/ч", feels:"29"},
   "Термез":    {temp:"40",icon:"🔆",cond:"Очень жарко", wind:"11 км/ч",feels:"43"},
+};
+
+/**
+ * Своё фото у каждого города. Раньше город без записи в POPULAR_CITIES
+ * получал снимок по кругу — Ташкент показывал Регистан, Наманган и
+ * Гулистан — минарет из Хивы. Снимки — Wikimedia Commons, CC0 и
+ * общественное достояние; у Джизака — Зааминский нацпарк, главное, ради
+ * чего едут в эту область.
+ */
+export const ФОТО_ГОРОДОВ: Record<string, string> = {
+  Ташкент: "/scenic/tashkent-1.webp",
+  Нукус: "/scenic/nukus-1.webp",
+  Фергана: "/scenic/fergana-1.webp",
+  Наманган: "/scenic/namangan-1.webp",
+  Андижан: "/scenic/andijan-1.webp",
+  Термез: "/scenic/termez-1.webp",
+  Карши: "/scenic/karshi-1.webp",
+  Гулистан: "/scenic/guliston-1.webp",
+  Джизак: "https://images.unsplash.com/photo-1716657309938-800da49506fa?w=900&h=600&fit=crop&auto=format",
+  Чарвак: "/scenic/charvak-2.webp",
 };
 
 export const UZ_CITIES = [

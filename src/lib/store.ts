@@ -1,5 +1,6 @@
 import path from "node:path";
 import { SEED, ПОЗДНИЕ_СЕМЕНА } from "@/data/seed";
+import { ФОТО_ГОРОДОВ } from "@/data/content";
 import { создатьХранилище } from "./storage";
 import type { Content, ContentKey } from "@/lib/types";
 
@@ -52,7 +53,7 @@ export async function readContent(): Promise<Content> {
     );
     if (добавить.length) (итог as Record<ContentKey, Записи>)[ключ] = [...список, ...добавить];
   }
-  return дополнитьПодробности(итог);
+  return исправитьФото(дополнитьПодробности(итог));
 }
 
 /*
@@ -99,6 +100,60 @@ function дополнитьПодробности(содержимое: Content)
     });
   }
   return итог;
+}
+
+/*
+ * Снимок Кальта-Минора из Хивы (Unsplash 1728281711729) в первых данных
+ * стоял заглушкой у мест и городов, где этого минарета нет: Чарвак,
+ * Наманган, Гулистан, Миздахкан, Ахсикент, Фаяз-тепа, гастрофест плова.
+ * Меняем только его — фото, выбранное в панели, не трогаем; у самой
+ * Хивы он верный, её в списке нет. Новые снимки лежат в public/scenic,
+ * все с Wikimedia Commons; CC0 и общественное достояние, кроме Ахсикента
+ * (CC BY-SA — с подписью автора).
+ */
+const ЧУЖОЙ_МИНАРЕТ = "photo-1728281711729";
+const ВЕРНЫЕ_ФОТО: { раздел: "places" | "cities" | "events"; кто: RegExp; img: string; credits?: string }[] = [
+  { раздел: "places", кто: /(^|-)chrvk$/, img: "/scenic/charvak-1.webp" },
+  { раздел: "places", кто: /(^|-)xmizd$/, img: "/scenic/mizdakhan-1.webp" },
+  {
+    раздел: "places",
+    кто: /(^|-)xakhs$/,
+    img: "/scenic/akhsikent-1.webp",
+    credits: "Фото: Ziqo — Wikimedia Commons, CC BY-SA 4.0",
+  },
+  { раздел: "places", кто: /(^|-)xfaya$/, img: "/scenic/fayaz-1.webp" },
+  { раздел: "events", кто: /Плов/, img: "/scenic/plov-1.webp" },
+];
+
+export function исправитьФото(содержимое: Content): Content {
+  const итог = { ...содержимое } as Record<string, unknown>;
+  for (const правка of ВЕРНЫЕ_ФОТО) {
+    const список = итог[правка.раздел] as Record<string, unknown>[] | undefined;
+    if (!Array.isArray(список)) continue;
+    итог[правка.раздел] = список.map((запись) => {
+      // Места узнаём по id, города и события — по названию.
+      const ключ = String(правка.раздел === "places" ? запись.id : запись.name);
+      if (!правка.кто.test(ключ)) return запись;
+      const чужое = (x: unknown) => typeof x === "string" && x.includes(ЧУЖОЙ_МИНАРЕТ);
+      if (!чужое(запись.img) && !(Array.isArray(запись.imgs) && запись.imgs.some(чужое))) return запись;
+      const копия = { ...запись };
+      if (чужое(копия.img)) копия.img = правка.img;
+      if (Array.isArray(копия.imgs)) копия.imgs = копия.imgs.map((x) => (чужое(x) ? правка.img : x));
+      if (правка.credits && !копия.credits) копия.credits = правка.credits;
+      return копия;
+    });
+  }
+  // Города: своё фото вместо доставшегося по кругу снимка другого города.
+  const чужиеГорода = ["1664602078796", "1653023102302", "1654861857666", ЧУЖОЙ_МИНАРЕТ];
+  const города = итог.cities as Record<string, unknown>[] | undefined;
+  if (Array.isArray(города)) {
+    итог.cities = города.map((г) => {
+      const своё = ФОТО_ГОРОДОВ[String(г.name)];
+      const img = String(г.img ?? "");
+      return своё && чужиеГорода.some((id) => img.includes(id)) ? { ...г, img: своё } : г;
+    });
+  }
+  return итог as unknown as Content;
 }
 
 /** Номера из первой заготовки: без фото и названий, id вида «гостиница-категория». */

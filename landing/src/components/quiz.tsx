@@ -16,12 +16,51 @@ type Старт = "tashkent" | "samarkand" | "bukhara";
 interface Точка {
   вид: "p" | "r";
   id: string;
-  /** Имена собственные: по-русски и латиницей для остальных языков. */
+  /** Имена собственные на всех десяти языках (бренды — как есть). */
   имя: Многоязычно;
 }
 
-const м = (id: string, ru: string, en: string): Точка => ({ вид: "p", id, имя: { ru, en } });
-const р = (id: string, ru: string, en: string): Точка => ({ вид: "r", id, имя: { ru, en } });
+/**
+ * Имена мест на остальных восьми языках — общепринятые написания: узбекская
+ * латиница, устоявшиеся китайские, японские и корейские названия, арабская
+ * транскрипция. Названия заведений-брендов (Minzifa, Caravan…) не переводятся.
+ */
+const ИМЕНА: Record<string, Omit<Многоязычно, "en">> = {
+  "Hast-Imam": { uz: "Hazrati Imom", zh: "哈斯特伊玛目建筑群", ko: "하스트 이맘", de: "Hast-Imam", fr: "Hast-Imam", ja: "ハスト・イマーム", tr: "Hast İmam", ar: "حضرتي إمام" },
+  "Chorsu Bazaar": { uz: "Chorsu bozori", zh: "乔尔苏巴扎", ko: "초르수 바자르", de: "Chorsu-Basar", fr: "Bazar Chorsu", ja: "チョルスー・バザール", tr: "Çorsu Pazarı", ar: "بازار تشورسو" },
+  "Amir Timur Museum": { uz: "Amir Temur muzeyi", zh: "帖木儿博物馆", ko: "아미르 티무르 박물관", de: "Amir-Timur-Museum", fr: "Musée Amir Timour", ja: "アミール・ティムール博物館", tr: "Emir Timur Müzesi", ar: "متحف الأمير تيمور" },
+  "Registan": { uz: "Registon", zh: "雷吉斯坦广场", ko: "레기스탄", de: "Registan", fr: "Registan", ja: "レギスタン広場", tr: "Registan", ar: "ريجستان" },
+  "Gur-e-Amir": { uz: "Go‘ri Amir", zh: "古尔-艾米尔陵", ko: "구르 에미르", de: "Gur-Emir", fr: "Gour-Emir", ja: "グーリ・アミール廟", tr: "Gur-i Emir", ar: "كور أمير" },
+  "Shah-i-Zinda": { uz: "Shohi Zinda", zh: "沙希辛德陵墓群", ko: "샤히 진다", de: "Schah-i-Sinda", fr: "Shah-i-Zinda", ja: "シャーヒ・ズィンダ廟群", tr: "Şah-ı Zinde", ar: "شاه زنده" },
+  "Bibi-Khanym Mosque": { uz: "Bibixonim masjidi", zh: "比比哈努姆清真寺", ko: "비비하눔 모스크", de: "Bibi-Chanum-Moschee", fr: "Mosquée Bibi-Khanoum", ja: "ビビ・ハニム・モスク", tr: "Bibi Hanım Camii", ar: "مسجد بيبي خانم" },
+  "Ulugh Beg Observatory": { uz: "Ulug‘bek rasadxonasi", zh: "兀鲁伯天文台", ko: "울루그베그 천문대", de: "Ulugh-Beg-Observatorium", fr: "Observatoire d'Ulugh Beg", ja: "ウルグ・ベク天文台", tr: "Uluğ Bey Gözlemevi", ar: "مرصد أولوغ بيك" },
+  "Meros paper mill": { uz: "«Meros» qog‘oz ustaxonasi", zh: "“梅罗斯”造纸坊", ko: "메로스 종이 공방", de: "Papiermanufaktur „Meros“", fr: "Moulin à papier Meros", ja: "メロス紙工房", tr: "Meros kâğıt atölyesi", ar: "ورشة «ميروس» للورق" },
+  "Ark Fortress": { uz: "Ark qal’asi", zh: "阿克城堡", ko: "아르크 요새", de: "Festung Ark", fr: "Forteresse de l'Ark", ja: "アルク城", tr: "Ark Kalesi", ar: "قلعة أرك" },
+  "Kalon Minaret": { uz: "Minorai Kalon", zh: "卡扬宣礼塔", ko: "칼론 미나렛", de: "Kalon-Minarett", fr: "Minaret Kalon", ja: "カラーン・ミナレット", tr: "Kalon Minaresi", ar: "منارة كلان" },
+  "Lyabi-Hauz": { uz: "Labi Hovuz", zh: "莱比哈乌斯", ko: "랴비 하우즈", de: "Labi-Hauz", fr: "Lyabi-Khaouz", ja: "ラビ・ハウズ", tr: "Lebi Havuz", ar: "لب حوض" },
+  "Samanid Mausoleum": { uz: "Somoniylar maqbarasi", zh: "萨曼王朝陵墓", ko: "사마니 영묘", de: "Samaniden-Mausoleum", fr: "Mausolée des Samanides", ja: "イスマイール・サーマーニー廟", tr: "Samaniler Türbesi", ar: "ضريح السامانيين" },
+  "Sitorai Mohi-Khosa": { uz: "Sitorai Mohi Xossa", zh: "斯托莱·莫希·霍萨宫", ko: "시토라이 모히 호사", de: "Sitorai Mohi-Chosa", fr: "Sitorai Mokhi-Khossa", ja: "シトライ・マヒ・ホサ宮殿", tr: "Sitorai Mohi Hossa", ar: "ستوراي ماهي خاصة" },
+  "Itchan Kala": { uz: "Ichan qal’a", zh: "伊钦·卡拉", ko: "이찬 칼라", de: "Itchan Kala", fr: "Itchan Kala", ja: "イチャン・カラ", tr: "İçan Kale", ar: "إيتشان قلعة" },
+  "Islam Khodja Minaret": { uz: "Islomxo‘ja minorasi", zh: "伊斯兰霍贾宣礼塔", ko: "이슬람 호자 미나렛", de: "Islam-Chodscha-Minarett", fr: "Minaret Islam Khodja", ja: "イスラーム・ホジャ・ミナレット", tr: "İslam Hoca Minaresi", ar: "منارة إسلام خوجة" },
+  "Charvak Reservoir": { uz: "Chorvoq suv ombori", zh: "恰尔瓦克水库", ko: "차르바크 저수지", de: "Tscharwak-Stausee", fr: "Réservoir de Tcharvak", ja: "チャルバク貯水池", tr: "Çarvak Barajı", ar: "خزان تشارفاك" },
+  "Chimgan Mountains": { uz: "Chimyon tog‘lari", zh: "奇姆甘山", ko: "침간 산맥", de: "Tschimgan-Berge", fr: "Monts Tchimgan", ja: "チムガン山地", tr: "Çimgan Dağları", ar: "جبال تشيمغان" },
+  "Urungach Lakes": { uz: "Urungach ko‘llari", zh: "乌伦加奇湖", ko: "우룬가치 호수", de: "Urungatsch-Seen", fr: "Lacs d'Ourungatch", ja: "ウルンガチ湖", tr: "Urungaç Gölleri", ar: "بحيرات أورونغاتش" },
+  "Amirsoy Resort": { uz: "Amirsoy kurorti", zh: "阿米尔索伊度假村", ko: "아미르소이 리조트", de: "Resort Amirsoy", fr: "Station Amirsoy", ja: "アミルソイ・リゾート", tr: "Amirsoy Tatil Köyü", ar: "منتجع أميرسوي" },
+  "Zaamin National Park": { uz: "Zomin milliy bog‘i", zh: "扎阿明国家公园", ko: "자아민 국립공원", de: "Nationalpark Saamin", fr: "Parc national de Zaamin", ja: "ザーミン国立公園", tr: "Zaamin Milli Parkı", ar: "حديقة زامين الوطنية" },
+  "Aydarkul Lake": { uz: "Aydarko‘l", zh: "艾达尔湖", ko: "아이다르쿨 호수", de: "Aydarkul-See", fr: "Lac Aydarkoul", ja: "アイダルクル湖", tr: "Aydarkul Gölü", ar: "بحيرة أيدركول" },
+  "Sentob & Nuratau": { uz: "Sentob va Nurota tog‘lari", zh: "森托布与努拉塔山", ko: "센토브와 누라타우 산맥", de: "Sentob und Nuratau-Gebirge", fr: "Sentob et monts Nourataou", ja: "セントブとヌラタウ山地", tr: "Sentob ve Nuratau Dağları", ar: "سنتوب وجبال نوراتاو" },
+  "Sarmishsay petroglyphs": { uz: "Sarmishsoy qoyatosh suratlari", zh: "萨尔米什赛岩画", ko: "사르미시사이 암각화", de: "Felsbilder von Sarmischsai", fr: "Pétroglyphes de Sarmichsaï", ja: "サルミシュサイの岩絵", tr: "Sarmışsay Kaya Resimleri", ar: "نقوش سرميشساي الصخرية" },
+  "Shakhimardan": { uz: "Shohimardon", zh: "沙希马尔丹", ko: "샤히마르단", de: "Schachimardan", fr: "Chakhimardan", ja: "シャヒマルダン", tr: "Şahimerdan", ar: "شاه مردان" },
+  "Central Asian Plov Centre": { uz: "Markaziy Osiyo palov markazi", zh: "中亚抓饭中心", ko: "중앙아시아 플로프 센터", de: "Zentralasiatisches Plov-Zentrum", fr: "Centre du plov d'Asie centrale", ja: "中央アジア・プロフセンター", tr: "Orta Asya Pilav Merkezi", ar: "مركز البلوف لآسيا الوسطى" },
+  "Rokhat Teahouse": { uz: "Rohat choyxonasi", zh: "罗哈特茶馆", ko: "로하트 차이하나", de: "Teehaus Rochat", fr: "Tchaïkhana Rokhat", ja: "ロハット・チャイハナ", tr: "Rohat Çayhanesi", ar: "مقهى روحات" },
+  "Siyob Bazaar": { uz: "Siyob bozori", zh: "锡亚布巴扎", ko: "시욥 바자르", de: "Siyob-Basar", fr: "Bazar Siyob", ja: "シヨブ・バザール", tr: "Siyob Pazarı", ar: "بازار سياب" },
+  "Samarkand Plov Centre": { uz: "Samarqand palov markazi", zh: "撒马尔罕抓饭中心", ko: "사마르칸트 플로프 센터", de: "Samarkander Plov-Zentrum", fr: "Centre du plov de Samarcande", ja: "サマルカンド・プロフセンター", tr: "Semerkant Pilav Merkezi", ar: "مركز البلوف في سمرقند" },
+  "Registan Teahouse": { uz: "Registon yonidagi choyxona", zh: "雷吉斯坦茶馆", ko: "레기스탄 차이하나", de: "Teehaus am Registan", fr: "Tchaïkhana du Registan", ja: "レギスタンのチャイハナ", tr: "Registan Çayhanesi", ar: "مقهى ريجستان" },
+  "Lyabi-Hauz Restaurant": { uz: "Labi Hovuz restorani", zh: "莱比哈乌斯餐厅", ko: "랴비 하우즈 레스토랑", de: "Restaurant Labi-Hauz", fr: "Restaurant Lyabi-Khaouz", ja: "ラビ・ハウズ・レストラン", tr: "Lebi Havuz Restoranı", ar: "مطعم لب حوض" },
+};
+
+const м = (id: string, ru: string, en: string): Точка => ({ вид: "p", id, имя: { ...ИМЕНА[en], ru, en } });
+const р = (id: string, ru: string, en: string): Точка => ({ вид: "r", id, имя: { ...ИМЕНА[en], ru, en } });
 
 /** Дни по городам: сперва город старта, дальше — по Шёлковому пути. */
 const ДНИ: Record<Интерес, Record<Старт | "khiva" | "extra", Точка[][]>> = {

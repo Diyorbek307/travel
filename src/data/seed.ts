@@ -7,6 +7,7 @@ import {
   RESTAURANTS,
   ROUTES,
   UZ_CITIES,
+  ФОТО_ГОРОДОВ,
 } from "./content";
 import { GREEN } from "@/lib/theme";
 import { типовыеНомера } from "@/lib/rooms";
@@ -68,7 +69,7 @@ const cities: ManagedCity[] = UZ_CITIES.map((name, i) => {
     name,
     sub: popular?.sub ?? "Узбекистан",
     region: name === "Чарвак" ? "Ташкентская область" : `${name}ская область`,
-    img: popular?.img ?? POPULAR_CITIES[i % POPULAR_CITIES.length].img,
+    img: popular?.img ?? ФОТО_ГОРОДОВ[name] ?? POPULAR_CITIES[i % POPULAR_CITIES.length].img,
     rating: popular?.rating ?? 4.5,
     // Числа демонстрационные: настоящие подставит редактор в панели.
     population: 0,
