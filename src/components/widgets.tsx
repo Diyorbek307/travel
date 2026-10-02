@@ -118,7 +118,7 @@ function прочитатьСкачанное(): Скачано {
  */
 export function OfflinePacks() {
   const { t, трК, lang } = useT();
-  const { PLACES, HOTELS, RESTAURANTS, AUDIO } = useAppContent();
+  const { PLACES, HOTELS, RESTAURANTS, AUDIO, CITIES } = useAppContent();
   const [скачано, setСкачано] = useState<Скачано>({});
   const [прогресс, setПрогресс] = useState<Record<string, number>>({});
   const [сбой, setСбой] = useState<string | null>(null);
@@ -131,12 +131,23 @@ export function OfflinePacks() {
 
   // Города — те, где есть места; порядок как в данных.
   const города = Array.from(new Set(PLACES.map((p) => p.city)));
+  // Всё, что турист увидит в карточках города: обложки, галереи, фото
+  // номеров и блюд. Без галерей карточка без сети открывалась серой.
   const файлыГорода = (город: string) => {
     const фото = [
-      ...PLACES.filter((p) => p.city === город).map((p) => p.img),
-      ...HOTELS.filter((h) => h.city === город).flatMap((h) => [h.img, ...(h.imgs ?? [])]),
-      ...RESTAURANTS.filter((r) => r.city === город).map((r) => r.img),
-    ];
+      ...CITIES.filter((c) => c.name === город).map((c) => c.img),
+      ...PLACES.filter((p) => p.city === город).flatMap((p) => [p.img, ...(p.imgs ?? [])]),
+      ...HOTELS.filter((h) => h.city === город).flatMap((h) => [
+        h.img,
+        ...(h.imgs ?? []),
+        ...(h.roomTypes ?? []).flatMap((н) => [н.img, ...(н.imgs ?? [])]),
+      ]),
+      ...RESTAURANTS.filter((r) => r.city === город).flatMap((r) => [
+        r.img,
+        ...(r.imgs ?? []),
+        ...(r.menu ?? []).map((б) => б.img),
+      ]),
+    ].filter((x): x is string => Boolean(x));
     const аудио = AUDIO.filter((а) => а.city === город).map((а) => а.url);
     return { фото: Array.from(new Set(фото.filter(Boolean))), аудио: Array.from(new Set(аудио)) };
   };
@@ -191,13 +202,25 @@ export function OfflinePacks() {
   if (!можно || города.length === 0) return null;
 
   return (
-    <div>
+    <div id="offline-packs" className="scroll-mt-20">
       <p className="font-bold text-sm mb-1" style={{ color: TEXT }}>
         ⬇️ {t("off_packs")}
       </p>
       <p className="text-xs mb-2.5" style={{ color: MUTED }}>
         {t("off_hint")}
       </p>
+      {/* Скачать все города разом — перед поездкой, пока есть Wi-Fi. */}
+      {города.some((г) => !скачано[г]) && Object.keys(прогресс).length === 0 && (
+        <button
+          onClick={async () => {
+            for (const г of города) if (!прочитатьСкачанное()[г]) await скачать(г);
+          }}
+          className="mb-2.5 w-full rounded-xl py-2.5 text-sm font-bold"
+          style={{ background: ACCENT_FILL, color: WHITE }}
+        >
+          ⬇ {t("off_all")}
+        </button>
+      )}
       <div className="space-y-2.5">
         {города.map((город) => {
           const { фото, аудио } = файлыГорода(город);

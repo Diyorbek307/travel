@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { APP_URL, тр, useЯзык, type Многоязычно } from "@/lib/i18n";
-import { Магнит, Счёт } from "./effects";
+import { тр, useЯзык, type Многоязычно } from "@/lib/i18n";
+import { Счёт } from "./effects";
+import StoreButtons from "./store-buttons";
 import { Слова, доля, useПрокрутка } from "./cinema";
 
 export interface Цифры {
@@ -30,17 +31,17 @@ const ПРО_КАРТУ: Многоязычно = {
   ar: "كل المدن والمعالم والمطاعم على خريطة واحدة وبلغتك. اختر مدينة واحصل على خطة اليوم.",
 };
 
-const ПРО_БРАУЗЕР: Многоязычно = {
-  en: "No sign-up and no app store. HelloUZ opens in the browser and keeps working when the signal is gone.",
-  ru: "Без регистрации и магазина приложений. HelloUZ открывается в браузере и работает, даже когда пропала связь.",
-  uz: "Roʻyxatdan oʻtishsiz va ilovalar doʻkonisiz. HelloUZ brauzerda ochiladi va aloqa yoʻqolganda ham ishlaydi.",
-  zh: "无需注册，也无需应用商店。HelloUZ 直接在浏览器中打开，没有信号也能继续使用。",
-  ko: "가입도, 앱 스토어도 필요 없어요. HelloUZ는 브라우저에서 열리고 신호가 끊겨도 작동해요.",
-  de: "Ohne Anmeldung und ohne App Store. HelloUZ öffnet sich im Browser und funktioniert auch ohne Empfang.",
-  fr: "Sans inscription ni magasin d’applications. HelloUZ s’ouvre dans le navigateur et fonctionne même sans réseau.",
-  ja: "登録もアプリストアも不要。HelloUZ はブラウザで開き、電波がなくても使えます。",
-  tr: "Kayıt yok, uygulama mağazası yok. HelloUZ tarayıcıda açılır ve sinyal yokken de çalışır.",
-  ar: "بلا تسجيل ولا متجر تطبيقات. يفتح HelloUZ في المتصفح ويعمل حتى عند انقطاع الإشارة.",
+const ПРО_ОФЛАЙН: Многоязычно = {
+  en: "Download your cities before the trip — HelloUZ keeps working in the mountains, on the train and in flight mode, with no signal or roaming.",
+  ru: "Скачайте города перед поездкой — и HelloUZ работает в горах, в поезде и в режиме полёта, без связи и роуминга.",
+  uz: "Safardan oldin shaharlarni yuklab oling — HelloUZ togʻda, poyezdda va parvoz rejimida aloqasiz va roumingsiz ishlaydi.",
+  zh: "出发前下载城市——在山里、火车上或飞行模式下，没有信号和漫游，HelloUZ 照样可用。",
+  ko: "여행 전에 도시를 받아 두세요 — 산에서도, 기차에서도, 비행기 모드에서도 신호·로밍 없이 HelloUZ가 작동해요.",
+  de: "Lade deine Städte vor der Reise — HelloUZ läuft in den Bergen, im Zug und im Flugmodus, ganz ohne Empfang und Roaming.",
+  fr: "Téléchargez vos villes avant le départ — HelloUZ fonctionne en montagne, dans le train et en mode avion, sans réseau ni itinérance.",
+  ja: "出発前に街をダウンロード — 山でも列車でも機内モードでも、電波やローミングなしでHelloUZが使えます。",
+  tr: "Yolculuktan önce şehirleri indirin — HelloUZ dağda, trende ve uçak modunda sinyal ve dolaşım olmadan çalışır.",
+  ar: "نزّل مدنك قبل الرحلة — ويعمل HelloUZ في الجبال وفي القطار وفي وضع الطيران دون إشارة أو تجوال.",
 };
 
 /** Ease-out: быстро стартует, мягко садится. */
@@ -240,7 +241,7 @@ export default function Hero({ цифры }: { цифры: Цифры }) {
             style={{ top: 0, transform: "translate3d(0, 120vh, 0)", willChange: "transform" }}
           >
             <Панель
-              текст={тр(ПРО_БРАУЗЕР, язык)}
+              текст={тр(ПРО_ОФЛАЙН, язык)}
               видно={видноB}
               строки={[
                 [t("stat_langs"), "10"],
@@ -282,25 +283,9 @@ export default function Hero({ цифры }: { цифры: Цифры }) {
                   <Слова текст={t("hero_title_3")} видно={показ} уход={ушёл} задержка={0.45} />
                 </em>
               </h1>
-              <div className="hero-cta flex flex-wrap items-center gap-3">
-                <Магнит>
-                  <a
-                    href={APP_URL}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="group inline-flex items-center gap-3 rounded-full px-7 py-4 text-[15px] font-semibold text-white transition-transform hover:scale-[1.03]"
-                    style={{ background: "var(--accent-fill)" }}
-                  >
-                    {t("hero_cta")}
-                    <span className="transition-transform group-hover:translate-x-1 rtl:rotate-180">→</span>
-                  </a>
-                </Магнит>
-                <a
-                  href="#demo"
-                  className="inline-flex items-center gap-2 rounded-full border border-white/30 px-5 py-3.5 text-[14px] font-semibold bg-black/25 text-white transition-colors hover:bg-white hover:text-[var(--ink)]"
-                >
-                  ▶ {t("hero_watch")}
-                </a>
+              {/* Магазины — «скоро», пока приложения там нет; рядом веб-версия. */}
+              <div className="hero-cta">
+                <StoreButtons тёмный />
               </div>
               <p className="flex gap-6 text-[13px] text-white/70">
                 <span>(10 {t("stat_langs")})</span>

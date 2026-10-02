@@ -25,10 +25,29 @@ export default function ServiceWorker() {
     // её страницы в кэше устройства ни к чему.
     if (pathname.startsWith("/admin")) return;
     const version = process.env.NEXT_PUBLIC_BUILD_ID ?? "dev";
-    navigator.serviceWorker.register(`/sw.js?v=${version}`).catch(() => {
-      // Офлайн — приятное дополнение, а не условие работы: если
-      // регистрация не прошла, приложение всё равно должно открыться.
-    });
+    navigator.serviceWorker
+      .register(`/sw.js?v=${version}`)
+      .then(() => navigator.serviceWorker.ready)
+      .then((р) => {
+        // Скрипты, стили и картинки первой загрузки прошли мимо офлайн-кэша:
+        // воркер ещё не управлял страницей. Передаём ему их список, иначе
+        // без сети приложение не запустится (или откроется с дырами), как
+        // только браузер почистит свой кэш.
+        const свои = performance
+          .getEntriesByType("resource")
+          .map((e) => e.name)
+          .filter((u) => {
+            const адрес = new URL(u);
+            if (адрес.hostname.endsWith("unsplash.com")) return true;
+            if (адрес.origin !== location.origin) return false;
+            return /^\/(_next\/static|tiles|scenic|icons|api\/media)\//.test(адрес.pathname);
+          });
+        р.active?.postMessage({ type: "precache", urls: свои });
+      })
+      .catch(() => {
+        // Офлайн — приятное дополнение, а не условие работы: если
+        // регистрация не прошла, приложение всё равно должно открыться.
+      });
   }, [pathname]);
 
   return null;

@@ -493,6 +493,33 @@ html.own-cursor * {
   }
 }
 
+/* ── ИИ-камера: сканирующая линия, мигание записи, волна голоса ── */
+.cam-scan {
+  animation: cam-scan 1.1s cubic-bezier(0.65, 0, 0.35, 1) infinite alternate;
+}
+@keyframes cam-scan {
+  to {
+    top: 100%;
+  }
+}
+.cam-blink {
+  animation: cam-blink 1s steps(2, start) infinite;
+}
+@keyframes cam-blink {
+  to {
+    visibility: hidden;
+  }
+}
+.cam-wave {
+  height: 30%;
+  animation: cam-wave 0.9s ease-in-out infinite alternate;
+}
+@keyframes cam-wave {
+  to {
+    height: 100%;
+  }
+}
+
 /* «Уменьшить движение» для кинематографичных блоков — в конце файла,
    чтобы перекрыть правила выше. */
 @media (prefers-reduced-motion: reduce) {
@@ -504,6 +531,9 @@ html.own-cursor * {
     opacity: 1;
   }
   .scroll-tick,
+  .cam-scan,
+  .cam-blink,
+  .cam-wave,
   .axis-crawl,
   .map-ping,
   .map-flash {

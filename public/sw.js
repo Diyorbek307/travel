@@ -20,9 +20,12 @@ const VERSION = new URL(self.location.href).searchParams.get("v") || "dev";
 const SHELL = `shell-${VERSION}`;
 const STATIC = "static-v1";
 const MEDIA = "media-v1";
+const ASSETS = "assets-v1";
 
 /** Сколько снимков держим: дальше вытесняем самые старые. */
 const MEDIA_LIMIT = 200;
+/** Свои картинки: плитки, виды городов, загруженные в панели фото. */
+const ASSETS_LIMIT = 300;
 /** Скрипты старых сборок копятся — держим с запасом на пару выкатов. */
 const STATIC_LIMIT = 400;
 
@@ -83,8 +86,49 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
+  // Свои картинки (плитки HelloUZ, виды городов, иконки, фото из панели)
+  // не меняются по адресу — сначала кэш. Раньше они шли «сначала сеть» и
+  // не сохранялись вовсе: без связи экран HelloUZ открывался с дырами.
+  if (request.destination === "image" || url.pathname.startsWith("/api/media/")) {
+    event.respondWith(cacheFirst(request, ASSETS, ASSETS_LIMIT).catch(() => fromAnyCache(request)));
+    return;
+  }
+
   // Свои запросы: сначала сеть, кэш как запасной вариант в офлайне.
   event.respondWith(networkFirst(request, url));
+});
+
+// Страница присылает скрипты, стили и картинки, загруженные до того, как
+// воркер начал ею управлять, — раскладываем их по кэшам, чтобы офлайн-старт
+// не зависел от кэша браузера.
+self.addEventListener("message", (event) => {
+  const данные = event.data || {};
+  if (данные.type !== "precache" || !Array.isArray(данные.urls)) return;
+  const куда = (u) => {
+    try {
+      const url = new URL(u);
+      if (url.hostname.endsWith("unsplash.com")) return MEDIA;
+      if (url.origin !== self.location.origin) return null;
+      if (url.pathname.startsWith("/_next/static/")) return STATIC;
+      if (/^\/(tiles|scenic|icons|api\/media)\//.test(url.pathname)) return ASSETS;
+    } catch {
+      // кривой адрес — пропускаем
+    }
+    return null;
+  };
+  event.waitUntil(
+    Promise.all(
+      данные.urls.map(async (u) => {
+        const имя = куда(u);
+        if (!имя) return;
+        const cache = await caches.open(имя);
+        if (await cache.match(u)) return;
+        const чужой = new URL(u).origin !== self.location.origin;
+        const ответ = await fetch(u, чужой ? { mode: "no-cors" } : undefined).catch(() => null);
+        if (ответ && (ответ.ok || ответ.type === "opaque")) await cache.put(u, ответ);
+      }),
+    ),
+  );
 });
 
 /** Ответ из любого кэша: оболочки, снимков или скачанного города. */

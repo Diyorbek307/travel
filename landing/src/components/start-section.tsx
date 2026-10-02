@@ -1,18 +1,17 @@
 "use client";
 
-import { APP_URL, useЯзык, type Ключ } from "@/lib/i18n";
+import { useЯзык, type Ключ } from "@/lib/i18n";
 import Reveal from "./reveal";
-import { Магнит } from "./effects";
+import StoreButtons from "./store-buttons";
 
 /**
- * «Как начать»: три шага без скачивания. У приложения есть manifest
- * (display: standalone) и service worker — его правда можно поставить
- * на экран телефона, в магазинах его пока нет, поэтому про них молчим.
+ * «Как начать»: установить приложение (пока магазины «скоро» — веб-версия),
+ * выбрать язык, скачать города для работы без связи.
  */
 const ШАГИ: { знак: string; з: Ключ; т: Ключ }[] = [
-  { знак: "🌐", з: "st_1_t", т: "st_1_s" },
+  { знак: "📲", з: "st_1_t", т: "st_1_s" },
   { знак: "文", з: "st_2_t", т: "st_2_s" },
-  { знак: "📲", з: "st_3_t", т: "st_3_s" },
+  { знак: "⬇️", з: "st_3_t", т: "st_3_s" },
 ];
 
 export default function StartSection() {
@@ -62,25 +61,7 @@ export default function StartSection() {
 
         <Reveal className="mt-14">
           <div className="mx-auto flex max-w-3xl flex-col items-center gap-5 rounded-[28px] border p-6 text-center sm:p-8" style={{ borderColor: "var(--line)", background: "rgba(255,255,255,0.75)" }}>
-            <div className="grid w-full gap-3 text-[14px] sm:grid-cols-2">
-              {(["st_ios", "st_android"] as const).map((к) => (
-                <p key={к} className="rounded-2xl px-4 py-3 font-medium" style={{ background: "var(--cream)" }}>
-                  {t(к)}
-                </p>
-              ))}
-            </div>
-            <Магнит>
-              <a
-                href={APP_URL}
-                target="_blank"
-                rel="noreferrer"
-                className="group inline-flex items-center gap-3 rounded-full px-7 py-4 text-[15px] font-semibold text-white shadow-[0_14px_30px_-12px_rgba(14,166,159,0.55)] transition-transform hover:scale-[1.03]"
-                style={{ background: "var(--accent-ink)" }}
-              >
-                {t("hero_cta")}
-                <span className="transition-transform group-hover:translate-x-1 rtl:rotate-180">→</span>
-              </a>
-            </Магнит>
+            <StoreButtons className="justify-center" />
           </div>
         </Reveal>
       </div>

@@ -42,6 +42,7 @@ import type { Hotel, Place, PublicUser, Restaurant, Route, Tab } from "@/lib/typ
 import TripScreen from "@/components/screens/trip";
 import IntroCinematic from "@/components/intro-cinematic";
 import IntroLogo from "@/components/intro-logo";
+import OfflineBanner from "@/components/offline-banner";
 import PushAsk, { ЭкранУведомлений } from "@/components/push-ask";
 
 /**
@@ -809,6 +810,7 @@ function App() {
                 <PremiumModal onClose={() => setShowPremium(false)} />
               </Слой>
 
+              <OfflineBanner />
               <div className="device-content flex-1 overflow-hidden">
                 <div key={tabKey} className="app-page animate-fade-in h-full" data-dir={направление}>
                   <Screen

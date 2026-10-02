@@ -113,10 +113,15 @@ export default function Nav() {
             href={APP_URL}
             target="_blank"
             rel="noreferrer"
-            className="hidden whitespace-nowrap rounded-full px-5 py-2.5 text-sm font-semibold text-white transition-transform hover:scale-[1.04] sm:inline-block"
+            aria-label={t("open_app")}
+            className="inline-flex h-9 w-9 items-center justify-center whitespace-nowrap rounded-full text-sm font-semibold text-white transition-transform hover:scale-[1.04] sm:h-auto sm:w-auto sm:px-5 sm:py-2.5"
             style={{ background: тёмный ? "var(--accent-fill)" : "var(--accent-ink)" }}
           >
-            {t("open_app")}
+            {/* На телефоне места мало — только стрелка; надпись с 640px. */}
+            <span className="sm:hidden" aria-hidden>
+              ↗
+            </span>
+            <span className="hidden sm:inline">{t("open_app")}</span>
           </a>
         </div>
       </div>

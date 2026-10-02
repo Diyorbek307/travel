@@ -3,6 +3,7 @@
 import Logo from "./logo";
 import { APP_URL, useЯзык } from "@/lib/i18n";
 import { Контуры, Слова } from "./cinema";
+import StoreButtons from "./store-buttons";
 
 /**
  * Финал — тёмная панель в бирюзовой рамке, по ней медленно текут линии
@@ -52,15 +53,7 @@ export default function Finale() {
               >
                 <Слова текст={t("fin_title")} шаг={0.1} />
               </h2>
-              <a
-                href={APP_URL}
-                target="_blank"
-                rel="noreferrer"
-                className="mt-4 inline-flex items-center gap-3 rounded-full px-8 py-4 text-[15px] font-semibold transition-transform hover:scale-[1.04]"
-                style={{ background: "var(--gold)", color: "var(--ink)" }}
-              >
-                {t("open_app")} ↗
-              </a>
+              <StoreButtons тёмный className="mt-6 justify-center" />
             </div>
 
             <p className="hand mx-auto -rotate-6 text-center text-5xl leading-none text-white/90 lg:text-6xl">

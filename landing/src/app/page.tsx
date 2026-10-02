@@ -8,7 +8,7 @@ import StartSection from "@/components/start-section";
 import FaqSection from "@/components/faq-section";
 import Quiz from "@/components/quiz";
 import Finale from "@/components/finale";
-import MosaicSection from "@/components/mosaic-section";
+import CameraSection from "@/components/camera-section";
 import GlobeSection from "@/components/globe-section";
 import Manifesto from "@/components/manifesto";
 import OpenCountry from "@/components/open-country";
@@ -46,7 +46,7 @@ export default async function Home() {
       <Hero цифры={await цифры()} />
       <Marquee />
       <Manifesto />
-      <MosaicSection />
+      <CameraSection />
       <OpenCountry />
       <Destinations />
       <Essentials />

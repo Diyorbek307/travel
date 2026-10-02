@@ -212,6 +212,23 @@ export function ExploreScreen({
       // Магазин eSIM живёт в «Полезном» → «Связь». Отдельная плитка — потому
       // что внутри памятки его не находили.
       { ключ: "esim", заголовок: t("ex_esim"), под: t("ex_esim_sub"), go: onEsim },
+      // Скачивание городов для офлайна живёт внизу «Аудио» — туда его и
+      // не находили. Плитка ведёт прямо к списку городов.
+      {
+        ключ: "offline",
+        заголовок: t("ex_offline"),
+        под: t("ex_offline_sub"),
+        go: () => {
+          onTab("audio");
+          setTimeout(
+            () =>
+              document
+                .getElementById("offline-packs")
+                ?.scrollIntoView({ behavior: "smooth", block: "start" }),
+            450,
+          );
+        },
+      },
       // Заглушка на будущее: настоящей 3D/VR-реконструкции городов ещё нет,
       // но место в конце сетки зарезервировано — когда она появится, здесь
       // достаточно будет заменить скоро на go с настоящим разделом.
@@ -402,7 +419,7 @@ const ГРУППЫ: { заголовок: TKey; ключи: string[]; тон: st
   },
   {
     заголовок: "ex_group_road",
-    ключи: ["transport", "esim", "tips", "cities"],
+    ключи: ["transport", "esim", "offline", "tips", "cities"],
     тон: "rgba(96, 165, 250, 0.14)",
     метка: "#60A5FA",
   },
@@ -849,12 +866,13 @@ function ИллюстрацияVR({ широкая }: { широкая: boolean 
 /** Плитки, у которых есть живая версия — видео в public/videos/tiles. */
 const ЖИВЫЕ_ПЛИТКИ = new Set(["museums", "places", "restaurants", "bars", "routes", "excursions", "hotels"]);
 /** Плитки с иллюстрацией-SVG вместо картинки из public/tiles. */
-const РИСОВАННЫЕ = new Set(["photo", "translate", "vr", "esim"]);
+const РИСОВАННЫЕ = new Set(["photo", "translate", "vr", "esim", "offline"]);
 
 function ИллюстрацияСкоро({ ключ, широкая }: { ключ: string; широкая: boolean }) {
   if (ключ === "photo") return <ИллюстрацияФото широкая={широкая} />;
   if (ключ === "translate") return <ИллюстрацияПереводчик широкая={широкая} />;
   if (ключ === "esim") return <ИллюстрацияEsim широкая={широкая} />;
+  if (ключ === "offline") return <ИллюстрацияОфлайн широкая={широкая} />;
   return <ИллюстрацияVR широкая={широкая} />;
 }
 
@@ -941,7 +959,10 @@ function ИллюстрацияEsim({ широкая }: { широкая: boolea
         </linearGradient>
       </defs>
       {/* Карта со срезанным углом, как у настоящей SIM. */}
-      <path d="M20 30 h38 l14 14 v42 a6 6 0 0 1 -6 6 h-46 a6 6 0 0 1 -6 -6 v-50 a6 6 0 0 1 6 -6 Z" fill={`url(#${id}c)`} />
+      <path
+        d="M20 30 h38 l14 14 v42 a6 6 0 0 1 -6 6 h-46 a6 6 0 0 1 -6 -6 v-50 a6 6 0 0 1 6 -6 Z"
+        fill={`url(#${id}c)`}
+      />
       <path d="M26 38 h28" stroke="#ffffff" strokeOpacity="0.35" strokeWidth="3" strokeLinecap="round" />
       {/* Чип. */}
       <rect x="28" y="52" width="30" height="24" rx="5" fill={GOLD} />
@@ -957,6 +978,47 @@ function ИллюстрацияEsim({ широкая }: { широкая: boolea
         <path d="M72 38 a28 28 0 0 1 38 0" opacity="0.45" />
       </g>
       <circle cx="91" cy="59" r="3.5" fill={GOLD} />
+    </СвгСкоро>
+  );
+}
+
+/**
+ * Без интернета: телефон, в который «падает» город — золотая стрелка
+ * вниз, на экране купол, рядом зачёркнутый сигнал.
+ */
+function ИллюстрацияОфлайн({ широкая }: { широкая: boolean }) {
+  const id = useId().replace(/:/g, "");
+  return (
+    <СвгСкоро широкая={широкая}>
+      <defs>
+        <linearGradient id={`${id}p`} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#2FD0C6" />
+          <stop offset="0.55" stopColor="#0FB3AC" />
+          <stop offset="1" stopColor="#07685F" />
+        </linearGradient>
+      </defs>
+      {/* Телефон. */}
+      <rect x="22" y="24" width="44" height="70" rx="9" fill={`url(#${id}p)`} />
+      <rect x="27" y="31" width="34" height="50" rx="4" fill="#0B4F49" />
+      <rect x="38" y="27" width="12" height="2.5" rx="1.2" fill="#ffffff" fillOpacity="0.5" />
+      {/* На экране — купол, город уже внутри. */}
+      <g fill={GOLD}>
+        <rect x="33" y="64" width="22" height="9" />
+        <path d="M36 64 a8 8 0 0 1 16 0 Z" />
+        <rect x="56" y="54" width="3" height="19" opacity="0.85" />
+      </g>
+      {/* Стрелка вниз: скачать. */}
+      <g stroke={GOLD} strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" fill="none">
+        <path d="M44 36 v14" />
+        <path d="M38 45 l6 6 l6 -6" />
+      </g>
+      {/* Сигнал перечёркнут: связь не нужна. */}
+      <g fill="none" stroke="#ffffff" strokeWidth="3" strokeLinecap="round">
+        <path d="M80 56 a10 10 0 0 1 14 0" />
+        <path d="M74 49 a19 19 0 0 1 26 0" opacity="0.7" />
+      </g>
+      <circle cx="87" cy="63" r="3" fill="#ffffff" />
+      <path d="M72 70 L102 40" stroke={GOLD} strokeWidth="3.5" strokeLinecap="round" />
     </СвгСкоро>
   );
 }
