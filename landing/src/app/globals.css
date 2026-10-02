@@ -355,7 +355,9 @@ body {
 /* ── Слова проявляются из размытия (см. Слова в cinema.tsx) ── */
 .wr .w {
   display: inline-block;
-  white-space: pre;
+  /* pre-wrap, а не pre: в китайском и японском пробелов нет, и вся фраза —
+     одно «слово»; ему нужно переноситься внутри себя. */
+  white-space: pre-wrap;
   /* text-indent наследуется в inline-block — без нуля отступ встаёт перед каждым словом */
   text-indent: 0;
   opacity: 0;

@@ -274,7 +274,8 @@ export default function Destinations() {
       />
 
       <div className="relative mx-auto flex h-full max-w-7xl flex-col justify-end px-5 pb-10 pt-28 text-white sm:px-8 lg:pb-16">
-        <div className="grid items-end gap-10 lg:grid-cols-[1fr_1.1fr]">
+        {/* minmax(0,…) и min-w-0: иначе лента карточек справа растягивает сетку шире телефона и режет текст слева. */}
+        <div className="grid grid-cols-[minmax(0,1fr)] items-end gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] [&>*]:min-w-0">
           <div key={город.id}>
             <p className="fade-up mb-3 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.25em] text-white/75">
               <span className="h-px w-10 bg-white/60" /> {t("cities_kicker")} · {город.регион[язык]}
