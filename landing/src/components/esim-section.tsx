@@ -95,11 +95,11 @@ function Телефон() {
         </div>
       </div>
       {/* Плавающие плашки */}
-      <div className="glass absolute -left-10 top-24 rounded-2xl px-3 py-2 text-xs font-semibold text-white sm:-left-16">
+      <div className="glass absolute -left-3 top-24 z-10 rounded-2xl px-3 py-2 text-xs font-semibold text-white sm:-left-16">
         ✈️ → 📶
       </div>
       <div
-        className="glass absolute -right-8 bottom-28 rounded-2xl px-3 py-2 text-xs font-semibold text-white sm:-right-14"
+        className="glass absolute -right-3 bottom-28 z-10 rounded-2xl px-3 py-2 text-xs font-semibold text-white sm:-right-14"
         style={{ animationDelay: "-2s" }}
       >
         Payme · Click

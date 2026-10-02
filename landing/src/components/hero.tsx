@@ -143,7 +143,7 @@ export default function Hero({ цифры }: { цифры: Цифры }) {
   const заголовок = `${t("hero_title_1")} ${t("hero_title_2")}`;
 
   return (
-    <section id="top" ref={блок} data-nav="dark" className="relative h-[330vh] bg-black lg:h-[380vh]">
+    <section id="top" ref={блок} data-nav="dark" className="relative h-[290vh] bg-black lg:h-[320vh]">
       <div className="sticky top-0 h-[100svh] overflow-hidden" style={{ perspective: "1600px" }}>
         {/* Фото: резкое и размытая копия поверх */}
         <div
@@ -154,7 +154,8 @@ export default function Hero({ цифры }: { цифры: Цифры }) {
           <img
             src={БУХАРА}
             alt="Bukhara, Po-i-Kalyan"
-            className="h-full w-full object-cover"
+            // На узком экране сдвигаем кадр к минарету — в портретной ориентации его иначе не видно.
+            className="h-full w-full object-cover object-[90%_50%] lg:object-center"
             fetchPriority="high"
           />
         </div>
@@ -164,7 +165,7 @@ export default function Hero({ цифры }: { цифры: Цифры }) {
           className="absolute inset-0 opacity-0 will-change-[opacity,transform]"
           style={{ transformOrigin: "80% 40%" }}
         >
-          <img src={БУХАРА_МЯГКО} alt="" className="h-full w-full scale-110 object-cover blur-2xl" />
+          <img src={БУХАРА_МЯГКО} alt="" className="h-full w-full scale-110 object-cover object-[90%_50%] blur-2xl lg:object-center" />
         </div>
         {/* Затемнения для читаемости: сверху под шапку, снизу под текст */}
         <div
@@ -172,7 +173,7 @@ export default function Hero({ цифры }: { цифры: Цифры }) {
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(180deg, rgba(10,17,16,0.5) 0%, rgba(10,17,16,0) 22%, rgba(10,17,16,0) 42%, rgba(10,17,16,0.75) 100%)",
+              "linear-gradient(180deg, rgba(10,17,16,0.5) 0%, rgba(10,17,16,0) 22%, rgba(10,17,16,0) 38%, rgba(10,17,16,0.55) 62%, rgba(10,17,16,0.82) 100%)",
           }}
         />
         <div
