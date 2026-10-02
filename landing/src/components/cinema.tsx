@@ -68,10 +68,13 @@ export function Слова({
   const [ref, вКадре] = useВКадре<HTMLSpanElement>();
   const вкл = видно ?? вКадре;
   const слова = текст.split(/(\s+)/).filter((с) => с.trim());
+  // Длинный текст проявляется без размытия: размытие на десятках слов
+  // сразу — заметная нагрузка, а на абзаце разницы почти не видно.
+  const лёгкий = слова.length > 12;
   return (
     <span
       ref={ref}
-      className={`wr ${вкл && !уход ? "on" : ""} ${уход ? "out" : ""} ${className}`}
+      className={`wr ${лёгкий ? "lite" : ""} ${вкл && !уход ? "on" : ""} ${уход ? "out" : ""} ${className}`}
       style={{ ["--st" as string]: `${шаг}s`, ["--d0" as string]: `${задержка}s` }}
     >
       <span className="sr-only">{текст}</span>
@@ -87,50 +90,48 @@ export function Слова({
 
 /**
  * Прогресс прокрутки «липкого» блока: 0 — верх блока у верха экрана,
- * 1 — блок докручен до конца. Значение сглаживается (догоняет цель),
- * поэтому сцена не дёргается даже при грубом колесе мыши.
- * Цикл крутится только пока блок на экране.
+ * 1 — блок докручен до конца. Плавность даёт сам Lenis, поэтому своего
+ * сглаживания здесь нет (двойное сглаживание ощущается как «тормоза»):
+ * считаем один раз на кадр и только когда страница действительно
+ * прокручивается, а блок на экране.
  */
-export function useПрокрутка(
-  ref: React.RefObject<HTMLElement | null>,
-  наКадр: (п: number) => void,
-  мягкость = 0.12,
-) {
+export function useПрокрутка(ref: React.RefObject<HTMLElement | null>, наКадр: (п: number) => void) {
   const колбэк = useRef(наКадр);
   колбэк.current = наКадр;
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    const тихо = ТИХО();
-    let цель = 0;
-    let сейчас = -1;
     let кадр = 0;
-    let виден = false;
-    const цельИз = () => {
+    let виден = true;
+    let прошлое = -1;
+    const посчитать = () => {
+      кадр = 0;
       const r = el.getBoundingClientRect();
       const путь = r.height - window.innerHeight;
-      цель = путь > 0 ? ограничить(-r.top / путь) : ограничить(1 - r.top / window.innerHeight);
+      const п = путь > 0 ? ограничить(-r.top / путь) : ограничить(1 - r.top / window.innerHeight);
+      if (п === прошлое) return;
+      прошлое = п;
+      колбэк.current(п);
     };
-    const цикл = () => {
-      цельИз();
-      if (сейчас < 0 || тихо) сейчас = цель;
-      else сейчас += (цель - сейчас) * мягкость;
-      if (Math.abs(цель - сейчас) < 0.0004) сейчас = цель;
-      колбэк.current(сейчас);
-      кадр = виден || сейчас !== цель ? requestAnimationFrame(цикл) : 0;
+    const запросить = () => {
+      if (виден && !кадр) кадр = requestAnimationFrame(посчитать);
     };
     const io = new IntersectionObserver(([e]) => {
       виден = e.isIntersecting;
-      if (виден && !кадр) кадр = requestAnimationFrame(цикл);
+      if (виден) запросить();
     });
     io.observe(el);
+    window.addEventListener("scroll", запросить, { passive: true });
+    window.addEventListener("resize", запросить);
     // Первый кадр — сразу, чтобы сцена не мигнула исходным состоянием.
-    цикл();
+    посчитать();
     return () => {
       io.disconnect();
+      window.removeEventListener("scroll", запросить);
+      window.removeEventListener("resize", запросить);
       cancelAnimationFrame(кадр);
     };
-  }, [ref, мягкость]);
+  }, [ref]);
 }
 
 /** Псевдослучайное число 0…1 для клетки — одно и то же при каждой отрисовке. */
@@ -196,28 +197,38 @@ export function Шахматка({
         }
       }
     };
-    const цикл = () => {
+    let виден = false;
+    // Перерисовка — только при прокрутке и только пока шов на экране;
+    // прогресс округляем до 1/120, чтобы не рисовать одно и то же.
+    const посчитать = () => {
+      кадр = 0;
       const r = блок.getBoundingClientRect();
-      const п = ограничить(1 - r.top / window.innerHeight);
-      if (Math.abs(п - последний) > 0.002) {
+      const п = Math.round(ограничить(1 - r.top / window.innerHeight) * 120) / 120;
+      if (п !== последний) {
         последний = п;
         рисовать(п);
       }
-      кадр = requestAnimationFrame(цикл);
+    };
+    const запросить = () => {
+      if (виден && !кадр) кадр = requestAnimationFrame(посчитать);
     };
     размер();
-    const ro = new ResizeObserver(размер);
+    const ro = new ResizeObserver(() => {
+      размер();
+      запросить();
+    });
     ro.observe(c);
     const io = new IntersectionObserver(([e]) => {
-      cancelAnimationFrame(кадр);
-      кадр = 0;
-      if (e.isIntersecting) кадр = requestAnimationFrame(цикл);
+      виден = e.isIntersecting;
+      запросить();
     });
     io.observe(c);
+    window.addEventListener("scroll", запросить, { passive: true });
     if (ТИХО()) рисовать(1);
     return () => {
       ro.disconnect();
       io.disconnect();
+      window.removeEventListener("scroll", запросить);
       cancelAnimationFrame(кадр);
     };
   }, [цвет, искра]);
@@ -234,7 +245,7 @@ export function Шахматка({
 /**
  * Линии рельефа, которые медленно текут: поле из четырёх синусоид,
  * изолинии строятся «бегущими квадратами» (marching squares) на сетке
- * ~90 клеток по длинной стороне. 24 кадра в секунду хватает — движение
+ * ~64 клетки по длинной стороне. 18 кадров в секунду хватает — движение
  * очень медленное, а батарею бережём.
  */
 export function Контуры({
@@ -270,7 +281,7 @@ export function Контуры({
       Math.sin(Math.hypot(x - 1.4, y - 0.8) * 2.4 - t * 0.19);
     const уровни = [-2.25, -1.5, -0.75, 0, 0.75, 1.5, 2.25];
     const рисовать = (t: number) => {
-      const n = 90;
+      const n = 64;
       const шаг = Math.max(ш, в) / n;
       const кол = Math.ceil(ш / шаг) + 1;
       const ряд = Math.ceil(в / шаг) + 1;
@@ -341,7 +352,7 @@ export function Контуры({
       ctx.stroke();
     };
     const цикл = (сейчас: number) => {
-      if (сейчас - прошлое > 40) {
+      if (сейчас - прошлое > 55) {
         прошлое = сейчас;
         рисовать((сейчас - старт) / 1000);
       }

@@ -13,9 +13,9 @@ export interface Цифры {
 
 /** Бухара: минарет Калян и мечеть Пои-Калян. К минарету камера и «подлетает». */
 const БУХАРА =
-  "https://images.unsplash.com/photo-1653023102302-247f5f0fbdd1?w=2400&q=80&auto=format&fit=crop";
+  "https://images.unsplash.com/photo-1653023102302-247f5f0fbdd1?w=1920&q=78&auto=format&fit=crop";
 const БУХАРА_МЯГКО =
-  "https://images.unsplash.com/photo-1653023102302-247f5f0fbdd1?w=900&q=50&auto=format&fit=crop";
+  "https://images.unsplash.com/photo-1653023102302-247f5f0fbdd1?w=480&q=45&auto=format&fit=crop";
 
 const ПРО_КАРТУ: Многоязычно = {
   en: "Every city, sight and table on one map, in your language. Pick a city and get a plan for the day.",
@@ -124,7 +124,7 @@ export default function Hero({ цифры }: { цифры: Цифры }) {
       if (!el) return 0;
       const д = доля(п, а, б);
       const выс = el.offsetHeight;
-      el.style.top = `${в + 60 - д * (в + 60 + выс + 40)}px`;
+      el.style.transform = `translate3d(0, ${в + 60 - д * (в + 60 + выс + 40)}px, 0)`;
       return д;
     };
     const дA = проезд(панельA.current, 0.44, 0.74);
@@ -221,7 +221,7 @@ export default function Hero({ цифры }: { цифры: Цифры }) {
           <div
             ref={панельA}
             className="absolute right-5 w-[min(92vw,380px)] sm:right-8 lg:right-[6%]"
-            style={{ top: "120vh" }}
+            style={{ top: 0, transform: "translate3d(0, 120vh, 0)", willChange: "transform" }}
           >
             <Панель
               текст={тр(ПРО_КАРТУ, язык)}
@@ -236,7 +236,7 @@ export default function Hero({ цифры }: { цифры: Цифры }) {
           <div
             ref={панельB}
             className="absolute left-5 w-[min(92vw,380px)] sm:left-8 lg:left-[6%]"
-            style={{ top: "120vh" }}
+            style={{ top: 0, transform: "translate3d(0, 120vh, 0)", willChange: "transform" }}
           >
             <Панель
               текст={тр(ПРО_БРАУЗЕР, язык)}
@@ -296,7 +296,7 @@ export default function Hero({ цифры }: { цифры: Цифры }) {
                 </Магнит>
                 <a
                   href="#demo"
-                  className="inline-flex items-center gap-2 rounded-full border border-white/30 px-5 py-3.5 text-[14px] font-semibold text-white backdrop-blur-md transition-colors hover:bg-white hover:text-[var(--ink)]"
+                  className="inline-flex items-center gap-2 rounded-full border border-white/30 px-5 py-3.5 text-[14px] font-semibold bg-black/25 text-white transition-colors hover:bg-white hover:text-[var(--ink)]"
                 >
                   ▶ {t("hero_watch")}
                 </a>
@@ -335,7 +335,7 @@ function Панель({
   строки: [string, React.ReactNode][];
 }) {
   return (
-    <div className="rounded-2xl bg-[rgba(10,17,16,0.62)] p-5 text-white backdrop-blur-md sm:rounded-none sm:bg-transparent sm:p-0 sm:backdrop-blur-none">
+    <div className="rounded-2xl bg-[rgba(10,17,16,0.86)] p-5 text-white sm:rounded-none sm:bg-transparent sm:p-0">
       <div
         className="mb-6 ml-auto h-[2px] w-24"
         style={{ background: "linear-gradient(90deg, #34dccf 0%, #0fb3ac 40%, #f2ce6e 100%)" }}

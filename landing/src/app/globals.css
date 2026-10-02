@@ -282,10 +282,11 @@ body {
 .flag-slice {
   animation: wave 2.8s ease-in-out infinite;
 }
+/* Только transform: анимация filter на десятках полосок перерисовывала
+   флаг каждый кадр. */
 @keyframes wave {
   50% {
     transform: translateY(var(--amp, 6px));
-    filter: brightness(1.08);
   }
 }
 
@@ -364,10 +365,16 @@ body {
     transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
   transition-delay: calc(var(--d0, 0s) + var(--i) * var(--st, 0.05s));
 }
+/* В покое — filter: none, а не blur(0): иначе браузер держит под каждое
+   слово отдельный слой, и прокрутка тяжелеет. */
 .wr.on .w {
   opacity: 1;
-  filter: blur(0);
+  filter: none;
   transform: none;
+}
+.wr.lite .w,
+.wr.lite.out .w {
+  filter: none;
 }
 .wr.out .w {
   opacity: 0;
@@ -390,7 +397,7 @@ body {
   to {
     opacity: 1;
     transform: none;
-    filter: blur(0);
+    filter: none;
   }
 }
 .hero-cta {

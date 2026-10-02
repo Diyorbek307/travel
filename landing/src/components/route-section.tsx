@@ -690,8 +690,10 @@ function ТочкиПоле() {
         Math.abs((мышь.есть ? 1 : 0) - свет.сила) < 0.01;
       кадр = покой ? 0 : requestAnimationFrame(цикл);
     };
+    let виден = false;
     const при = (e: PointerEvent) => {
-      if (e.pointerType !== "mouse") return;
+      // Карта вне экрана — мышь нас не касается, ничего не считаем.
+      if (e.pointerType !== "mouse" || !виден) return;
       const r = c.getBoundingClientRect();
       мышь.x = e.clientX - r.left;
       мышь.y = e.clientY - r.top;
@@ -700,15 +702,24 @@ function ТочкиПоле() {
         свет.x = мышь.x;
         свет.y = мышь.y;
       }
-      if (!кадр) кадр = requestAnimationFrame(цикл);
+      if (!кадр && (мышь.есть || свет.сила > 0.01)) кадр = requestAnimationFrame(цикл);
     };
     испечь();
+    const io = new IntersectionObserver(([e]) => {
+      виден = e.isIntersecting;
+      if (!виден && свет.сила > 0.01) {
+        мышь.есть = false;
+        if (!кадр) кадр = requestAnimationFrame(цикл);
+      }
+    });
+    io.observe(c);
     const ro = new ResizeObserver(испечь);
     ro.observe(c);
     const можно = window.matchMedia("(hover: hover)").matches && !ТИХО();
     if (можно) window.addEventListener("pointermove", при, { passive: true });
     return () => {
       ro.disconnect();
+      io.disconnect();
       window.removeEventListener("pointermove", при);
       cancelAnimationFrame(кадр);
     };

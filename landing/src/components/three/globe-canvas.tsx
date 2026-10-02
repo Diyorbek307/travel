@@ -221,16 +221,26 @@ function Планета({ подписи }: { подписи: boolean }) {
   }, []);
   const ташкент = useMemo(() => точка(ТАШКЕНТ.шир, ТАШКЕНТ.долг, R * 1.004), []);
   const пульс = useRef<THREE.Mesh>(null);
-  // Подписи прячутся за Землёй — включаем их, когда Земля уже в сцене.
-  const земля = useRef<THREE.Object3D | null>(null);
-  const [земляЕсть, setЗемляЕсть] = useState(false);
-  const { scene } = useThree();
-  useEffect(() => {
-    const з = scene.getObjectByName("земля");
-    if (з && !земля.current) {
-      земля.current = з;
-      setЗемляЕсть(true);
-    }
+  // Подписи прячутся за Землёй. Раньше это делал occlude у <Html> —
+  // луч по шару из 32 тысяч треугольников для каждой подписи на каждом
+  // кадре (≈12 мс). Шар выпуклый, поэтому хватает знака скалярного
+  // произведения: точка видна, если смотрит в сторону камеры.
+  const шар = useRef<THREE.Group>(null);
+  const ярлыки = useRef<(HTMLDivElement | null)[]>([]);
+  const точкиГородов = useMemo(() => ГОРОДА.map((г) => точка(г.шир, г.долг, R * 1.003)), []);
+  const мир = useMemo(() => new THREE.Vector3(), []);
+  const наКамеру = useMemo(() => new THREE.Vector3(), []);
+  useFrame(({ camera }) => {
+    const g = шар.current;
+    if (!g || !подписи) return;
+    наКамеру.copy(camera.position).normalize();
+    точкиГородов.forEach((p, i) => {
+      const el = ярлыки.current[i];
+      if (!el) return;
+      мир.copy(p).applyMatrix4(g.matrixWorld).normalize();
+      const к = мир.dot(наКамеру);
+      el.style.opacity = String(Math.max(0, Math.min(1, (к - 0.12) / 0.15)));
+    });
   });
   useFrame(({ clock }) => {
     const s = 1 + ((clock.elapsedTime * 0.8) % 1) * 2.4;
@@ -244,7 +254,7 @@ function Планета({ подписи }: { подписи: boolean }) {
     [ташкент],
   );
   return (
-    <group rotation={[НАКЛОН, поворот, 0]}>
+    <group ref={шар} rotation={[НАКЛОН, поворот, 0]}>
       <Земля />
       <Облака />
       <Атмосфера />
@@ -261,7 +271,7 @@ function Планета({ подписи }: { подписи: boolean }) {
         </mesh>
       </group>
       {ГОРОДА.map((г, n) => {
-        const p = точка(г.шир, г.долг, R * 1.003);
+        const p = точкиГородов[n];
         return (
           <group key={г.имя}>
             <mesh position={p}>
@@ -269,15 +279,13 @@ function Планета({ подписи }: { подписи: boolean }) {
               <meshBasicMaterial color="#9ff3ea" />
             </mesh>
             <Дуга от={p} смещение={n / ГОРОДА.length} />
-            {подписи && земляЕсть && (
-              <Html
-                position={p.clone().multiplyScalar(1.05)}
-                center
-                occlude={[земля as React.RefObject<THREE.Object3D>]}
-                zIndexRange={[20, 0]}
-              >
+            {подписи && (
+              <Html position={p.clone().multiplyScalar(1.05)} center zIndexRange={[20, 0]}>
                 <div
-                  className="pointer-events-none whitespace-nowrap rounded-full bg-black/60 px-2.5 py-1 text-[11px] font-semibold text-white backdrop-blur-sm"
+                  ref={(el) => {
+                    ярлыки.current[n] = el;
+                  }}
+                  className="pointer-events-none whitespace-nowrap rounded-full bg-black/70 px-2.5 py-1 text-[11px] font-semibold text-white"
                   style={{ transform: `translate(${г.dx}px, ${г.dy}px)` }}
                 >
                   {г.привет}
@@ -305,7 +313,7 @@ export default function СценаГлобуса() {
     <div ref={коробка} className="h-full w-full cursor-grab active:cursor-grabbing">
       <Canvas
         frameloop={виден ? "always" : "never"}
-        dpr={[1, 2]}
+        dpr={[1, 1.5]}
         camera={{ position: [0, 0, 6.4], fov: 40 }}
         gl={{ alpha: true, antialias: true }}
       >

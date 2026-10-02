@@ -55,7 +55,16 @@ export default function Nav() {
           : "py-5"
       }`}
       style={
-        тёмный && прокручено ? { borderColor: "transparent", background: "rgba(10,17,16,0.55)" } : undefined
+        // Над тёмными блоками — без размытия подложки: под шапкой там движется
+        // фото первого экрана, и размытие пересчитывалось бы каждый кадр.
+        тёмный && прокручено
+          ? {
+              borderColor: "transparent",
+              background: "rgba(10,17,16,0.82)",
+              backdropFilter: "none",
+              WebkitBackdropFilter: "none",
+            }
+          : undefined
       }
     >
       <div className="mx-auto flex max-w-7xl items-center gap-6 px-5 sm:px-8">
