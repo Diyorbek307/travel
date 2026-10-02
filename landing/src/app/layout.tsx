@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Caveat, Oswald, Playfair_Display, Rubik } from "next/font/google";
+import { Caveat, Inter_Tight, Oswald, Playfair_Display, Rubik } from "next/font/google";
 import "./globals.css";
 import SmoothScroll from "@/components/smooth-scroll";
 import { ЯзыкProvider } from "@/lib/i18n";
@@ -11,6 +11,12 @@ const rubik = Rubik({ subsets: ["latin", "cyrillic"], variable: "--font-sans" })
 const playfair = Playfair_Display({ subsets: ["latin", "cyrillic"], variable: "--font-serif" });
 const caveat = Caveat({ subsets: ["latin", "cyrillic"], variable: "--font-hand" });
 const oswald = Oswald({ subsets: ["latin", "cyrillic"], variable: "--font-condensed" });
+// Плотный гротеск для «кинематографичных» блоков: огромный знак на первом экране, панели, маршрут.
+const tight = Inter_Tight({
+  subsets: ["latin", "cyrillic"],
+  weight: ["400", "500", "600"],
+  variable: "--font-tight",
+});
 
 export const metadata: Metadata = {
   title: "HelloUZ — Uzbekistan in one app",
@@ -34,7 +40,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${rubik.variable} ${playfair.variable} ${caveat.variable} ${oswald.variable}`}
+      className={`${rubik.variable} ${playfair.variable} ${caveat.variable} ${oswald.variable} ${tight.variable}`}
     >
       <head>
         {/* Первый вход за сессию — заставка; до её конца анимации первого экрана ждут. */}

@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import { useЯзык, ЯЗЫКИ } from "@/lib/i18n";
+import { Шахматка } from "./cinema";
 import Reveal from "./reveal";
 
 const СценаГлобуса = dynamic(() => import("./three/globe-canvas"), { ssr: false });
@@ -23,9 +24,11 @@ export default function GlobeSection() {
   return (
     <section
       id="globe"
+      data-nav="dark"
       className="relative overflow-hidden py-24 sm:py-32"
-      style={{ background: "radial-gradient(ellipse at 70% 50%, #0d1f33, #03070d 70%)" }}
+      style={{ background: "radial-gradient(ellipse at 70% 50%, #13201e, #070c0b 72%)" }}
     >
+      <Шахматка цвет="#f4f7f7" />
       {/* Звёздная пыль */}
       <div
         aria-hidden

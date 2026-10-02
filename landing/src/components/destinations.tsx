@@ -242,6 +242,7 @@ export default function Destinations() {
   return (
     <section
       id="cities"
+      data-nav="dark"
       className="relative h-[100svh] min-h-[640px] overflow-hidden"
       style={{ background: "var(--night)" }}
       onPointerEnter={() => setПауза(true)}

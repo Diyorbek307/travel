@@ -1,10 +1,9 @@
 "use client";
 
-import { useRef } from "react";
-import Logo from "./logo";
-import { APP_URL, useЯзык } from "@/lib/i18n";
-import { Гранат, Купол, Минарет, Портал, Птицы } from "./sketches";
+import { useEffect, useRef, useState } from "react";
+import { APP_URL, тр, useЯзык, type Многоязычно } from "@/lib/i18n";
 import { Магнит, Счёт } from "./effects";
+import { Слова, доля, useПрокрутка } from "./cinema";
 
 export interface Цифры {
   cities: number;
@@ -12,295 +11,350 @@ export interface Цифры {
   venues: number;
 }
 
-const РЕГИСТАН =
-  "https://images.unsplash.com/photo-1664602078796-68ee76b3fc59?w=1100&q=80&auto=format&fit=crop";
+/** Бухара: минарет Калян и мечеть Пои-Калян. К минарету камера и «подлетает». */
+const БУХАРА =
+  "https://images.unsplash.com/photo-1653023102302-247f5f0fbdd1?w=2400&q=80&auto=format&fit=crop";
+const БУХАРА_МЯГКО =
+  "https://images.unsplash.com/photo-1653023102302-247f5f0fbdd1?w=900&q=50&auto=format&fit=crop";
+
+const ПРО_КАРТУ: Многоязычно = {
+  en: "Every city, sight and table on one map, in your language. Pick a city and get a plan for the day.",
+  ru: "Все города, места и столики — на одной карте и на вашем языке. Выберите город — и получите план на день.",
+  uz: "Barcha shaharlar, joylar va restoranlar — bitta xaritada, oʻz tilingizda. Shaharni tanlang — kunlik reja tayyor.",
+  zh: "所有城市、景点和餐厅都在一张地图上，用你的语言呈现。选一座城市，就能得到当天的行程。",
+  ko: "모든 도시와 명소, 식당이 한 지도에, 내 언어로. 도시를 고르면 하루 일정이 나와요.",
+  de: "Alle Städte, Sehenswürdigkeiten und Tische auf einer Karte, in deiner Sprache. Stadt wählen — Tagesplan erhalten.",
+  fr: "Toutes les villes, les sites et les tables sur une seule carte, dans votre langue. Choisissez une ville, obtenez le plan du jour.",
+  ja: "すべての街、名所、レストランをひとつの地図に、あなたの言語で。街を選べば1日のプランが手に入ります。",
+  tr: "Tüm şehirler, yerler ve masalar tek haritada, kendi dilinizde. Bir şehir seçin, günün planını alın.",
+  ar: "كل المدن والمعالم والمطاعم على خريطة واحدة وبلغتك. اختر مدينة واحصل على خطة اليوم.",
+};
+
+const ПРО_БРАУЗЕР: Многоязычно = {
+  en: "No sign-up and no app store. HelloUZ opens in the browser and keeps working when the signal is gone.",
+  ru: "Без регистрации и магазина приложений. HelloUZ открывается в браузере и работает, даже когда пропала связь.",
+  uz: "Roʻyxatdan oʻtishsiz va ilovalar doʻkonisiz. HelloUZ brauzerda ochiladi va aloqa yoʻqolganda ham ishlaydi.",
+  zh: "无需注册，也无需应用商店。HelloUZ 直接在浏览器中打开，没有信号也能继续使用。",
+  ko: "가입도, 앱 스토어도 필요 없어요. HelloUZ는 브라우저에서 열리고 신호가 끊겨도 작동해요.",
+  de: "Ohne Anmeldung und ohne App Store. HelloUZ öffnet sich im Browser und funktioniert auch ohne Empfang.",
+  fr: "Sans inscription ni magasin d’applications. HelloUZ s’ouvre dans le navigateur et fonctionne même sans réseau.",
+  ja: "登録もアプリストアも不要。HelloUZ はブラウザで開き、電波がなくても使えます。",
+  tr: "Kayıt yok, uygulama mağazası yok. HelloUZ tarayıcıda açılır ve sinyal yokken de çalışır.",
+  ar: "بلا تسجيل ولا متجر تطبيقات. يفتح HelloUZ في المتصفح ويعمل حتى عند انقطاع الإشارة.",
+};
+
+/** Ease-out: быстро стартует, мягко садится. */
+const плавно = (x: number) => 1 - Math.pow(1 - x, 3);
 
 /**
- * Первый экран — «билет» Silk Road Pass, как у лучших туристических
- * лендингов: слева крупная антиква и призыв, справа объёмный билет с
- * Регистаном в окне. Билет поворачивается за курсором, фото внутри
- * смещается глубже — получается слой за слоем. Вокруг — наброски
- * памятников, которые рисуются сами.
+ * Первый экран — сцена «на липучке», как у сайтов-витрин из примеров:
+ *
+ * 1. Бухара во весь экран, огромное «HelloUZ» внизу, рядом — заголовок
+ *    и кнопки. Камера медленно подлетает к минарету Калян.
+ * 2. Текст растворяется по словам, фото уходит в размытие и ночь.
+ * 3. Из темноты поднимается телефон с настоящим экраном приложения,
+ *    а по бокам проплывают две панели с живыми цифрами.
+ *
+ * Размытие — не фильтр на каждом кадре (это тяжело), а заранее
+ * размытая копия, которая проявляется поверх резкой.
  */
 export default function Hero({ цифры }: { цифры: Цифры }) {
-  const { t } = useЯзык();
-  const сцена = useRef<HTMLDivElement>(null);
-  const билет = useRef<HTMLDivElement>(null);
+  const { t, язык } = useЯзык();
+  const блок = useRef<HTMLElement>(null);
   const фото = useRef<HTMLDivElement>(null);
+  const мягко = useRef<HTMLDivElement>(null);
+  const ночь = useRef<HTMLDivElement>(null);
+  const текст = useRef<HTMLDivElement>(null);
+  const телефон = useRef<HTMLDivElement>(null);
+  const сияние = useRef<HTMLDivElement>(null);
+  const панельA = useRef<HTMLDivElement>(null);
+  const панельB = useRef<HTMLDivElement>(null);
+  const подсказка = useRef<HTMLDivElement>(null);
 
-  const двигать = (e: React.PointerEvent) => {
-    const с = сцена.current?.getBoundingClientRect();
-    if (!с || !билет.current || !фото.current) return;
-    const x = (e.clientX - с.left) / с.width - 0.5;
-    const y = (e.clientY - с.top) / с.height - 0.5;
-    билет.current.style.transform = `rotateY(${x * 14 - 8}deg) rotateX(${-y * 10 + 4}deg)`;
-    фото.current.style.transform = `translate3d(${x * -18}px, ${y * -14}px, 0) scale(1.1)`;
-  };
-  const сброс = () => {
-    if (билет.current) билет.current.style.transform = "";
-    if (фото.current) фото.current.style.transform = "";
-  };
+  const [ушёл, setУшёл] = useState(false);
+  const [видноA, setВидноA] = useState(false);
+  const [видноB, setВидноB] = useState(false);
+  const флаги = useRef({ ушёл: false, a: false, b: false });
 
-  const доверие = [
-    ["✦", t("trust_free"), t("trust_free_sub")],
-    ["文", t("trust_langs"), t("trust_langs_sub")],
-    ["⤓", t("trust_offline"), t("trust_offline_sub")],
-    ["✧", t("trust_ai"), t("trust_ai_sub")],
-  ];
+  // Текст проявляется, когда ушла заставка (или сразу, если её не было).
+  const [готов, setГотов] = useState(false);
+  useEffect(() => {
+    const html = document.documentElement;
+    if (!html.classList.contains("intro-wait")) return setГотов(true);
+    const mo = new MutationObserver(() => {
+      if (!html.classList.contains("intro-wait")) {
+        setГотов(true);
+        mo.disconnect();
+      }
+    });
+    mo.observe(html, { attributes: true, attributeFilter: ["class"] });
+    return () => mo.disconnect();
+  }, []);
+  const показ = готов && !ушёл;
+
+  useПрокрутка(блок, (п) => {
+    const в = window.innerHeight;
+    const зум = плавно(доля(п, 0, 0.6));
+    if (фото.current) фото.current.style.transform = `scale(${1.06 + зум * 0.34})`;
+    if (мягко.current) {
+      мягко.current.style.opacity = String(доля(п, 0.16, 0.4));
+      мягко.current.style.transform = `scale(${1.1 + зум * 0.34})`;
+    }
+    if (ночь.current) ночь.current.style.opacity = String(0.92 * доля(п, 0.2, 0.48));
+
+    const т = доля(п, 0.12, 0.26);
+    if (текст.current) {
+      текст.current.style.opacity = String(1 - т);
+      текст.current.style.transform = `translate3d(0, ${-110 * т}px, 0)`;
+      текст.current.style.pointerEvents = т > 0.5 ? "none" : "auto";
+    }
+    if (подсказка.current) подсказка.current.style.opacity = String(1 - доля(п, 0, 0.06));
+
+    const ф = плавно(доля(п, 0.34, 0.6));
+    if (телефон.current) {
+      телефон.current.style.opacity = String(доля(п, 0.33, 0.44));
+      телефон.current.style.transform = `translate3d(0, ${(1 - ф) * 62}vh, 0) rotateX(${
+        (1 - ф) * 26
+      }deg) rotateY(${(доля(п, 0.6, 1) - 0.5) * -10}deg) scale(${0.84 + ф * 0.16})`;
+    }
+    if (сияние.current) сияние.current.style.opacity = String(ф);
+
+    // Панели проезжают экран снизу вверх, каждая в своём окне прокрутки.
+    const проезд = (el: HTMLDivElement | null, а: number, б: number) => {
+      if (!el) return 0;
+      const д = доля(п, а, б);
+      const выс = el.offsetHeight;
+      el.style.top = `${в + 60 - д * (в + 60 + выс + 40)}px`;
+      return д;
+    };
+    const дA = проезд(панельA.current, 0.44, 0.74);
+    const дB = проезд(панельB.current, 0.62, 0.94);
+
+    const ф2 = флаги.current;
+    const новоеУшёл = п > 0.15;
+    const новоеA = дA > 0.12 && дA < 0.9;
+    const новоеB = дB > 0.12 && дB < 0.9;
+    if (новоеУшёл !== ф2.ушёл) setУшёл((ф2.ушёл = новоеУшёл));
+    if (новоеA !== ф2.a) setВидноA((ф2.a = новоеA));
+    if (новоеB !== ф2.b) setВидноB((ф2.b = новоеB));
+  });
+
+  const экран = `/app/tabs/${язык === "ru" ? "ru" : "en"}-home.jpg`;
+  const заголовок = `${t("hero_title_1")} ${t("hero_title_2")}`;
 
   return (
-    <section id="top" className="paper-grain relative overflow-hidden pt-28 sm:pt-32">
-      {/* Мягкое сияние бирюзы и золота — цвета логотипа */}
-      <div className="aurora -left-24 top-20 h-[460px] w-[460px]" style={{ background: "rgba(15,179,172,0.3)" }} />
-      <div
-        className="aurora right-[-10%] top-[35%] h-[420px] w-[420px]"
-        style={{ background: "rgba(233,196,106,0.4)", animationDelay: "-8s" }}
-      />
-      {/* Наброски по краям — как на полях путевого блокнота */}
-      <div
-        className="pointer-events-none absolute inset-0 hidden lg:block"
-        style={{ color: "rgba(13,23,21,0.55)" }}
-      >
-        <Птицы className="absolute left-[30%] top-[16%] w-16" />
-        <Гранат className="absolute bottom-[14%] left-[3%] w-14" />
-      </div>
-
-      <div className="relative mx-auto grid max-w-7xl gap-12 px-5 pb-16 sm:px-8 lg:grid-cols-[1.08fr_1fr] lg:items-center lg:pb-24">
-        <div>
-          <p
-            className="fade-up mb-7 inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em]"
-            style={{ borderColor: "var(--line)", color: "var(--accent-ink)", background: "rgba(255,255,255,0.5)" }}
-          >
-            <span>📍</span> {t("hero_kicker")}
-          </p>
-          <h1 className="serif mb-7 text-[clamp(2.5rem,4.3vw,4.3rem)] font-semibold leading-[1.02] tracking-[-0.02em]">
-            <span className="line-mask">
-              <span style={{ ["--delay" as string]: "0.1s" }}>{t("hero_title_1")}</span>
-            </span>
-            <span className="line-mask">
-              <span style={{ ["--delay" as string]: "0.22s" }}>{t("hero_title_2")}</span>
-            </span>
-            <span className="line-mask">
-              <span style={{ ["--delay" as string]: "0.34s" }}>
-                <em className="text-shimmer not-italic">{t("hero_title_3")}</em>
-              </span>
-            </span>
-          </h1>
-          <p
-            className="fade-up mb-9 max-w-lg text-[17px] leading-relaxed"
-            style={{ color: "var(--ink-soft)", ["--delay" as string]: "0.5s" }}
-          >
-            {t("hero_sub")}
-          </p>
-          <div
-            className="fade-up mb-12 flex flex-wrap items-center gap-4"
-            style={{ ["--delay" as string]: "0.62s" }}
-          >
-            <Магнит>
-              <a
-                href={APP_URL}
-                target="_blank"
-                rel="noreferrer"
-                className="group inline-flex items-center gap-3 rounded-full px-7 py-4 text-[15px] font-semibold text-white shadow-[0_14px_30px_-12px_rgba(14,166,159,0.55)] transition-transform hover:scale-[1.03]"
-                style={{ background: "var(--accent-ink)" }}
-              >
-                {t("hero_cta")}
-                <span className="transition-transform group-hover:translate-x-1 rtl:rotate-180">→</span>
-              </a>
-            </Магнит>
-            <a href="#demo" className="group inline-flex items-center gap-3 text-[15px] font-semibold">
-              <span
-                className="flex h-12 w-12 items-center justify-center rounded-full border transition-colors group-hover:bg-[var(--ink)] group-hover:text-[var(--paper)]"
-                style={{ borderColor: "var(--line)", background: "rgba(255,255,255,0.6)" }}
-              >
-                ▶
-              </span>
-              {t("hero_watch")}
-            </a>
-          </div>
-          <div
-            className="fade-up grid grid-cols-2 gap-3 sm:grid-cols-4"
-            style={{ ["--delay" as string]: "0.75s" }}
-          >
-            {доверие.map(([знак, заголовок, под]) => (
-              <div
-                key={заголовок}
-                className="rounded-2xl border p-3.5 transition-transform hover:-translate-y-1"
-                style={{ borderColor: "var(--line)", background: "rgba(255,255,255,0.55)" }}
-              >
-                <p className="mb-2 text-lg" style={{ color: "var(--accent-ink)" }}>
-                  {знак}
-                </p>
-                <p className="text-[13px] font-semibold">{заголовок}</p>
-                <p className="text-[11px] leading-snug" style={{ color: "var(--ink-soft)" }}>
-                  {под}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Билет */}
+    <section id="top" ref={блок} data-nav="dark" className="relative h-[330vh] bg-black lg:h-[380vh]">
+      <div className="sticky top-0 h-[100svh] overflow-hidden" style={{ perspective: "1600px" }}>
+        {/* Фото: резкое и размытая копия поверх */}
         <div
-          ref={сцена}
-          onPointerMove={двигать}
-          onPointerLeave={сброс}
-          className="relative mx-auto mb-10 aspect-[5/4] w-full max-w-[700px] lg:mb-0"
-          style={{ perspective: "1400px" }}
+          ref={фото}
+          className="absolute inset-0 will-change-transform"
+          style={{ transformOrigin: "80% 40%" }}
         >
-          <div
-            className="pointer-events-none absolute -left-10 -top-12 z-0 w-24"
-            style={{ color: "rgba(13,23,21,0.6)" }}
-          >
-            <Минарет className="w-full" />
-            <p className="hand -mt-2 text-center text-xl" style={{ color: "var(--ink-soft)" }}>
-              Kalon
-            </p>
-          </div>
-          <div
-            className="pointer-events-none absolute -right-4 -top-24 z-0 w-40"
-            style={{ color: "rgba(13,23,21,0.6)" }}
-          >
-            <Купол className="w-full" />
-            <p className="hand -mt-1 text-center text-xl" style={{ color: "var(--ink-soft)" }}>
-              Gur-e-Amir
-            </p>
-          </div>
-          <div
-            className="pointer-events-none absolute -bottom-12 -right-10 z-0 w-36"
-            style={{ color: "rgba(13,23,21,0.55)" }}
-          >
-            <Портал className="w-full" />
-            <p className="hand -mt-1 text-center text-xl" style={{ color: "var(--ink-soft)" }}>
-              Registan
-            </p>
-          </div>
+          <img
+            src={БУХАРА}
+            alt="Bukhara, Po-i-Kalyan"
+            className="h-full w-full object-cover"
+            fetchPriority="high"
+          />
+        </div>
+        <div
+          ref={мягко}
+          aria-hidden
+          className="absolute inset-0 opacity-0 will-change-[opacity,transform]"
+          style={{ transformOrigin: "80% 40%" }}
+        >
+          <img src={БУХАРА_МЯГКО} alt="" className="h-full w-full scale-110 object-cover blur-2xl" />
+        </div>
+        {/* Затемнения для читаемости: сверху под шапку, снизу под текст */}
+        <div
+          aria-hidden
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(10,17,16,0.5) 0%, rgba(10,17,16,0) 22%, rgba(10,17,16,0) 42%, rgba(10,17,16,0.75) 100%)",
+          }}
+        />
+        <div
+          ref={ночь}
+          aria-hidden
+          className="absolute inset-0 opacity-0"
+          style={{ background: "var(--night)" }}
+        />
 
+        {/* Бирюзовое сияние за телефоном */}
+        <div
+          ref={сияние}
+          aria-hidden
+          className="absolute left-1/2 top-1/2 h-[80vh] w-[80vh] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-0"
+          style={{
+            background:
+              "radial-gradient(circle, rgba(52,220,207,0.3) 0%, rgba(242,206,110,0.08) 40%, transparent 68%)",
+          }}
+        />
+
+        {/* Телефон с настоящим экраном приложения */}
+        <div className="absolute inset-0 flex items-center justify-center" style={{ perspective: "1400px" }}>
           <div
-            ref={билет}
-            className="float absolute inset-x-[6%] inset-y-[10%] transition-transform duration-300 ease-out"
-            style={{ transformStyle: "preserve-3d", transform: "rotateY(-8deg) rotateX(4deg)" }}
+            ref={телефон}
+            className="relative opacity-0 will-change-transform"
+            style={{ height: "min(70svh, 660px)", aspectRatio: "585 / 1266", transformStyle: "preserve-3d" }}
           >
             <div
-              className="shine-sweep absolute inset-0 flex overflow-hidden rounded-[28px] shadow-[0_40px_80px_-30px_rgba(13,23,21,0.55)]"
-              style={{ background: "linear-gradient(135deg,#ffffff,#e3f4f2)" }}
-            >
-              {/* Корешок билета */}
-              <div
-                className="relative flex w-[38%] flex-col justify-between border-r-2 border-dashed p-3 sm:w-[34%] sm:p-5"
-                style={{ borderColor: "rgba(13,23,21,0.2)" }}
-              >
-                <div>
-                  <Logo size={34} />
-                  <p
-                    className="serif mt-2 text-sm font-bold leading-tight sm:mt-3 sm:text-xl"
-                    style={{ color: "var(--accent-ink)" }}
-                  >
-                    {t("pass_title")}
-                  </p>
-                  <p
-                    className="mt-1 hidden text-[10px] leading-snug sm:block"
-                    style={{ color: "var(--ink-soft)" }}
-                  >
-                    {t("pass_sub")}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-[9px] font-bold tracking-[0.18em]" style={{ color: "var(--ink-soft)" }}>
-                    {t("pass_valid")}
-                  </p>
-                  {/* Штрихкод */}
-                  <div className="mt-2 flex h-10 items-stretch gap-[2px]">
-                    {Array.from({ length: 30 }, (_, i) => (
-                      <span
-                        key={i}
-                        style={{ width: [1, 2, 1, 3, 1, 2][i % 6], background: "var(--ink)", opacity: 0.85 }}
-                      />
-                    ))}
-                  </div>
-                  <p
-                    className="mt-1 font-mono text-[9px] tracking-widest"
-                    style={{ color: "var(--ink-soft)" }}
-                  >
-                    HZ 2026 · UZB · 10 LANG
-                  </p>
-                </div>
-                {/* Вырезы, как у настоящего билета */}
-                <span
-                  className="absolute -right-3 -top-3 h-6 w-6 rounded-full"
-                  style={{ background: "var(--paper)" }}
-                />
-                <span
-                  className="absolute -bottom-3 -right-3 h-6 w-6 rounded-full"
-                  style={{ background: "var(--paper)" }}
-                />
-              </div>
-              {/* Окно с Регистаном */}
-              <div className="relative flex-1 overflow-hidden">
-                <div
-                  ref={фото}
-                  className="absolute inset-[-6%] transition-transform duration-300 ease-out"
-                  style={{ transform: "scale(1.1)" }}
-                >
-                  <img src={РЕГИСТАН} alt="Registan, Samarkand" className="h-full w-full object-cover" />
-                </div>
-                <div
-                  className="absolute inset-0"
-                  style={{ background: "linear-gradient(to top, rgba(20,12,6,0.55), transparent 55%)" }}
-                />
-                <p className="serif absolute bottom-4 left-5 text-2xl font-semibold text-white">Samarkand</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Дети-проводники из приложения */}
-          <div className="absolute -bottom-12 left-0 z-30 flex items-center gap-2 sm:-left-8 sm:bottom-[2%]">
-            <video
-              src={`${APP_URL}/videos/kids-hello.mp4`}
-              poster={`${APP_URL}/videos/kids-hello.webp`}
-              autoPlay
-              muted
-              loop
-              playsInline
-              className="h-20 w-20 rounded-full border-4 object-cover shadow-xl sm:h-24 sm:w-24"
-              style={{ borderColor: "var(--paper)", objectPosition: "center 40%" }}
+              className="absolute -inset-[3.2%] rounded-[16%/7.5%] shadow-[0_60px_120px_-40px_rgba(15,179,172,0.55)]"
+              style={{ background: "linear-gradient(145deg,#2c3a39,#0b1312 40%,#1d2a29)" }}
             />
-            <span
-              className="hand rounded-2xl rounded-bl-none px-3 py-1.5 text-lg shadow-lg"
-              style={{ background: "var(--paper)" }}
-            >
-              {t("kids_hello")}
-            </span>
+            <div className="absolute inset-0 overflow-hidden rounded-[13%/6%] bg-black">
+              <img src={экран} alt="HelloUZ" className="h-full w-full object-cover" />
+              <div
+                aria-hidden
+                className="absolute inset-0"
+                style={{ background: "linear-gradient(120deg, rgba(255,255,255,0.16), transparent 38%)" }}
+              />
+            </div>
+            <div className="absolute left-1/2 top-[1.6%] h-[3.2%] w-[30%] -translate-x-1/2 rounded-full bg-black" />
           </div>
         </div>
-      </div>
 
-      {/* Живые цифры из приложения */}
-      <div className="relative mx-auto max-w-7xl px-5 pb-14 sm:px-8">
-        <div
-          className="grid grid-cols-2 gap-y-5 rounded-3xl border px-6 py-5 sm:grid-cols-4"
-          style={{ borderColor: "var(--line)", background: "rgba(255,255,255,0.55)" }}
-        >
-          {[
-            [цифры.cities, t("stat_cities")],
-            [цифры.places, t("stat_places")],
-            [цифры.venues, t("stat_venues")],
-            [10, t("stat_langs")],
-          ].map(([число, подпись]) => (
-            <div key={String(подпись)} className="text-center">
-              <p className="serif text-4xl font-semibold tabular-nums" style={{ color: "var(--accent)" }}>
-                <Счёт до={Number(число)} />
+        {/* Панели с цифрами: справа и слева, проезжают снизу вверх */}
+        <div className="pointer-events-none absolute inset-0 z-20 mx-auto max-w-[1600px] px-5 sm:px-8">
+          <div
+            ref={панельA}
+            className="absolute right-5 w-[min(92vw,380px)] sm:right-8 lg:right-[6%]"
+            style={{ top: "120vh" }}
+          >
+            <Панель
+              текст={тр(ПРО_КАРТУ, язык)}
+              видно={видноA}
+              строки={[
+                [t("stat_cities"), <Счёт key="c" до={цифры.cities} />],
+                [t("stat_places"), <Счёт key="p" до={цифры.places} />],
+                [t("stat_venues"), <Счёт key="v" до={цифры.venues} />],
+              ]}
+            />
+          </div>
+          <div
+            ref={панельB}
+            className="absolute left-5 w-[min(92vw,380px)] sm:left-8 lg:left-[6%]"
+            style={{ top: "120vh" }}
+          >
+            <Панель
+              текст={тр(ПРО_БРАУЗЕР, язык)}
+              видно={видноB}
+              строки={[
+                [t("stat_langs"), "10"],
+                [t("trust_offline"), "✓"],
+                [t("trust_free"), "✓"],
+              ]}
+            />
+          </div>
+        </div>
+
+        {/* Текст первого экрана */}
+        <div ref={текст} className="absolute inset-x-0 bottom-0 z-30 px-5 pb-7 text-white sm:px-8 sm:pb-10">
+          <div className="mx-auto grid max-w-[1600px] items-end gap-7 lg:grid-cols-12 lg:gap-6">
+            <div className="lg:col-span-7">
+              <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.28em] text-white/75 sm:text-xs">
+                <Слова текст={t("hero_kicker")} видно={показ} уход={ушёл} шаг={0.04} />
               </p>
-              <p
-                className="text-xs font-medium uppercase tracking-[0.14em]"
-                style={{ color: "var(--ink-soft)" }}
+              <div
+                aria-hidden
+                dir="ltr"
+                className="tight select-none whitespace-nowrap text-[clamp(4.4rem,16.5vw,15rem)] font-medium leading-[0.84] tracking-[-0.06em]"
               >
-                {подпись}
+                <span className="hero-mark">
+                  {"HelloUZ".split("").map((б, i) => (
+                    <span key={i} style={{ ["--i" as string]: i }}>
+                      {б}
+                    </span>
+                  ))}
+                </span>
+              </div>
+              <p className="mt-5 max-w-[36rem] text-[15px] leading-[1.35] text-white/85 [text-indent:3.2em] sm:text-[17px] lg:[text-indent:7.5rem]">
+                <Слова текст={t("hero_sub")} видно={показ} уход={ушёл} шаг={0.025} задержка={0.35} />
               </p>
             </div>
-          ))}
+            <div className="flex flex-col gap-6 lg:col-span-4 lg:col-start-9 lg:pb-2">
+              <h1 className="tight text-[clamp(1.7rem,2.5vw,2.5rem)] font-medium leading-[1.04] tracking-[-0.03em]">
+                <Слова текст={заголовок} видно={показ} уход={ушёл} шаг={0.06} задержка={0.2} />{" "}
+                <em className="serif font-semibold italic" style={{ color: "var(--gold-bright)" }}>
+                  <Слова текст={t("hero_title_3")} видно={показ} уход={ушёл} задержка={0.45} />
+                </em>
+              </h1>
+              <div className="hero-cta flex flex-wrap items-center gap-3">
+                <Магнит>
+                  <a
+                    href={APP_URL}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="group inline-flex items-center gap-3 rounded-full px-7 py-4 text-[15px] font-semibold text-white transition-transform hover:scale-[1.03]"
+                    style={{ background: "var(--accent-fill)" }}
+                  >
+                    {t("hero_cta")}
+                    <span className="transition-transform group-hover:translate-x-1 rtl:rotate-180">→</span>
+                  </a>
+                </Магнит>
+                <a
+                  href="#demo"
+                  className="inline-flex items-center gap-2 rounded-full border border-white/30 px-5 py-3.5 text-[14px] font-semibold text-white backdrop-blur-md transition-colors hover:bg-white hover:text-[var(--ink)]"
+                >
+                  ▶ {t("hero_watch")}
+                </a>
+              </div>
+              <p className="flex gap-6 text-[13px] text-white/70">
+                <span>(10 {t("stat_langs")})</span>
+                <span>(2026)</span>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Подсказка «листайте» */}
+        <div
+          ref={подсказка}
+          aria-hidden
+          className="absolute bottom-6 left-1/2 z-30 hidden -translate-x-1/2 flex-col items-center gap-2 text-white/70 lg:flex"
+        >
+          <span className="h-10 w-px overflow-hidden bg-white/20">
+            <span className="scroll-tick block h-4 w-px bg-white" />
+          </span>
         </div>
       </div>
     </section>
+  );
+}
+
+/** Панель как у витрин техники: цветная черта, утверждение, таблица характеристик. */
+function Панель({
+  текст,
+  видно,
+  строки,
+}: {
+  текст: string;
+  видно: boolean;
+  строки: [string, React.ReactNode][];
+}) {
+  return (
+    <div className="rounded-2xl bg-[rgba(10,17,16,0.62)] p-5 text-white backdrop-blur-md sm:rounded-none sm:bg-transparent sm:p-0 sm:backdrop-blur-none">
+      <div
+        className="mb-6 ml-auto h-[2px] w-24"
+        style={{ background: "linear-gradient(90deg, #34dccf 0%, #0fb3ac 40%, #f2ce6e 100%)" }}
+      />
+      <p className="tight text-[clamp(1.2rem,1.9vw,1.75rem)] font-normal leading-[1.18] tracking-[-0.03em] [text-indent:2.5em]">
+        <Слова текст={текст} видно={видно} шаг={0.035} />
+      </p>
+      <div className="mt-10 border-t border-white/80 pt-3 sm:mt-14">
+        {строки.map(([подпись, значение]) => (
+          <div
+            key={подпись}
+            className="flex items-center gap-3 py-1.5 text-[12px] font-medium uppercase tracking-[0.04em] sm:text-[13px]"
+          >
+            <span className="h-3.5 w-1.5 shrink-0 bg-white" />
+            <span className="flex-1 truncate">{подпись}</span>
+            <span className="tabular-nums">{значение}</span>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }

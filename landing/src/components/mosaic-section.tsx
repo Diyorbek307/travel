@@ -145,8 +145,8 @@ export default function MosaicSection() {
   const шаг = Math.min(ФАКТЫ.length - 1, Math.floor(фаза * ФАКТЫ.length));
 
   return (
-    <section ref={обёртка} id="portal" className="relative h-[330vh]">
-      <div ref={сцена} className="sticky top-0 h-[100svh] overflow-hidden" style={{ background: "#06302d" }}>
+    <section ref={обёртка} id="portal" data-nav="dark" className="relative h-[330vh]">
+      <div ref={сцена} className="sticky top-0 h-[100svh] overflow-hidden" style={{ background: "var(--night)" }}>
         {/* Стена изразцов */}
         {раскладка.out.map((пл, i) => (
           <div
@@ -197,7 +197,7 @@ export default function MosaicSection() {
           className="pointer-events-none absolute inset-0"
           style={{
             opacity: 0.25,
-            background: "linear-gradient(to top, rgba(4,20,18,0.85) 0%, rgba(4,20,18,0.25) 55%, transparent 100%)",
+            background: "linear-gradient(to top, rgba(10,17,16,0.85) 0%, rgba(10,17,16,0.25) 55%, transparent 100%)",
           }}
         />
 

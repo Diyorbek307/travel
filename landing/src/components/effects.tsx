@@ -61,8 +61,8 @@ export function Заставка() {
         <Logo size={96} />
       </div>
       <p className="serif mt-6 text-2xl text-white/90">HelloUZ</p>
-      <p className="condensed absolute bottom-8 right-8 text-7xl font-bold tabular-nums text-white/90 sm:text-9xl">
-        {число}
+      <p className="condensed absolute bottom-6 right-8 text-8xl font-bold leading-none tabular-nums text-white/90 sm:text-[11rem]">
+        {String(число).padStart(3, "0")}
       </p>
       <div className="absolute inset-x-0 bottom-0 h-1" style={{ background: "rgba(255,255,255,0.1)" }}>
         <div className="h-full" style={{ width: `${число}%`, background: "var(--gold)" }} />

@@ -13,6 +13,7 @@ import GlobeSection from "@/components/globe-section";
 import Manifesto from "@/components/manifesto";
 import OpenCountry from "@/components/open-country";
 import Essentials from "@/components/essentials";
+import RouteSection from "@/components/route-section";
 import InsideSection from "@/components/inside-section";
 import FreeSection from "@/components/free-section";
 import EsimSection from "@/components/esim-section";
@@ -49,6 +50,7 @@ export default async function Home() {
       <OpenCountry />
       <Destinations />
       <Essentials />
+      <RouteSection />
       <Features />
       <InsideSection />
       <TourSection />

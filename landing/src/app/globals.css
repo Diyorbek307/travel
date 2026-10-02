@@ -22,8 +22,15 @@
   --accent-light: #2fd0c6;
   --gold: #e9c46a;
   --gold-ink: #8a6814;
-  --night: #062a27;
-  --night-soft: #0b3b37;
+  /* Тёмные блоки — тёмная тема приложения (src/app/globals.css):
+     почти чёрный фон, карточки, линии, яркая бирюза и золото. */
+  --night: #0a1110;
+  --night-soft: #13201e;
+  --night-line: #22322f;
+  --night-text: #e8f1ef;
+  --night-muted: #8a9b96;
+  --glow: #34dccf;
+  --gold-bright: #f2ce6e;
   --line: rgba(13, 23, 21, 0.1);
 }
 
@@ -46,6 +53,9 @@ body {
 }
 .hand {
   font-family: var(--font-hand), cursive;
+}
+.tight {
+  font-family: var(--font-tight), var(--font-sans), ui-sans-serif, system-ui, sans-serif;
 }
 .condensed {
   font-family: var(--font-condensed), "Arial Narrow", sans-serif;
@@ -204,7 +214,14 @@ body {
 
 /* ── Переливающийся текст: бирюза → золото → бирюза ── */
 .text-shimmer {
-  background: linear-gradient(100deg, var(--accent-deep), var(--accent) 30%, var(--gold) 50%, var(--accent) 70%, var(--accent-deep));
+  background: linear-gradient(
+    100deg,
+    var(--accent-deep),
+    var(--accent) 30%,
+    var(--gold) 50%,
+    var(--accent) 70%,
+    var(--accent-deep)
+  );
   background-size: 250% 100%;
   -webkit-background-clip: text;
   background-clip: text;
@@ -248,7 +265,11 @@ body {
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: radial-gradient(260px circle at var(--mx, -300px) var(--my, -300px), rgba(15, 179, 172, 0.16), transparent 70%);
+  background: radial-gradient(
+    260px circle at var(--mx, -300px) var(--my, -300px),
+    rgba(15, 179, 172, 0.16),
+    transparent 70%
+  );
   opacity: 0;
   transition: opacity 0.3s;
   z-index: -1;
@@ -330,10 +351,70 @@ body {
   }
 }
 
+/* ── Слова проявляются из размытия (см. Слова в cinema.tsx) ── */
+.wr .w {
+  display: inline-block;
+  white-space: pre;
+  /* text-indent наследуется в inline-block — без нуля отступ встаёт перед каждым словом */
+  text-indent: 0;
+  opacity: 0;
+  filter: blur(10px);
+  transform: translate3d(0, 0.45em, 0);
+  transition: opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1), filter 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: calc(var(--d0, 0s) + var(--i) * var(--st, 0.05s));
+}
+.wr.on .w {
+  opacity: 1;
+  filter: blur(0);
+  transform: none;
+}
+.wr.out .w {
+  opacity: 0;
+  filter: blur(9px);
+  transform: translate3d(0, -0.6em, 0);
+  transition-duration: 0.3s;
+  transition-delay: calc(var(--i) * 0.012s);
+}
+
+/* ── Огромный знак HelloUZ: буквы поднимаются по очереди ── */
+.hero-mark > span {
+  display: inline-block;
+  opacity: 0;
+  transform: translate3d(0, 0.35em, 0);
+  filter: blur(14px);
+  animation: mark-in 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: calc(0.1s + var(--i) * 0.055s);
+}
+@keyframes mark-in {
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
+.hero-cta {
+  opacity: 0;
+  animation: fadeUp 0.9s 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+.scroll-tick {
+  animation: tick 1.8s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+@keyframes tick {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(260%);
+  }
+}
+
 /* ── Заставка: пока она на экране, анимации первого экрана стоят ── */
 .intro-wait .line-mask > span,
 .intro-wait .fade-up,
-.intro-wait .sketch path {
+.intro-wait .sketch path,
+.intro-wait .hero-mark > span,
+.intro-wait .hero-cta {
   animation-play-state: paused;
 }
 .intro-logo path {
@@ -359,4 +440,69 @@ body {
 html.own-cursor,
 html.own-cursor * {
   cursor: none !important;
+}
+
+/* ── Карта маршрута: пунктир осей ползёт, пульс на Самарканде, вспышка города ── */
+.axis-crawl {
+  stroke-dasharray: 6 5;
+  animation: crawl 7s linear infinite;
+}
+@keyframes crawl {
+  to {
+    stroke-dashoffset: -22;
+  }
+}
+.map-ping,
+.map-flash {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.map-ping {
+  animation: ping 4.2s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+@keyframes ping {
+  from {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  to {
+    transform: scale(12);
+    opacity: 0;
+  }
+}
+.map-flash {
+  animation: flash 1.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+@keyframes flash {
+  from {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  to {
+    transform: scale(5);
+    opacity: 0;
+  }
+}
+
+/* «Уменьшить движение» для кинематографичных блоков — в конце файла,
+   чтобы перекрыть правила выше. */
+@media (prefers-reduced-motion: reduce) {
+  .hero-mark > span,
+  .hero-cta {
+    animation: none;
+    transform: none;
+    filter: none;
+    opacity: 1;
+  }
+  .scroll-tick,
+  .axis-crawl,
+  .map-ping,
+  .map-flash {
+    animation: none;
+  }
+  .wr .w {
+    transition: none;
+    filter: none;
+    transform: none;
+  }
 }
