@@ -7,6 +7,7 @@ import { useДистанция } from "@/lib/distance";
 import GoogleMap, { googleКлюч } from "@/components/google-map";
 import { ГОРОДА, МЕСТА, расстояниеКм, точка } from "@/data/geo";
 import { ссылкаНаЗаказ } from "@/lib/taxi";
+import type { СпособПути } from "@/components/how-to-get";
 import { ACCENT_FILL, BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE } from "@/lib/theme";
 import type { Geo } from "@/lib/types";
 
@@ -33,6 +34,14 @@ interface Дорога {
  *
  * Поэтому пошаговую навигацию отдаём тем, у кого есть дорожный граф:
  * Яндекс Карты для пешком и за рулём, Яндекс Go для такси.
+ *
+ * Три режима — пешком, на машине, на такси — выбираются прямо в
+ * карточке («Как добраться»), экран открывается уже в нужном.
+ *
+ * Если точных координат нет (гостиницы и рестораны без точки в панели),
+ * раньше маршрут вёл в центр города — человек приехал бы не туда. Теперь
+ * навигатор и такси ищут место по названию и городу, а экран прямо
+ * говорит, что адрес примерный.
  */
 
 /** Подписи единиц времени приходят из словаря — «мин» есть не в каждом языке. */
@@ -62,21 +71,31 @@ export default function RouteView({
   название,
   город,
   geo,
+  способ: начальный,
   onBack,
 }: {
   название: string;
   город: string;
   /** Если координаты известны точнее, чем по справочнику. */
   geo?: Geo | null;
+  /** Как человек хочет добираться — выбрано в карточке. */
+  способ?: СпособПути;
   onBack: () => void;
 }) {
   const { t, трК } = useT();
   const единицы: Единицы = { ч: t("common_h"), мин: t("common_min") };
   const дист = useДистанция();
+  // Точно знаем, где цель: координаты из панели или общеизвестное место.
+  // Иначе точка — центр города, и по ней можно только показать район.
+  const точно = Boolean(geo) || название in МЕСТА;
   const цель = geo ?? точка(название, город);
+  /** Текст для поиска в навигаторе, когда координат нет. */
+  const поиск = [название, город, "Uzbekistan"].filter(Boolean).join(", ");
+  const [режим, setРежим] = useState<СпособПути>(начальный ?? "авто");
   const [откуда, setОткуда] = useState<Geo | null>(null);
   const [состояние, setСостояние] = useState<"ищем" | "нашли" | "отказ">("ищем");
-  const [способ, setСпособ] = useState<Способ>("авто");
+  // Движок маршрутов знает два способа; такси едет по той же дороге, что и машина.
+  const способ: Способ = режим === "пешком" ? "пешком" : "авто";
   const [дорога, setДорога] = useState<Дорога | null>(null);
   const [считаем, setСчитаем] = useState(false);
   /** Что умеет движок. Пустой список — движка нет, остаёмся на прямой. */
@@ -110,7 +129,8 @@ export default function RouteView({
    * прямо об этом говоря.
    */
   useEffect(() => {
-    if (!откуда || !цель) return;
+    // Дорогу до центра города вместо места не рисуем — это была бы неправда.
+    if (!откуда || !цель || !точно) return;
     let отменено = false;
     setСчитаем(true);
     fetch("/api/route", {
@@ -136,7 +156,8 @@ export default function RouteView({
     // Цель за время жизни экрана не меняется, следим за точкой и способом.
   }, [откуда, цель?.lat, цель?.lon, способ]);
 
-  const км = откуда && цель ? расстояниеКм(откуда, цель) : null;
+  // Без точного адреса расстояние было бы до центра города — не показываем.
+  const км = точно && откуда && цель ? расстояниеКм(откуда, цель) : null;
 
   /*
    * Окно карты. Считаем по обеим осям отдельно: карта шире, чем выше, и
@@ -178,18 +199,24 @@ export default function RouteView({
         .slice(0, 8)
     : [];
 
-  function навигатор(): string | null {
-    if (!цель) return null;
+  /**
+   * Навигатор: Яндекс Карты с маршрутом нужного вида — pd (пешком), auto
+   * (за рулём), taxi (такси). Без точных координат цель — текстом, Карты
+   * сами найдут место по названию.
+   */
+  function навигатор(вид: "pd" | "auto" | "taxi"): string | null {
+    if (!цель && !поиск) return null;
     const п = new URLSearchParams();
-    п.set(
-      "rtext",
-      откуда ? `${откуда.lat},${откуда.lon}~${цель.lat},${цель.lon}` : `~${цель.lat},${цель.lon}`,
-    );
-    п.set("rtt", "auto");
+    const куда = точно && цель ? `${цель.lat},${цель.lon}` : поиск;
+    п.set("rtext", `${откуда ? `${откуда.lat},${откуда.lon}` : ""}~${куда}`);
+    п.set("rtt", вид);
     return `https://yandex.ru/maps/?${п.toString()}`;
   }
 
-  const адресНавигатора = навигатор();
+  const адресНавигатора = навигатор(режим === "пешком" ? "pd" : "auto");
+  // Такси: с точной точкой — сразу Яндекс Go; без неё — Карты в режиме
+  // такси, они найдут место по названию и предложат вызвать машину.
+  const адресТакси = точно && цель ? ссылкаНаЗаказ(откуда, цель, название) : навигатор("taxi");
 
   return (
     <div className="flex h-full flex-col" style={{ background: CREAM }}>
@@ -260,30 +287,42 @@ export default function RouteView({
                   откуда={откуда}
                   путь={дорога?.точки ?? null}
                   точки={[
-                    { geo: цель, подпись: название, главная: true },
+                    { geo: цель, подпись: точно ? название : трК(город), главная: true },
                     ...рядом.map((р) => ({ geo: р.geo, подпись: р.название })),
                   ]}
                 />
               )}
             </div>
 
-            {способы.length > 1 && (
-              <div className="mt-4 flex gap-2">
-                {способы.map((в) => (
-                  <button
-                    key={в}
-                    onClick={() => setСпособ(в)}
-                    className="flex-1 rounded-xl border py-2 text-xs font-bold"
-                    style={{
-                      background: способ === в ? ACCENT_FILL : SURFACE,
-                      color: способ === в ? WHITE : MUTED,
-                      borderColor: способ === в ? GREEN : BORDER,
-                    }}
-                  >
-                    {в === "авто" ? t("route_mode_car") : t("route_mode_walk")}
-                  </button>
-                ))}
-              </div>
+            <div className="mt-4 flex gap-2">
+              {(
+                [
+                  ["пешком", "🚶", "route_mode_walk"],
+                  ["авто", "🚗", "route_mode_car"],
+                  ["такси", "🚕", "tr_taxi"],
+                ] as const
+              ).map(([в, знак, подпись]) => (
+                <button
+                  key={в}
+                  onClick={() => setРежим(в)}
+                  className="flex-1 rounded-xl border py-2 text-xs font-bold"
+                  style={{
+                    background: режим === в ? ACCENT_FILL : SURFACE,
+                    color: режим === в ? WHITE : MUTED,
+                    borderColor: режим === в ? GREEN : BORDER,
+                  }}
+                >
+                  {знак} {t(подпись)}
+                </button>
+              ))}
+            </div>
+            {!точно && (
+              <p
+                className="mt-3 rounded-xl px-3 py-2 text-[11px] leading-relaxed"
+                style={{ background: SURFACE, color: MUTED }}
+              >
+                ℹ️ {t("route_approx")}
+              </p>
             )}
 
             <div className="mt-4 rounded-2xl border p-4" style={{ background: SURFACE, borderColor: BORDER }}>
@@ -362,25 +401,33 @@ export default function RouteView({
               </p>
             </div>
 
-            <div className="mt-4 flex flex-col gap-2 pb-6">
+            <div className={`mt-4 flex gap-2 pb-6 ${режим === "такси" ? "flex-col-reverse" : "flex-col"}`}>
               <a
                 href={адресНавигатора ?? "#"}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-2xl py-3.5 text-center text-sm font-bold text-white"
-                style={{ background: ACCENT_FILL }}
+                className="rounded-2xl py-3.5 text-center text-sm font-bold"
+                style={
+                  режим === "такси"
+                    ? { color: GREEN, border: `1px solid ${GREEN}` }
+                    : { background: ACCENT_FILL, color: WHITE }
+                }
               >
-                {t("route_open_nav")}
+                {режим === "пешком" ? "🚶" : "🚗"} {t("route_open_nav")}
               </a>
               {/* Такси — сразу в Яндекс Go с этой точкой назначения. */}
               <a
-                href={ссылкаНаЗаказ(откуда, цель, название)}
+                href={адресТакси ?? "#"}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-2xl border py-3.5 text-center text-sm font-bold"
-                style={{ color: GREEN, borderColor: GREEN }}
+                className="rounded-2xl py-3.5 text-center text-sm font-bold"
+                style={
+                  режим === "такси"
+                    ? { background: ACCENT_FILL, color: WHITE }
+                    : { color: GREEN, border: `1px solid ${GREEN}` }
+                }
               >
-                {t("route_taxi_here")}
+                🚕 {t("route_taxi_here")}
               </a>
             </div>
           </>

@@ -1,6 +1,13 @@
 "use client";
 
 import { КнопкаВМаршрут } from "./trip-button";
+import КакДобраться, { type СпособПути } from "./how-to-get";
+import type { Geo } from "@/lib/types";
+
+/** Что передать экрану маршрута: точные координаты (если заданы в панели) и способ. */
+export type ДопПути = { geo?: Geo | null; способ?: СпособПути };
+/** Координаты записи, если их вписали в панели (поле geo). */
+const geoЗаписи = (x: object): Geo | null => (x as { geo?: Geo }).geo ?? null;
 import { СтатусОткрыто } from "./open-status";
 import { КнопкаПоделиться } from "./share-button";
 import { СкидкаPremium, ЗначокСкидки } from "./premium-discount";
@@ -67,7 +74,7 @@ export function PlaceDetail({
   place: Place;
   onBack: () => void;
   onToast: (m: string) => void;
-  onПуть: (название: string, город: string) => void;
+  onПуть: (название: string, город: string, доп?: ДопПути) => void;
 }) {
   const { t, трК, lang } = useT();
   const { AUDIO } = useAppContent();
@@ -313,16 +320,14 @@ export function PlaceDetail({
             )}
           </div>
         )}
+        {/* В маршрут уходит исходное название: по нему ищутся координаты,
+            а переведённое («Registan Square») там не найдётся. */}
+        <КакДобраться
+          onВыбор={(способ) =>
+            onПуть(place.nameRu ?? place.name, place.city, { geo: geoЗаписи(place), способ })
+          }
+        />
         <div className="flex gap-3 mb-3">
-          {/* В маршрут уходит исходное название: по нему ищутся координаты,
-              а переведённое («Registan Square») там не найдётся. */}
-          <button
-            onClick={() => onПуть(place.nameRu ?? place.name, place.city)}
-            className="flex-1 py-3.5 rounded-2xl text-white text-sm font-bold active:scale-[0.98] transition-all"
-            style={{ background: ACCENT_FILL }}
-          >
-            📍 {t("d_route")}
-          </button>
           <button
             onClick={() => {
               const стало = переключитьВМаршруте({
@@ -368,7 +373,7 @@ export function HotelDetail({
 }: {
   hotel: Hotel;
   onBack: () => void;
-  onПуть: (название: string, город: string) => void;
+  onПуть: (название: string, город: string, доп?: ДопПути) => void;
 }) {
   const { t, трК } = useT();
   const [imgIdx, setImgIdx] = useState(0);
@@ -610,13 +615,9 @@ export function HotelDetail({
         </div>
         <СкидкаPremium процент={hotel.premiumDiscount} заведение={hotel.name} />
         <ПолезноЗнать факты={hotel.facts ?? []} />
-        <button
-          onClick={() => onПуть(hotel.name, hotel.city)}
-          className="mb-3 w-full rounded-2xl py-3.5 text-sm font-bold text-white transition-all active:scale-[0.98]"
-          style={{ background: ACCENT_FILL }}
-        >
-          📍 {t("d_route")}
-        </button>
+        <КакДобраться
+          onВыбор={(способ) => onПуть(hotel.name, hotel.city, { geo: geoЗаписи(hotel), способ })}
+        />
         <КнопкаВМаршрут вид="hotel" id={hotel.id} name={hotel.name} city={hotel.city} img={hotel.img} />
         <ГалереяЗаведения фото={hotel.imgs ?? []} />
         <НомераОтеля
@@ -654,7 +655,7 @@ export function RestaurantDetail({
 }: {
   r: Restaurant;
   onBack: () => void;
-  onПуть: (название: string, город: string) => void;
+  onПуть: (название: string, город: string, доп?: ДопПути) => void;
 }) {
   const { t, трК } = useT();
   const дг = useДеньги();
@@ -798,14 +799,8 @@ export function RestaurantDetail({
               📞 {t("d_call")}
             </a>
           )}
-          <button
-            onClick={() => onПуть(r.name, r.city)}
-            className="flex-1 py-3.5 rounded-2xl text-white text-sm font-bold active:scale-[0.98] transition-all"
-            style={{ background: "#C1603A" }}
-          >
-            📍 {t("d_route")}
-          </button>
         </div>
+        <КакДобраться onВыбор={(способ) => onПуть(r.name, r.city, { geo: geoЗаписи(r), способ })} />
         <КнопкаВМаршрут вид="restaurant" id={r.id} name={r.name} city={r.city} img={r.img} />
         <BookingForm kind="restaurant" itemId={r.id} itemName={r.name} />
         <ReviewForm placeId={r.id} placeName={r.name} />
@@ -825,7 +820,7 @@ export function RouteDetail({
 }: {
   route: Route;
   onBack: () => void;
-  onПуть: (название: string, город: string) => void;
+  onПуть: (название: string, город: string, доп?: ДопПути) => void;
   onToast: (m: string) => void;
 }) {
   const { t, трК } = useT();

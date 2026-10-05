@@ -23,6 +23,9 @@ import TransportScreen from "@/components/screens/transport";
 import PracticalScreen from "@/components/screens/practical";
 import FavoritesScreen from "@/components/screens/favorites";
 import RouteView from "@/components/route-view";
+import type { СпособПути } from "@/components/how-to-get";
+import type { ДопПути } from "@/components/details";
+import type { Geo } from "@/lib/types";
 import { MiniPlayer, Toast } from "@/components/widgets";
 import { AdInterstitial } from "@/components/ads";
 import { ContentProvider, useAppContent, useContentReady } from "@/components/content-provider";
@@ -64,7 +67,7 @@ type Detail =
   | { kind: "restaurant"; value: Restaurant }
   | { kind: "route"; value: Route }
   /** Дорога до выбранного места: своя карточка, а не всплывающая надпись. */
-  | { kind: "путь"; название: string; город: string };
+  | { kind: "путь"; название: string; город: string; geo?: Geo | null; способ?: СпособПути };
 
 /**
  * «checking» — пока не пришёл ответ о сессии. Без него приложение
@@ -363,7 +366,8 @@ function App() {
     setDetail({ kind: "restaurant", value });
     переход();
   };
-  const openПуть = (название: string, город: string) => setDetail({ kind: "путь", название, город });
+  const openПуть = (название: string, город: string, доп?: ДопПути) =>
+    setDetail({ kind: "путь", название, город, geo: доп?.geo ?? null, способ: доп?.способ });
 
   /*
    * Переход по ссылке кампании — из колокольчика или push. Запись могли
@@ -895,7 +899,7 @@ interface ScreenProps {
   onExcursion: (r: Route) => void;
   onHotel: (h: Hotel) => void;
   onRestaurant: (r: Restaurant) => void;
-  onПуть: (название: string, город: string) => void;
+  onПуть: (название: string, город: string, доп?: ДопПути) => void;
   profileView?: "stats" | "bookings" | "support";
   разделОбзора?: РазделОбзора;
   onРазделОбзора: (р?: РазделОбзора) => void;
@@ -956,7 +960,15 @@ function Карточка({ detail, ...p }: ScreenProps & { detail: Detail }) {
           <RouteDetail route={detail.value} onBack={p.onCloseDetail} onПуть={p.onПуть} onToast={p.onToast} />
         );
       case "путь":
-        return <RouteView название={detail.название} город={detail.город} onBack={p.onCloseDetail} />;
+        return (
+          <RouteView
+            название={detail.название}
+            город={detail.город}
+            geo={detail.geo}
+            способ={detail.способ}
+            onBack={p.onCloseDetail}
+          />
+        );
     }
   }
 }
