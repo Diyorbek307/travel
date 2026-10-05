@@ -13,7 +13,7 @@
 
 export type ВидЗаведения = "hotel" | "restaurant";
 
-const ОБЩИЕ = ["desc", "phone", "img", "imgs", "facts", "connection"] as const;
+const ОБЩИЕ = ["desc", "phone", "img", "imgs", "facts", "connection", "geo"] as const;
 const ПОЛЯ: Record<ВидЗаведения, readonly string[]> = {
   hotel: [...ОБЩИЕ, "price", "tag", "facilities", "roomTypes"],
   restaurant: [...ОБЩИЕ, "price", "open", "cuisine", "menu", "zones", "tables", "avgCheck"],
@@ -97,6 +97,21 @@ export function чистыеПравки(вид: ВидЗаведения, те�
             })
             .slice(0, 30);
         break;
+      case "geo": {
+        // Точка на карте для навигатора: только числа в пределах Земли.
+        // null — стереть точку.
+        if (v === null) итог.geo = null;
+        const g = v as Record<string, unknown> | null;
+        if (
+          g &&
+          typeof g.lat === "number" &&
+          typeof g.lon === "number" &&
+          Math.abs(g.lat) <= 90 &&
+          Math.abs(g.lon) <= 180
+        )
+          итог.geo = { lat: g.lat, lon: g.lon };
+        break;
+      }
       case "connection": {
         const c = чисто(v) as Record<string, unknown> | undefined;
         if (c && typeof c.kind === "string" && ВИДЫ_СВЯЗИ.includes(c.kind)) итог.connection = c;

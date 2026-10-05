@@ -210,7 +210,13 @@ export default function MyVenue() {
           кабинет
           вид={вид}
           запись={запись}
-          onSave={(изменения) => void сохранить(изменения as Record<string, unknown>)}
+          onSave={(изменения) =>
+            // «geo: undefined» (точку стёрли) в JSON пропал бы — шлём явный null.
+            void сохранить({
+              ...(изменения as Record<string, unknown>),
+              ...("geo" in изменения && !изменения.geo ? { geo: null } : {}),
+            })
+          }
           onClose={() => setПодробно(false)}
         />
       )}

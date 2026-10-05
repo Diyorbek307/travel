@@ -1,5 +1,7 @@
 "use client";
 
+import { разобратьКоординаты, вУзбекистане } from "@/lib/geo-parse";
+import type { Geo } from "@/lib/types";
 import { useEffect, useState } from "react";
 import { Btn } from "./shared";
 import { ГалереяФото } from "./PhotoField";
@@ -68,6 +70,8 @@ export interface Подробности {
   tables?: TableType[];
   facts?: Fact[];
   connection?: Connection;
+  /** Точка на карте для «Как добраться». undefined — стереть. */
+  geo?: Geo;
 }
 
 const НАЗВАНИЕ_КАТЕГОРИИ: Record<RoomCategory, string> = {
@@ -178,6 +182,13 @@ export default function VenueExtras({
   const [столы, setСтолы] = useState<TableType[]>(запись.tables ?? []);
   const [факты, setФакты] = useState<Fact[]>(запись.facts ?? []);
   const [связь, setСвязь] = useState<Connection>(запись.connection ?? { kind: "none" });
+  // Точка на карте: поле принимает и «41.31, 69.27», и ссылку из карт.
+  const [точкаТекст, setТочкаТекст] = useState(запись.geo ? `${запись.geo.lat}, ${запись.geo.lon}` : "");
+  const [ищемТочку, setИщемТочку] = useState(false);
+  const [точкаОшибка, setТочкаОшибка] = useState("");
+  /** Что нашёл поиск по названию — показать, чтобы сотрудник сверил. */
+  const [найдено, setНайдено] = useState("");
+  const точка = разобратьКоординаты(точкаТекст);
 
   const естьНаличие = вид === "hotel" || вид === "restaurant";
 
@@ -236,8 +247,34 @@ export default function VenueExtras({
       изменения.connection =
         связь.kind === "manual" ? { ...связь, manualUpdatedAt: new Date().toISOString() } : связь;
     }
+    // Точка: пустое поле стирает её, неразборчивое — не трогает.
+    if (!точкаТекст.trim()) изменения.geo = undefined;
+    else if (точка) изменения.geo = точка;
     onSave(изменения);
     onClose();
+  }
+
+  /** Поиск точки по названию и городу — бесплатный геокодер OpenStreetMap. */
+  async function найтиТочку() {
+    setИщемТочку(true);
+    setТочкаОшибка("");
+    try {
+      const q = [запись.name, запись.city, "Uzbekistan"].filter(Boolean).join(", ");
+      const r = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(q)}`,
+        { headers: { "Accept-Language": "ru,en" } },
+      );
+      const д = (await r.json()) as { lat: string; lon: string; display_name?: string }[];
+      if (д[0]) {
+        setТочкаТекст(`${Number(д[0].lat).toFixed(6)}, ${Number(д[0].lon).toFixed(6)}`);
+        // Поиск иногда находит соседнее заведение с похожим названием.
+        setНайдено(д[0].display_name ?? "");
+      } else setТочкаОшибка("По названию не нашлось — вставьте ссылку из Google или Яндекс Карт.");
+    } catch {
+      setТочкаОшибка("Поиск не ответил — вставьте ссылку из Google или Яндекс Карт.");
+    } finally {
+      setИщемТочку(false);
+    }
   }
 
   return (
@@ -271,6 +308,63 @@ export default function VenueExtras({
             ×
           </button>
         </div>
+
+        <Заголовок>Где находится</Заголовок>
+        <Поле
+          label="КООРДИНАТЫ ИЛИ ССЫЛКА ИЗ GOOGLE / ЯНДЕКС КАРТ"
+          value={точкаТекст}
+          onChange={(v) => {
+            setТочкаТекст(v);
+            setТочкаОшибка("");
+            setНайдено("");
+          }}
+          placeholder="41.311100, 69.279700 — или вставьте ссылку на место"
+        />
+        <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px]">
+          <button
+            type="button"
+            onClick={найтиТочку}
+            disabled={ищемТочку}
+            className="cursor-pointer rounded px-2.5 py-1.5"
+            style={{
+              background: "var(--color-surface)",
+              border: "1px solid var(--color-border)",
+              color: "var(--color-text)",
+            }}
+          >
+            {ищемТочку ? "Ищем…" : "🔎 Найти по названию"}
+          </button>
+          {точка && (
+            <a
+              href={`https://yandex.ru/maps/?pt=${точка.lon},${точка.lat}&z=17&l=map`}
+              target="_blank"
+              rel="noreferrer"
+              className="rounded px-2.5 py-1.5"
+              style={{ border: "1px solid var(--color-border)", color: "var(--color-amber)" }}
+            >
+              📍 Проверить на карте
+            </a>
+          )}
+          <span style={подпись}>
+            {точкаТекст.trim() === ""
+              ? "Без точки навигатор ищет заведение по названию — может ошибиться."
+              : !точка
+              ? "Не разобрать — нужны два числа или ссылка на место в картах."
+              : !вУзбекистане(точка)
+              ? `⚠ ${точка.lat}, ${точка.lon} — это не Узбекистан. Не перепутаны широта и долгота?`
+              : `✓ ${точка.lat}, ${точка.lon} — туристы получат точный маршрут.`}
+          </span>
+        </div>
+        {найдено && (
+          <p className="mt-1 text-[11px]" style={{ color: "var(--color-amber)" }}>
+            Найдено: {найдено}. Поиск иногда путает похожие названия — проверьте на карте перед сохранением.
+          </p>
+        )}
+        {точкаОшибка && (
+          <p className="mt-1 text-[11px]" style={{ color: "var(--color-amber)" }}>
+            {точкаОшибка}
+          </p>
+        )}
 
         <Заголовок>Фотографии</Заголовок>
 
