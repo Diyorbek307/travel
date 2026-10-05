@@ -207,7 +207,7 @@ export default function IntroCinematic({ onDone }: { onDone: () => void }) {
               textShadow: "0 0 16px #ffffff88",
             }}
           >
-            Discover Uzbekistan
+            {t("intro_discover")}
           </p>
           <p className="mt-1.5 text-[11px]" style={{ color: "rgba(255,255,255,0.55)" }}>
             {t("splash_tagline")}

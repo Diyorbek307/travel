@@ -33,6 +33,12 @@ const ЗАПИСИ: [string, Строка][] = [
   // Категории мест
   с("История", { en: "History", uz: "Tarix", zh: "历史", ko: "역사", de: "Geschichte", fr: "Histoire", ja: "歴史", tr: "Tarih", ar: "التاريخ" }),
   с("Мечеть", { en: "Mosque", uz: "Masjid", zh: "清真寺", ko: "모스크", de: "Moschee", fr: "Mosquée", ja: "モスク", tr: "Cami", ar: "مسجد" }),
+  с("Театр", { en: "Theatre", uz: "Teatr", zh: "剧院", ko: "극장", de: "Theater", fr: "Théâtre", ja: "劇場", tr: "Tiyatro", ar: "مسرح" }),
+  с("Развлечения", { en: "Entertainment", uz: "Koʻngilochar", zh: "娱乐", ko: "엔터테인먼트", de: "Unterhaltung", fr: "Divertissement", ja: "エンタメ", tr: "Eğlence", ar: "ترفيه" }),
+  с("Парк", { en: "Park", uz: "Bogʻ", zh: "公园", ko: "공원", de: "Park", fr: "Parc", ja: "公園", tr: "Park", ar: "حديقة" }),
+  с("Аквапарк", { en: "Water park", uz: "Akvapark", zh: "水上乐园", ko: "워터파크", de: "Wasserpark", fr: "Parc aquatique", ja: "ウォーターパーク", tr: "Su parkı", ar: "حديقة مائية" }),
+  с("Кино", { en: "Cinema", uz: "Kino", zh: "电影院", ko: "영화관", de: "Kino", fr: "Cinéma", ja: "映画館", tr: "Sinema", ar: "سينما" }),
+  с("Гостевой дом", { en: "Guesthouse", uz: "Mehmon uyi", zh: "民宿", ko: "게스트하우스", de: "Gästehaus", fr: "Maison d’hôtes", ja: "ゲストハウス", tr: "Pansiyon", ar: "بيت ضيافة" }),
   с("Музей", { en: "Museum", uz: "Muzey", zh: "博物馆", ko: "박물관", de: "Museum", fr: "Musée", ja: "博物館", tr: "Müze", ar: "متحف" }),
   с("Природа", { en: "Nature", uz: "Tabiat", zh: "自然", ko: "자연", de: "Natur", fr: "Nature", ja: "自然", tr: "Doğa", ar: "الطبيعة" }),
   с("Базары", { en: "Bazaar", uz: "Bozor", zh: "集市", ko: "시장", de: "Basar", fr: "Bazar", ja: "バザール", tr: "Pazar", ar: "سوق" }),

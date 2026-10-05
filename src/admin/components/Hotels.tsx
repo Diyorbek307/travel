@@ -40,7 +40,12 @@ const EMPTY_FORM: HotelForm = {
  * Хостелы» внутри раздела «Гостиницы». У старых записей поля нет — они
  * считаются отелями.
  */
-const ВИД: Record<HotelKind, string> = { hotel: "Отель", motel: "Мотель", hostel: "Хостел" };
+const ВИД: Record<HotelKind, string> = {
+  hotel: "Отель",
+  motel: "Мотель",
+  hostel: "Хостел",
+  guesthouse: "Гостевой дом",
+};
 const видОтеля = (h: Hotel): HotelKind => h.kind ?? "hotel";
 
 const СТАТУС: Record<string, string> = {
@@ -308,7 +313,7 @@ export default function Hotels() {
             </button>
           ))}
           <div className="w-px h-5 shrink-0 self-center" style={{ background: "var(--color-border)" }} />
-          {(["all", "hotel", "motel", "hostel"] as const).map((k) => (
+          {(["all", "hotel", "motel", "hostel", "guesthouse"] as const).map((k) => (
             <button
               key={k}
               onClick={() => setKindFilter(k)}

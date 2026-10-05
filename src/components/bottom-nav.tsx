@@ -7,17 +7,21 @@ import type { Tab } from "@/lib/types";
 import { LogoMark, Wordmark } from "@/components/ui";
 
 /**
- * Вкладка посередине панели. Это «Исследовать» — вход во все разделы
- * (города, места, отели, рестораны…), поэтому на телефоне она стоит в
- * центре, приподнята и подписана знаком HelloUZ, как главная кнопка
- * приложения.
+ * Вкладки поменялись местами по просьбе владельца: разделы (гостиницы,
+ * рестораны, музеи…) — это теперь «Главная», первая кнопка слева, с неё
+ * приложение и открывается. А прежняя главная — погода, города, лучшие
+ * места — живёт под приподнятой кнопкой HelloUZ посередине.
+ *
+ * Внутри приложения вкладки по-прежнему зовутся "explore" (разделы) и
+ * "home" (погода и подборки): меняется только то, где они стоят в меню и
+ * как подписаны, — все переходы между экранами остаются прежними.
  */
-const ЦЕНТР: Tab = "explore";
+const ЦЕНТР: Tab = "home";
 
 /** Иконки нижней панели: контур в покое, заливка у активной вкладки. */
 const ITEMS: { key: Tab; ключ: TKey; icon: (active: boolean) => React.ReactNode }[] = [
   {
-    key: "home",
+    key: "explore",
     ключ: "nav_home",
     icon: (a) => (
       <svg
@@ -54,8 +58,8 @@ const ITEMS: { key: Tab; ключ: TKey; icon: (active: boolean) => React.ReactN
     ),
   },
   {
-    key: "explore",
-    ключ: "nav_explore",
+    key: "home",
+    ключ: "nav_hellouz",
     icon: (a) => (
       <svg
         width="21"
@@ -200,7 +204,7 @@ export default function BottomNav({ tab, onTab }: { tab: Tab; onTab: (t: Tab) =>
               }}
             >
               <span className="flex h-5 w-5 shrink-0 items-center justify-center">{icon(active)}</span>
-              <span className="text-sm font-semibold">{t(ключ)}</span>
+              <span className="text-sm font-semibold">{key === ЦЕНТР ? "HelloUZ" : t(ключ)}</span>
             </button>
           );
         })}

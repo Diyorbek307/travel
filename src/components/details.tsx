@@ -358,6 +358,7 @@ const ВИД_ГОСТИНИЦЫ: Record<HotelKind, TKey> = {
   hotel: "hk_hotel",
   motel: "hk_motel",
   hostel: "hk_hostel",
+  guesthouse: "hk_guesthouse",
 };
 
 export function HotelDetail({

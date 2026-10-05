@@ -844,6 +844,11 @@ function App() {
                       setРаскрытьПамятку("internet");
                       setShowPractical(true);
                     }}
+                    onTaxi={() => {
+                      // Плитка «Такси» — памятка «Такси и Yandex Go» с заказом.
+                      setРаскрытьПамятку("taxi");
+                      setShowPractical(true);
+                    }}
                     onTransport={() => setShowTransport(true)}
                     onMenu={() => setShowMenu(true)}
                     onLogout={logout}
@@ -904,6 +909,7 @@ interface ScreenProps {
   onNotifs: () => void;
   onPractical: () => void;
   onEsim: () => void;
+  onTaxi: () => void;
   onTransport: () => void;
   onMenu: () => void;
   onLogout: () => void;
@@ -990,6 +996,7 @@ function ЭкранВкладки({ tab, ...p }: ScreenProps) {
           onTransport={p.onTransport}
           onPractical={p.onPractical}
           onEsim={p.onEsim}
+          onTaxi={p.onTaxi}
         />
       );
     case "map":

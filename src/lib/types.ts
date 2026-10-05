@@ -56,7 +56,7 @@ export interface Route {
 }
 
 /** Вид гостиницы. Без поля — обычный отель: так записи из базы не ломаются. */
-export type HotelKind = "hotel" | "motel" | "hostel";
+export type HotelKind = "hotel" | "motel" | "hostel" | "guesthouse";
 
 /** Ресторан или бар. Без поля — ресторан. */
 export type RestaurantKind = "restaurant" | "bar";

@@ -48,6 +48,8 @@ export type РазделОбзора =
   | "places"
   | "museums"
   | "hotels"
+  | "hostels"
+  | "fun"
   | "restaurants"
   | "bars"
   | "excursions"
@@ -92,6 +94,7 @@ export function ExploreScreen({
   onTransport,
   onPractical,
   onEsim,
+  onTaxi,
 }: {
   onPlace: (p: Place) => void;
   onHotel: (h: Hotel) => void;
@@ -108,6 +111,8 @@ export function ExploreScreen({
   onPractical: () => void;
   /** «Полезное», сразу раскрытое на «Связи» — там магазин eSIM. */
   onEsim: () => void;
+  /** «Полезное», раскрытое на «Такси и Yandex Go». */
+  onTaxi: () => void;
 }) {
   const { CITIES, HOTELS, PLACES, POPULAR_CITIES, RESTAURANTS, ROUTES } = useAppContent();
   const { t, трК, lang } = useT();
@@ -135,11 +140,17 @@ export function ExploreScreen({
     .filter((p) => (p.typeRu ?? p.type) === "Природа")
     .sort((a, b) => (b.imgs?.length ?? 0) - (a.imgs?.length ?? 0));
   const музеи = места.filter((p) => (ТИПЫ_МЕСТ["Музеи"] ?? []).includes(p.typeRu ?? p.type));
-  const отели = вГороде(HOTELS);
+  const развлечения = места.filter((p) => (ТИПЫ_МЕСТ["Развлечения"] ?? []).includes(p.typeRu ?? p.type));
+  // Гостиницы и хостелы — отдельные плитки: их ищут разные люди с разным
+  // бюджетом. Без поля «вид» запись — обычный отель.
+  const отели = вГороде(HOTELS).filter((h) => ВИДЫ_ОТЕЛЕЙ.includes(h.kind ?? "hotel"));
+  const хостелы = вГороде(HOTELS).filter((h) => ВИДЫ_ХОСТЕЛОВ.includes(h.kind ?? "hotel"));
   // Бары — те же заведения из раздела ресторанов, но с видом «bar»: их
   // ищут вечером и по другой причине, поэтому у них своя плитка, а в
   // «Ресторанах» их нет.
-  const рестораны = вГороде(RESTAURANTS).filter((r) => r.kind !== "bar");
+  // «Рестораны, кафе, бары» — одной плиткой; у баров по-прежнему есть и
+  // свой раздел (на него ведут старые ссылки).
+  const рестораны = вГороде(RESTAURANTS);
   const бары = вГороде(RESTAURANTS).filter((r) => r.kind === "bar");
   // У многодневного тура через всю страну города нет: при выбранном
   // городе он не показывается, иначе фильтр врал бы.
@@ -189,24 +200,38 @@ export function ExploreScreen({
     const число = (n: number) => ({ под: String(n), пусто: n === 0 });
     const плитки: ПлиткаДанные[] = [
       { ключ: "cities", заголовок: t("ex_cities"), под: String(CITIES.length), go: () => onРаздел("cities") },
-      { ключ: "hotels", заголовок: t("ex_stay"), ...число(отели.length), go: () => onРаздел("hotels") },
+      { ключ: "hotels", заголовок: t("ex_hotels"), ...число(отели.length), go: () => onРаздел("hotels") },
+      {
+        ключ: "hostels",
+        заголовок: t("ex_hostels"),
+        ...число(хостелы.length),
+        go: () => onРаздел("hostels"),
+      },
+      { ключ: "fun", заголовок: t("ex_fun"), ...число(развлечения.length), go: () => onРаздел("fun") },
+      { ключ: "taxi", заголовок: t("ex_taxi"), под: t("ex_taxi_sub"), go: onTaxi },
       {
         ключ: "restaurants",
-        заголовок: t("home_restaurants"),
+        заголовок: t("ex_food"),
         ...число(рестораны.length),
         go: () => onРаздел("restaurants"),
       },
       { ключ: "bars", заголовок: t("ex_bars"), ...число(бары.length), go: () => onРаздел("bars") },
-      { ключ: "museums", заголовок: t("f_museums"), ...число(музеи.length), go: () => onРаздел("museums") },
+      {
+        ключ: "museums",
+        заголовок: t("ex_museums_theatres"),
+        ...число(музеи.length),
+        go: () => onРаздел("museums"),
+      },
       { ключ: "places", заголовок: t("ex_sights"), ...число(места.length), go: () => onРаздел("places") },
-      { ключ: "transport", заголовок: t("home_transport"), под: t("home_transport_sub"), go: onTransport },
+      // Билеты на поезда и самолёты и межгород продаются в «Транспорте».
+      { ключ: "transport", заголовок: t("ex_tickets"), под: t("ex_tickets_sub"), go: onTransport },
       {
         ключ: "excursions",
         заголовок: t("ex_excursions"),
         ...число(экскурсии.length),
         go: () => onРаздел("excursions"),
       },
-      { ключ: "ai", заголовок: t("ex_ai"), под: t("ex_ai_sub"), go: () => onРаздел("ai") },
+      { ключ: "ai", заголовок: t("ex_ai_helper"), под: t("ex_ai_sub"), go: () => onРаздел("ai") },
       { ключ: "routes", заголовок: t("home_routes"), под: t("ex_routes_sub"), go: () => onTab("map") },
       { ключ: "tips", заголовок: t("ex_tips"), под: t("home_practical_sub"), go: onPractical },
       // Магазин eSIM живёт в «Полезном» → «Связь». Отдельная плитка — потому
@@ -264,8 +289,12 @@ export function ExploreScreen({
       </h2>
     );
     const группа = (г: (typeof ГРУППЫ)[number], номерГруппы: number) => (
-      <section key={г.заголовок} className="mb-5" data-tour={номерГруппы === 0 ? "tiles" : undefined}>
-        {заголовокГруппы(г.заголовок, г.метка)}
+      <section
+        key={г.заголовок ?? "main"}
+        className="mb-5"
+        data-tour={номерГруппы === 0 ? "tiles" : undefined}
+      >
+        {г.заголовок && заголовокГруппы(г.заголовок, г.метка)}
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           {г.ключи.map((ключ, i) => (
             <Плитка
@@ -309,8 +338,7 @@ export function ExploreScreen({
           */}
           {группа(ГРУППЫ[0], 0)}
           <ЛентаКрасивых места={красивые} onPlace={onPlace} onВсе={() => onРаздел("scenic")} />
-          <КарточкаИИ onClick={по("ai").go} />
-          {ГРУППЫ.slice(1, 4).map((г, i) => группа(г, i + 1))}
+          {ГРУППЫ.slice(1, 3).map((г, i) => группа(г, i + 1))}
 
           <section className="mb-5">
             {заголовокГруппы("ex_group_info", "var(--muted)")}
@@ -318,7 +346,7 @@ export function ExploreScreen({
             <КакПользоваться />
           </section>
 
-          {группа(ГРУППЫ[4], 4)}
+          {группа(ГРУППЫ[3], 3)}
 
           <div className="mt-4">
             <AdInline isPremium={isPremium} cities={город ? [город] : рядом ? [рядом] : undefined} />
@@ -332,9 +360,11 @@ export function ExploreScreen({
     scenic: "ex_scenic",
     cities: "ex_cities",
     places: "ex_sights",
-    museums: "f_museums",
-    hotels: "ex_stay",
-    restaurants: "home_restaurants",
+    museums: "ex_museums_theatres",
+    hotels: "ex_hotels",
+    hostels: "ex_hostels",
+    fun: "ex_fun",
+    restaurants: "ex_food",
     bars: "ex_bars",
     excursions: "ex_excursions",
     ai: "ex_ai",
@@ -389,7 +419,13 @@ export function ExploreScreen({
         {раздел === "places" && <СписокМест места={места} onPlace={onPlace} сброс={сброс} />}
         {раздел === "scenic" && <СписокМест места={красивые} onPlace={onPlace} сброс={сброс} безТипов />}
         {раздел === "museums" && <СписокМест места={музеи} onPlace={onPlace} сброс={сброс} безТипов />}
-        {раздел === "hotels" && <СписокОтелей отели={отели} onHotel={onHotel} сброс={сброс} />}
+        {раздел === "hotels" && (
+          <СписокОтелей отели={отели} виды={ВИДЫ_ОТЕЛЕЙ} onHotel={onHotel} сброс={сброс} />
+        )}
+        {раздел === "hostels" && (
+          <СписокОтелей отели={хостелы} виды={ВИДЫ_ХОСТЕЛОВ} onHotel={onHotel} сброс={сброс} />
+        )}
+        {раздел === "fun" && <СписокМест места={развлечения} onPlace={onPlace} сброс={сброс} безТипов />}
         {раздел === "restaurants" && (
           <СписокРесторанов рестораны={рестораны} onRestaurant={onRestaurant} сброс={сброс} />
         )}
@@ -403,23 +439,36 @@ export function ExploreScreen({
   );
 }
 
-/** Группы плиток на экране HelloUZ. ИИ-гид стоит отдельно, над ними. */
-const ГРУППЫ: { заголовок: TKey; ключи: string[]; тон: string; метка: string }[] = [
+/** Виды гостиниц, которые показывает плитка «Гостиницы и отели». */
+const ВИДЫ_ОТЕЛЕЙ: HotelKind[] = ["hotel", "motel"];
+/** …и плитка «Хостелы и гостевые дома». */
+const ВИДЫ_ХОСТЕЛОВ: HotelKind[] = ["hostel", "guesthouse"];
+
+/**
+ * Группы плиток на главной. Первая — главная сетка в порядке, который
+ * задал владелец: где жить, где есть, чем заняться, что посмотреть, как
+ * доехать. Заголовка у неё нет — это и есть разделы приложения.
+ */
+const ГРУППЫ: { заголовок?: TKey; ключи: string[]; тон: string; метка: string }[] = [
   {
-    заголовок: "ex_group_see",
-    ключи: ["places", "museums", "excursions", "routes"],
+    ключи: [
+      "hotels",
+      "hostels",
+      "restaurants",
+      "fun",
+      "museums",
+      "places",
+      "excursions",
+      "transport",
+      "ai",
+      "taxi",
+    ],
     тон: "var(--accent-soft)",
     метка: "var(--accent)",
   },
   {
-    заголовок: "ex_group_stay",
-    ключи: ["hotels", "restaurants", "bars"],
-    тон: "var(--accent-2-soft)",
-    метка: "var(--accent-2)",
-  },
-  {
-    заголовок: "ex_group_road",
-    ключи: ["transport", "esim", "offline", "tips", "cities"],
+    заголовок: "ex_group_more",
+    ключи: ["routes", "cities", "esim", "offline", "tips"],
     тон: "rgba(96, 165, 250, 0.14)",
     метка: "#60A5FA",
   },
@@ -674,6 +723,7 @@ function Плитка({
   return (
     <button
       onClick={плитка.скоро ? undefined : плитка.go}
+      data-tour={плитка.ключ === "ai" ? "ai" : undefined}
       // aria-disabled, а не disabled: карточка остаётся видна и читаема
       // экранным диктором как «скоро», а не пропадает из фокуса совсем.
       aria-disabled={плитка.скоро}
@@ -866,13 +916,16 @@ function ИллюстрацияVR({ широкая }: { широкая: boolean 
 /** Плитки, у которых есть живая версия — видео в public/videos/tiles. */
 const ЖИВЫЕ_ПЛИТКИ = new Set(["museums", "places", "restaurants", "bars", "routes", "excursions", "hotels"]);
 /** Плитки с иллюстрацией-SVG вместо картинки из public/tiles. */
-const РИСОВАННЫЕ = new Set(["photo", "translate", "vr", "esim", "offline"]);
+const РИСОВАННЫЕ = new Set(["photo", "translate", "vr", "esim", "offline", "hostels", "fun", "taxi"]);
 
 function ИллюстрацияСкоро({ ключ, широкая }: { ключ: string; широкая: boolean }) {
   if (ключ === "photo") return <ИллюстрацияФото широкая={широкая} />;
   if (ключ === "translate") return <ИллюстрацияПереводчик широкая={широкая} />;
   if (ключ === "esim") return <ИллюстрацияEsim широкая={широкая} />;
   if (ключ === "offline") return <ИллюстрацияОфлайн широкая={широкая} />;
+  if (ключ === "hostels") return <ИллюстрацияХостел широкая={широкая} />;
+  if (ключ === "fun") return <ИллюстрацияКолесо широкая={широкая} />;
+  if (ключ === "taxi") return <ИллюстрацияТакси широкая={широкая} />;
   return <ИллюстрацияVR широкая={широкая} />;
 }
 
@@ -978,6 +1031,99 @@ function ИллюстрацияEsim({ широкая }: { широкая: boolea
         <path d="M72 38 a28 28 0 0 1 38 0" opacity="0.45" />
       </g>
       <circle cx="91" cy="59" r="3.5" fill={GOLD} />
+    </СвгСкоро>
+  );
+}
+
+/** Хостел: двухъярусная кровать с бирюзовым одеялом и золотой лампой. */
+function ИллюстрацияХостел({ широкая }: { широкая: boolean }) {
+  const id = useId().replace(/:/g, "");
+  return (
+    <СвгСкоро широкая={широкая}>
+      <defs>
+        <linearGradient id={`${id}o`} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#2FD0C6" />
+          <stop offset="0.55" stopColor="#0FB3AC" />
+          <stop offset="1" stopColor="#07685F" />
+        </linearGradient>
+      </defs>
+      {/* Стойки */}
+      <rect x="14" y="20" width="6" height="72" rx="3" fill="#07685F" />
+      <rect x="90" y="20" width="6" height="72" rx="3" fill="#07685F" />
+      {/* Верхний ярус */}
+      <rect x="18" y="38" width="74" height="8" rx="3" fill="#0B4F49" />
+      <rect x="22" y="28" width="66" height="12" rx="5" fill={`url(#${id}o)`} />
+      <rect x="24" y="26" width="18" height="9" rx="4" fill="#ffffff" />
+      {/* Нижний ярус */}
+      <rect x="18" y="74" width="74" height="8" rx="3" fill="#0B4F49" />
+      <rect x="22" y="64" width="66" height="12" rx="5" fill={`url(#${id}o)`} />
+      <rect x="24" y="62" width="18" height="9" rx="4" fill="#ffffff" />
+      {/* Лесенка и лампа */}
+      <g stroke="#07685F" strokeWidth="2.5" strokeLinecap="round">
+        <path d="M100 40 v40" />
+        <path d="M100 48 h8 M100 58 h8 M100 68 h8" />
+        <path d="M108 40 v40" />
+      </g>
+      <circle cx="60" cy="14" r="6" fill={GOLD} />
+      <path d="M60 4 v4" stroke={GOLD} strokeWidth="2" strokeLinecap="round" />
+    </СвгСкоро>
+  );
+}
+
+/** Развлечения: колесо обозрения с бирюзовыми кабинками. */
+function ИллюстрацияКолесо({ широкая }: { широкая: boolean }) {
+  const кабинки = Array.from({ length: 8 }, (_, i) => {
+    const у = (i / 8) * Math.PI * 2;
+    return [58 + Math.cos(у) * 30, 48 + Math.sin(у) * 30] as const;
+  });
+  return (
+    <СвгСкоро широкая={широкая}>
+      <path d="M40 92 L58 48 L76 92" fill="none" stroke="#07685F" strokeWidth="5" strokeLinecap="round" />
+      <circle cx="58" cy="48" r="30" fill="none" stroke="#0FB3AC" strokeWidth="4" />
+      <circle cx="58" cy="48" r="20" fill="none" stroke="#2FD0C6" strokeWidth="2" opacity="0.6" />
+      {кабинки.map(([x, y], i) => (
+        <g key={i}>
+          <path
+            d={`M58 48 L${x.toFixed(1)} ${y.toFixed(1)}`}
+            stroke="#2FD0C6"
+            strokeWidth="1.5"
+            opacity="0.7"
+          />
+          <rect x={x - 6} y={y - 4} width="12" height="10" rx="3" fill={i % 2 ? GOLD : "#0FB3AC"} />
+        </g>
+      ))}
+      <circle cx="58" cy="48" r="5" fill={GOLD} />
+      <rect x="30" y="90" width="56" height="4" rx="2" fill="#07685F" />
+    </СвгСкоро>
+  );
+}
+
+/** Такси: жёлтая машинка с шашечками, как у Yandex Go. */
+function ИллюстрацияТакси({ широкая }: { широкая: boolean }) {
+  return (
+    <СвгСкоро широкая={широкая}>
+      {/* Кузов */}
+      <path
+        d="M14 70 v-10 a8 8 0 0 1 8 -8 h8 l12 -16 h38 l14 16 h10 a8 8 0 0 1 8 8 v10 a6 6 0 0 1 -6 6 h-86 a6 6 0 0 1 -6 -6 Z"
+        fill={GOLD}
+      />
+      {/* Окна */}
+      <path d="M36 52 l9 -12 h18 v12 Z" fill="#0B4F49" opacity="0.85" />
+      <path d="M67 52 v-12 h14 l10 12 Z" fill="#0B4F49" opacity="0.85" />
+      {/* Шашечки на крыше */}
+      <rect x="50" y="26" width="22" height="9" rx="2" fill="#0B4F49" />
+      <g fill={GOLD}>
+        <rect x="52" y="28" width="4" height="2.5" />
+        <rect x="60" y="28" width="4" height="2.5" />
+        <rect x="56" y="31" width="4" height="2.5" />
+        <rect x="64" y="31" width="4" height="2.5" />
+      </g>
+      {/* Колёса и фары */}
+      <circle cx="36" cy="76" r="9" fill="#0B4F49" />
+      <circle cx="36" cy="76" r="4" fill="#ffffff" />
+      <circle cx="92" cy="76" r="9" fill="#0B4F49" />
+      <circle cx="92" cy="76" r="4" fill="#ffffff" />
+      <rect x="110" y="60" width="6" height="5" rx="2" fill="#ffffff" />
     </СвгСкоро>
   );
 }
@@ -1462,6 +1608,7 @@ const ВИДЫ_ГОСТИНИЦ: { значение: HotelKind | "all"; подп
   { значение: "hotel", подпись: "hk_hotels" },
   { значение: "motel", подпись: "hk_motels" },
   { значение: "hostel", подпись: "hk_hostels" },
+  { значение: "guesthouse", подпись: "hk_guesthouses" },
 ];
 
 type Порядок = "рек" | "дешевле" | "дороже" | "рейтинг";
@@ -1526,10 +1673,13 @@ const БЮДЖЕТЫ: { значение: string; подпись: TKey; до: nu
 
 function СписокОтелей({
   отели,
+  виды,
   onHotel,
   сброс,
 }: {
   отели: Hotel[];
+  /** Какие виды показывает раздел — чипы только для них. */
+  виды?: HotelKind[];
   onHotel: (h: Hotel) => void;
   сброс?: () => void;
 }) {
@@ -1549,7 +1699,11 @@ function СписокОтелей({
   );
   return (
     <>
-      <Чипы варианты={ВИДЫ_ГОСТИНИЦ} выбран={вид} onВыбор={setВид} />
+      <Чипы
+        варианты={ВИДЫ_ГОСТИНИЦ.filter((в) => в.значение === "all" || !виды || виды.includes(в.значение))}
+        выбран={вид}
+        onВыбор={setВид}
+      />
       <Чипы
         варианты={БЮДЖЕТЫ}
         выбран={бюджет}
