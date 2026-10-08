@@ -26,11 +26,22 @@ function id(префикс: string): string {
 /* Поддержка                                                          */
 /* ------------------------------------------------------------------ */
 
+/** Кто написал: турист, живой оператор или ИИ-помощник. */
+export type SupportAuthor = "user" | "staff" | "ai";
+
 export interface SupportMessage {
   id: string;
-  author: "user" | "staff";
+  author: SupportAuthor;
   text: string;
   createdAt: string;
+  /** ИИ — ключ помощника (ravshan…), оператор — его имя из панели. */
+  name?: string;
+  /**
+   * С этого момента ответ виден туристу. ИИ отвечает за секунды, но
+   * мгновенный ответ сбивает с толку и читается как отписка; до этой
+   * минуты в переписке «печатает…».
+   */
+  showAt?: string;
 }
 
 export interface SupportThread {
@@ -39,6 +50,14 @@ export interface SupportThread {
   updatedAt: string;
   /** Сколько сообщений оператор ещё не открывал. */
   unreadForStaff: number;
+  /** Кто отвечает: ИИ-помощник или живой оператор. По умолчанию — ИИ. */
+  mode?: "ai" | "human";
+  /** Помощник, закреплённый за перепиской, — чтобы имя не менялось. */
+  agent?: string;
+  /** Турист или помощник позвали человека, а оператор ещё не ответил. */
+  needsHuman?: boolean;
+  /** ИИ уже думает над ответом — показываем «печатает…». */
+  aiPendingSince?: string | null;
 }
 
 const поддержка = создатьХранилище<SupportThread[]>(path.join(DATA_DIR, "support.json"), () => []);
@@ -53,14 +72,17 @@ export async function getThread(userId: string): Promise<SupportThread | null> {
 
 export async function addSupportMessage(
   userId: string,
-  author: "user" | "staff",
+  author: SupportAuthor,
   text: string,
+  доп: { name?: string; showAt?: string } = {},
 ): Promise<SupportMessage> {
   const сообщение: SupportMessage = {
     id: id("m"),
     author,
     text: text.trim(),
     createdAt: new Date().toISOString(),
+    ...(доп.name ? { name: доп.name } : {}),
+    ...(доп.showAt ? { showAt: доп.showAt } : {}),
   };
 
   return поддержка.update<SupportMessage>((все) => {
@@ -73,13 +95,32 @@ export async function addSupportMessage(
       messages: [...ветка.messages, сообщение],
       updatedAt: сообщение.createdAt,
       // Ответ оператора обнуляет счётчик: он только что всё прочитал.
-      unreadForStaff: author === "user" ? ветка.unreadForStaff + 1 : 0,
+      // Ответ ИИ счётчик не трогает — оператор его не читал.
+      unreadForStaff:
+        author === "user" ? ветка.unreadForStaff + 1 : author === "staff" ? 0 : ветка.unreadForStaff,
+      // Оператор ответил — он взял переписку на себя, ИИ замолкает.
+      ...(author === "staff" ? { mode: "human" as const, needsHuman: false } : {}),
+      ...(author === "ai" ? { aiPendingSince: null } : {}),
     };
 
     const копия = [...все];
     if (i === -1) копия.push(обновлённая);
     else копия[i] = обновлённая;
     return [копия, сообщение];
+  });
+}
+
+/** Поменять что-то в ветке, не трогая сообщений (режим, помощник, «печатает»). */
+export async function updateThread(
+  userId: string,
+  поля: Partial<Pick<SupportThread, "mode" | "agent" | "needsHuman" | "aiPendingSince">>,
+): Promise<SupportThread | null> {
+  return поддержка.update<SupportThread | null>((все) => {
+    const i = все.findIndex((t) => t.userId === userId);
+    if (i === -1) return [все, null];
+    const копия = [...все];
+    копия[i] = { ...копия[i], ...поля };
+    return [копия, копия[i]];
   });
 }
 

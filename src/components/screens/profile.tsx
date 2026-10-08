@@ -343,7 +343,7 @@ export function SettingsView({
       await fetch("/api/support", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: `★ ${n}/5` }),
+        body: JSON.stringify({ text: `★ ${n}/5`, rating: true }),
       });
     } catch {
       /* не критично */

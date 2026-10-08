@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
-import { отказЕсли } from "@/lib/admin-auth";
-import { addSupportMessage, listThreads, markThreadRead } from "@/lib/community";
+import { отказЕсли, разрешено, ROOT_ID } from "@/lib/admin-auth";
+import { addSupportMessage, listThreads, markThreadRead, updateThread } from "@/lib/community";
 import { listUsers } from "@/lib/users";
+import { findAdminById } from "@/lib/admins";
+import { имяПомощника, печатает } from "@/lib/support-desk";
 
 export const dynamic = "force-dynamic";
 
@@ -29,6 +31,13 @@ export async function GET() {
           email: u?.email ?? "",
           photoUrl: u?.hasPhoto ? `/api/photo/${u.id}` : null,
           country: u?.country ?? "",
+          mode: t.mode ?? "ai",
+          needsHuman: Boolean(t.needsHuman),
+          agent: имяПомощника(t.agent, "ru"),
+          typing: печатает(t),
+          // Имя помощника в панели — по-русски; оператор видит и ответы,
+          // которые туристу ещё не показаны («печатает…»).
+          messages: t.messages.map((m) => (m.author === "ai" ? { ...m, name: имяПомощника(m.name, "ru") } : m)),
         };
       }),
     },
@@ -36,10 +45,10 @@ export async function GET() {
   );
 }
 
-/** Ответ оператора либо отметка «прочитано». */
+/** Ответ оператора, отметка «прочитано» или кто ведёт переписку. */
 export async function POST(request: Request) {
-  const нет = await отказЕсли("operations");
-  if (нет) return нет;
+  const админ = await разрешено("operations");
+  if (!админ) return NextResponse.json({ error: "forbidden" }, { status: 403 });
 
   let body: Record<string, unknown>;
   try {
@@ -56,9 +65,21 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true });
   }
 
+  // «Взять на себя» / «Вернуть ИИ-помощнику».
+  if (body.mode === "ai" || body.mode === "human") {
+    await updateThread(userId, {
+      mode: body.mode,
+      needsHuman: false,
+      ...(body.mode === "human" ? { aiPendingSince: null } : {}),
+    });
+    return NextResponse.json({ ok: true });
+  }
+
   const text = typeof body.text === "string" ? body.text.trim() : "";
   if (!text) return NextResponse.json({ error: "text_required" }, { status: 400 });
 
-  const сообщение = await addSupportMessage(userId, "staff", text.slice(0, 2000));
+  // Турист видит настоящее имя оператора — подпись «Имя · HelloUZ».
+  const имя = админ.id === ROOT_ID ? "Администратор" : ((await findAdminById(админ.id))?.name ?? "Оператор");
+  const сообщение = await addSupportMessage(userId, "staff", text.slice(0, 2000), { name: имя });
   return NextResponse.json({ ok: true, message: сообщение });
 }
