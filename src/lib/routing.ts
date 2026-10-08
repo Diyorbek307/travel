@@ -18,14 +18,51 @@ import type { Geo } from "@/lib/types";
  *    согласия, но нужен работающий сервер с парой гигабайт памяти.
  *
  * Обе говорят на разных языках, поэтому здесь они сведены к одному ответу.
- * Если ни одна не настроена, возвращаем null — и экран рисует прямую и
- * прямо об этом пишет. Молча подсовывать прямую вместо дороги нельзя:
- * человек по ней рассчитает время выезда.
+ * Если ни одна не настроена, спрашиваем общий сервер OSRM, который держит
+ * немецкое объединение FOSSGIS на данных OpenStreetMap
+ * (routing.openstreetmap.de). Он бесплатный, но с правилами: подписывать
+ * OpenStreetMap и давать ссылку «исправить карту», представляться своим
+ * User-Agent и не чаще одного запроса в секунду. Это годится, пока людей
+ * немного; при большой нагрузке нужен свой OSRM или ключ ORS — тогда
+ * общий сервер больше не трогаем. ROUTING_PUBLIC=off выключает его совсем.
+ *
+ * Если не ответил никто, возвращаем null — и экран рисует прямую и прямо
+ * об этом пишет. Молча подсовывать прямую вместо дороги нельзя: человек
+ * по ней рассчитает время выезда.
  *
  * Ключи живут только на сервере. Отданный в браузер ключ выберут за день.
  */
 
 export type Способ = "авто" | "пешком";
+
+/** Что сделать в точке манёвра — навигатор превращает это в слова. */
+export type Манёвр =
+  | "старт"
+  | "прямо"
+  | "налево"
+  | "направо"
+  | "плавно-налево"
+  | "плавно-направо"
+  | "резко-налево"
+  | "резко-направо"
+  | "левее"
+  | "правее"
+  | "разворот"
+  | "кольцо"
+  | "финиш";
+
+/** Шаг пути: манёвр и сколько идти после него до следующего. */
+export interface Шаг {
+  манёвр: Манёвр;
+  /** Номер съезда с кольца. */
+  съезд?: number;
+  /** Улица, на которую выходим; пусто, если у неё нет имени. */
+  улица: string;
+  метры: number;
+  секунды: number;
+  /** Где манёвр. */
+  где: Geo;
+}
 
 export interface Маршрут {
   /** Линия дороги: то, что рисуется на карте. */
@@ -34,10 +71,22 @@ export interface Маршрут {
   секунды: number;
   /** Кто посчитал — показываем человеку, чтобы он знал, чему верит. */
   источник: string;
+  /** Повороты по порядку — по ним ведёт навигатор. */
+  шаги: Шаг[];
+  /** Куда сообщить об ошибке на карте (требование общего сервера). */
+  исправить?: string;
 }
 
 /** Дальше этого не спрашиваем: чужой сервер отвечает, а человек ждёт. */
 const ЖДЁМ_МС = 8000;
+
+/** Общий сервер FOSSGIS: на каждый способ — свой профиль в адресе. */
+const ОБЩИЙ = {
+  авто: "https://routing.openstreetmap.de/routed-car",
+  пешком: "https://routing.openstreetmap.de/routed-foot",
+} as const;
+/** Правила общего сервера требуют представляться. */
+const КТО_МЫ = "HelloUZ/1.0 (travel guide for Uzbekistan; +https://uzbekistan-travel.onrender.com)";
 
 /** Своего сервера может не быть, чужой может лежать — держим оба варианта. */
 function настройка(способ: Способ) {
@@ -51,13 +100,45 @@ function настройка(способ: Способ) {
    */
   const свой = способ === "пешком" ? process.env.OSRM_FOOT_URL : process.env.OSRM_URL;
   const адрес = свой?.replace(/\/+$/, "");
-  if (адрес) return { вид: "osrm" as const, адрес };
+  if (адрес) return { вид: "osrm" as const, адрес, общий: false };
 
   // OpenRouteService различает профили сам, ему достаточно одного ключа.
   const ключ = process.env.ORS_API_KEY;
   if (ключ) return { вид: "ors" as const, ключ };
 
-  return null;
+  if (process.env.ROUTING_PUBLIC === "off") return null;
+  return { вид: "osrm" as const, адрес: ОБЩИЙ[способ], общий: true };
+}
+
+/*
+ * Не чаще запроса в секунду к общему серверу — на весь наш сервер, а не
+ * на человека. Запросы встают в очередь; если очередь длинная, человек
+ * ждал бы слишком долго — честнее сразу ответить «не посчитали».
+ */
+let очередь: Promise<void> = Promise.resolve();
+let ждут = 0;
+const ПАУЗА_МС = 1100;
+const ДЛИННАЯ_ОЧЕРЕДЬ = 6;
+
+async function вОчереди<T>(дело: () => Promise<T>): Promise<T | null> {
+  if (ждут >= ДЛИННАЯ_ОЧЕРЕДЬ) return null;
+  ждут++;
+  const моя = очередь.then(async () => {
+    try {
+      return await дело();
+    } finally {
+      await new Promise((r) => setTimeout(r, ПАУЗА_МС));
+    }
+  });
+  очередь = моя.then(
+    () => undefined,
+    () => undefined,
+  );
+  try {
+    return await моя;
+  } finally {
+    ждут--;
+  }
 }
 
 /** Способы, которые мы действительно умеем считать. */
@@ -108,14 +189,102 @@ function изGeoJson(координаты: unknown): Geo[] | null {
   return точки.length >= 2 ? точки : null;
 }
 
-async function черезOsrm(адрес: string, откуда: Geo, куда: Geo): Promise<Маршрут | null> {
+interface OsrmШаг {
+  distance?: number;
+  duration?: number;
+  name?: string;
+  maneuver?: { type?: string; modifier?: string; exit?: number; location?: [number, number] };
+}
+
+/** Поворот по направлению OSRM: «slight left» → «плавно-налево». */
+function поворот(направление: string | undefined): Манёвр {
+  switch (направление) {
+    case "left":
+      return "налево";
+    case "right":
+      return "направо";
+    case "slight left":
+      return "плавно-налево";
+    case "slight right":
+      return "плавно-направо";
+    case "sharp left":
+      return "резко-налево";
+    case "sharp right":
+      return "резко-направо";
+    case "uturn":
+      return "разворот";
+    default:
+      return "прямо";
+  }
+}
+
+export function манёврOsrm(тип: string | undefined, направление: string | undefined): Манёвр {
+  if (тип === "depart") return "старт";
+  if (тип === "arrive") return "финиш";
+  if (тип === "roundabout" || тип === "rotary") return "кольцо";
+  // Развилка, съезд и слияние — это «держитесь левее/правее», а не поворот.
+  if (тип === "fork" || тип === "off ramp" || тип === "on ramp" || тип === "merge") {
+    if (направление?.includes("left")) return "левее";
+    if (направление?.includes("right")) return "правее";
+    return "прямо";
+  }
+  // «Новое имя улицы» — это не манёвр: человек идёт как шёл.
+  if (тип === "new name") return "прямо";
+  return поворот(направление);
+}
+
+/**
+ * Склеиваем «прямо» с предыдущим шагом: смена имени улицы или «продолжайте
+ * прямо» — не повод говорить под руку. Дистанция при этом не теряется.
+ */
+export function склеитьПрямо(шаги: Шаг[]): Шаг[] {
+  const итог: Шаг[] = [];
+  for (const ш of шаги) {
+    const пред = итог[итог.length - 1];
+    if (ш.манёвр === "прямо" && пред) {
+      пред.метры += ш.метры;
+      пред.секунды += ш.секунды;
+      if (!пред.улица) пред.улица = ш.улица;
+      continue;
+    }
+    итог.push({ ...ш });
+  }
+  return итог;
+}
+
+export function шагиOsrm(сырые: OsrmШаг[]): Шаг[] {
+  const шаги: Шаг[] = [];
+  for (const с of сырые) {
+    const м = с.maneuver;
+    const где = м?.location;
+    if (!м || !Array.isArray(где) || typeof где[0] !== "number" || typeof где[1] !== "number") continue;
+    const манёвр = манёврOsrm(м.type, м.modifier);
+    шаги.push({
+      манёвр,
+      ...(манёвр === "кольцо" && typeof м.exit === "number" ? { съезд: м.exit } : {}),
+      улица: с.name ?? "",
+      метры: Math.round(с.distance ?? 0),
+      секунды: Math.round(с.duration ?? 0),
+      где: { lat: где[1], lon: где[0] },
+    });
+  }
+  return склеитьПрямо(шаги);
+}
+
+async function черезOsrm(адрес: string, откуда: Geo, куда: Geo, общий: boolean): Promise<Маршрут | null> {
   // Профиль задан самим сервером, в адресе он ничего не значит.
   const профиль = "driving";
   const пары = `${откуда.lon},${откуда.lat};${куда.lon},${куда.lat}`;
-  const url = `${адрес}/route/v1/${профиль}/${пары}?overview=full&geometries=geojson`;
+  const url = `${адрес}/route/v1/${профиль}/${пары}?overview=full&geometries=geojson&steps=true`;
 
-  const ответ = (await запрос(url, { method: "GET" })) as {
-    routes?: { distance?: number; duration?: number; geometry?: { coordinates?: unknown } }[];
+  const спросить = () => запрос(url, { method: "GET", headers: { "User-Agent": КТО_МЫ } });
+  const ответ = (await (общий ? вОчереди(спросить) : спросить())) as {
+    routes?: {
+      distance?: number;
+      duration?: number;
+      geometry?: { coordinates?: unknown };
+      legs?: { steps?: OsrmШаг[] }[];
+    }[];
   } | null;
 
   const первый = ответ?.routes?.[0];
@@ -128,7 +297,9 @@ async function черезOsrm(адрес: string, откуда: Geo, куда: G
     точки,
     метры: Math.round(первый.distance ?? 0),
     секунды: Math.round(первый.duration ?? 0),
-    источник: "OSRM",
+    источник: общий ? "OSRM · OpenStreetMap" : "OSRM",
+    шаги: шагиOsrm((первый.legs ?? []).flatMap((н) => н.steps ?? [])),
+    ...(общий ? { исправить: "https://www.openstreetmap.org/fixthemap" } : {}),
   };
 }
 
@@ -148,7 +319,19 @@ async function черезOrs(ключ: string, откуда: Geo, куда: Geo,
   })) as {
     features?: {
       geometry?: { coordinates?: unknown };
-      properties?: { summary?: { distance?: number; duration?: number } };
+      properties?: {
+        summary?: { distance?: number; duration?: number };
+        segments?: {
+          steps?: {
+            type?: number;
+            exit_number?: number;
+            name?: string;
+            distance?: number;
+            duration?: number;
+            way_points?: number[];
+          }[];
+        }[];
+      };
     }[];
   } | null;
 
@@ -159,13 +342,47 @@ async function черезOrs(ключ: string, откуда: Geo, куда: Geo,
   if (!точки) return null;
 
   const итог = первый.properties?.summary;
+  const шаги: Шаг[] = [];
+  for (const с of (первый.properties?.segments ?? []).flatMap((сег) => сег.steps ?? [])) {
+    const где = точки[с.way_points?.[0] ?? -1];
+    if (!где) continue;
+    const манёвр = ТИПЫ_ORS[с.type ?? -1] ?? "прямо";
+    шаги.push({
+      манёвр,
+      ...(манёвр === "кольцо" && typeof с.exit_number === "number" ? { съезд: с.exit_number } : {}),
+      // ORS пишет «-» вместо пустого имени.
+      улица: с.name && с.name !== "-" ? с.name : "",
+      метры: Math.round(с.distance ?? 0),
+      секунды: Math.round(с.duration ?? 0),
+      где,
+    });
+  }
   return {
     точки,
     метры: Math.round(итог?.distance ?? 0),
     секунды: Math.round(итог?.duration ?? 0),
     источник: "OpenRouteService",
+    шаги: склеитьПрямо(шаги),
   };
 }
+
+/** Коды шагов ORS по порядку из его документации. */
+const ТИПЫ_ORS: Record<number, Манёвр> = {
+  0: "налево",
+  1: "направо",
+  2: "резко-налево",
+  3: "резко-направо",
+  4: "плавно-налево",
+  5: "плавно-направо",
+  6: "прямо",
+  7: "кольцо",
+  8: "прямо",
+  9: "разворот",
+  10: "финиш",
+  11: "старт",
+  12: "левее",
+  13: "правее",
+};
 
 export async function построитьМаршрут(
   откуда: Geo,
@@ -180,7 +397,9 @@ export async function построитьМаршрут(
   if (было && было.до > Date.now()) return было.маршрут;
 
   const маршрут =
-    н.вид === "osrm" ? await черезOsrm(н.адрес, откуда, куда) : await черезOrs(н.ключ, откуда, куда, способ);
+    н.вид === "osrm"
+      ? await черезOsrm(н.адрес, откуда, куда, н.общий)
+      : await черезOrs(н.ключ, откуда, куда, способ);
 
   // Неудачу тоже помним, но недолго: иначе при лежащем сервере каждый
   // повторный заход снова упирается в восьмисекундное ожидание.

@@ -10,15 +10,11 @@ import { ссылкаНаЗаказ } from "@/lib/taxi";
 import type { СпособПути } from "@/components/how-to-get";
 import { ACCENT_FILL, BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE } from "@/lib/theme";
 import type { Geo } from "@/lib/types";
+import type { Маршрут } from "@/lib/routing";
+import Навигатор from "@/components/navigator";
 
 type Способ = "авто" | "пешком";
-
-interface Дорога {
-  точки: Geo[];
-  метры: number;
-  секунды: number;
-  источник: string;
-}
+type Дорога = Маршрут;
 
 /**
  * Маршрут до места.
@@ -32,8 +28,9 @@ interface Дорога {
  * назвать её дорогой значило бы подсунуть человеку цифру, по которой он
  * рассчитает время выезда.
  *
- * Поэтому пошаговую навигацию отдаём тем, у кого есть дорожный граф:
- * Яндекс Карты для пешком и за рулём, Яндекс Go для такси.
+ * Когда движок посчитал дорогу с поворотами, кнопка «Начать навигацию»
+ * ведёт по ней прямо здесь, шаг за шагом и голосом (components/navigator).
+ * Яндекс Карты остаются запасным вариантом, Яндекс Go — для такси.
  *
  * Три режима — пешком, на машине, на такси — выбираются прямо в
  * карточке («Как добраться»), экран открывается уже в нужном.
@@ -100,6 +97,8 @@ export default function RouteView({
   const [считаем, setСчитаем] = useState(false);
   /** Что умеет движок. Пустой список — движка нет, остаёмся на прямой. */
   const [способы, setСпособы] = useState<Способ[]>([]);
+  /** Идёт ли пошаговое ведение. */
+  const [ведём, setВедём] = useState(false);
 
   useEffect(() => {
     if (!navigator.geolocation) {
@@ -217,6 +216,21 @@ export default function RouteView({
   // Такси: с точной точкой — сразу Яндекс Go; без неё — Карты в режиме
   // такси, они найдут место по названию и предложат вызвать машину.
   const адресТакси = точно && цель ? ссылкаНаЗаказ(откуда, цель, название) : навигатор("taxi");
+  // Вести сами можем, только когда знаем и человека, и цель, и дорогу между ними.
+  const можноВести = Boolean(дорога && откуда && цель && точно && режим !== "такси");
+
+  if (ведём && дорога && откуда && цель) {
+    return (
+      <Навигатор
+        дорога={дорога}
+        откуда={откуда}
+        цель={цель}
+        название={название}
+        способ={способ}
+        onStop={() => setВедём(false)}
+      />
+    );
+  }
 
   return (
     <div className="flex h-full flex-col" style={{ background: CREAM }}>
@@ -394,26 +408,40 @@ export default function RouteView({
                   : считаем
                   ? t("route_calc")
                   : дорога
-                  ? t("route_by_streets").replace("{s}", дорога.источник)
+                  ? t("route_by_streets").replace("{s}", дорога.источник) + (дорога.исправить ? " " : "")
                   : способы.length > 0
                   ? t("route_calc_failed")
                   : t("route_straight_note")}
+                {дорога?.исправить && !считаем && состояние !== "отказ" && (
+                  <a href={дорога.исправить} target="_blank" rel="noopener noreferrer" className="underline">
+                    {t("nav_fix_map")}
+                  </a>
+                )}
               </p>
             </div>
 
             <div className={`mt-4 flex gap-2 pb-6 ${режим === "такси" ? "flex-col-reverse" : "flex-col"}`}>
+              {можноВести && (
+                <button
+                  onClick={() => setВедём(true)}
+                  className="rounded-2xl py-3.5 text-center text-sm font-bold"
+                  style={{ background: ACCENT_FILL, color: WHITE }}
+                >
+                  ▶ {t("nav_start")}
+                </button>
+              )}
               <a
                 href={адресНавигатора ?? "#"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="rounded-2xl py-3.5 text-center text-sm font-bold"
                 style={
-                  режим === "такси"
+                  режим === "такси" || можноВести
                     ? { color: GREEN, border: `1px solid ${GREEN}` }
                     : { background: ACCENT_FILL, color: WHITE }
                 }
               >
-                {режим === "пешком" ? "🚶" : "🚗"} {t("route_open_nav")}
+                {режим === "пешком" ? "🚶" : "🚗"} {t(можноВести ? "route_open_yandex" : "route_open_nav")}
               </a>
               {/* Такси — сразу в Яндекс Go с этой точкой назначения. */}
               <a
