@@ -1,6 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import Logo from "./logo";
+import { СТРАНИЦЫ } from "@/lib/pages";
 import { APP_URL, useЯзык } from "@/lib/i18n";
 import { Контуры, Слова } from "./cinema";
 import StoreButtons from "./store-buttons";
@@ -97,7 +99,16 @@ export default function Finale() {
             </div>
           </div>
 
-          <div className="mt-14 flex flex-col items-center justify-between gap-3 border-t border-white/15 pt-6 text-xs text-white/55 sm:flex-row">
+          {/* Все разделы сайта — внизу каждой страницы. */}
+          <nav className="mt-14 flex flex-wrap justify-center gap-x-6 gap-y-3 text-sm font-medium text-white/80">
+            {СТРАНИЦЫ.map((с) => (
+              <Link key={с.путь} href={с.путь} className="hover:text-white">
+                {t(с.меню)}
+              </Link>
+            ))}
+          </nav>
+
+          <div className="mt-8 flex flex-col items-center justify-between gap-3 border-t border-white/15 pt-6 text-xs text-white/55 sm:flex-row">
             <p>© {new Date().getFullYear()} HelloUZ · Made in Uzbekistan</p>
             <p>{t("fin_credits")}</p>
           </div>

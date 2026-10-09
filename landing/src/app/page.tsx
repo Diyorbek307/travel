@@ -1,22 +1,8 @@
-import Nav from "@/components/nav";
 import Hero, { type Цифры } from "@/components/hero";
 import Marquee from "@/components/marquee";
-import Destinations from "@/components/destinations";
-import Features from "@/components/features";
-import TourSection from "@/components/tour-section";
-import StartSection from "@/components/start-section";
-import FaqSection from "@/components/faq-section";
-import Quiz from "@/components/quiz";
-import Finale from "@/components/finale";
-import CameraSection from "@/components/camera-section";
-import GlobeSection from "@/components/globe-section";
 import Manifesto from "@/components/manifesto";
-import OpenCountry from "@/components/open-country";
-import Essentials from "@/components/essentials";
-import RouteSection from "@/components/route-section";
-import InsideSection from "@/components/inside-section";
-import FreeSection from "@/components/free-section";
-import EsimSection from "@/components/esim-section";
+import StartSection from "@/components/start-section";
+import { SiteSections } from "@/components/page-parts";
 import { APP_URL } from "@/lib/i18n";
 
 // Цифры берём из живого приложения раз в час — никаких «500+» с потолка.
@@ -39,28 +25,18 @@ async function цифры(): Promise<Цифры> {
   }
 }
 
+/**
+ * Главная — коротко: первый экран, о чём HelloUZ, вход в разделы и как
+ * начать. Всё подробное — на страницах разделов (lib/pages.ts).
+ */
 export default async function Home() {
   return (
     <main>
-      <Nav />
       <Hero цифры={await цифры()} />
       <Marquee />
       <Manifesto />
-      <CameraSection />
-      <OpenCountry />
-      <Destinations />
-      <Essentials />
-      <RouteSection />
-      <Features />
-      <InsideSection />
-      <TourSection />
-      <FreeSection />
-      <EsimSection />
+      <SiteSections />
       <StartSection />
-      <GlobeSection />
-      <Quiz />
-      <FaqSection />
-      <Finale />
     </main>
   );
 }

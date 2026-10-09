@@ -4,6 +4,8 @@ import "./globals.css";
 import SmoothScroll from "@/components/smooth-scroll";
 import { ЯзыкProvider } from "@/lib/i18n";
 import { Заставка, Курсор, Прогресс } from "@/components/effects";
+import Nav from "@/components/nav";
+import Finale from "@/components/finale";
 
 // Rubik — как в приложении и на логотипе; антиква — для заголовков,
 // рукописный — для подписей к наброскам, узкий — для названий городов.
@@ -56,7 +58,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Прогресс />
         <ЯзыкProvider>
           <Заставка />
+          {/* Меню и подвал общие для всех страниц. */}
+          <Nav />
           {children}
+          <Finale />
         </ЯзыкProvider>
       </body>
     </html>

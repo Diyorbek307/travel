@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 import Lenis from "lenis";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -14,6 +15,17 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
  * ScrollTrigger должен считать позицию из Lenis, а не из window.scrollY.
  */
 export default function SmoothScroll() {
+  const путь = usePathname();
+  const ленис = useRef<Lenis | null>(null);
+
+  // Перешли на другую страницу — начинаем с её верха, а триггеры
+  // прокрутки пересчитываем под новую высоту.
+  useEffect(() => {
+    ленис.current?.scrollTo(0, { immediate: true });
+    window.scrollTo(0, 0);
+    requestAnimationFrame(() => ScrollTrigger.refresh());
+  }, [путь]);
+
   useEffect(() => {
     // При системной настройке «уменьшить движение» инерцию не включаем:
     // для части людей плавная прокрутка вызывает тошноту.
@@ -33,6 +45,7 @@ export default function SmoothScroll() {
       anchors: { offset: -70 },
     });
 
+    ленис.current = lenis;
     lenis.on("scroll", ScrollTrigger.update);
 
     // Один общий тикер вместо двух независимых циклов анимации.
@@ -43,6 +56,7 @@ export default function SmoothScroll() {
     return () => {
       gsap.ticker.remove(raf);
       lenis.destroy();
+      ленис.current = null;
     };
   }, []);
 
