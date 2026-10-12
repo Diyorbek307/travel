@@ -51,7 +51,7 @@ const ОБНОВЛЕНИЯ: Record<string, Запись> = {
     city: "Самарканд",
     type: "Площадь",
     distance: "",
-    entry: "",
+    entry: "Платно",
     hours: "",
     geo: { lat: 39.654722, lon: 66.975556 },
     время: "1–2 часа",
@@ -63,7 +63,7 @@ const ОБНОВЛЕНИЯ: Record<string, Запись> = {
     city: "Самарканд",
     type: "Мавзолей",
     distance: "",
-    entry: "",
+    entry: "Платно",
     hours: "",
     geo: { lat: 39.66262, lon: 66.987878 },
     время: "1–1,5 часа",
@@ -76,8 +76,8 @@ const ОБНОВЛЕНИЯ: Record<string, Запись> = {
     city: "Самарканд",
     type: "Мавзолей",
     distance: "",
-    entry: "",
-    hours: "",
+    entry: "Платно",
+    hours: "09:00–18:00",
     geo: { lat: 39.648333, lon: 66.968889 },
     время: "45–75 минут",
     заповедник: true,
@@ -89,8 +89,8 @@ const ОБНОВЛЕНИЯ: Record<string, Запись> = {
     city: "Самарканд",
     type: "Мечеть",
     distance: "",
-    entry: "",
-    hours: "",
+    entry: "Платно",
+    hours: "09:00–18:00",
     geo: { lat: 39.660556, lon: 66.979722 },
     время: "45–75 минут",
     заповедник: true,
@@ -102,8 +102,8 @@ const ОБНОВЛЕНИЯ: Record<string, Запись> = {
     city: "Самарканд",
     type: "Музей",
     distance: "",
-    entry: "",
-    hours: "",
+    entry: "Платно",
+    hours: "09:00–18:00",
     geo: { lat: 39.674722, lon: 67.005556 },
     время: "45–75 минут",
     заповедник: true,
@@ -115,7 +115,7 @@ const ОБНОВЛЕНИЯ: Record<string, Запись> = {
     city: "Самарканд",
     type: "Музей",
     distance: "",
-    entry: "",
+    entry: "Платно",
     hours: "09:00–18:00",
     geo: { lat: 39.669344, lon: 66.993353 },
     время: "1–1,5 часа",
@@ -128,7 +128,7 @@ const ОБНОВЛЕНИЯ: Record<string, Запись> = {
     city: "Самарканд",
     type: "Базары",
     distance: "",
-    entry: "",
+    entry: "Бесплатно",
     hours: "",
     geo: { lat: 39.661893, lon: 66.979915 },
     время: "45–90 минут",
@@ -140,7 +140,7 @@ const ОБНОВЛЕНИЯ: Record<string, Запись> = {
     city: "Самарканд",
     type: "Ремёсла",
     distance: "",
-    entry: "",
+    entry: "Уточняйте",
     hours: "",
     geo: { lat: 39.6685, lon: 67.031833 },
     время: "1–2 часа",
@@ -535,21 +535,12 @@ export const САМАРКАНД_НОВЫЕ: Place[] = НОВЫЕ.map(собра�
 export const САМАРКАНД_ОБНОВЛЕНИЯ: Record<string, Partial<Place> & { geo: Geo }> = Object.fromEntries(
   Object.entries(ОБНОВЛЕНИЯ).map(([id, з]) => {
     const полное = собрать(з);
-    // Цены, часы, рейтинг и отзывы прежних карточек не трогаем — их ведут в панели.
-    const {
-      id: _id,
-      city: _c,
-      entry: _e,
-      hours: _h,
-      rating: _r,
-      reviews: _rv,
-      audio: _a,
-      qr: _q,
-      tickets: _t,
-      distance: _d,
-      ...поля
-    } = полное;
-    return [id, поля];
+    // Рейтинг, отзывы и аудио прежних карточек не трогаем. Цену и часы —
+    // только где они подтверждены (иначе остаётся, как было), а шаблонные
+    // билеты с придуманными ценами убираем: tickets — пустой список.
+    const { id: _id, city: _c, entry, hours, rating: _r, reviews: _rv, audio: _a, qr: _q, distance: _d, ...поля } =
+      полное;
+    return [id, { ...поля, ...(з.entry ? { entry } : {}), ...(з.hours ? { hours } : {}) }];
   }),
 );
 
