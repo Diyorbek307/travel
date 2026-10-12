@@ -37,6 +37,7 @@ import type {
   ManagedRoute,
   ManagedAudio,
 } from "@/lib/types";
+import { САМАРКАНД_НОВЫЕ_ID } from "./samarkand";
 
 /**
  * Начальное содержимое платформы.
@@ -254,6 +255,8 @@ const ПОЗДНИЕ_ИСХОДНЫЕ = new Set([
   // Красивые места
   "sckitob", "scurng", "sczaam", "scsarm", "scmuyn", "scsent", "scshoh", "scamir", "sckosn", "scboys", "scsukk",
   "xnamm", "xkasm", "xgulm", "xb10", "xb11", "r19",
+  // Самарканд по базе владельца (октябрь 2026)
+  ...САМАРКАНД_НОВЫЕ_ID,
   "xkhiv", "xsito", "xmizd", "xyodg", "xrish", "xkhud", "xakhs", "xotav", "xbabm", "xandj", "xfaya", "xterm", "xhaki", "xkokg", "xodin", "xaydr", "xtemg", "xrash", "xsyrd", "xh1", "xh2", "xh3", "xh4", "xh5", "xh6", "xh7", "xh8", "xh9", "xh10", "xh11", "xh12", "xr1", "xr2", "xr3", "xr4", "xr5", "xr6", "xr7", "xr8", "xb1", "xb2", "xb3", "xb4", "xb5", "xb6", "xb7", "xb8", "xb9", "r11", "r12", "r13", "r14", "r15", "r16", "r17", "r18",
 ]);
 const позднее = (x: { id: string }) => ПОЗДНИЕ_ИСХОДНЫЕ.has(x.id.replace(/^\d+-/, ""));

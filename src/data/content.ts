@@ -1,5 +1,6 @@
 import { GREEN } from "@/lib/theme";
 import type { Hotel, Place, Restaurant, Route } from "@/lib/types";
+import { САМАРКАНД_НОВЫЕ, САМАРКАНД_ОБНОВЛЕНИЯ } from "./samarkand";
 
 /**
  * Содержимое приложения.
@@ -9,7 +10,7 @@ import type { Hotel, Place, Restaurant, Route } from "@/lib/types";
  * появится, эти массивы заменит выборка — типы останутся теми же.
  */
 
-export const PLACES: Place[] = [
+const ИСХОДНЫЕ_МЕСТА: Place[] = [
   { id:"reg",   name:"Площадь Регистан",         city:"Самарканд", type:"История",      rating:4.9, reviews:12847, distance:"0.3 км", entry:"$8",        hours:"08:00–19:00", audio:true,  qr:true,  img:"https://images.unsplash.com/photo-1664602078796-68ee76b3fc59?w=700&h=480&fit=crop&auto=format",  desc:"Сердце древнего Самарканда — три великолепных медресе, украшенных лучшей мозаичной плиткой в мире. Объект Всемирного наследия ЮНЕСКО." },
   { id:"shah",  name:"Шахи-Зинда",               city:"Самарканд", type:"Мечеть",       rating:4.8, reviews:8392,  distance:"1.2 км", entry:"$5",        hours:"08:00–18:00", audio:true,  qr:true,  img:"https://images.unsplash.com/photo-1728029062560-4b0e2b958885?w=700&h=480&fit=crop&auto=format",  desc:"Аллея мавзолеев — священный некрополь с куполами бирюзовых плиток, охватывающий семь веков исламского искусства." },
   { id:"ark",   name:"Бухарская Арка",           city:"Бухара",    type:"Крепость",     rating:4.7, reviews:6128,  distance:"0.5 км", entry:"$6",        hours:"09:00–18:00", audio:true,  qr:true,  img:"https://images.unsplash.com/photo-1653023102302-247f5f0fbdd1?w=700&h=480&fit=crop&auto=format",  desc:"Гигантская крепость, служившая резиденцией эмиров Бухары на протяжении 14 веков." },
@@ -75,6 +76,15 @@ export const PLACES: Place[] = [
   {"id": "sckosn", "name": "Касансайское водохранилище", "city": "Наманган", "type": "Природа", "rating": 0, "reviews": 0, "distance": "40 км", "entry": "Бесплатно", "hours": "Всегда", "audio": true, "qr": false, "img": "https://images.unsplash.com/photo-1701620868378-a598a12b208a?w=900&h=600&fit=crop&auto=format", "desc": "Горное водохранилище над городом Касансай, в предгорьях Чаткальского хребта. Спокойная вода в кольце холмов, прохладный ветер и почти нет туристов — место для пикника и заката.", "imgs": ["https://images.unsplash.com/photo-1701620868378-a598a12b208a?w=900&h=600&fit=crop&auto=format", "https://images.unsplash.com/photo-1701620868292-11228fcac038?w=900&h=600&fit=crop&auto=format", "https://images.unsplash.com/photo-1718984697448-585f834eee9b?w=900&h=600&fit=crop&auto=format", "https://images.unsplash.com/photo-1701621464073-30a3216f102c?w=900&h=600&fit=crop&auto=format"], "credits": "Фото: Unsplash", "facts": [{"id": "sckosn-f0", "label": "Как добраться", "value": "Около часа на машине от Намангана"}, {"id": "sckosn-f1", "label": "Лучшее время", "value": "Весна и начало осени"}, {"id": "sckosn-f2", "label": "Совет", "value": "Возьмите еду с собой — кафе поблизости немного"}]},
   {"id": "scboys", "name": "Бойсун и горы Сурхандарьи", "city": "Термез", "type": "Природа", "rating": 0, "reviews": 0, "distance": "180 км", "entry": "Бесплатно", "hours": "Круглый год", "audio": true, "qr": false, "img": "https://images.unsplash.com/photo-1684561041901-5f50ee528b3f?w=900&h=600&fit=crop&auto=format", "desc": "Бойсун — горный район, чья культура внесена ЮНЕСКО в список нематериального наследия человечества: здесь живы древние обряды, песни и ремёсла. Вокруг — ущелья с реками, хребет Бабатаг и кишлаки, где время будто остановилось.", "imgs": ["https://images.unsplash.com/photo-1684561041901-5f50ee528b3f?w=900&h=600&fit=crop&auto=format", "https://images.unsplash.com/photo-1684561106377-7549c71eac8a?w=900&h=600&fit=crop&auto=format", "https://images.unsplash.com/photo-1684561107619-389ad42a6b75?w=900&h=600&fit=crop&auto=format", "/scenic/boysun-4.webp"], "credits": "Фото: Unsplash; Humoyun Mehridinov — Wikimedia Commons, CC BY-SA 4.0", "facts": [{"id": "scboys-f0", "label": "ЮНЕСКО", "value": "«Культурное пространство Бойсуна» — нематериальное наследие"}, {"id": "scboys-f1", "label": "Когда ехать", "value": "Май — фестиваль «Бойсун бахори»"}, {"id": "scboys-f2", "label": "Как добраться", "value": "Около 3 часов на машине от Термеза"}, {"id": "scboys-f3", "label": "Совет", "value": "Одевайтесь скромно — это традиционные кишлаки"}]},
   {"id": "scsukk", "name": "Кишлак Сукок", "city": "Ташкент", "type": "Природа", "rating": 0, "reviews": 0, "distance": "60 км", "entry": "Бесплатно", "hours": "Всегда", "audio": true, "qr": false, "img": "https://images.unsplash.com/photo-1784390436851-93055750219f?w=900&h=600&fit=crop&auto=format", "desc": "Горный кишлак в Паркентском районе: глиняные дома ступенями поднимаются по склону, вокруг сады и арыки, а за ними — снежные вершины. Место, где видно, как живут горные деревни.", "imgs": ["https://images.unsplash.com/photo-1784390436851-93055750219f?w=900&h=600&fit=crop&auto=format"], "credits": "Фото: Unsplash", "facts": [{"id": "scsukk-f0", "label": "Как добраться", "value": "Около часа на машине от Ташкента"}, {"id": "scsukk-f1", "label": "Лучшее время", "value": "Апрель–май — цветение, октябрь — золотая осень"}, {"id": "scsukk-f2", "label": "Совет", "value": "Спрашивайте разрешения, прежде чем фотографировать жителей"}]},
+];
+
+/**
+ * Места: исходный список, где карточки Самарканда обновлены по базе
+ * владельца, и новые места Самарканда (src/data/samarkand.ts).
+ */
+export const PLACES: Place[] = [
+  ...ИСХОДНЫЕ_МЕСТА.map((p) => ({ ...p, ...(САМАРКАНД_ОБНОВЛЕНИЯ[p.id] ?? {}) })),
+  ...САМАРКАНД_НОВЫЕ,
 ];
 
 export const POPULAR_CITIES = [
@@ -325,9 +335,9 @@ export const LANGS = ["🇬🇧 English","🇷🇺 Русский","🇺🇿 O'z
  * сравнение с русским словом не сошлось бы ни разу.
  */
 export const ТИПЫ_МЕСТ: Record<string, string[]> = {
-  "История": ["История", "Мавзолей", "Крепость", "Площадь", "Минарет", "Старый город"],
+  "История": ["История", "Мавзолей", "Крепость", "Площадь", "Минарет", "Старый город", "Памятник"],
   "Мечети": ["Мечеть"],
-  "Музеи": ["Музей", "Театр"],
+  "Музеи": ["Музей", "Театр", "Ремёсла"],
   // Развлекательные места: парки, аттракционы, кино. Пока в данных их нет —
   // типы нужны, чтобы заводить их в панели.
   "Развлечения": ["Развлечения", "Парк", "Аквапарк", "Кино"],

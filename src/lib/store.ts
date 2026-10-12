@@ -1,6 +1,7 @@
 import path from "node:path";
 import { SEED, ПОЗДНИЕ_СЕМЕНА } from "@/data/seed";
 import { ФОТО_ГОРОДОВ } from "@/data/content";
+import { обновитьМестаСамарканда } from "@/data/samarkand";
 import { создатьХранилище } from "./storage";
 import type { Content, ContentKey } from "@/lib/types";
 
@@ -53,6 +54,8 @@ export async function readContent(): Promise<Content> {
     );
     if (добавить.length) (итог as Record<ContentKey, Записи>)[ключ] = [...список, ...добавить];
   }
+  // Карточки Самарканда, которые редактор не правил, — по новой базе.
+  итог.places = обновитьМестаСамарканда(итог.places);
   return исправитьФото(дополнитьПодробности(итог));
 }
 

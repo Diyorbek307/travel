@@ -1,4 +1,7 @@
 import type { Locale } from "./i18n";
+import { ПЕРЕВОДЫ_САМАРКАНДА } from "./content-i18n-samarkand";
+import { ОПИСАНИЯ_САМАРКАНДА } from "./content-i18n-samarkand-desc";
+import { САМАРКАНД_ОПИСАНИЯ } from "@/data/samarkand";
 
 /**
  * Перевод содержимого — того, что вводит редактор, а не печатает код.
@@ -414,7 +417,15 @@ const ЗАПИСИ: [string, Строка][] = [
   с("Регистан: три медресе", { en: "Registan: three madrasahs", uz: "Registon: uch madrasa", zh: "雷吉斯坦：三座经学院", ko: "레기스탄: 세 마드라사", de: "Registan: drei Medresen", fr: "Reguistan : trois madrasas", ja: "レギスタン：三つのマドラサ", tr: "Registan: üç medrese", ar: "ريغستان: ثلاث مدارس" }),
 ];
 
-const СЛОВАРЬ: Map<string, Строка> = new Map(ЗАПИСИ);
+const СЛОВАРЬ: Map<string, Строка> = new Map([
+  ...ЗАПИСИ,
+  // Самарканд по базе владельца: названия, подписи и описания.
+  ...ПЕРЕВОДЫ_САМАРКАНДА,
+  ...Object.entries(ОПИСАНИЯ_САМАРКАНДА).flatMap(([id, п]): [string, Строка][] => {
+    const текст = САМАРКАНД_ОПИСАНИЯ[id];
+    return текст ? [[текст, п]] : [];
+  }),
+]);
 
 /** Переводы, которых нет в словаре: из панели и от автоперевода. */
 export type ЖивыеПереводы = Record<string, Строка>;
