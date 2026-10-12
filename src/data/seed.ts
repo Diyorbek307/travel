@@ -1,6 +1,7 @@
 import {
   ADS,
   EVENTS,
+  УБРАННЫЕ_МЕСТА,
   HOTELS,
   PLACES,
   POPULAR_CITIES,
@@ -82,7 +83,7 @@ const cities: ManagedCity[] = UZ_CITIES.map((name, i) => {
   };
 });
 
-const places: ManagedPlace[] = PLACES.map((p, i) => ({
+const places: ManagedPlace[] = PLACES.map((p, i): ManagedPlace => ({
   ...p,
   id: slug(p.id, i),
   region: p.city,
@@ -94,7 +95,7 @@ const places: ManagedPlace[] = PLACES.map((p, i) => ({
   tickets: p.tickets ?? типовыеБилеты(p),
   facts: p.facts ?? фактыМеста(p),
   imgs: p.imgs ?? галереяМеста(p),
-}));
+})).filter((p) => !УБРАННЫЕ_МЕСТА.has(p.id.replace(/^\d+-/, "")));
 
 const hotels: ManagedHotel[] = HOTELS.map((h, i) => {
   const priceFrom = priceNumber(h.price);

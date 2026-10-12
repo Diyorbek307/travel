@@ -202,6 +202,7 @@ const ЗАПИСИ: [string, Строка][] = [
   с("Транспорт в Самарканде?", { en: "Getting around Samarkand?", uz: "Samarqandda transport?", zh: "撒马尔罕的交通？", ko: "사마르칸트 교통편?", de: "Verkehr in Samarkand?", fr: "Transports à Samarcande ?", ja: "サマルカンドの交通は？", tr: "Semerkant'ta ulaşım?", ar: "التنقل في سمرقند؟" }),
   /* Достижения в профиле. */
   с("Открыл Самарканд", { en: "Discovered Samarkand", uz: "Samarqandni ochdi", zh: "探索撒马尔罕", ko: "사마르칸트 개척", de: "Samarkand entdeckt", fr: "Samarcande découverte", ja: "サマルカンド制覇", tr: "Semerkant'ı keşfetti", ar: "اكتشف سمرقند" }),
+  с("Исследователь Самарканда", { en: "Samarkand explorer", uz: "Samarqand tadqiqotchisi", zh: "撒马尔罕探索者", ko: "사마르칸트 탐험가", de: "Samarkand-Entdecker", fr: "Explorateur de Samarcande", ja: "サマルカンド探検家", tr: "Semerkant kâşifi", ar: "مستكشف سمرقند" }),
   с("Исследователь Бухары", { en: "Bukhara explorer", uz: "Buxoro tadqiqotchisi", zh: "布哈拉探索者", ko: "부하라 탐험가", de: "Buchara-Entdecker", fr: "Explorateur de Boukhara", ja: "ブハラ探検家", tr: "Buhara kâşifi", ar: "مستكشف بخارى" }),
   с("Шёлковый путь", { en: "Silk Road", uz: "Ipak yo'li", zh: "丝绸之路", ko: "실크로드", de: "Seidenstraße", fr: "Route de la soie", ja: "シルクロード", tr: "İpek Yolu", ar: "طريق الحرير" }),
   с("Знаток музеев", { en: "Museum buff", uz: "Muzeylar bilimdoni", zh: "博物馆达人", ko: "박물관 마니아", de: "Museumskenner", fr: "Amateur de musées", ja: "博物館通", tr: "Müze meraklısı", ar: "خبير المتاحف" }),

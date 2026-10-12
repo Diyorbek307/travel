@@ -21,7 +21,7 @@ async function цифры(): Promise<Цифры> {
     };
   } catch {
     // Приложение спит (бесплатный хостинг) — показываем последнее известное.
-    return { cities: 13, places: 60, venues: 66 };
+    return { cities: 13, places: 35, venues: 66 };
   }
 }
 
