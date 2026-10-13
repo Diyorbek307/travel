@@ -12,7 +12,8 @@
     "icons": "node scripts/generate-icons.mjs",
     "format": "prettier --write src",
     "format:check": "prettier --check src",
-    "test:api": "node scripts/api-check.mjs"
+    "test:api": "node scripts/api-check.mjs",
+    "postinstall": "patch-package || echo patch-package skipped"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.120.0",
@@ -45,6 +46,7 @@
     "@types/react-dom": "^19.1.9",
     "@types/three": "^0.180.0",
     "@types/web-push": "^3.6.4",
+    "patch-package": "^8.0.1",
     "postcss": "^8.5.6",
     "prettier": "2.8.8",
     "tailwindcss": "^4.1.13",
