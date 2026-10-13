@@ -337,3 +337,26 @@ export async function setReviewStatus(reviewId: string, status: ReviewStatus): P
     return [копия, true];
   });
 }
+
+/* ------------------------------------------------------------------ */
+/* Удаление аккаунта                                                  */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Стереть следы человека, который удалил аккаунт.
+ *
+ * Переписку с поддержкой и сигналы SOS (там его координаты) удаляем
+ * целиком. Отзывы остаются — они нужны заведению и другим туристам, — но
+ * без имени и без связи с человеком. Брони остаются записью у заведения
+ * (дата, гости), тоже без связи с человеком. Так и написано в политике
+ * конфиденциальности (/privacy).
+ */
+export async function забытьПользователя(userId: string): Promise<void> {
+  await поддержка.update((все) => [все.filter((t) => t.userId !== userId), undefined]);
+  await сигналы.update((все) => [все.filter((s) => s.userId !== userId), undefined]);
+  await отзывы.update((все) => [
+    все.map((r) => (r.userId === userId ? { ...r, userId: "", userName: undefined } : r)),
+    undefined,
+  ]);
+  await брони.update((все) => [все.map((b) => (b.userId === userId ? { ...b, userId: "" } : b)), undefined]);
+}

@@ -1,3 +1,6 @@
+import { забытьПользователя } from "@/lib/community";
+import { отписатьПользователя } from "@/lib/push";
+import { удалитьЗаявкиПользователя } from "@/lib/support-desk";
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { savePhoto, deletePhoto, фотоГодится } from "@/lib/photos";
@@ -82,7 +85,14 @@ export async function DELETE() {
   const userId = (await userBySession((await cookies()).get(SESSION_COOKIE)?.value))?.id;
   if (!userId) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
-  await deleteUser(userId);
+  // Вместе с аккаунтом — всё, что с ним связано (см. забытьПользователя).
+  await Promise.all([
+    deleteUser(userId),
+    deletePhoto(userId),
+    забытьПользователя(userId),
+    отписатьПользователя(userId),
+    удалитьЗаявкиПользователя(userId),
+  ]);
   const res = NextResponse.json({ ok: true }, { headers: { "Cache-Control": "no-store" } });
   res.cookies.set(SESSION_COOKIE, "", { httpOnly: true, path: "/", maxAge: 0 });
   return res;

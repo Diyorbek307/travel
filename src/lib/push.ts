@@ -187,3 +187,8 @@ export async function sendCampaign(к: Кампания, картинка?: stri
   }
   return ушло;
 }
+
+/** Все подписки человека — при удалении аккаунта. */
+export async function отписатьПользователя(userId: string): Promise<void> {
+  await подписки.update((все) => [все.filter((п) => п.userId !== userId), undefined]);
+}

@@ -15,6 +15,7 @@ on:
       - "public/**"
       - "capacitor.config.ts"
       - "package.json"
+      - "ios/**"
       - ".github/workflows/ios.yml"
   workflow_dispatch: {} # можно запускать вручную кнопкой в GitHub
 
@@ -32,18 +33,15 @@ jobs:
       - name: Установить зависимости
         run: npm ci
 
-      - name: Создать iOS-проект
-        # Без маскировки ошибок: если cap add упадёт — увидим это здесь, а
-        # не глубже. cap add уже копирует шаблон и ставит поды.
-        run: npx cap add ios
+      - name: Создать iOS-проект, если его нет
+        # Проект ios/ теперь лежит в репозитории (с иконками, правами на
+        # геолокацию и камеру в Info.plist) — cap add нужен, только если
+        # папку когда-нибудь удалят.
+        run: "[ -d ios/App ] || npx cap add ios"
 
       - name: Синхронизировать
         run: npx cap sync ios
 
-      - name: Иконки приложения из assets/
-        # iOS-проект создаётся здесь заново, поэтому значок ставим тем же
-        # источником (assets/icon.png), что и на Android — бренд один.
-        run: npx @capacitor/assets generate --ios --iconBackgroundColor "#14402c" || true
 
       - name: Собрать под симулятор (без подписи)
         # Capacitor 8 использует Swift Package Manager, а не CocoaPods:

@@ -270,3 +270,8 @@ export async function ответПомощника(
     return null;
   }
 }
+
+/** Заявки об ошибках человека — при удалении аккаунта (там его устройство). */
+export async function удалитьЗаявкиПользователя(userId: string): Promise<void> {
+  await ошибки.update((все) => [все.filter((з) => з.userId !== userId), undefined]);
+}

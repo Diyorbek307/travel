@@ -7,6 +7,8 @@
  * Тексты честные и общие: без обещаний, которых приложение не держит.
  */
 
+import { ПОЛИТИКА } from "@/app/privacy/texts";
+
 export type Локаль = string;
 
 type Блок = { q: string; a: string };
@@ -23,22 +25,22 @@ const FAQ: ТриFAQ = {
   ru: [
     { q: "Нужен ли интернет?", a: "Для карт, погоды и поиска — да. Скачанные аудиогиды и офлайн-карты работают без сети." },
     { q: "Как включить аудиогид?", a: "Откройте место и нажмите «Слушать», либо наведите камеру на QR-табличку у объекта." },
-    { q: "Как построить маршрут?", a: "На карточке места нажмите «Маршрут» — откроется навигатор с проложенным путём." },
-    { q: "Что даёт Premium?", a: "Убирает рекламу и открывает все аудиогиды и офлайн-карты без ограничений." },
+    { q: "Как построить маршрут?", a: "В карточке места в блоке «Как добраться» выберите «Пешком» или «На машине» и нажмите «Начать навигацию» — приложение поведёт по шагам и голосом." },
+    { q: "Что даёт Premium?", a: "Убирает рекламу и даёт скидки и акции партнёров. Аудиогиды и скачивание городов для работы без интернета бесплатны для всех." },
     { q: "Как сменить язык или валюту?", a: "Профиль → Настройки: язык вверху, валюта — в разделе «Внешний вид»." },
   ],
   en: [
     { q: "Do I need the internet?", a: "For maps, weather and search — yes. Downloaded audio guides and offline maps work without a connection." },
     { q: "How do I start an audio guide?", a: "Open a place and tap “Listen”, or point your camera at the QR plate next to the site." },
-    { q: "How do I build a route?", a: "On a place card tap “Route” — your navigator opens with the path drawn." },
-    { q: "What does Premium give me?", a: "It removes ads and unlocks all audio guides and offline maps." },
+    { q: "How do I build a route?", a: "On a place card, under “How to get there”, choose “On foot” or “By car” and tap “Start navigation” — the app guides you turn by turn with voice." },
+    { q: "What does Premium give me?", a: "It removes ads and gives you partner discounts and offers. Audio guides and downloading cities for offline use are free for everyone." },
     { q: "How do I change language or currency?", a: "Profile → Settings: language at the top, currency under “Appearance”." },
   ],
   uz: [
     { q: "Internet kerakmi?", a: "Xarita, ob-havo va qidiruv uchun — ha. Yuklab olingan audiogidlar va offline xaritalar tarmoqsiz ishlaydi." },
     { q: "Audiogidni qanday yoqaman?", a: "Joyni oching va «Tinglash»ni bosing yoki kamerani obyekt yonidagi QR-taxtaga qarating." },
-    { q: "Marshrutni qanday tuzaman?", a: "Joy kartochkasida «Marshrut»ni bosing — navigator yoʻl bilan ochiladi." },
-    { q: "Premium nima beradi?", a: "Reklamani olib tashlaydi va barcha audiogid hamda offline xaritalarni ochadi." },
+    { q: "Marshrutni qanday tuzaman?", a: "Joy kartochkasidagi «Qanday borish mumkin» blokida «Piyoda» yoki «Mashinada»ni tanlang va «Navigatsiyani boshlash»ni bosing — ilova qadamma-qadam ovoz bilan olib boradi." },
+    { q: "Premium nima beradi?", a: "Reklamani olib tashlaydi va hamkorlarning chegirma hamda aksiyalarini beradi. Audiogidlar va shaharlarni internetsiz ishlatish uchun yuklab olish hamma uchun bepul." },
     { q: "Til yoki valyutani qanday almashtiraman?", a: "Profil → Sozlamalar: til yuqorida, valyuta «Tashqi koʻrinish»da." },
   ],
 };
@@ -70,32 +72,20 @@ const TERMS: Три = {
     "Aloqa: «Qoʻllab-quvvatlashga yozish» boʻlimi.",
 };
 
-const PRIVACY: Три = {
-  ru:
-    "Политика конфиденциальности HelloUZ\n\n" +
-    "Мы бережно относимся к данным и собираем только необходимое.\n\n" +
-    "1. Аккаунт: имя, почта и (по желанию) страна и телефон. Пароль хранится в виде хеша — в открытом виде его нет ни у кого.\n\n" +
-    "2. На устройстве: язык, валюта, тема, избранное, маршрут и посещённые города. Эти данные не покидают телефон.\n\n" +
-    "3. Геолокация используется только пока открыто приложение — чтобы показать расстояние и ближайшие места. Мы не ведём историю перемещений.\n\n" +
-    "4. Погоду и курсы валют получаем от внешних сервисов; им уходит только сам запрос, без ваших данных.\n\n" +
-    "5. Вы можете скачать свои данные или удалить аккаунт в разделе «Аккаунт».",
-  en:
-    "HelloUZ Privacy Policy\n\n" +
-    "We treat data carefully and collect only what's needed.\n\n" +
-    "1. Account: name, email and (optionally) country and phone. The password is stored as a hash — no one holds it in the clear.\n\n" +
-    "2. On the device: language, currency, theme, favourites, route and visited cities. This data never leaves the phone.\n\n" +
-    "3. Location is used only while the app is open — to show distance and nearby places. We keep no movement history.\n\n" +
-    "4. Weather and exchange rates come from external services; only the request is sent, without your data.\n\n" +
-    "5. You can download your data or delete your account in the “Account” section.",
-  uz:
-    "HelloUZ maxfiylik siyosati\n\n" +
-    "Maʼlumotlarga ehtiyotkorlik bilan qaraymiz va faqat zarurini yigʻamiz.\n\n" +
-    "1. Hisob: ism, e-pochta va (ixtiyoriy) davlat hamda telefon. Parol hash koʻrinishida saqlanadi — ochiq holda hech kimda yoʻq.\n\n" +
-    "2. Qurilmada: til, valyuta, mavzu, sevimlilar, marshrut va tashrif buyurilgan shaharlar. Bu maʼlumot telefondan chiqmaydi.\n\n" +
-    "3. Joylashuv faqat ilova ochiq turganda ishlatiladi — masofa va yaqin joylarni koʻrsatish uchun. Harakat tarixini yuritmaymiz.\n\n" +
-    "4. Ob-havo va valyuta kurslarini tashqi xizmatlardan olamiz; ularga faqat soʻrov ketadi, maʼlumotlaringizsiz.\n\n" +
-    "5. «Hisob» boʻlimida maʼlumotlaringizni yuklab olishingiz yoki hisobni oʻchirishingiz mumkin.",
-};
+/**
+ * Политика внутри приложения — тот же текст, что на странице /privacy
+ * (src/app/privacy/texts.ts): один источник, чтобы они не разошлись.
+ */
+function текстПолитики(lang: Локаль): string {
+  const п = ПОЛИТИКА[lang === "en" || lang === "uz" ? lang : "ru"];
+  return [
+    п.название,
+    п.обновлено,
+    п.вступление,
+    ...п.разделы.map((р) => `${р.заголовок}\n${р.пункты.map((x) => `• ${x}`).join("\n")}`),
+    п.контакт(null),
+  ].join("\n\n");
+}
 
 export function faqТексты(lang: Локаль): Блок[] {
   return выбрать(FAQ, lang);
@@ -104,5 +94,5 @@ export function условияТекст(lang: Локаль): string {
   return выбрать(TERMS, lang);
 }
 export function политикаТекст(lang: Локаль): string {
-  return выбрать(PRIVACY, lang);
+  return текстПолитики(lang);
 }
