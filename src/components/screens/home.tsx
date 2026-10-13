@@ -325,19 +325,21 @@ export function HomeScreen({
       {/* Достопримечательности по интересам */}
       <CardDeck places={местаПоИнтересам} onPlace={onPlace} />
 
-      {/* События */}
-      <div className="pt-5">
-        <div className="flex items-center justify-between mb-3 px-4">
-          <p className="font-bold text-base" style={{ color: TEXT, fontFamily: "var(--font-heading)" }}>
-            🎉 {t("home_events")}
-          </p>
+      {/* События — когда они есть: демо-события убраны, свои заводят в панели. */}
+      {EVENTS.length > 0 && (
+        <div className="pt-5">
+          <div className="flex items-center justify-between mb-3 px-4">
+            <p className="font-bold text-base" style={{ color: TEXT, fontFamily: "var(--font-heading)" }}>
+              🎉 {t("home_events")}
+            </p>
+          </div>
+          <div className="flex gap-3 overflow-x-auto hide-scroll px-4 pb-1">
+            {EVENTS.map((ev) => (
+              <EventCard key={ev.name} ev={ev} t={t} трК={трК} onToast={onToast} />
+            ))}
+          </div>
         </div>
-        <div className="flex gap-3 overflow-x-auto hide-scroll px-4 pb-1">
-          {EVENTS.map((ev) => (
-            <EventCard key={ev.name} ev={ev} t={t} трК={трК} onToast={onToast} />
-          ))}
-        </div>
-      </div>
+      )}
 
       {/* Такси */}
       <TaxiOrder />
@@ -346,103 +348,105 @@ export function HomeScreen({
       <AdSpotlight isPremium={isPremium} cities={городРекл ? [городРекл] : undefined} />
       <AdShelf isPremium={isPremium} />
 
-      {/* Гостиницы */}
-      <div className="pt-5">
-        <div className="flex items-center justify-between mb-3 px-4">
-          <p className="font-bold text-base" style={{ color: TEXT, fontFamily: "var(--font-heading)" }}>
-            {t("home_flash_hotels")}
-          </p>
-          <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-            <span className="text-xs font-bold text-red-500">LIVE</span>
+      {/* Гостиницы — когда они есть: демо-гостиницы убраны, свои заводят в панели. */}
+      {HOTELS.length > 0 && (
+        <div className="pt-5">
+          <div className="flex items-center justify-between mb-3 px-4">
+            <p className="font-bold text-base" style={{ color: TEXT, fontFamily: "var(--font-heading)" }}>
+              {t("home_flash_hotels")}
+            </p>
+            <div className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+              <span className="text-xs font-bold text-red-500">LIVE</span>
+            </div>
+          </div>
+          <div className="flex gap-3 overflow-x-auto hide-scroll px-4 pb-1">
+            {HOTELS.map((h) => (
+              <button
+                key={h.id}
+                onClick={() => onHotel(h)}
+                className="lazy-card flex-shrink-0 relative rounded-3xl overflow-hidden text-left active:scale-95 transition-all"
+                style={{ width: 188, height: 270, background: "#111", flexShrink: 0 }}
+              >
+                <img src={h.img} alt={h.name} className="absolute inset-0 w-full h-full object-cover" />
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background:
+                      "linear-gradient(to top,rgba(0,0,0,0.95) 0%,rgba(0,0,0,0.2) 50%,transparent 100%)",
+                  }}
+                />
+                <div className="absolute top-3 left-3">
+                  <span
+                    className="text-[8px] font-bold px-2 py-0.5 rounded-full"
+                    style={{ background: "rgba(233,196,106,0.92)", color: ON_GOLD }}
+                  >
+                    {h.tag}
+                  </span>
+                </div>
+                <div className="absolute bottom-0 left-0 right-0 p-3">
+                  <p className="text-[8px] mb-0.5" style={{ color: "rgba(255,255,255,0.45)" }}>
+                    📍 {трК(h.city)}
+                  </p>
+                  <p
+                    className="text-white font-bold leading-tight mb-1.5"
+                    style={{ fontSize: 13, fontFamily: "var(--font-heading)" }}
+                  >
+                    {h.name}
+                  </p>
+                  <div
+                    className="flex gap-3 pb-2 mb-2 border-b"
+                    style={{ borderColor: "rgba(255,255,255,0.1)" }}
+                  >
+                    <div>
+                      <p className="text-white font-bold text-[10px]">{h.rating}★</p>
+                      <p className="text-[7px]" style={{ color: "rgba(255,255,255,0.4)" }}>
+                        {t("card_rating")}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-white font-bold text-[10px]">{h.reviews}</p>
+                      <p className="text-[7px]" style={{ color: "rgba(255,255,255,0.4)" }}>
+                        {t("d_reviews_word")}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-white font-bold text-[10px]">{h.facilities.length}</p>
+                      <p className="text-[7px]" style={{ color: "rgba(255,255,255,0.4)" }}>
+                        {t("home_services")}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-[7px]" style={{ color: "rgba(255,255,255,0.4)" }}>
+                        {t("home_per_night")}
+                      </p>
+                      <p className="text-white font-bold text-sm">{дг.цена(h.price)}</p>
+                    </div>
+                    <div
+                      className="w-8 h-8 rounded-full flex items-center justify-center"
+                      style={{ background: GOLD }}
+                    >
+                      <svg
+                        className="rtl-flip"
+                        width="11"
+                        height="11"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke={ON_GOLD}
+                        strokeWidth="2.5"
+                      >
+                        <polyline points="9 18 15 12 9 6" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </button>
+            ))}
           </div>
         </div>
-        <div className="flex gap-3 overflow-x-auto hide-scroll px-4 pb-1">
-          {HOTELS.map((h) => (
-            <button
-              key={h.id}
-              onClick={() => onHotel(h)}
-              className="lazy-card flex-shrink-0 relative rounded-3xl overflow-hidden text-left active:scale-95 transition-all"
-              style={{ width: 188, height: 270, background: "#111", flexShrink: 0 }}
-            >
-              <img src={h.img} alt={h.name} className="absolute inset-0 w-full h-full object-cover" />
-              <div
-                className="absolute inset-0"
-                style={{
-                  background:
-                    "linear-gradient(to top,rgba(0,0,0,0.95) 0%,rgba(0,0,0,0.2) 50%,transparent 100%)",
-                }}
-              />
-              <div className="absolute top-3 left-3">
-                <span
-                  className="text-[8px] font-bold px-2 py-0.5 rounded-full"
-                  style={{ background: "rgba(233,196,106,0.92)", color: ON_GOLD }}
-                >
-                  {h.tag}
-                </span>
-              </div>
-              <div className="absolute bottom-0 left-0 right-0 p-3">
-                <p className="text-[8px] mb-0.5" style={{ color: "rgba(255,255,255,0.45)" }}>
-                  📍 {трК(h.city)}
-                </p>
-                <p
-                  className="text-white font-bold leading-tight mb-1.5"
-                  style={{ fontSize: 13, fontFamily: "var(--font-heading)" }}
-                >
-                  {h.name}
-                </p>
-                <div
-                  className="flex gap-3 pb-2 mb-2 border-b"
-                  style={{ borderColor: "rgba(255,255,255,0.1)" }}
-                >
-                  <div>
-                    <p className="text-white font-bold text-[10px]">{h.rating}★</p>
-                    <p className="text-[7px]" style={{ color: "rgba(255,255,255,0.4)" }}>
-                      {t("card_rating")}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-white font-bold text-[10px]">{h.reviews}</p>
-                    <p className="text-[7px]" style={{ color: "rgba(255,255,255,0.4)" }}>
-                      {t("d_reviews_word")}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-white font-bold text-[10px]">{h.facilities.length}</p>
-                    <p className="text-[7px]" style={{ color: "rgba(255,255,255,0.4)" }}>
-                      {t("home_services")}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-[7px]" style={{ color: "rgba(255,255,255,0.4)" }}>
-                      {t("home_per_night")}
-                    </p>
-                    <p className="text-white font-bold text-sm">{дг.цена(h.price)}</p>
-                  </div>
-                  <div
-                    className="w-8 h-8 rounded-full flex items-center justify-center"
-                    style={{ background: GOLD }}
-                  >
-                    <svg
-                      className="rtl-flip"
-                      width="11"
-                      height="11"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke={ON_GOLD}
-                      strokeWidth="2.5"
-                    >
-                      <polyline points="9 18 15 12 9 6" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
+      )}
 
       {/* Рестораны — когда они есть: демо-заведения убраны, свои заводят в панели. */}
       {RESTAURANTS.length > 0 && (

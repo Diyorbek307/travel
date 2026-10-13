@@ -2,7 +2,6 @@ import {
   ADS,
   EVENTS,
   УБРАННЫЕ_МЕСТА,
-  УБРАННЫЕ_ЗАВЕДЕНИЯ,
   HOTELS,
   PLACES,
   POPULAR_CITIES,
@@ -84,7 +83,7 @@ const cities: ManagedCity[] = UZ_CITIES.map((name, i) => {
   };
 });
 
-const places: ManagedPlace[] = PLACES.map((p, i): ManagedPlace => ({
+const всеМеста: ManagedPlace[] = PLACES.map((p, i): ManagedPlace => ({
   ...p,
   id: slug(p.id, i),
   region: p.city,
@@ -96,9 +95,9 @@ const places: ManagedPlace[] = PLACES.map((p, i): ManagedPlace => ({
   tickets: p.tickets ?? типовыеБилеты(p),
   facts: p.facts ?? фактыМеста(p),
   imgs: p.imgs ?? галереяМеста(p),
-})).filter((p) => !УБРАННЫЕ_МЕСТА.has(p.id.replace(/^\d+-/, "")));
+}));
 
-const hotels: ManagedHotel[] = HOTELS.map((h, i) => {
+const всеГостиницы: ManagedHotel[] = HOTELS.map((h, i) => {
   const priceFrom = priceNumber(h.price);
   // Звёзды по цене: дешёвые — три, дороже сотни — пять.
   const stars = priceFrom >= 110 ? 5 : priceFrom >= 70 ? 4 : 3;
@@ -120,7 +119,7 @@ const hotels: ManagedHotel[] = HOTELS.map((h, i) => {
   };
 });
 
-const restaurants: ManagedRestaurant[] = RESTAURANTS.map((r, i): ManagedRestaurant => {
+const всеРестораны: ManagedRestaurant[] = RESTAURANTS.map((r, i): ManagedRestaurant => {
   const from = priceNumber(r.price);
   return {
     ...r,
@@ -142,7 +141,7 @@ const restaurants: ManagedRestaurant[] = RESTAURANTS.map((r, i): ManagedRestaura
     imgs: галереяРесторана(r),
     facts: фактыРесторана(r),
   };
-}).filter((r) => !УБРАННЫЕ_ЗАВЕДЕНИЯ.has(r.id.replace(/^\d+-/, "")));
+});
 
 /**
  * Гиды туров — демонстрационные имена, чтобы в «Экскурсиях» было видно,
@@ -170,7 +169,7 @@ const ГИДЫ: Record<string, string> = {
   r19: "Дилшод Каримов",
 };
 
-const routes: ManagedRoute[] = ROUTES.map((r, i) => ({
+const всеЭкскурсии: ManagedRoute[] = ROUTES.map((r, i) => ({
   ...r,
   id: slug(r.id, i),
   // Цена маршрута — из подписи вида «5 мест · 12 км · ~$26». Только
@@ -188,7 +187,7 @@ const routes: ManagedRoute[] = ROUTES.map((r, i) => ({
   status: "active",
 }));
 
-const events: ManagedEvent[] = EVENTS.map((e, i) => ({
+const всеСобытия: ManagedEvent[] = EVENTS.map((e, i) => ({
   id: slug(e.name, i),
   name: e.name,
   city: e.city,
@@ -229,6 +228,34 @@ const ads: ManagedAd[] = ADS.map((a) => ({
  * молча ничего не воспроизводящей. Раздел наполняется через панель.
  */
 const audio: ManagedAudio[] = [];
+
+/**
+ * Демо-записи, убранные по просьбе владельца (октябрь 2026): в приложении
+ * только то, что есть в его базе (папка import/), — пока это места
+ * Самарканда. Гостиницы, рестораны и бары, экскурсии и события были
+ * демонстрационными и убраны целиком; места других городов — тоже.
+ * Города оставлены — так решил владелец.
+ *
+ * Записи по-прежнему строятся полностью: id семени — «номер-исходный id»,
+ * и удаление из списков сдвинуло бы id Самарканда, а с ними отзывы,
+ * избранное и штампы. Убираются они здесь и из сохранённого на сайте
+ * (lib/store.ts). Заведённое в панели имеет свои id и остаётся.
+ */
+export const УБРАННЫЕ_СЕМЕНА: Partial<Record<ContentKey, ReadonlySet<string>>> = {
+  places: new Set(всеМеста.filter((p) => УБРАННЫЕ_МЕСТА.has(p.id.replace(/^\d+-/, ""))).map((x) => x.id)),
+  hotels: new Set(всеГостиницы.map((x) => x.id)),
+  restaurants: new Set(всеРестораны.map((x) => x.id)),
+  routes: new Set(всеЭкскурсии.map((x) => x.id)),
+  events: new Set(всеСобытия.map((x) => x.id)),
+};
+const оставить = <T extends { id: string }>(ключ: ContentKey, список: T[]) =>
+  список.filter((x) => !УБРАННЫЕ_СЕМЕНА[ключ]?.has(x.id));
+
+const places = оставить("places", всеМеста);
+const hotels = оставить("hotels", всеГостиницы);
+const restaurants = оставить("restaurants", всеРестораны);
+const routes = оставить("routes", всеЭкскурсии);
+const events = оставить("events", всеСобытия);
 
 export const SEED: Content = { cities, places, hotels, restaurants, routes, events, ads, audio };
 

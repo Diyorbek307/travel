@@ -209,6 +209,11 @@ export function MapScreen({
         )}
         {mode === "routes" && (
           <div className="p-4 space-y-3">
+            {ROUTES.length === 0 && (
+              <p className="py-10 text-center text-sm" style={{ color: MUTED }}>
+                {t("explore_empty")}
+              </p>
+            )}
             {ROUTES.map((r) => (
               <button
                 key={r.id}
