@@ -1,5 +1,6 @@
 "use client";
 
+import { замолчать, сказать, языкГолоса } from "@/lib/speech";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { ACCENT_FILL, ACCENT_SOFT, BORDER, CREAM, GREEN, MUTED, TEXT, WHITE } from "@/lib/theme";
@@ -632,49 +633,28 @@ export function ПолезноЗнать({ факты }: { факты: Fact[] })
  * без файлов и без сети, а когда редактор загрузит настоящую запись,
  * карточка покажет её вместо этого блока.
  */
-const ГОЛОС: Record<string, string> = {
-  ru: "ru-RU",
-  en: "en-US",
-  uz: "uz-UZ",
-  zh: "zh-CN",
-  ko: "ko-KR",
-  de: "de-DE",
-  fr: "fr-FR",
-  ja: "ja-JP",
-  tr: "tr-TR",
-  ar: "ar-SA",
-};
-
 export function АудиогидГолосом({ заголовок, текст }: { заголовок: string; текст: string }) {
   const { t, lang } = useT();
   const [играет, setИграет] = useState(false);
   const [нет, setНет] = useState(false);
 
   // Ушёл с карточки — рассказ замолкает, а не продолжает на фоне.
-  useEffect(() => () => window.speechSynthesis?.cancel(), []);
+  useEffect(() => () => замолчать(), []);
 
-  function переключить() {
-    const синтез = typeof window !== "undefined" ? window.speechSynthesis : undefined;
-    if (!синтез) {
-      setНет(true);
-      return;
-    }
+  async function переключить() {
     if (играет) {
-      синтез.cancel();
+      замолчать();
       setИграет(false);
       return;
     }
-    const речь = new SpeechSynthesisUtterance(`${заголовок}. ${текст}`);
-    речь.lang = ГОЛОС[lang] ?? "en-US";
-    // Голос нужного языка, если он есть в системе; нет — браузер выберет сам.
-    const голос = синтез.getVoices().find((г) => г.lang.startsWith(lang));
-    if (голос) речь.voice = голос;
-    речь.rate = 0.95;
-    речь.onend = () => setИграет(false);
-    речь.onerror = () => setИграет(false);
-    синтез.cancel();
-    синтез.speak(речь);
+    // Голос языка интерфейса — в браузере или нативный в приложении.
+    const код = await языкГолоса(lang);
+    if (!код) {
+      setНет(true);
+      return;
+    }
     setИграет(true);
+    void сказать(`${заголовок}. ${текст}`, код, { скорость: 0.95, конец: () => setИграет(false) });
   }
 
   return (

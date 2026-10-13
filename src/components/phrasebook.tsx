@@ -1,5 +1,6 @@
 "use client";
 
+import { замолчать, сказать as произнести, языкГолоса } from "@/lib/speech";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { ACCENT_FILL, BORDER, CREAM, GREEN, MUTED, SURFACE, TEXT, WHITE } from "@/lib/theme";
@@ -10,7 +11,7 @@ import { РАЗГОВОРНИК, type Фраза } from "@/data/phrases";
 /**
  * Разговорник с озвучкой.
  *
- * Голос — встроенный в телефон (speechSynthesis): работает без интернета
+ * Голос — встроенный в телефон (lib/speech.ts): работает без интернета
  * и ничего не стоит. Узбекского голоса на большинстве телефонов нет —
  * тогда читаем турецким: узбекская латиница по звучанию к нему ближе
  * всех, и таксист поймёт. Русский голос есть почти везде.
@@ -27,23 +28,6 @@ const ПОДПИСИ: Record<string, TKey> = {
   help: "pb_help",
 };
 
-/** Подходящий голос: сам язык, для узбекского — турецкий как запасной. */
-function голос(язык: "uz" | "ru"): SpeechSynthesisVoice | null {
-  const все = window.speechSynthesis.getVoices();
-  const найти = (код: string) => все.find((v) => v.lang.toLowerCase().startsWith(код)) ?? null;
-  return язык === "uz" ? найти("uz") ?? найти("tr") : найти("ru");
-}
-
-function сказать(текст: string, язык: "uz" | "ru") {
-  const речь = window.speechSynthesis;
-  речь.cancel();
-  const фраза = new SpeechSynthesisUtterance(текст);
-  const г = голос(язык);
-  if (г) фраза.voice = г;
-  фраза.lang = г?.lang ?? (язык === "uz" ? "uz-UZ" : "ru-RU");
-  фраза.rate = 0.85;
-  речь.speak(фраза);
-}
 
 export function Разговорник() {
   const { t, lang } = useT();
@@ -52,17 +36,20 @@ export function Разговорник() {
   // Голоса у браузера появляются не сразу — ждём список. Кнопку 🔊
   // показываем только там, где есть подходящий голос: чужой голос
   // исковеркал бы фразу так, что её не поймут.
-  const [голоса, setГолоса] = useState({ uz: false, ru: false });
+  // Код голоса для каждого языка (для узбекского — турецкий как запасной).
+  const [голоса, setГолоса] = useState<{ uz: string | null; ru: string | null }>({ uz: null, ru: null });
   useEffect(() => {
-    if (!("speechSynthesis" in window)) return;
-    const обновить = () => setГолоса({ uz: Boolean(голос("uz")), ru: Boolean(голос("ru")) });
-    обновить();
-    window.speechSynthesis.addEventListener("voiceschanged", обновить);
+    let жив = true;
+    void Promise.all([языкГолоса("uz", "tr"), языкГолоса("ru")]).then(([uz, ru]) => жив && setГолоса({ uz, ru }));
     return () => {
-      window.speechSynthesis.removeEventListener("voiceschanged", обновить);
-      window.speechSynthesis.cancel();
+      жив = false;
+      замолчать();
     };
   }, []);
+  const сказать = (текст: string, язык: "uz" | "ru") => {
+    const код = голоса[язык];
+    if (код) void произнести(текст, код, { скорость: 0.85 });
+  };
 
   const смысл = (ф: Фраза) => (lang === "ru" ? ф.ru : lang === "uz" ? ф.uz : ф.смысл[lang]);
   const фразы = РАЗГОВОРНИК.find((р) => р.id === раздел)?.фразы ?? [];

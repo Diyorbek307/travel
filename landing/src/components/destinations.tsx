@@ -19,6 +19,8 @@ interface Город {
   img: string;
   /** Какую часть кадра держать в окне. */
   позиция?: string;
+  /** Автор и лицензия — для фото с Wikimedia Commons (CC BY-SA требует подписи). */
+  автор?: string;
 }
 
 const ГОРОДА: Город[] = [
@@ -140,7 +142,10 @@ const ГОРОДА: Город[] = [
       tr: "İçan Kale — surlar içinde bir şehir, yaşayan bir açık hava müzesi.",
       ar: "إيتشان قلعة — مدينة داخل الأسوار ومتحف حيّ في الهواء الطلق.",
     },
-    img: фото("1654861857666-1e8c438cbe4a"),
+    // Прежний снимок был не из Хивы (похоже, Хазрати Имам в Ташкенте).
+    // Мавзолей Пахлавана Махмуда и минарет Ислам-Ходжа, Ичан-Кала.
+    img: "/cities/khiva.webp",
+    автор: "Фото: Panpanchik, CC BY-SA 4.0, Wikimedia Commons",
   },
   {
     id: "tashkent",
@@ -265,6 +270,9 @@ export default function Destinations() {
           )}
         </div>
       ))}
+      {город.автор && (
+        <p className="absolute bottom-2 right-3 z-10 text-[10px] text-white/55">{город.автор}</p>
+      )}
       <div
         className="absolute inset-0"
         style={{

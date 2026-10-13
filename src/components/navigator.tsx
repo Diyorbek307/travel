@@ -5,7 +5,7 @@ import RealMap from "@/components/real-map";
 import { useT } from "@/components/lang-provider";
 import { useДистанция } from "@/lib/distance";
 import { useSettings } from "@/lib/settings";
-import type { Locale } from "@/lib/i18n";
+import { замолчать, сказать as произнести, языкГолоса } from "@/lib/speech";
 import type { Маршрут, Шаг } from "@/lib/routing";
 import {
   круглыеМетры,
@@ -30,23 +30,12 @@ import type { Geo } from "@/lib/types";
  * говорит заранее и в самый момент. Ушёл с дороги дальше допуска —
  * маршрут пересчитывается от того места, где человек сейчас.
  *
- * Голос — синтез речи самого телефона. В браузерах он есть, а во
- * встроенном окне Android-приложения его может не оказаться; тогда
- * переключателя голоса просто нет, а на поворотах телефон вибрирует.
+ * Голос — синтез речи самого телефона (lib/speech.ts): в браузере —
+ * speechSynthesis, в приложении — нативный модуль, потому что во
+ * встроенном окне Android синтеза речи может не быть. Нет голоса языка —
+ * переключателя голоса нет, а на поворотах телефон вибрирует.
  */
 
-const КОД_РЕЧИ: Record<Locale, string> = {
-  en: "en-US",
-  ru: "ru-RU",
-  uz: "uz-UZ",
-  zh: "zh-CN",
-  ko: "ko-KR",
-  de: "de-DE",
-  fr: "fr-FR",
-  ja: "ja-JP",
-  tr: "tr-TR",
-  ar: "ar-SA",
-};
 const КЛЮЧ_ГОЛОСА = "uzup.nav.voice";
 
 /** Цель достигнута, когда до неё осталось столько метров. */
@@ -206,38 +195,47 @@ export default function Навигатор({
 
   /* ---------- голос ---------- */
 
+  // Код голоса («ru-RU»), если в телефоне есть голос этого языка.
+  const кодГолоса = useRef<string | null>(null);
   useEffect(() => {
-    const есть = typeof window !== "undefined" && "speechSynthesis" in window;
-    setГолосЕсть(есть);
+    let жив = true;
+    void языкГолоса(lang).then((код) => {
+      if (!жив) return;
+      кодГолоса.current = код;
+      setГолосЕсть(Boolean(код));
+      // Первая фраза — сразу после нажатия «Начать», когда голос нашёлся.
+      if (код && !сказаноСтарт.current) {
+        сказаноСтарт.current = true;
+        сказать(t("nav_go"));
+      }
+    });
     try {
       if (localStorage.getItem(КЛЮЧ_ГОЛОСА) === "off") setГолос(false);
     } catch {
       // Приватный режим — голос просто включён.
     }
+    return () => {
+      жив = false;
+    };
+    // Язык за время поездки не меняется.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  const сказаноСтарт = useRef(false);
 
   const голосРеф = useRef(голос);
   голосРеф.current = голос;
 
   function сказать(текст: string) {
-    if (!голосРеф.current || typeof window === "undefined" || !("speechSynthesis" in window)) return;
-    const синтез = window.speechSynthesis;
-    const голоса = синтез.getVoices();
-    const свой = голоса.find((г) => г.lang.replace("_", "-").toLowerCase().startsWith(lang));
     // Голоса этого языка в телефоне нет — молчим: английский голос,
     // читающий узбекские слова, только запутает.
-    if (голоса.length > 0 && !свой) return;
-    const фраза = new SpeechSynthesisUtterance(текст);
-    фраза.lang = КОД_РЕЧИ[lang];
-    if (свой) фраза.voice = свой;
-    синтез.cancel();
-    синтез.speak(фраза);
+    if (!голосРеф.current || !кодГолоса.current) return;
+    void произнести(текст, кодГолоса.current);
   }
 
   function переключитьГолос() {
     const новое = !голос;
     setГолос(новое);
-    if (!новое) window.speechSynthesis?.cancel();
+    if (!новое) замолчать();
     try {
       localStorage.setItem(КЛЮЧ_ГОЛОСА, новое ? "on" : "off");
     } catch {
@@ -281,16 +279,10 @@ export default function Навигатор({
     return () => {
       document.removeEventListener("visibilitychange", снова);
       void замок?.release().catch(() => undefined);
-      window.speechSynthesis?.cancel();
+      замолчать();
     };
   }, []);
 
-  // Первая фраза — сразу после нажатия «Начать».
-  useEffect(() => {
-    сказать(t("nav_go"));
-    // Только при старте.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   /* ---------- ведение ---------- */
 

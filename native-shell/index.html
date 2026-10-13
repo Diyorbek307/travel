@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>HelloUZ</title>
+<!--
+  Страница внутри приложения на случай, когда сайт не открылся:
+  нет сети или сервер ещё просыпается (бесплатный тариф Render).
+  Capacitor показывает её сам (server.errorPath в capacitor.config.ts).
+  Кнопка «Повторить» снова открывает живой сайт.
+-->
+<style>
+  :root { color-scheme: light dark; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    display: flex; align-items: center; justify-content: center;
+    background: #0a1110; color: #e8f1ef;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    padding: 24px; box-sizing: border-box; text-align: center;
+  }
+  main { max-width: 340px; }
+  img { width: 88px; height: 88px; border-radius: 22px; }
+  h1 { font-size: 22px; margin: 22px 0 8px; }
+  p { color: #8a9b96; line-height: 1.5; margin: 0 0 26px; }
+  button {
+    border: 0; border-radius: 16px; padding: 14px 28px; font-size: 16px; font-weight: 700;
+    background: #0ea69f; color: #fff; width: 100%;
+  }
+  button:active { transform: scale(0.98); }
+</style>
+</head>
+<body>
+<main>
+  <img src="icon-192.png" alt="HelloUZ">
+  <h1 id="t">No connection</h1>
+  <p id="s">HelloUZ will open as soon as the internet is back. Cities you downloaded work offline once the app has loaded.</p>
+  <button id="b" type="button">Try again</button>
+</main>
+<script>
+  var T = {
+    en: ["No connection", "HelloUZ will open as soon as the internet is back. Cities you downloaded work offline once the app has loaded.", "Try again"],
+    ru: ["Нет связи", "HelloUZ откроется, как только появится интернет. Скачанные города работают без сети, когда приложение загрузится.", "Повторить"],
+    uz: ["Aloqa yoʻq", "Internet paydo boʻlishi bilan HelloUZ ochiladi. Yuklab olingan shaharlar ilova ochilgandan keyin internetsiz ishlaydi.", "Qayta urinish"],
+    zh: ["没有网络", "网络恢复后 HelloUZ 会立即打开。应用加载后，已下载的城市可离线使用。", "重试"],
+    ko: ["연결 없음", "인터넷이 연결되면 HelloUZ가 열립니다. 앱이 열린 뒤에는 내려받은 도시를 오프라인으로 볼 수 있어요.", "다시 시도"],
+    de: ["Keine Verbindung", "HelloUZ öffnet sich, sobald das Internet wieder da ist. Heruntergeladene Städte funktionieren offline, sobald die App geladen ist.", "Erneut versuchen"],
+    fr: ["Pas de connexion", "HelloUZ s'ouvrira dès le retour d'Internet. Les villes téléchargées fonctionnent hors ligne une fois l'appli chargée.", "Réessayer"],
+    ja: ["接続がありません", "インターネットが戻るとHelloUZが開きます。アプリの読み込み後は、ダウンロードした都市をオフラインで使えます。", "再試行"],
+    tr: ["Bağlantı yok", "İnternet gelir gelmez HelloUZ açılacak. Uygulama yüklendikten sonra indirdiğiniz şehirler çevrimdışı çalışır.", "Tekrar dene"],
+    ar: ["لا يوجد اتصال", "سيفتح HelloUZ فور عودة الإنترنت. المدن التي نزّلتها تعمل دون اتصال بعد تحميل التطبيق.", "أعد المحاولة"]
+  };
+  var l = (navigator.language || "en").slice(0, 2).toLowerCase();
+  var x = T[l] || T.en;
+  document.documentElement.lang = l;
+  if (l === "ar") document.documentElement.dir = "rtl";
+  document.getElementById("t").textContent = x[0];
+  document.getElementById("s").textContent = x[1];
+  var b = document.getElementById("b");
+  b.textContent = x[2];
+  b.onclick = function () { location.href = "https://uzbekistan-travel.onrender.com"; };
+</script>
+</body>
+</html>
