@@ -305,7 +305,15 @@ export function HomeScreen({
               {t("ex_esim_sub")}
             </p>
           </div>
-          <svg className="rtl-flip" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={MUTED} strokeWidth="2.5">
+          <svg
+            className="rtl-flip"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke={MUTED}
+            strokeWidth="2.5"
+          >
             <polyline points="9 18 15 12 9 6" />
           </svg>
         </button>
@@ -436,100 +444,102 @@ export function HomeScreen({
         </div>
       </div>
 
-      {/* Рестораны */}
-      <div className="pt-5">
-        <div className="flex items-center justify-between mb-3 px-4">
-          <p className="font-bold text-base" style={{ color: TEXT, fontFamily: "var(--font-heading)" }}>
-            {t("home_best_rest")}
-          </p>
-          <button
-            onClick={() => onExplore("restaurants")}
-            className="text-xs font-medium"
-            style={{ color: GREEN }}
-          >
-            {t("home_all")}
-          </button>
-        </div>
-        <div className="flex gap-3 overflow-x-auto hide-scroll px-4 pb-1">
-          {RESTAURANTS.slice(0, 8).map((r) => (
+      {/* Рестораны — когда они есть: демо-заведения убраны, свои заводят в панели. */}
+      {RESTAURANTS.length > 0 && (
+        <div className="pt-5">
+          <div className="flex items-center justify-between mb-3 px-4">
+            <p className="font-bold text-base" style={{ color: TEXT, fontFamily: "var(--font-heading)" }}>
+              {t("home_best_rest")}
+            </p>
             <button
-              key={r.id}
-              onClick={() => onRestaurant(r)}
-              className="lazy-card flex-shrink-0 relative rounded-3xl overflow-hidden text-left active:scale-95 transition-all"
-              style={{ width: 172, height: 248 }}
+              onClick={() => onExplore("restaurants")}
+              className="text-xs font-medium"
+              style={{ color: GREEN }}
             >
-              <img src={r.img} alt={r.name} className="absolute inset-0 w-full h-full object-cover" />
-              <div
-                className="absolute inset-0"
-                style={{
-                  background:
-                    "linear-gradient(to top,rgba(0,0,0,0.96) 0%,rgba(0,0,0,0.15) 55%,transparent 100%)",
-                }}
-              />
-              <div className="absolute top-3 left-3">
-                <span
-                  className="text-[8px] font-bold px-2 py-0.5 rounded-full"
-                  style={{ background: "rgba(193,96,58,0.92)", color: WHITE }}
-                >
-                  {r.cuisine}
-                </span>
-              </div>
-              <div className="absolute bottom-0 left-0 right-0 p-3">
-                <p className="text-[8px] mb-0.5" style={{ color: "rgba(255,255,255,0.45)" }}>
-                  📍 {трК(r.city)}
-                </p>
-                <p
-                  className="text-white font-bold leading-tight mb-1.5"
-                  style={{ fontSize: 12, fontFamily: "var(--font-heading)" }}
-                >
-                  {r.name}
-                </p>
-                <div
-                  className="flex gap-3 pb-1.5 mb-1.5 border-b"
-                  style={{ borderColor: "rgba(255,255,255,0.1)" }}
-                >
-                  <div>
-                    <p className="text-white font-bold text-[10px]">{r.rating}★</p>
-                    <p className="text-[7px]" style={{ color: "rgba(255,255,255,0.4)" }}>
-                      {t("card_rating")}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-white font-bold text-[10px]">{r.open.split("–")[0]}</p>
-                    <p className="text-[7px]" style={{ color: "rgba(255,255,255,0.4)" }}>
-                      {t("home_open_word")}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-[7px]" style={{ color: "rgba(255,255,255,0.4)" }}>
-                      {t("d_price")}
-                    </p>
-                    <p className="text-white font-bold text-xs">{дг.цена(r.price)}</p>
-                  </div>
-                  <div
-                    className="w-7 h-7 rounded-full flex items-center justify-center"
-                    style={{ background: "#C1603A" }}
-                  >
-                    <svg
-                      className="rtl-flip"
-                      width="10"
-                      height="10"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="white"
-                      strokeWidth="2.5"
-                    >
-                      <polyline points="9 18 15 12 9 6" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
+              {t("home_all")}
             </button>
-          ))}
+          </div>
+          <div className="flex gap-3 overflow-x-auto hide-scroll px-4 pb-1">
+            {RESTAURANTS.slice(0, 8).map((r) => (
+              <button
+                key={r.id}
+                onClick={() => onRestaurant(r)}
+                className="lazy-card flex-shrink-0 relative rounded-3xl overflow-hidden text-left active:scale-95 transition-all"
+                style={{ width: 172, height: 248 }}
+              >
+                <img src={r.img} alt={r.name} className="absolute inset-0 w-full h-full object-cover" />
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background:
+                      "linear-gradient(to top,rgba(0,0,0,0.96) 0%,rgba(0,0,0,0.15) 55%,transparent 100%)",
+                  }}
+                />
+                <div className="absolute top-3 left-3">
+                  <span
+                    className="text-[8px] font-bold px-2 py-0.5 rounded-full"
+                    style={{ background: "rgba(193,96,58,0.92)", color: WHITE }}
+                  >
+                    {r.cuisine}
+                  </span>
+                </div>
+                <div className="absolute bottom-0 left-0 right-0 p-3">
+                  <p className="text-[8px] mb-0.5" style={{ color: "rgba(255,255,255,0.45)" }}>
+                    📍 {трК(r.city)}
+                  </p>
+                  <p
+                    className="text-white font-bold leading-tight mb-1.5"
+                    style={{ fontSize: 12, fontFamily: "var(--font-heading)" }}
+                  >
+                    {r.name}
+                  </p>
+                  <div
+                    className="flex gap-3 pb-1.5 mb-1.5 border-b"
+                    style={{ borderColor: "rgba(255,255,255,0.1)" }}
+                  >
+                    <div>
+                      <p className="text-white font-bold text-[10px]">{r.rating}★</p>
+                      <p className="text-[7px]" style={{ color: "rgba(255,255,255,0.4)" }}>
+                        {t("card_rating")}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-white font-bold text-[10px]">{r.open.split("–")[0]}</p>
+                      <p className="text-[7px]" style={{ color: "rgba(255,255,255,0.4)" }}>
+                        {t("home_open_word")}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-[7px]" style={{ color: "rgba(255,255,255,0.4)" }}>
+                        {t("d_price")}
+                      </p>
+                      <p className="text-white font-bold text-xs">{дг.цена(r.price)}</p>
+                    </div>
+                    <div
+                      className="w-7 h-7 rounded-full flex items-center justify-center"
+                      style={{ background: "#C1603A" }}
+                    >
+                      <svg
+                        className="rtl-flip"
+                        width="10"
+                        height="10"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="white"
+                        strokeWidth="2.5"
+                      >
+                        <polyline points="9 18 15 12 9 6" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

@@ -2,6 +2,7 @@ import {
   ADS,
   EVENTS,
   УБРАННЫЕ_МЕСТА,
+  УБРАННЫЕ_ЗАВЕДЕНИЯ,
   HOTELS,
   PLACES,
   POPULAR_CITIES,
@@ -119,7 +120,7 @@ const hotels: ManagedHotel[] = HOTELS.map((h, i) => {
   };
 });
 
-const restaurants: ManagedRestaurant[] = RESTAURANTS.map((r, i) => {
+const restaurants: ManagedRestaurant[] = RESTAURANTS.map((r, i): ManagedRestaurant => {
   const from = priceNumber(r.price);
   return {
     ...r,
@@ -141,7 +142,7 @@ const restaurants: ManagedRestaurant[] = RESTAURANTS.map((r, i) => {
     imgs: галереяРесторана(r),
     facts: фактыРесторана(r),
   };
-});
+}).filter((r) => !УБРАННЫЕ_ЗАВЕДЕНИЯ.has(r.id.replace(/^\d+-/, "")));
 
 /**
  * Гиды туров — демонстрационные имена, чтобы в «Экскурсиях» было видно,

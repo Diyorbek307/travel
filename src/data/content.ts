@@ -183,6 +183,14 @@ export const RESTAURANTS: Restaurant[] = [
   { id:"xb11", name:"Jizzakh Road Lounge", city:"Джизак", cuisine:"Лаунж-бар", kind:"bar", rating:4.1, reviews:120, price:"$3–9", open:"18:00–00:00", img:"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&h=400&fit=crop&auto=format", desc:"Лаунж у трассы на Самарканд: отдохнуть с дороги за чаем и кальяном." },
 ];
 
+/**
+ * Рестораны, кафе и бары, убранные по просьбе владельца (октябрь 2026):
+ * все они демонстрационные, в его базе заведений пока нет. Записи
+ * остаются в RESTAURANTS по той же причине, что и места: по номеру
+ * строятся id семян. Убираются в seed.ts и store.ts. Исходный id.
+ */
+export const УБРАННЫЕ_ЗАВЕДЕНИЯ: ReadonlySet<string> = new Set(RESTAURANTS.map((r) => r.id));
+
 export const ROUTES: Route[] = [
   { id:"r1",title:"Самарканд за 1 день",      sub:"5 мест · 12 км · ~$26",  duration:"8 ч",   icon:"🕌",color:"#0E6F66",       badge:"Классика", city:"Самарканд",
     stops:[{time:"09:00",name:"Площадь Регистан",dur:"2 ч",note:"Лучший свет для фото",entry:"$8"},{time:"11:00",name:"Мечеть Биби-Ханым",dur:"45 мин",note:"5 мин пешком",entry:"$4"},{time:"12:00",name:"Базар Сиаб",dur:"1 ч",note:"Нон и сухофрукты",entry:"Бесплатно"},{time:"13:30",name:"Шахи-Зинда",dur:"1.5 ч",note:"Послеполуденный свет",entry:"$5"},{time:"15:30",name:"Обс. Улугбека",dur:"1 ч",note:"Такси 15 мин",entry:"$3"}] },
