@@ -21,7 +21,9 @@ on:
 
 jobs:
   build:
-    runs-on: macos-14
+    # Capacitor 8 требует Xcode 26: на macos-14 со старым компилятором
+    # модули плагинов не видели часть API Capacitor (reject, getString).
+    runs-on: macos-26
     steps:
       - uses: actions/checkout@v4
 
