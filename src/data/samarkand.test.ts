@@ -60,3 +60,16 @@ describe("Самарканд из базы владельца", () => {
     expect(б).toBe(правленая);
   });
 });
+
+describe("подробные рассказы", () => {
+  it("есть у каждого места, переводы en/uz на каждый раздел", async () => {
+    const { РАССКАЗЫ } = await import("./samarkand-stories");
+    const { РАССКАЗЫ_ПЕРЕВОД } = await import("@/lib/content-i18n-samarkand-story");
+    for (const p of PLACES.filter((x) => x.city === "Самарканд" && x.id !== "navruz")) {
+      const р = РАССКАЗЫ[p.id];
+      expect(р?.length, p.id).toBeGreaterThan(0);
+      expect(РАССКАЗЫ_ПЕРЕВОД[p.id]?.en.length, p.id).toBe(р.length);
+      expect(РАССКАЗЫ_ПЕРЕВОД[p.id]?.uz.length, p.id).toBe(р.length);
+    }
+  });
+});
