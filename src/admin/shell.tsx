@@ -24,7 +24,7 @@ import ThemeEditor from "./components/ThemeEditor";
 import AppPreview from "./components/AppPreview";
 import Settings from "./components/Settings";
 import Analytics from "./components/Analytics";
-import Guides from "./components/Guides";
+import Partners from "./components/Partners";
 import PromoCodes from "./components/PromoCodes";
 import Finance from "./components/Finance";
 import TourCalendar from "./components/TourCalendar";
@@ -95,6 +95,14 @@ const NAV_GROUPS: {
       { id: "cities", label: "Города", icon: "cities" },
       { id: "translations", label: "Переводы", icon: "translations" },
       { id: "push", label: "Уведомления", icon: "push" },
+    ],
+  },
+  {
+    label: "Партнёры",
+    items: [
+      { id: "drivers", label: "Водители", icon: "drivers" },
+      { id: "guides", label: "Гиды и туры", icon: "guides" },
+      { id: "partnerpay", label: "Оплаты и тарифы", icon: "partnerpay" },
     ],
   },
   {
@@ -212,7 +220,9 @@ export default function AdminShell() {
     preview: <AppPreview />,
     settings: <Settings onNavigate={setActive} />,
     analytics: <Analytics />,
-    guides: <Guides />,
+    drivers: <Partners вид="driver" />,
+    guides: <Partners вид="guide" />,
+    partnerpay: <Partners вид="pay" />,
     promos: <PromoCodes />,
     finance: <Finance />,
     calendar: <TourCalendar />,

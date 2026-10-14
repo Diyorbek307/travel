@@ -26,6 +26,9 @@ export type ИмяИконки =
   | "cities"
   | "translations"
   | "myvenue"
+  | "drivers"
+  | "guides"
+  | "partnerpay"
   | "esim"
   | "push"
   | "users"
@@ -153,6 +156,30 @@ const ФИГУРЫ: Record<ИмяИконки, React.ReactNode> = {
     <>
       <path d="M7 3h7l4 4v14H7z" />
       <rect x="9.5" y="11" width="6" height="6" rx="1" />
+    </>
+  ),
+  drivers: (
+    <>
+      <path d="M3 16v-3l2-5h14l2 5v3" />
+      <path d="M3 16h18v2H3z" />
+      <circle cx="7" cy="18.5" r="1.5" />
+      <circle cx="17" cy="18.5" r="1.5" />
+      <path d="M6.5 11h11" />
+    </>
+  ),
+  guides: (
+    <>
+      <path d="M6 21V3" />
+      <path d="M6 4h11l-2.5 3.5L17 11H6" />
+      <circle cx="15" cy="17" r="2.5" />
+      <path d="M11 21c.5-2 2-3 4-3s3.5 1 4 3" />
+    </>
+  ),
+  partnerpay: (
+    <>
+      <rect x="3" y="6" width="18" height="13" rx="2" />
+      <path d="M3 10h18M7 15h4" />
+      <path d="M16 3l2 3" />
     </>
   ),
   myvenue: (
