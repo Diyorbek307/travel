@@ -1030,6 +1030,33 @@ export function ProfileScreen({
         <div className="flex-1 overflow-y-auto hide-scroll animate-fade-in">
           <AdInline isPremium={isPremium} />
           <div className="px-4">
+            {/* Водители и гиды подают анкету и ведут дела в кабинете. */}
+            <a
+              href="/cabinet"
+              className="mb-4 flex items-center gap-3 rounded-3xl border p-4 transition-transform active:scale-[0.98]"
+              style={{
+                borderColor: GOLD,
+                background: "linear-gradient(135deg, rgba(233,196,106,0.18), transparent)",
+              }}
+            >
+              <span
+                className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl text-xl"
+                style={{ background: GOLD }}
+              >
+                🤝
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-sm font-bold" style={{ color: TEXT }}>
+                  {t("pt_become")}
+                </span>
+                <span className="block text-[11px] leading-snug" style={{ color: MUTED }}>
+                  {t("pt_become_sub")}
+                </span>
+              </span>
+              <span className="rtl-flip text-lg" style={{ color: GOLD }}>
+                ›
+              </span>
+            </a>
             <div
               className="rounded-3xl overflow-hidden mb-4 shadow-lg"
               style={{ background: `linear-gradient(135deg,${ACCENT_DEEP} 0%,${ACCENT_FILL} 100%)` }}

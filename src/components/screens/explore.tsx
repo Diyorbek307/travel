@@ -18,6 +18,7 @@ import {
   ON_GOLD,
 } from "@/lib/theme";
 import { ТИПЫ_МЕСТ } from "@/data/content";
+import { КаталогВодителей, КаталогГидов } from "@/components/partners";
 import type { TKey } from "@/lib/i18n";
 import { useAppContent } from "@/components/content-provider";
 import { useT } from "@/components/lang-provider";
@@ -56,7 +57,9 @@ export type РазделОбзора =
   | "ai"
   | "tourism"
   | "translate"
-  | "photo";
+  | "photo"
+  | "drivers"
+  | "guides";
 
 /*
  * Город — не отдельный мир, а фильтр над всеми разделами.
@@ -232,6 +235,15 @@ export function ExploreScreen({
         go: () => onРаздел("excursions"),
       },
       { ключ: "ai", заголовок: t("ex_ai_helper"), под: t("ex_ai_sub"), go: () => onРаздел("ai") },
+      // Водители и гиды — партнёры с подпиской; подпись, а не счётчик:
+      // количество меняется, а смысл раздела — нет.
+      {
+        ключ: "drivers",
+        заголовок: t("ex_drivers"),
+        под: t("ex_drivers_sub"),
+        go: () => onРаздел("drivers"),
+      },
+      { ключ: "guides", заголовок: t("ex_guides"), под: t("ex_guides_sub"), go: () => onРаздел("guides") },
       { ключ: "routes", заголовок: t("home_routes"), под: t("ex_routes_sub"), go: () => onTab("map") },
       { ключ: "tips", заголовок: t("ex_tips"), под: t("home_practical_sub"), go: onPractical },
       // Магазин eSIM живёт в «Полезном» → «Связь». Отдельная плитка — потому
@@ -371,6 +383,8 @@ export function ExploreScreen({
     tourism: "tour_title",
     translate: "ex_translate",
     photo: "ex_photo",
+    drivers: "ex_drivers",
+    guides: "ex_guides",
   };
   // У ИИ-помощников город ни при чём — чипы городов им не нужны.
   const безГородов =
@@ -434,6 +448,8 @@ export function ExploreScreen({
         {раздел === "translate" && <ПереводчикФото />}
         {раздел === "photo" && <ПереводчикФото режим="guide" />}
         {раздел === "excursions" && <СписокЭкскурсий туры={экскурсии} onRoute={onRoute} сброс={сброс} />}
+        {раздел === "drivers" && <КаталогВодителей город={город} />}
+        {раздел === "guides" && <КаталогГидов город={город} />}
       </div>
     </div>
   );
@@ -459,6 +475,8 @@ const ГРУППЫ: { заголовок?: TKey; ключи: string[]; тон: s
       "museums",
       "places",
       "excursions",
+      "guides",
+      "drivers",
       "transport",
       "ai",
       "taxi",
@@ -916,7 +934,18 @@ function ИллюстрацияVR({ широкая }: { широкая: boolean 
 /** Плитки, у которых есть живая версия — видео в public/videos/tiles. */
 const ЖИВЫЕ_ПЛИТКИ = new Set(["museums", "places", "restaurants", "bars", "routes", "excursions", "hotels"]);
 /** Плитки с иллюстрацией-SVG вместо картинки из public/tiles. */
-const РИСОВАННЫЕ = new Set(["photo", "translate", "vr", "esim", "offline", "hostels", "fun", "taxi"]);
+const РИСОВАННЫЕ = new Set([
+  "photo",
+  "translate",
+  "vr",
+  "esim",
+  "offline",
+  "hostels",
+  "fun",
+  "taxi",
+  "drivers",
+  "guides",
+]);
 
 function ИллюстрацияСкоро({ ключ, широкая }: { ключ: string; широкая: boolean }) {
   if (ключ === "photo") return <ИллюстрацияФото широкая={широкая} />;
@@ -926,6 +955,8 @@ function ИллюстрацияСкоро({ ключ, широкая }: { клю
   if (ключ === "hostels") return <ИллюстрацияХостел широкая={широкая} />;
   if (ключ === "fun") return <ИллюстрацияКолесо широкая={широкая} />;
   if (ключ === "taxi") return <ИллюстрацияТакси широкая={широкая} />;
+  if (ключ === "drivers") return <ИллюстрацияВодитель широкая={широкая} />;
+  if (ключ === "guides") return <ИллюстрацияГид широкая={широкая} />;
   return <ИллюстрацияVR широкая={широкая} />;
 }
 
@@ -1099,6 +1130,83 @@ function ИллюстрацияКолесо({ широкая }: { широкая
 }
 
 /** Такси: жёлтая машинка с шашечками, как у Yandex Go. */
+/**
+ * Машина с водителем: бирюзовый седан, за рулём водитель в тюбетейке,
+ * над машиной — солнце: «на весь день».
+ */
+function ИллюстрацияВодитель({ широкая }: { широкая: boolean }) {
+  const id = useId().replace(/:/g, "");
+  return (
+    <СвгСкоро широкая={широкая}>
+      <defs>
+        <linearGradient id={`${id}c`} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#2FD0C6" />
+          <stop offset="0.55" stopColor="#0FB3AC" />
+          <stop offset="1" stopColor="#07685F" />
+        </linearGradient>
+      </defs>
+      {/* Солнце: целый день в дороге. */}
+      <circle cx="98" cy="24" r="10" fill={GOLD} />
+      <g stroke={GOLD} strokeWidth="2.5" strokeLinecap="round">
+        <path d="M98 8 v-4 M112 24 h4 M108 13 l3 -3 M88 13 l-3 -3" />
+      </g>
+      {/* Кузов. */}
+      <path
+        d="M10 74 v-11 a8 8 0 0 1 8 -8 h10 l14 -17 h40 l15 17 h9 a8 8 0 0 1 8 8 v11 a6 6 0 0 1 -6 6 h-92 a6 6 0 0 1 -6 -6 Z"
+        fill={`url(#${id}c)`}
+      />
+      {/* Окна и водитель в тюбетейке. */}
+      <path d="M33 55 l11 -13 h18 v13 Z" fill="#0B4F49" opacity="0.85" />
+      <path d="M66 55 v-13 h15 l11 13 Z" fill="#0B4F49" opacity="0.85" />
+      <circle cx="54" cy="49" r="4.5" fill="#F3C9A0" />
+      <path d="M49.5 46 a4.5 3 0 0 1 9 0 Z" fill={GOLD} />
+      {/* Колёса, фара, полоса. */}
+      <circle cx="34" cy="80" r="9" fill="#0B4F49" />
+      <circle cx="34" cy="80" r="4" fill="#ffffff" />
+      <circle cx="94" cy="80" r="9" fill="#0B4F49" />
+      <circle cx="94" cy="80" r="4" fill="#ffffff" />
+      <rect x="112" y="63" width="6" height="5" rx="2" fill="#ffffff" />
+      <rect x="18" y="66" width="96" height="3" rx="1.5" fill={GOLD} opacity="0.9" />
+    </СвгСкоро>
+  );
+}
+
+/**
+ * Гид: человек с флажком на фоне купола и минарета, в руке — путеводная
+ * карточка маршрута с точками.
+ */
+function ИллюстрацияГид({ широкая }: { широкая: boolean }) {
+  return (
+    <СвгСкоро широкая={широкая}>
+      {/* Город за спиной: купол и минарет. */}
+      <g fill="#0B4F49" opacity="0.18">
+        <rect x="62" y="52" width="40" height="32" />
+        <path d="M66 52 a16 16 0 0 1 32 0 Z" />
+        <rect x="104" y="30" width="8" height="54" />
+      </g>
+      {/* Флажок гида. */}
+      <path d="M44 20 v52" stroke="#0B4F49" strokeWidth="3" strokeLinecap="round" />
+      <path d="M44 20 h24 l-6 7 l6 7 h-24 Z" fill={GOLD} />
+      {/* Гид: голова, тюбетейка, тело в бирюзе. */}
+      <circle cx="34" cy="44" r="8" fill="#F3C9A0" />
+      <path d="M26 41 a8 5 0 0 1 16 0 Z" fill={GOLD} />
+      <path d="M20 84 v-18 a14 14 0 0 1 28 0 v18 Z" fill="#0FB3AC" />
+      <path d="M44 64 l4 -6" stroke="#F3C9A0" strokeWidth="5" strokeLinecap="round" />
+      {/* Карточка маршрута с точками. */}
+      <rect x="70" y="60" width="34" height="22" rx="4" fill="#ffffff" />
+      <path
+        d="M76 76 q8 -12 16 -4 t8 -6"
+        fill="none"
+        stroke="#0FB3AC"
+        strokeWidth="2"
+        strokeDasharray="3 2"
+      />
+      <circle cx="76" cy="76" r="2.5" fill={GOLD} />
+      <circle cx="100" cy="66" r="2.5" fill={GOLD} />
+    </СвгСкоро>
+  );
+}
+
 function ИллюстрацияТакси({ широкая }: { широкая: boolean }) {
   return (
     <СвгСкоро широкая={широкая}>

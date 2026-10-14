@@ -10,6 +10,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react
 import BottomNav from "@/components/bottom-nav";
 import SideMenu from "@/components/side-menu";
 import { HotelDetail, PlaceDetail, RestaurantDetail, RouteDetail } from "@/components/details";
+import { ДеталиВодителя, ДеталиГида, ДеталиТура, type ДеталиПартнёра } from "@/components/partners";
 import { NotifsPanel, PremiumModal, SearchModal } from "@/components/modals";
 import { OnboardingInterests, OnboardingLang, SplashScreen } from "@/components/onboarding";
 import { ОбучениеДети } from "@/components/kids-tour";
@@ -66,6 +67,8 @@ type Detail =
   | { kind: "hotel"; value: Hotel }
   | { kind: "restaurant"; value: Restaurant }
   | { kind: "route"; value: Route }
+  /** Водитель, гид или тур гида — из каталога партнёров. */
+  | ДеталиПартнёра
   /** Дорога до выбранного места: своя карточка, а не всплывающая надпись. */
   | { kind: "путь"; название: string; город: string; geo?: Geo | null; способ?: СпособПути };
 
@@ -91,6 +94,26 @@ function запомнитьВход(да: boolean): void {
     if (да) localStorage.setItem(ВХОДИЛ, "1");
     else localStorage.removeItem(ВХОДИЛ);
   } catch {}
+}
+
+/** Куда вернуть после входа (например, в кабинет партнёра). */
+const ДАЛЬШЕ = "hellouz.next";
+function запомнитьДальше(путь: string): void {
+  try {
+    sessionStorage.setItem(ДАЛЬШЕ, путь);
+  } catch {}
+}
+/** Есть куда вернуться — уходим туда и говорим «да». */
+function вернутьсяДальше(): boolean {
+  try {
+    const путь = sessionStorage.getItem(ДАЛЬШЕ);
+    if (!путь) return false;
+    sessionStorage.removeItem(ДАЛЬШЕ);
+    window.location.href = путь;
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 /*
@@ -292,6 +315,14 @@ function App() {
     if (поСсылке) статьГостем();
     return гость() ? "app" : первыйЭкран();
   };
+  // Карточка водителя, гида или тура — из каталога партнёров.
+  useEffect(() => {
+    const открыть = (e: Event) => {
+      setDetail((e as CustomEvent<ДеталиПартнёра>).detail);
+    };
+    window.addEventListener("hellouz:partner", открыть);
+    return () => window.removeEventListener("hellouz:partner", открыть);
+  }, []);
   // Вход и регистрация по просьбе из брони, отзыва или профиля гостя.
   useEffect(() => {
     const открыть = (e: Event) =>
@@ -301,13 +332,25 @@ function App() {
   }, []);
   useEffect(() => {
     let cancelled = false;
+    /*
+     * «/?auth=login&next=/cabinet» — вход по просьбе другой страницы
+     * (кабинет партнёра). После входа возвращаем человека туда, откуда
+     * он пришёл; уже вошедшего — сразу.
+     */
+    const п = new URLSearchParams(window.location.search);
+    const просятВход = п.get("auth");
+    const дальше = п.get("next");
+    if (дальше?.startsWith("/") && !дальше.startsWith("//")) запомнитьДальше(дальше);
     fetch("/api/auth/me")
       .then((r) => r.json())
       .then((d: { user: PublicUser | null }) => {
         if (cancelled) return;
         if (d.user) {
+          if (вернутьсяДальше()) return;
           setUser(d.user);
           setPhase("app");
+        } else if (просятВход === "login" || просятВход === "register") {
+          setPhase(просятВход);
         } else {
           setPhase(безАккаунта());
         }
@@ -661,6 +704,7 @@ function App() {
               <RegisterScreen
                 onBack={() => setPhase(гость() ? "app" : "splash")}
                 onDone={(u) => {
+                  if (вернутьсяДальше()) return;
                   setUser(u);
                   // Сюда попадаем уже после подтверждения почты: сессия
                   // открыта. Новичку показываем язык и интересы.
@@ -676,6 +720,7 @@ function App() {
                 onBack={() => setPhase(гость() ? "app" : "splash")}
                 onRegister={() => setPhase("register")}
                 onDone={(u) => {
+                  if (вернутьсяДальше()) return;
                   setUser(u);
                   setPhase("push");
                 }}
@@ -959,6 +1004,12 @@ function Карточка({ detail, ...p }: ScreenProps & { detail: Detail }) {
         return (
           <RouteDetail route={detail.value} onBack={p.onCloseDetail} onПуть={p.onПуть} onToast={p.onToast} />
         );
+      case "driver":
+        return <ДеталиВодителя п={detail.value} onBack={p.onCloseDetail} />;
+      case "guide":
+        return <ДеталиГида п={detail.value} onBack={p.onCloseDetail} />;
+      case "guidetour":
+        return <ДеталиТура тур={detail.value} onBack={p.onCloseDetail} />;
       case "путь":
         return (
           <RouteView
