@@ -31,6 +31,9 @@ export interface Place {
    * «Советы»… Его же читает аудиогид и на него опирается гид в карточке.
    */
   story?: StorySection[];
+  /** Исходные русские тексты — для запасного голоса, когда своего нет. */
+  descRu?: string;
+  storyRu?: StorySection[];
 }
 
 export interface StorySection {

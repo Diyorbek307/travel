@@ -29,6 +29,7 @@ import {
 } from "./venue-details";
 import ReviewForm, { useРейтинг } from "./review-form";
 import ГидМеста, { голосМеста } from "./place-guide";
+import { переведиКонтент } from "@/lib/content-i18n";
 import type { Hotel, HotelKind, Place, Restaurant, Route, RoomType, StorySection } from "@/lib/types";
 import type { TKey } from "@/lib/i18n";
 import {
@@ -254,6 +255,7 @@ export function PlaceDetail({
             заголовок={place.name}
             текст={[place.desc, ...(place.story ?? []).map((р) => `${р.title}. ${р.text}`)].join(" ")}
             голос={голосМеста(place.id)}
+            запасные={рассказНа(place)}
           />
         )}
         <ГидМеста place={place} />
@@ -366,6 +368,16 @@ export function PlaceDetail({
       </div>
     </div>
   );
+}
+
+/** Весь рассказ о месте по-русски и по-английски — для запасного голоса. */
+function рассказНа(place: Place): { ru?: string; en?: string } {
+  const название = place.nameRu ?? place.name;
+  const описание = place.descRu ?? place.desc;
+  const разделы = place.storyRu ?? [];
+  const собрать = (тр: (s: string) => string) =>
+    [`${тр(название)}.`, тр(описание), ...разделы.map((р) => `${тр(р.title)}. ${тр(р.text)}`)].join(" ");
+  return { ru: собрать((s) => s), en: собрать((s) => переведиКонтент(s, "en")) };
 }
 
 /**

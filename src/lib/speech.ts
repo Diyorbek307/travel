@@ -144,7 +144,11 @@ async function произнести(текст: string, код: string, { ско
   фраза.lang = код;
   const свои = синтез.getVoices().filter((г) => г.lang.replace("_", "-") === код.replace("_", "-"));
   const выбран = свои.length ? свои[(голос ?? 0) % свои.length] : undefined;
-  if (выбран) фраза.voice = выбран;
+  try {
+    if (выбран) фраза.voice = выбран;
+  } catch {
+    // Голос не подошёл — браузер скажет своим голосом этого языка.
+  }
   фраза.rate = скорость;
   фраза.pitch = тон(голос);
   await new Promise<void>((готово) => {
