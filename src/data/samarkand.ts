@@ -1,5 +1,6 @@
 import type { Fact, Geo, Place } from "@/lib/types";
 import { ФОТО_САМАРКАНДА } from "./samarkand-photos";
+import { РАССКАЗЫ } from "./samarkand-stories";
 
 /**
  * Самарканд: места из базы, которую собрал владелец (папка import/, октябрь 2026).
@@ -523,6 +524,7 @@ function собрать(з: Запись): Place & { geo: Geo } {
     imgs: фото?.imgs ?? [],
     credits: фото?.credits,
     facts: факты(з.id, з),
+    story: РАССКАЗЫ[з.id] ?? [],
     // Цен по категориям в открытых источниках нет — билеты не выдумываем.
     tickets: [],
   };

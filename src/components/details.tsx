@@ -28,7 +28,8 @@ import {
   НомераОтеля,
 } from "./venue-details";
 import ReviewForm, { useРейтинг } from "./review-form";
-import type { Hotel, HotelKind, Place, Restaurant, Route, RoomType } from "@/lib/types";
+import ГидМеста, { голосМеста } from "./place-guide";
+import type { Hotel, HotelKind, Place, Restaurant, Route, RoomType, StorySection } from "@/lib/types";
 import type { TKey } from "@/lib/i18n";
 import {
   ACCENT_FILL,
@@ -178,7 +179,8 @@ export function PlaceDetail({
         <div className="absolute bottom-0 left-0 right-0 p-4">
           <div className="flex items-center gap-1.5 mb-1.5">
             <Badge text={place.type} onPhoto />
-            {записи.length > 0 && <Badge text={"🎧 " + t("d_audioguide")} onPhoto />}
+            {/* Аудиогид есть у каждого места: запись диктора или голос телефона. */}
+            <Badge text={"🎧 " + t("d_audioguide")} onPhoto />
             {place.qr && <Badge text="QR" onPhoto />}
           </div>
           <h2 className="text-white text-xl font-bold" style={{ fontFamily: "var(--font-heading)" }}>
@@ -236,6 +238,7 @@ export function PlaceDetail({
             {place.desc}
           </p>
         </div>
+        <РассказМеста разделы={place.story ?? []} />
         {/* В галерее места — виды города вокруг, так и подписываем. */}
         {/* Свои фото места — «Фото» и авторы (лицензия CC BY-SA это требует). */}
         <ГалереяЗаведения фото={place.imgs ?? []} подпись={place.credits ? t("d_photos") : трК(place.city)} />
@@ -244,8 +247,16 @@ export function PlaceDetail({
             {place.credits}
           </p>
         )}
-        {/* Записи диктора нет — рассказ читает сам телефон. */}
-        {!запись && place.audio && <АудиогидГолосом заголовок={place.name} текст={place.desc} />}
+        {/* Записи диктора нет — весь рассказ читает сам телефон, у каждого
+            места своим голосом. Запись из панели заменит этот блок. */}
+        {!запись && (
+          <АудиогидГолосом
+            заголовок={place.name}
+            текст={[place.desc, ...(place.story ?? []).map((р) => `${р.title}. ${р.text}`)].join(" ")}
+            голос={голосМеста(place.id)}
+          />
+        )}
+        <ГидМеста place={place} />
         <БилетыМеста place={place} />
         <ПолезноЗнать факты={place.facts ?? []} />
         {запись && (
@@ -353,6 +364,46 @@ export function PlaceDetail({
         <ReviewForm placeId={place.id} placeName={place.name} />
         <div className="pb-6" />
       </div>
+    </div>
+  );
+}
+
+/**
+ * Подробный рассказ о месте: первый раздел открыт, остальные — по
+ * «Читать дальше», чтобы карточка не превращалась в простыню.
+ */
+function РассказМеста({ разделы }: { разделы: StorySection[] }) {
+  const { t } = useT();
+  const [всё, setВсё] = useState(false);
+  if (!разделы.length) return null;
+  const видно = всё ? разделы : разделы.slice(0, 1);
+  return (
+    <div className="mb-3 rounded-2xl border bg-white p-4 shadow-sm" style={{ borderColor: BORDER }}>
+      <p className="mb-3 text-sm font-bold" style={{ color: TEXT }}>
+        📖 {t("st_title")}
+      </p>
+      {видно.map((р, i) => (
+        <section key={i} className={i ? "mt-4" : undefined}>
+          <h3 className="mb-1.5 text-[13px] font-bold" style={{ color: GREEN }}>
+            {р.title}
+          </h3>
+          {р.text.split(/\n{2,}/).map((абзац, j) => (
+            <p key={j} className="mb-2 text-sm leading-relaxed" style={{ color: MUTED }}>
+              {абзац}
+            </p>
+          ))}
+        </section>
+      ))}
+      {разделы.length > 1 && (
+        <button onClick={() => setВсё(!всё)} className="mt-1 text-xs font-bold" style={{ color: GREEN }}>
+          {всё
+            ? t("st_less")
+            : `${t("st_more")} · ${разделы
+                .slice(1)
+                .map((р) => р.title)
+                .join(" · ")}`}
+        </button>
+      )}
     </div>
   );
 }

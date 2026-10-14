@@ -254,7 +254,15 @@ export default function AudioGuides() {
         </div>
       )}
 
-      {код && <ОкноКода гид={код} onClose={() => setКод(null)} />}
+      {код && (
+        <ОкноQR
+          заголовок={код.title}
+          подпись={`${код.placeName} · ${код.lang}`}
+          адрес={`${window.location.origin}/?audio=${encodeURIComponent(код.id)}`}
+          файл={`qr-${код.id}.png`}
+          onClose={() => setКод(null)}
+        />
+      )}
     </div>
   );
 }
@@ -266,12 +274,21 @@ export default function AudioGuides() {
  * телефон открыл бы голый звук в браузере, без названия, языка и
  * остального города вокруг.
  */
-function ОкноКода({ гид, onClose }: { гид: ManagedAudio; onClose: () => void }) {
+export function ОкноQR({
+  заголовок,
+  подпись,
+  адрес,
+  файл,
+  onClose,
+}: {
+  заголовок: string;
+  подпись: string;
+  адрес: string;
+  файл: string;
+  onClose: () => void;
+}) {
   const [картинка, setКартинка] = useState<string | null>(null);
   const [ошибка, setОшибка] = useState(false);
-
-  const адрес =
-    typeof window === "undefined" ? "" : `${window.location.origin}/?audio=${encodeURIComponent(гид.id)}`;
 
   useEffect(() => {
     let живо = true;
@@ -297,10 +314,10 @@ function ОкноКода({ гид, onClose }: { гид: ManagedAudio; onClose: 
         onClick={(e) => e.stopPropagation()}
       >
         <p className="mb-1 text-sm font-semibold" style={{ color: "var(--color-text)" }}>
-          {гид.title}
+          {заголовок}
         </p>
         <p className="mb-4 text-xs" style={{ color: "var(--color-muted)" }}>
-          {гид.placeName} · {гид.lang}
+          {подпись}
         </p>
 
         {ошибка ? (
@@ -310,7 +327,7 @@ function ОкноКода({ гид, onClose }: { гид: ManagedAudio; onClose: 
         ) : картинка ? (
           <>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={картинка} alt="QR-код аудиогида" className="w-full rounded-xl bg-white" />
+            <img src={картинка} alt={`QR-код: ${заголовок}`} className="w-full rounded-xl bg-white" />
             <p className="mt-3 break-all text-[11px]" style={{ color: "var(--color-faint)" }}>
               {адрес}
             </p>
@@ -325,7 +342,7 @@ function ОкноКода({ гид, onClose }: { гид: ManagedAudio; onClose: 
           {картинка && (
             <a
               href={картинка}
-              download={`qr-${гид.id}.png`}
+              download={файл}
               className="rounded-lg px-3 py-1.5 text-xs font-semibold"
               style={{ background: "var(--color-amber)", color: "#1a1a1a" }}
             >

@@ -111,6 +111,7 @@ export function useAppContent() {
     type: трК(p.type),
     desc: трК(p.desc),
     entry: трК(p.entry),
+    story: p.story?.map((р) => ({ ...р, title: трК(р.title), text: трК(р.text) })),
   });
   // Удобства (facilities) не переводим здесь: иконку в деталях выбирают по
   // русскому ключу, поэтому перевод делается на месте показа (details.tsx),

@@ -36,6 +36,8 @@ import { useДеньги } from "@/lib/money";
 import { AdShelf, AdSpotlight } from "@/components/ads";
 import { glass, glassLight } from "@/lib/theme";
 import TaxiOrder from "@/components/taxi-order";
+import { useState } from "react";
+import QrScanner, { ссылкаИзКода } from "@/components/qr-scanner";
 
 export function HomeScreen({
   onPlace,
@@ -63,6 +65,7 @@ export function HomeScreen({
   isPremium: boolean;
 }) {
   const { EVENTS, HOTELS, PLACES, POPULAR_CITIES, RESTAURANTS } = useAppContent();
+  const [сканер, setСканер] = useState(false);
   const { t, lang, трК } = useT();
   const погода = useWeather();
   const { pos } = useGeo();
@@ -212,38 +215,91 @@ export function HomeScreen({
             {трК(главныйГород)}
           </h1>
           <p className="text-white/65 text-xs mb-3">{подписьГорода}</p>
-          <button
-            onClick={() => onSearch()}
-            className="w-full flex items-center gap-3 rounded-2xl px-4 py-3.5"
-            style={{
-              background: "rgba(255,255,255,0.2)",
-              backdropFilter: "blur(20px)",
-              border: "1px solid rgba(255,255,255,0.38)",
-            }}
-          >
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="rgba(255,255,255,0.7)"
-              strokeWidth="2"
+          <div className="flex gap-2">
+            <button
+              onClick={() => onSearch()}
+              className="min-w-0 flex-1 flex items-center gap-3 rounded-2xl px-4 py-3.5"
+              style={{
+                background: "rgba(255,255,255,0.2)",
+                backdropFilter: "blur(20px)",
+                border: "1px solid rgba(255,255,255,0.38)",
+              }}
             >
-              <circle cx="11" cy="11" r="8" />
-              <line x1="21" y1="21" x2="16.65" y2="16.65" />
-            </svg>
-            <span className="flex-1 text-left text-sm" style={{ color: "rgba(255,255,255,0.72)" }}>
-              {t("home_search_ph")}
-            </span>
-            <div
-              className="px-2.5 py-1 rounded-lg text-[10px] font-bold"
-              style={{ background: GOLD, color: ON_GOLD }}
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="rgba(255,255,255,0.7)"
+                strokeWidth="2"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              <span className="flex-1 text-left text-sm" style={{ color: "rgba(255,255,255,0.72)" }}>
+                {t("home_search_ph")}
+              </span>
+              <div
+                className="px-2.5 py-1 rounded-lg text-[10px] font-bold"
+                style={{ background: GOLD, color: ON_GOLD }}
+              >
+                {t("common_search")}
+              </div>
+            </button>
+            {/* QR с таблички у памятника — сразу карточка этого места. */}
+            <button
+              onClick={() => setСканер(true)}
+              aria-label={t("qr_scan_place")}
+              title={t("qr_scan_place")}
+              className="flex w-[52px] flex-shrink-0 items-center justify-center rounded-2xl active:scale-95 transition-all"
+              style={{
+                background: "rgba(255,255,255,0.2)",
+                backdropFilter: "blur(20px)",
+                border: "1px solid rgba(255,255,255,0.38)",
+              }}
             >
-              {t("common_search")}
-            </div>
-          </button>
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="white"
+                strokeWidth="2"
+                strokeLinecap="round"
+              >
+                <path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3" />
+                <rect x="8" y="8" width="3" height="3" rx="0.5" />
+                <rect x="13" y="8" width="3" height="3" rx="0.5" />
+                <rect x="8" y="13" width="3" height="3" rx="0.5" />
+                <path d="M13 13h3v3" />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
+      {сканер && (
+        <QrScanner
+          onClose={() => setСканер(false)}
+          onКод={(текст) => {
+            setСканер(false);
+            const ссылка = ссылкаИзКода(текст);
+            const [вид, id] = ссылка
+              ? [ссылка.slice(0, ссылка.indexOf(":")), ссылка.slice(ссылка.indexOf(":") + 1)]
+              : [];
+            if (вид === "audio") {
+              // Аудиогид живёт на своей вкладке — открываем её с этим рассказом.
+              window.location.search = `?audio=${encodeURIComponent(id!)}`;
+              return;
+            }
+            const есть =
+              (вид === "place" && PLACES.some((p) => p.id === id)) ||
+              (вид === "hotel" && HOTELS.some((h) => h.id === id)) ||
+              (вид === "restaurant" && RESTAURANTS.some((r) => r.id === id));
+            if (!есть) return onToast(t("qr_not_found"));
+            window.dispatchEvent(new CustomEvent("hellouz:open", { detail: ссылка }));
+          }}
+        />
+      )}
 
       {/* Разделы (места, отели, рестораны) живут в HelloUZ — здесь
           только транспорт, которого там нет. */}

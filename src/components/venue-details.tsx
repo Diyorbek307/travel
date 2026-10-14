@@ -1,6 +1,6 @@
 "use client";
 
-import { замолчать, сказать, языкГолоса } from "@/lib/speech";
+import { замолчать, рассказать, языкГолоса } from "@/lib/speech";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { ACCENT_FILL, ACCENT_SOFT, BORDER, CREAM, GREEN, MUTED, TEXT, WHITE } from "@/lib/theme";
@@ -631,12 +631,22 @@ export function ПолезноЗнать({ факты }: { факты: Fact[] })
  * Аудиогид голосом телефона — для мест, где записи диктора ещё нет.
  * Читает рассказ о месте на языке интерфейса встроенным синтезом речи:
  * без файлов и без сети, а когда редактор загрузит настоящую запись,
- * карточка покажет её вместо этого блока.
+ * карточка покажет её вместо этого блока. голос — номер голоса карточки:
+ * у каждого места свой (см. голосМеста), чтобы места звучали по-разному.
  */
-export function АудиогидГолосом({ заголовок, текст }: { заголовок: string; текст: string }) {
+export function АудиогидГолосом({
+  заголовок,
+  текст,
+  голос,
+}: {
+  заголовок: string;
+  текст: string;
+  голос?: number;
+}) {
   const { t, lang } = useT();
   const [играет, setИграет] = useState(false);
   const [нет, setНет] = useState(false);
+  const [часть, setЧасть] = useState<{ n: number; m: number } | null>(null);
 
   // Ушёл с карточки — рассказ замолкает, а не продолжает на фоне.
   useEffect(() => () => замолчать(), []);
@@ -645,6 +655,7 @@ export function АудиогидГолосом({ заголовок, текст 
     if (играет) {
       замолчать();
       setИграет(false);
+      setЧасть(null);
       return;
     }
     // Голос языка интерфейса — в браузере или нативный в приложении.
@@ -654,7 +665,15 @@ export function АудиогидГолосом({ заголовок, текст 
       return;
     }
     setИграет(true);
-    void сказать(`${заголовок}. ${текст}`, код, { скорость: 0.95, конец: () => setИграет(false) });
+    void рассказать(`${заголовок}. ${текст}`, код, {
+      скорость: 0.95,
+      голос,
+      часть: (n, m) => setЧасть({ n: n + 1, m }),
+      конец: () => {
+        setИграет(false);
+        setЧасть(null);
+      },
+    });
   }
 
   return (
@@ -681,7 +700,13 @@ export function АудиогидГолосом({ заголовок, текст 
       </button>
       <div className="min-w-0 flex-1">
         <p className="text-sm font-semibold text-white">🎧 {t("d_audioguide")}</p>
-        <p className="text-[11px] text-white/70">{нет ? t("d_audio_no_voice") : t("d_audio_voice")}</p>
+        <p className="text-[11px] text-white/70">
+          {нет
+            ? t("d_audio_no_voice")
+            : часть && часть.m > 1
+            ? t("d_audio_part").replace("{n}", String(часть.n)).replace("{m}", String(часть.m))
+            : t("d_audio_voice")}
+        </p>
       </div>
       {играет && (
         <span className="flex h-5 items-end gap-0.5" aria-hidden>

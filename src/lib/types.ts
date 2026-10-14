@@ -26,6 +26,18 @@ export interface Place {
   facts?: Fact[];
   /** Авторы и лицензия фото — подпись под галереей (CC BY-SA требует). */
   credits?: string;
+  /**
+   * Подробный рассказ — разделы «История», «Что посмотреть», «Легенды»,
+   * «Советы»… Его же читает аудиогид и на него опирается гид в карточке.
+   */
+  story?: StorySection[];
+}
+
+export interface StorySection {
+  /** Что это за раздел — по нему гид в карточке находит ответ на кнопку. */
+  kind?: "history" | "architecture" | "see" | "legend" | "facts" | "tips";
+  title: string;
+  text: string;
 }
 
 export interface RouteStop {

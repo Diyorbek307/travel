@@ -40,7 +40,8 @@ async function плагин() {
   return TextToSpeech;
 }
 
-const подходит = (тег: string, язык: string) => тег.replace("_", "-").toLowerCase().startsWith(язык.toLowerCase());
+const подходит = (тег: string, язык: string) =>
+  тег.replace("_", "-").toLowerCase().startsWith(язык.toLowerCase());
 
 /** Голоса браузера появляются не сразу — ждём список, но не дольше секунды. */
 function голосаБраузера(): Promise<SpeechSynthesisVoice[]> {
@@ -78,18 +79,52 @@ export async function языкГолоса(язык: string, запасной?: 
   return найти(язык) ?? (запасной ? найти(запасной) : undefined) ?? null;
 }
 
-/** Сказать фразу; новая фраза обрывает предыдущую. */
-export async function сказать(
-  текст: string,
-  код: string,
-  { скорость = 1, конец }: { скорость?: number; конец?: () => void } = {},
-): Promise<void> {
-  if (typeof window === "undefined") return;
+/**
+ * Номер разговора. Каждая новая фраза и каждое «замолчать» его меняют —
+ * так длинный рассказ, читаемый по кусочкам, понимает, что его прервали,
+ * и не продолжает следующим куском поверх новой фразы.
+ */
+let разговор = 0;
+
+type Опции = {
+  скорость?: number;
+  /**
+   * Чей голос: у каждой карточки места свой (номер из её id). Из голосов
+   * нужного языка берётся голос с этим номером по кругу, и тон чуть
+   * разный — даже если голос в телефоне один, карточки звучат по-разному.
+   */
+  голос?: number;
+  конец?: () => void;
+};
+
+/** Тон по номеру голоса: 0.9–1.1, без номера — обычный. */
+const тон = (голос?: number) => (голос == null ? 1 : 0.9 + (голос % 5) * 0.05);
+
+/** Номер голоса нативного движка: из голосов языка — по кругу. */
+async function нативныйГолос(код: string, голос?: number): Promise<number | undefined> {
+  if (голос == null) return undefined;
+  try {
+    const { voices } = await (await плагин()).getSupportedVoices();
+    const свои = voices.map((г, i) => ({ г, i })).filter(({ г }) => подходит(г.lang, код.slice(0, 2)));
+    return свои.length ? свои[голос % свои.length].i : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/** Одна фраза: промис закрывается, когда фраза прозвучала (или сорвалась). */
+async function произнести(текст: string, код: string, { скорость = 1, голос }: Опции): Promise<void> {
   if (нативно()) {
     try {
       const tts = await плагин();
-      await tts.stop();
-      const фраза = { text: текст, lang: код, rate: скорость, category: "playback" };
+      const фраза = {
+        text: текст,
+        lang: код,
+        rate: скорость,
+        pitch: тон(голос),
+        voice: await нативныйГолос(код, голос),
+        category: "playback",
+      };
       try {
         await tts.speak(фраза);
       } catch {
@@ -101,25 +136,95 @@ export async function сказать(
     } catch {
       // Не сказалось — подсказка всё равно на экране.
     }
-    конец?.();
     return;
   }
-  if (!("speechSynthesis" in window)) return конец?.();
+  if (!("speechSynthesis" in window)) return;
   const синтез = window.speechSynthesis;
   const фраза = new SpeechSynthesisUtterance(текст);
   фраза.lang = код;
-  const голос = синтез.getVoices().find((г) => г.lang.replace("_", "-") === код.replace("_", "-"));
-  if (голос) фраза.voice = голос;
+  const свои = синтез.getVoices().filter((г) => г.lang.replace("_", "-") === код.replace("_", "-"));
+  const выбран = свои.length ? свои[(голос ?? 0) % свои.length] : undefined;
+  if (выбран) фраза.voice = выбран;
   фраза.rate = скорость;
-  фраза.onend = () => конец?.();
-  фраза.onerror = () => конец?.();
-  синтез.cancel();
-  синтез.speak(фраза);
+  фраза.pitch = тон(голос);
+  await new Promise<void>((готово) => {
+    фраза.onend = () => готово();
+    фраза.onerror = () => готово();
+    синтез.speak(фраза);
+  });
+}
+
+/** Сказать фразу; новая фраза обрывает предыдущую. */
+export async function сказать(текст: string, код: string, опции: Опции = {}): Promise<void> {
+  if (typeof window === "undefined") return;
+  разговор++;
+  if (нативно()) {
+    await (await плагин().catch(() => null))?.stop().catch(() => undefined);
+  } else if ("speechSynthesis" in window) {
+    window.speechSynthesis.cancel();
+  } else {
+    return опции.конец?.();
+  }
+  await произнести(текст, код, опции);
+  опции.конец?.();
+}
+
+/**
+ * Длинный рассказ — аудиогид. Браузеры обрывают длинную фразу на
+ * середине (Chrome молчит после ~15 секунд одной фразы), поэтому читаем
+ * по предложениям, кусками до ~220 знаков, один за другим. часть(i, n) —
+ * какой кусок звучит, чтобы показать ход рассказа.
+ */
+export async function рассказать(
+  текст: string,
+  код: string,
+  опции: Опции & { часть?: (номер: number, всего: number) => void } = {},
+): Promise<void> {
+  if (typeof window === "undefined") return;
+  const куски = нарезать(текст);
+  const мой = ++разговор;
+  if (нативно()) {
+    await (await плагин().catch(() => null))?.stop().catch(() => undefined);
+  } else if ("speechSynthesis" in window) {
+    window.speechSynthesis.cancel();
+  } else {
+    return опции.конец?.();
+  }
+  for (let i = 0; i < куски.length; i++) {
+    if (мой !== разговор) return; // прервали — тот, кто прервал, сам скажет своё
+    опции.часть?.(i, куски.length);
+    await произнести(куски[i], код, опции);
+  }
+  if (мой === разговор) опции.конец?.();
+}
+
+/** Текст → куски по предложениям, не длиннее ~220 знаков. */
+export function нарезать(текст: string, предел = 220): string[] {
+  const предложения = текст
+    .replace(/\s+/g, " ")
+    .split(/(?<=[.!?…。！？])\s+/)
+    .map((x) => x.trim())
+    .filter(Boolean);
+  const куски: string[] = [];
+  for (const п of предложения) {
+    const последний = куски[куски.length - 1];
+    if (последний && последний.length + п.length + 1 <= предел) куски[куски.length - 1] = `${последний} ${п}`;
+    else if (п.length <= предел) куски.push(п);
+    // Слишком длинное предложение — режем по запятым.
+    else
+      for (const к of п.split(/(?<=[,;:—])\s+/)) {
+        const хвост = куски[куски.length - 1];
+        if (хвост && хвост.length + к.length + 1 <= предел) куски[куски.length - 1] = `${хвост} ${к}`;
+        else куски.push(к);
+      }
+  }
+  return куски;
 }
 
 /** Замолчать сразу. */
 export function замолчать(): void {
   if (typeof window === "undefined") return;
+  разговор++;
   if (нативно()) {
     void плагин()
       .then((tts) => tts.stop())

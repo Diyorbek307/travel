@@ -2,6 +2,7 @@ import { useState } from "react";
 import { PageHeader, Badge, Btn, Table } from "./shared";
 import { useEntity } from "../context/useEntity";
 import VenueExtras from "./VenueExtras";
+import { ОкноQR } from "./AudioGuides";
 import type { ManagedPlace as Dest } from "@/lib/types";
 import { ТИПЫ_МЕСТ } from "@/data/content";
 
@@ -55,6 +56,7 @@ export default function Destinations() {
   // Черновик правки: и новое место, и изменение старого правятся копией
   // и применяются разом по «Сохранить».
   const [selected, setSelected] = useState<Dest | null>(null);
+  const [qr, setQr] = useState<Dest | null>(null);
   // Окно «Фото и билеты» — отдельно от основного редактирования.
   const [подробности, setПодробности] = useState<Dest | null>(null);
 
@@ -234,6 +236,11 @@ export default function Destinations() {
                 >
                   <span>{d.visits.toLocaleString()} посещений</span>
                   <span>{d.tours} туров</span>
+                  <span className="ml-auto" onClick={(e) => e.stopPropagation()}>
+                    <Btn variant="ghost" small onClick={() => setQr(d)}>
+                      QR
+                    </Btn>
+                  </span>
                 </div>
               </div>
             </div>
@@ -258,11 +265,25 @@ export default function Destinations() {
               <Btn variant="ghost" small onClick={() => setSelected(d)}>
                 Изменить
               </Btn>
+              <Btn variant="ghost" small onClick={() => setQr(d)}>
+                QR
+              </Btn>
               <Btn variant="danger" small onClick={() => remove(d)}>
                 Удалить
               </Btn>
             </div>,
           ])}
+        />
+      )}
+
+      {/* QR для таблички у места: турист сканирует — открывается карточка. */}
+      {qr && (
+        <ОкноQR
+          заголовок={qr.name}
+          подпись={`${qr.type} · ${qr.city} — табличка у места`}
+          адрес={`${window.location.origin}/?place=${encodeURIComponent(qr.id)}`}
+          файл={`qr-${qr.id}.png`}
+          onClose={() => setQr(null)}
         />
       )}
 

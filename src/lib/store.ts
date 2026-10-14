@@ -76,7 +76,7 @@ export async function readContent(): Promise<Content> {
 const ПОДРОБНОСТИ = {
   hotels: ["facts"],
   restaurants: ["menu", "zones", "tables", "avgCheck", "imgs", "facts"],
-  places: ["tickets", "facts", "imgs"],
+  places: ["tickets", "facts", "imgs", "story"],
 } as const;
 
 function дополнитьПодробности(содержимое: Content): Content {
@@ -95,6 +95,19 @@ function дополнитьПодробности(содержимое: Content)
       // Обложка-пицца из первых данных: редактор её не менял — меняем мы.
       if (ключ === "restaurants" && typeof r.img === "string" && r.img.includes("photo-1565299624946"))
         добавка.img = семя.img;
+      if (ключ === "places") {
+        // Рассказ в панели не правится — у мест из семян он всегда свежий.
+        if (семя.story) добавка.story = семя.story;
+        // Фото Самарканда из нашей папки (не загруженные редактором) — по
+        // текущим семенам: в них галерея пополняется новыми ракурсами.
+        const наши = (x: unknown) => typeof x === "string" && x.startsWith("/places/samarkand/");
+        const было = r.imgs as string[] | undefined;
+        if (наши(r.img) && (!было || было.every(наши)) && наши(семя.img)) {
+          добавка.img = семя.img;
+          добавка.imgs = семя.imgs;
+          добавка.credits = семя.credits;
+        }
+      }
       if (ключ === "hotels") {
         if (старыеНомера(r)) добавка.roomTypes = семя.roomTypes;
         // Старая галерея — начало новой: её никто не правил.

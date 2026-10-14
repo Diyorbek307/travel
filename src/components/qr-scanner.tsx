@@ -159,3 +159,31 @@ export function КнопкаСканера({ onClick }: { onClick: () => void })
     </button>
   );
 }
+
+/**
+ * Что открыть по QR-коду с таблички: «place:<id>», «hotel:<id>»,
+ * «restaurant:<id>» или «audio:<id>». Понимает ссылки приложения
+ * (…/?place=<id>), страницы мест (…/place/<id>), схему hellouz://place/<id>
+ * и голую запись «place:<id>». Чужой код — null.
+ */
+export function ссылкаИзКода(текст: string): string | null {
+  const код = текст.trim();
+  const виды = ["place", "hotel", "restaurant", "audio"];
+  const голая = /^(place|hotel|restaurant|audio):(.+)$/.exec(код);
+  if (голая) return `${голая[1]}:${голая[2]}`;
+  let адрес: URL;
+  try {
+    адрес = new URL(код);
+  } catch {
+    return null;
+  }
+  for (const вид of виды) {
+    const id = адрес.searchParams.get(вид);
+    if (id) return `${вид}:${id}`;
+  }
+  // hellouz://place/<id> — у такой ссылки «place» оказывается хостом.
+  const части = [адрес.host, ...адрес.pathname.split("/")].filter(Boolean).map(decodeURIComponent);
+  for (let i = 0; i < части.length - 1; i++)
+    if (виды.includes(части[i])) return `${части[i]}:${части[i + 1]}`;
+  return null;
+}

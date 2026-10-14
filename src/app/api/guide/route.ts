@@ -77,6 +77,32 @@ function подсказка(c: Content): string {
 ${справочник(c)}`;
 }
 
+/**
+ * Вопрос из карточки места: гид получает подробный рассказ о месте и
+ * расстояние до туриста. Ближе 150 м — турист стоит у места, и гид
+ * говорит с ним как экскурсовод на месте («перед вами…», «вы здесь»).
+ */
+function контекстМеста(c: Content, body: unknown): string | null {
+  if (typeof body !== "object" || body === null) return null;
+  const { place, distanceM } = body as { place?: unknown; distanceM?: unknown };
+  if (typeof place !== "string") return null;
+  const м = c.places.find((x) => x.id === place);
+  if (!м) return null;
+  const метры = typeof distanceM === "number" && Number.isFinite(distanceM) ? Math.round(distanceM) : null;
+  const где =
+    метры == null
+      ? "Где турист — неизвестно (геолокация выключена)."
+      : метры <= 150
+      ? `Турист СЕЙЧАС У ЭТОГО МЕСТА (≈${метры} м). Говори как гид на месте: «вы здесь», «перед вами», «обернитесь».`
+      : `Турист в ${метры >= 1000 ? `${(метры / 1000).toFixed(1)} км` : `${метры} м`} от места.`;
+  const рассказ = (м.story ?? []).map((р) => `${р.title}: ${р.text}`).join("\n");
+  return `ТУРИСТ ОТКРЫЛ КАРТОЧКУ МЕСТА [place:${м.id}] «${м.name}» (${м.city}, ${м.type}; вход ${м.entry}; часы ${м.hours}).
+${где}
+Вопросы — прежде всего об этом месте. Опирайся на рассказ ниже; чего в нём нет — общеизвестное, без выдумок.
+${м.desc}
+${рассказ}`;
+}
+
 /** Разбираем историю из запроса и не пропускаем лишнего. */
 function разобрать(body: unknown): Реплика[] | null {
   if (typeof body !== "object" || body === null) return null;
@@ -120,13 +146,17 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "too_many" }, { status: 429 });
 
   const содержимое = await readContent();
+  const место = контекстМеста(содержимое, body);
   try {
     const ответ = await ai.messages.create({
       model: МОДЕЛЬ,
       max_tokens: 700,
       // Справочник одинаков для всех, поэтому кешируем его: повторные
       // вопросы стоят в разы дешевле.
-      system: [{ type: "text", text: подсказка(содержимое), cache_control: { type: "ephemeral" } }],
+      system: [
+        { type: "text", text: подсказка(содержимое), cache_control: { type: "ephemeral" } },
+        ...(место ? [{ type: "text" as const, text: место }] : []),
+      ],
       messages: реплики.map((r) => ({ role: r.role === "ai" ? "assistant" : "user", content: r.text })),
     });
     const текст = текстОтвета(ответ);
