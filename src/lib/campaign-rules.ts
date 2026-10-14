@@ -84,7 +84,7 @@ export type Переход =
   | { kind: "profile" }
   | { kind: "place" | "hotel" | "restaurant"; id: string };
 
-const РАЗДЕЛЫ = ["cities", "places", "museums", "hotels", "restaurants", "bars", "excursions", "ai"];
+const РАЗДЕЛЫ = ["cities", "places", "museums", "hotels", "restaurants", "bars", "excursions", "ai", "drivers", "guides"];
 
 export function разобратьСсылку(ссылка: string): Переход | null {
   const [вид, хвост = ""] = ссылка.split(":", 2);
