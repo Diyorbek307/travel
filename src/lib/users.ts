@@ -57,6 +57,10 @@ export interface User {
    * продлевает её при каждом заходе.
    */
   sessionsFrom?: string | null;
+  /** Вход через Google: постоянный идентификатор человека у Google. */
+  googleSub?: string;
+  /** Вход через Apple: то же у Apple. */
+  appleSub?: string;
   createdAt: string;
   lastSeenAt: string;
 }
@@ -65,7 +69,7 @@ export interface User {
 export type { PublicUser } from "./types";
 
 export function publicUser(u: User): Omit<User, "passwordHash"> {
-  const { passwordHash: _hidden, ...rest } = u;
+  const { passwordHash: _hidden, googleSub: _g, appleSub: _a, ...rest } = u;
   return rest;
 }
 
@@ -206,6 +210,69 @@ export async function createUser(input: {
       country: кодСтраны(input.country) ?? input.country.trim().slice(0, 60),
       phone: input.phone.trim(),
       emailVerified: false,
+      createdAt: now,
+      lastSeenAt: now,
+    };
+    return [[...users, user], user];
+  });
+}
+
+/**
+ * Вход через Google или Apple: найти аккаунт или завести новый.
+ *
+ * Сначала ищем по постоянному идентификатору провайдера, потом — по почте,
+ * если провайдер ручается за неё. Код из письма не нужен: почту уже
+ * подтвердил Google или Apple.
+ *
+ * Если по этой почте был неподтверждённый аккаунт с паролем, пароль
+ * сбрасываем и старые сессии гасим: иначе кто-то мог заранее завести
+ * аккаунт на чужую почту и потом войти в него своим паролем.
+ */
+export async function войтиЧерезПровайдера(л: {
+  провайдер: "google" | "apple";
+  sub: string;
+  email: string;
+  почтаПодтверждена: boolean;
+  имя: string;
+  фамилия: string;
+}): Promise<User | "no_email" | "email_unverified"> {
+  const поле = л.провайдер === "google" ? "googleSub" : "appleSub";
+  const случайный = await hashPassword(randomBytes(24).toString("hex"));
+  const now = new Date().toISOString();
+  return хранилище.update<User | "no_email" | "email_unverified">((users) => {
+    const поSub = users.find((u) => u[поле] === л.sub);
+    if (поSub) return [users, поSub];
+    if (!л.email) return [users, "no_email" as const];
+    if (!л.почтаПодтверждена) return [users, "email_unverified" as const];
+
+    const i = users.findIndex((u) => u.email === л.email);
+    if (i !== -1) {
+      const был = users[i];
+      const обновлён: User = {
+        ...был,
+        [поле]: л.sub,
+        emailVerified: true,
+        ...(был.emailVerified ? {} : { passwordHash: случайный, sessionsFrom: now }),
+        firstName: был.firstName || л.имя,
+        lastName: был.lastName || л.фамилия,
+      };
+      const копия = [...users];
+      копия[i] = обновлён;
+      return [копия, обновлён];
+    }
+
+    const user: User = {
+      id: `u-${Date.now().toString(36)}-${randomBytes(4).toString("hex")}`,
+      email: л.email,
+      // Пароля нет: при желании человек задаст его через «Забыли пароль?».
+      passwordHash: случайный,
+      firstName: л.имя || л.email.split("@")[0].slice(0, 60),
+      lastName: л.фамилия,
+      hasPhoto: false,
+      country: "",
+      phone: "",
+      emailVerified: true,
+      [поле]: л.sub,
       createdAt: now,
       lastSeenAt: now,
     };

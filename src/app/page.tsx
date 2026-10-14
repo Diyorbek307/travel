@@ -1,5 +1,6 @@
 "use client";
 
+import { слушатьВозвратВхода } from "@/lib/oauth-client";
 import { запомнитьЗаказEsim } from "@/components/esim-shop";
 import { разобратьКод, заменитьМаршрут, текущийМаршрут } from "@/lib/trip";
 import { лёгкийСейчас } from "@/lib/lite";
@@ -330,6 +331,8 @@ function App() {
     window.addEventListener("hellouz:auth", открыть);
     return () => window.removeEventListener("hellouz:auth", открыть);
   }, []);
+  // Приложение: вход через Google/Apple возвращается ссылкой hellouz://auth.
+  useEffect(() => слушатьВозвратВхода(), []);
   useEffect(() => {
     let cancelled = false;
     /*
