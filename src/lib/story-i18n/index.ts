@@ -2,6 +2,10 @@ import type { Locale } from "../i18n";
 import { РАССКАЗЫ_DE } from "./de";
 import { РАССКАЗЫ_FR } from "./fr";
 import { РАССКАЗЫ_TR } from "./tr";
+import { РАССКАЗЫ_ZH } from "./zh";
+import { РАССКАЗЫ_KO } from "./ko";
+import { РАССКАЗЫ_JA } from "./ja";
+import { РАССКАЗЫ_AR } from "./ar";
 
 /**
  * Подробные рассказы о местах Самарканда на остальных языках (кроме en и
@@ -12,6 +16,10 @@ export const РАССКАЗЫ_ПО_ЯЗЫКАМ: Partial<Record<Locale, Record<s
   de: РАССКАЗЫ_DE,
   fr: РАССКАЗЫ_FR,
   tr: РАССКАЗЫ_TR,
+  zh: РАССКАЗЫ_ZH,
+  ko: РАССКАЗЫ_KO,
+  ja: РАССКАЗЫ_JA,
+  ar: РАССКАЗЫ_AR,
 };
 
 /** Заголовки разделов на этих языках. */
