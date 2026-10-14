@@ -471,7 +471,7 @@ export interface PublicUser {
   lastSeenAt: string;
 }
 
-export type BookingKind = "hotel" | "restaurant" | "tour";
+export type BookingKind = "hotel" | "restaurant" | "tour" | "driver" | "guide" | "guidetour";
 
 /** Строка «Полезно знать» в карточке: подпись и значение, как их вписал редактор. */
 export interface Fact {

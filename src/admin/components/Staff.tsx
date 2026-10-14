@@ -122,6 +122,7 @@ const РОЛЬ_ЦВЕТ: Record<AdminRole, "amber" | "teal" | "dim"> = {
   editor: "teal",
   support: "dim",
   venue: "amber",
+  manager: "teal",
 };
 
 export default function Staff() {

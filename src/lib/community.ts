@@ -138,7 +138,7 @@ export async function markThreadRead(userId: string): Promise<void> {
 /* Брони                                                              */
 /* ------------------------------------------------------------------ */
 
-export type BookingKind = "hotel" | "restaurant" | "tour";
+export type BookingKind = "hotel" | "restaurant" | "tour" | "driver" | "guide" | "guidetour";
 export type BookingStatus = "new" | "confirmed" | "cancelled";
 
 export interface Booking {
@@ -157,6 +157,14 @@ export interface Booking {
   /** Время визита в ресторан, HH:MM. */
   time?: string;
   note: string;
+  /** Водитель или гид, которому адресована заявка — он видит её в кабинете. */
+  providerId?: string;
+  /** Сколько дней нужна машина или гид. */
+  days?: number;
+  /** Где встретить: адрес, гостиница, аэропорт. */
+  pickup?: string;
+  /** Телефон туриста для связи — водителю и гиду он нужен сразу. */
+  contactPhone?: string;
   status: BookingStatus;
   createdAt: string;
   /**

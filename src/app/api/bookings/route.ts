@@ -7,10 +7,12 @@ import { КАТЕГОРИИ } from "@/lib/availability";
 import { отправитьБронь } from "@/lib/partners";
 import { readContent } from "@/lib/store";
 import type { RoomCategory } from "@/lib/types";
+import { отметить, партнёрПоId, турПоId } from "@/lib/providers";
+import { виденВКаталоге, телефонГоден } from "@/lib/provider-rules";
 
 export const dynamic = "force-dynamic";
 
-const ВИДЫ: BookingKind[] = ["hotel", "restaurant", "tour"];
+const ВИДЫ: BookingKind[] = ["hotel", "restaurant", "tour", "driver", "guide", "guidetour"];
 
 export async function GET() {
   const user = await currentUser();
@@ -40,11 +42,24 @@ export async function POST(request: Request) {
 
   const itemId = typeof body.itemId === "string" ? body.itemId : "";
   if (!itemId) return NextResponse.json({ error: "item_required" }, { status: 400 });
-  // Заведение должно существовать; название — из данных, а не из запроса.
-  const раздел = kind === "hotel" ? "hotels" : kind === "restaurant" ? "restaurants" : "routes";
-  const запись = await записьПоId(itemId, [раздел]);
-  if (!запись) return NextResponse.json({ error: "item_not_found" }, { status: 404 });
-  const itemName = (запись.name ?? запись.title ?? itemId).slice(0, 120);
+  // Водитель, гид или тур гида — из анкет партнёров, и только видимые в
+  // каталоге: заявка скрытому или неоплаченному партнёру ушла бы в пустоту.
+  let itemName: string;
+  let providerId: string | undefined;
+  if (kind === "driver" || kind === "guide" || kind === "guidetour") {
+    const тур = kind === "guidetour" ? await турПоId(itemId) : null;
+    const партнёр = await партнёрПоId(тур ? тур.providerId : itemId);
+    if (!партнёр || !виденВКаталоге(партнёр) || (kind === "guidetour" && (!тур || тур.status !== "active")))
+      return NextResponse.json({ error: "item_not_found" }, { status: 404 });
+    providerId = партнёр.id;
+    itemName = (тур ? `${тур.title} — ${партнёр.name}` : партнёр.name).slice(0, 120);
+  } else {
+    // Заведение должно существовать; название — из данных, а не из запроса.
+    const раздел = kind === "hotel" ? "hotels" : kind === "restaurant" ? "restaurants" : "routes";
+    const запись = await записьПоId(itemId, [раздел]);
+    if (!запись) return NextResponse.json({ error: "item_not_found" }, { status: 404 });
+    itemName = (запись.name ?? запись.title ?? itemId).slice(0, 120);
+  }
 
   const guests = Number(body.guests);
   if (!Number.isInteger(guests) || guests < 1 || guests > 30) {
@@ -85,6 +100,14 @@ export async function POST(request: Request) {
       ? body.time
       : undefined;
   const note = typeof body.note === "string" ? body.note.trim().slice(0, 500) : "";
+  // Водителю и гиду: сколько дней, где встретить и как связаться.
+  const days = providerId ? Math.round(Number(body.days)) : undefined;
+  if (providerId && !(days! >= 1 && days! <= 30))
+    return NextResponse.json({ error: "days_invalid" }, { status: 400 });
+  const pickup = providerId && typeof body.pickup === "string" ? body.pickup.trim().slice(0, 160) : undefined;
+  const телефон = typeof body.phone === "string" ? body.phone.trim().slice(0, 30) : "";
+  const contactPhone = providerId ? (телефонГоден(телефон) ? телефон : user.phone || undefined) : undefined;
+  if (providerId && !contactPhone) return NextResponse.json({ error: "phone_invalid" }, { status: 400 });
 
   const бронь = await createBooking({
     userId: user.id,
@@ -97,7 +120,12 @@ export async function POST(request: Request) {
     roomCategory,
     time,
     note,
+    providerId,
+    days,
+    pickup,
+    contactPhone,
   });
+  if (providerId) void отметить(providerId, "requests");
 
   /*
    * Заведение подключено к своей системе (OSHBOARD или любой другой по

@@ -1,5 +1,6 @@
 import { timingSafeEqual } from "node:crypto";
-import { всеЗаказы, заказПоId, изменитьЗаказ, отметитьОплату, type ТранзакцияPayme } from "./esim-orders";
+import type { ТранзакцияPayme } from "./esim-orders";
+import { всеЗаказы, заказПоId, изменитьЗаказ, отметитьОплату, нельзяОтменить } from "./orders";
 
 /**
  * Payme Merchant API — Payme сам сообщает нам о платеже.
@@ -37,7 +38,7 @@ const НЕТ_ТРАНЗАКЦИИ = () =>
 const НЕЛЬЗЯ_ПРОВЕСТИ = () =>
   new ОшибкаPayme(-31008, м("Операцию нельзя выполнить", "Amalni bajarib boʻlmaydi", "Unable to perform"));
 const НЕЛЬЗЯ_ОТМЕНИТЬ = () =>
-  new ОшибкаPayme(-31007, м("eSIM уже выдана, отмена невозможна", "eSIM berilgan", "eSIM already issued"));
+  new ОшибкаPayme(-31007, м("Услуга уже оказана, отмена невозможна", "Xizmat koʻrsatilgan", "Service already provided"));
 
 /** Транзакция, не проведённая за 12 часов, по правилам Payme отменяется. */
 const СРОК_МС = 12 * 60 * 60 * 1000;
@@ -133,7 +134,7 @@ export async function выполнить(метод: string, п: Парамет�
       if (т.state < 0) return { transaction: т.id, cancel_time: т.cancel_time, state: т.state };
       // Оплаченную, но ещё не выданную eSIM отменить можно; выданную — нет:
       // Airalo уже списал за неё деньги.
-      if (т.state === 2 && з.esim) throw НЕЛЬЗЯ_ОТМЕНИТЬ();
+      if (т.state === 2 && нельзяОтменить(з)) throw НЕЛЬЗЯ_ОТМЕНИТЬ();
       const итог = await отменить(з.id, Number(п.reason) || null);
       return { transaction: т.id, cancel_time: итог.cancel_time, state: итог.state };
     }

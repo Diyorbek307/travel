@@ -1,5 +1,5 @@
 import { createHash, timingSafeEqual } from "node:crypto";
-import { заказПоId, изменитьЗаказ, отметитьОплату } from "./esim-orders";
+import { заказПоId, изменитьЗаказ, отметитьОплату } from "./orders";
 
 /**
  * Click SHOP API — Click сам сообщает нам о платеже, в два шага.

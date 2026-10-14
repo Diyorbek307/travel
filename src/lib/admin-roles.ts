@@ -20,7 +20,7 @@
  *                 прямым запросом.
  */
 
-export type AdminRole = "owner" | "editor" | "support" | "venue";
+export type AdminRole = "owner" | "editor" | "support" | "venue" | "manager";
 
 export const ROLE_META: Record<AdminRole, { label: string; desc: string; color: string }> = {
   owner: {
@@ -43,12 +43,17 @@ export const ROLE_META: Record<AdminRole, { label: string; desc: string; color: 
     desc: "Кабинет одного отеля или ресторана: карточка, брони, отзывы",
     color: "#e0a526",
   },
+  manager: {
+    label: "Менеджер партнёров",
+    desc: "Водители и гиды: проверка анкет, оплаты, продвижение",
+    color: "#c05bd6",
+  },
 };
 
-export const ВСЕ_РОЛИ: AdminRole[] = ["owner", "editor", "support", "venue"];
+export const ВСЕ_РОЛИ: AdminRole[] = ["owner", "editor", "support", "manager", "venue"];
 
 export function рольСуществует(x: string): x is AdminRole {
-  return x === "owner" || x === "editor" || x === "support" || x === "venue";
+  return x === "owner" || x === "editor" || x === "support" || x === "venue" || x === "manager";
 }
 
 /**
@@ -56,13 +61,15 @@ export function рольСуществует(x: string): x is AdminRole {
  * может быть узким («Отели»), но за ним стоит домен («content»), и
  * проверять на сервере удобнее домен: их пять, а не тридцать.
  */
-export type Домен = "content" | "operations" | "users" | "money" | "staff" | "venue";
+export type Домен = "content" | "operations" | "users" | "money" | "staff" | "venue" | "partners";
 
 const РОЛЬ_ДОМЕНЫ: Record<AdminRole, Домен[]> = {
-  owner: ["content", "operations", "users", "money", "staff"],
+  owner: ["content", "operations", "users", "money", "staff", "partners"],
   editor: ["content"],
   support: ["operations", "users"],
   venue: ["venue"],
+  // Менеджер партнёров: водители и гиды. Тарифы меняет только владелец.
+  manager: ["partners"],
 };
 
 export function можетДомен(role: AdminRole, домен: Домен): boolean {
@@ -78,7 +85,11 @@ const РАЗДЕЛ_ДОСТУП: Record<string, AdminRole[]> = {
   // Все три роли — общий вход и обзор.
   dashboard: ["owner", "editor", "support"],
   preview: ["owner", "editor", "support"],
-  settings: ["owner", "editor", "support", "venue"],
+  settings: ["owner", "editor", "support", "venue", "manager"],
+  // Водители и гиды — менеджер партнёров.
+  drivers: ["owner", "manager"],
+  guides: ["owner", "manager"],
+  partnerpay: ["owner", "manager"],
   // Кабинет заведения — только самому заведению.
   myvenue: ["venue"],
   // Операции — поддержка.
