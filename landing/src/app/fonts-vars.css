@@ -1,0 +1,8 @@
+/* Имена шрифтов для стилей (раньше их задавал next/font/google). */
+:root {
+  --font-sans: "Rubik", ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif;
+  --font-serif: "Playfair Display", Georgia, "Times New Roman", serif;
+  --font-hand: "Caveat", "Segoe Print", cursive;
+  --font-condensed: "Oswald", "Arial Narrow", sans-serif;
+  --font-tight: "Inter Tight", ui-sans-serif, system-ui, sans-serif;
+}

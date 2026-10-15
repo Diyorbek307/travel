@@ -1,0 +1,5 @@
+/* Имена шрифтов для темы (раньше их задавал next/font/google). */
+:root {
+  --font-sans: "Rubik", ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif;
+  --font-menu: "Playfair Display", Georgia, "Times New Roman", serif;
+}

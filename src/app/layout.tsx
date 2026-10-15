@@ -1,31 +1,15 @@
 import type { Metadata, Viewport } from "next";
-import { Playfair_Display, Rubik } from "next/font/google";
+import "./fonts.css";
+import "./fonts-vars.css";
 import ServiceWorker from "@/components/service-worker";
 import "./globals.css";
 
 /*
- * Rubik подобран под буквы логотипа: плотный геометрический гротеск со
- * скруглёнными углами. В нём есть кириллица, поэтому латиница и русский
- * набираются одной гарнитурой — раньше латиница шла одним шрифтом, а
- * кириллица подменялась другим, и в строке «HelloUZ Premium активен»
- * буквы были из разных семейств. Шрифт переменный: все насыщенности
- * в одном файле.
+ * Шрифты — файлами из репозитория (public/fonts, src/app/fonts.css), а не
+ * через next/font/google: тот качает их во время сборки, и когда сервер
+ * сборки не достучался до Google Fonts, падала вся выкладка. Переменные
+ * --font-sans и --font-menu заданы в fonts-vars.css.
  */
-const rubik = Rubik({
-  subsets: ["latin", "cyrillic"],
-  variable: "--font-sans",
-});
-
-/*
- * Антиква для меню ресторанов: бумажному меню нужен книжный шрифт с
- * засечками, гротеск делает его похожим на прайс-лист. Не предзагружаем —
- * шрифт нужен только в карточке ресторана.
- */
-const playfair = Playfair_Display({
-  subsets: ["latin", "cyrillic"],
-  variable: "--font-menu",
-  preload: false,
-});
 
 export const metadata: Metadata = {
   // База для абсолютных ссылок в og/twitter — иначе картинка шеринга
@@ -104,7 +88,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     // suppressHydrationWarning — атрибут меняет этот скрипт, а не React.
     <html
       lang="ru"
-      className={`${rubik.variable} ${playfair.variable}`}
       data-theme="light"
       suppressHydrationWarning
     >
