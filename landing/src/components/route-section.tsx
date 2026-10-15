@@ -352,9 +352,9 @@ export default function RouteSection() {
       <Шахматка цвет="#f4f7f7" искра="#34dccf" />
       <ТочкиПоле />
 
-      <div className="relative z-10 mx-auto grid min-h-[100svh] max-w-[1600px] gap-10 px-5 pb-12 pt-[26vh] sm:px-8 lg:grid-cols-12 lg:pb-16 lg:pt-[22vh]">
+      <div className="relative z-10 mx-auto grid min-h-[100svh] max-w-7xl gap-10 px-5 pb-12 pt-[26vh] sm:px-8 lg:grid-cols-12 lg:pb-16 lg:pt-[22vh]">
         {/* Слева: заголовок и вступление */}
-        <div className="lg:col-span-4">
+        <div className="lg:col-span-5">
           <p className="mb-5 text-[11px] font-semibold uppercase tracking-[0.28em] text-white/60">
             {тр(ТЕКСТ.кикер, язык)}
           </p>
@@ -407,7 +407,7 @@ export default function RouteSection() {
         </div>
 
         {/* Справа: карта маршрута */}
-        <div ref={кадр} className="relative lg:col-span-8">
+        <div ref={кадр} className="relative lg:col-span-7">
           <svg
             viewBox={`${окно.x} ${окно.y} ${окно.w} ${окно.h}`}
             className="h-auto w-full overflow-visible"

@@ -66,8 +66,10 @@ body {
 /* ── Бумага: едва заметное зерно, чтобы кремовый не был пластиком ── */
 .paper-grain {
   background-color: var(--paper);
-  background-image: radial-gradient(circle at 20% 10%, rgba(233, 196, 106, 0.14), transparent 45%),
-    radial-gradient(circle at 85% 30%, rgba(15, 179, 172, 0.12), transparent 40%),
+  /* closest-side: пятна гаснут раньше края блока — между соседними
+     секциями не остаётся резкого шва. */
+  background-image: radial-gradient(closest-side at 20% 30%, rgba(233, 196, 106, 0.16), transparent),
+    radial-gradient(closest-side at 85% 55%, rgba(15, 179, 172, 0.13), transparent),
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.06'/%3E%3C/svg%3E");
 }
 
@@ -543,5 +545,52 @@ html.own-cursor * {
     transition: none;
     filter: none;
     transform: none;
+  }
+}
+
+/* ── Рамка подвала ──
+   Градиентная кайма бирюза → золото → бирюза медленно обходит панель
+   по кругу; снаружи — мягкое бирюзовое свечение. Без поддержки @property
+   кайма просто стоит на месте. */
+@property --frame-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+.footer-frame {
+  border: 1.5px solid transparent;
+  background:
+    linear-gradient(var(--night), var(--night)) padding-box,
+    conic-gradient(
+        from var(--frame-angle),
+        rgba(52, 220, 207, 0.95),
+        rgba(15, 179, 172, 0.35) 25%,
+        rgba(242, 206, 110, 0.95) 50%,
+        rgba(15, 179, 172, 0.35) 75%,
+        rgba(52, 220, 207, 0.95)
+      )
+      border-box;
+  box-shadow:
+    0 0 0 6px rgba(15, 179, 172, 0.06),
+    0 40px 90px -40px rgba(15, 179, 172, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  animation: frame-spin 14s linear infinite;
+}
+@keyframes frame-spin {
+  to {
+    --frame-angle: 360deg;
+  }
+}
+.footer-tiles {
+  background:
+    repeating-linear-gradient(135deg, var(--accent) 0 8px, transparent 8px 16px),
+    repeating-linear-gradient(45deg, var(--gold) 0 4px, transparent 4px 16px);
+  opacity: 0.5;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
+}
+@media (prefers-reduced-motion: reduce) {
+  .footer-frame {
+    animation: none;
   }
 }

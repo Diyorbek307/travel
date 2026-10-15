@@ -8,7 +8,8 @@ import { Контуры, Слова } from "./cinema";
 import StoreButtons from "./store-buttons";
 
 /**
- * Финал — тёмная панель в бирюзовой рамке, по ней медленно текут линии
+ * Финал — тёмная панель в переливающейся рамке (бирюза → золото, как
+ * крыло знака) с узором-«ёлочкой» майолики по верхнему краю, по ней медленно текут линии
  * рельефа: вращающийся значок, крупный заголовок, рукописное
  * «Salom, O‘zbekiston!» и отдельный вход для заведений — у них в
  * приложении свой кабинет.
@@ -16,8 +17,10 @@ import StoreButtons from "./store-buttons";
 export default function Finale() {
   const { t } = useЯзык();
   return (
-    <footer data-nav="dark" className="relative p-2.5 text-white sm:p-4" style={{ background: "#0fb3ac" }}>
-      <div className="relative overflow-hidden" style={{ background: "var(--night)" }}>
+    <footer data-nav="dark" className="relative px-2.5 pb-2.5 pt-6 text-white sm:px-5 sm:pb-5 sm:pt-10">
+      <div className="footer-frame relative overflow-hidden rounded-[28px] sm:rounded-[44px]">
+        {/* Узор-«ёлочка» по верхнему краю — как изразцы Хивы, гаснет к углам. */}
+        <div aria-hidden className="footer-tiles pointer-events-none absolute inset-x-0 top-0 h-2.5" />
         <Контуры цвет="rgba(255,255,255,0.09)" />
         <div
           aria-hidden
@@ -77,7 +80,7 @@ export default function Finale() {
                   {t("fin_partners_sub")}
                 </p>
                 <div className="mt-4 flex flex-wrap gap-2">
-                  {(["fin_p_1", "fin_p_2", "fin_p_3", "fin_p_4"] as const).map((к) => (
+                  {(["fin_p_5", "fin_p_2", "fin_p_1", "fin_p_3", "fin_p_4"] as const).map((к) => (
                     <span
                       key={к}
                       className="rounded-full border border-white/30 px-3 py-1 text-xs font-medium"
@@ -87,28 +90,39 @@ export default function Finale() {
                   ))}
                 </div>
               </div>
-              <a
-                href={`${APP_URL}/admin`}
-                target="_blank"
-                rel="noreferrer"
-                className="whitespace-nowrap rounded-full px-6 py-3 text-sm font-semibold transition-transform hover:scale-[1.04]"
-                style={{ background: "var(--gold)", color: "#1c1606" }}
-              >
-                {t("fin_p_cta")} ↗
-              </a>
+              {/* Водители и гиды — в свой кабинет; заведения входят в панель. */}
+              <div className="flex w-full flex-col items-stretch gap-2 sm:w-auto lg:items-end">
+                <a
+                  href={`${APP_URL}/cabinet`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="whitespace-nowrap rounded-full px-6 py-3 text-center text-sm font-semibold transition-transform hover:scale-[1.04]"
+                  style={{ background: "var(--gold)", color: "#1c1606" }}
+                >
+                  {t("fin_p_cta")} ↗
+                </a>
+                <a
+                  href={`${APP_URL}/admin`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="py-1.5 text-center text-xs font-medium text-white/65 underline-offset-4 hover:text-white hover:underline"
+                >
+                  {t("fin_p_venue")} ↗
+                </a>
+              </div>
             </div>
           </div>
 
           {/* Все разделы сайта — внизу каждой страницы. */}
-          <nav className="mt-14 flex flex-wrap justify-center gap-x-6 gap-y-3 text-sm font-medium text-white/80">
+          <nav className="mt-14 flex flex-wrap justify-center gap-x-2 gap-y-1 text-sm font-medium text-white/80">
             {СТРАНИЦЫ.map((с) => (
-              <Link key={с.путь} href={с.путь} className="hover:text-white">
+              <Link key={с.путь} href={с.путь} className="rounded-full px-3 py-2.5 transition-colors hover:bg-white/10 hover:text-white">
                 {t(с.меню)}
               </Link>
             ))}
           </nav>
 
-          <div className="mt-8 flex flex-col items-center justify-between gap-3 border-t border-white/15 pt-6 text-xs text-white/55 sm:flex-row">
+          <div className="mt-8 flex flex-col items-center justify-between gap-3 border-t border-white/15 pt-6 text-center text-xs text-white/55 sm:flex-row sm:text-start">
             <p>© {new Date().getFullYear()} HelloUZ · Made in Uzbekistan</p>
             <p>{t("fin_credits")}</p>
           </div>

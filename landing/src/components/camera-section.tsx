@@ -142,7 +142,7 @@ export default function CameraSection() {
         style={{ background: "radial-gradient(circle, rgba(52,220,207,0.12), transparent 65%)" }}
       />
 
-      <div className="relative z-10 mx-auto grid max-w-[1400px] items-center gap-12 px-5 pb-20 pt-[30vh] sm:px-8 lg:grid-cols-12 lg:gap-8 lg:pb-24 lg:pt-[24vh]">
+      <div className="relative z-10 mx-auto grid max-w-7xl items-center gap-12 px-5 pb-20 pt-[30vh] sm:px-8 lg:grid-cols-12 lg:gap-8 lg:pb-24 lg:pt-[24vh]">
         {/* Что это */}
         <div className="lg:col-span-4">
           <p

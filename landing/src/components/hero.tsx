@@ -70,7 +70,6 @@ export default function Hero({ цифры }: { цифры: Цифры }) {
   const сияние = useRef<HTMLDivElement>(null);
   const панельA = useRef<HTMLDivElement>(null);
   const панельB = useRef<HTMLDivElement>(null);
-  const подсказка = useRef<HTMLDivElement>(null);
 
   const [ушёл, setУшёл] = useState(false);
   const [видноA, setВидноA] = useState(false);
@@ -109,7 +108,6 @@ export default function Hero({ цифры }: { цифры: Цифры }) {
       текст.current.style.transform = `translate3d(0, ${-110 * т}px, 0)`;
       текст.current.style.pointerEvents = т > 0.5 ? "none" : "auto";
     }
-    if (подсказка.current) подсказка.current.style.opacity = String(1 - доля(п, 0, 0.06));
 
     const ф = плавно(доля(п, 0.34, 0.6));
     if (телефон.current) {
@@ -219,10 +217,18 @@ export default function Hero({ цифры }: { цифры: Цифры }) {
         </div>
 
         {/* Панели с цифрами: справа и слева, проезжают снизу вверх */}
-        <div className="pointer-events-none absolute inset-0 z-20 mx-auto max-w-[1600px] px-5 sm:px-8">
+        <div
+          className="pointer-events-none absolute inset-0 z-20 mx-auto max-w-7xl px-5 sm:px-8"
+          // Панели уезжают вверх под меню — гасим их раньше, чем текст
+          // наедет на логотип и пункты меню.
+          style={{
+            maskImage: "linear-gradient(to bottom, transparent 0, transparent 72px, #000 150px)",
+            WebkitMaskImage: "linear-gradient(to bottom, transparent 0, transparent 72px, #000 150px)",
+          }}
+        >
           <div
             ref={панельA}
-            className="absolute right-5 w-[min(92vw,380px)] sm:right-8 lg:right-[6%]"
+            className="absolute right-5 w-[min(calc(100vw-40px),380px)] sm:right-8"
             style={{ top: 0, transform: "translate3d(0, 120vh, 0)", willChange: "transform" }}
           >
             <Панель
@@ -237,7 +243,7 @@ export default function Hero({ цифры }: { цифры: Цифры }) {
           </div>
           <div
             ref={панельB}
-            className="absolute left-5 w-[min(92vw,380px)] sm:left-8 lg:left-[6%]"
+            className="absolute left-5 w-[min(calc(100vw-40px),380px)] sm:left-8"
             style={{ top: 0, transform: "translate3d(0, 120vh, 0)", willChange: "transform" }}
           >
             <Панель
@@ -254,7 +260,7 @@ export default function Hero({ цифры }: { цифры: Цифры }) {
 
         {/* Текст первого экрана */}
         <div ref={текст} className="absolute inset-x-0 bottom-0 z-30 px-5 pb-7 text-white sm:px-8 sm:pb-10">
-          <div className="mx-auto grid max-w-[1600px] items-end gap-7 lg:grid-cols-12 lg:gap-6">
+          <div className="mx-auto grid max-w-[76rem] items-end gap-7 lg:grid-cols-12 lg:gap-6">
             <div className="lg:col-span-7">
               <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.28em] text-white/75 sm:text-xs">
                 <Слова текст={t("hero_kicker")} видно={показ} уход={ушёл} шаг={0.04} />
@@ -262,7 +268,7 @@ export default function Hero({ цифры }: { цифры: Цифры }) {
               <div
                 aria-hidden
                 dir="ltr"
-                className="tight select-none whitespace-nowrap text-[clamp(4.4rem,16.5vw,15rem)] font-medium leading-[0.84] tracking-[-0.06em]"
+                className="tight select-none whitespace-nowrap text-[clamp(4.4rem,min(15vw,25svh),13.5rem)] font-medium leading-[0.84] tracking-[-0.06em]"
               >
                 <span className="hero-mark">
                   {"HelloUZ".split("").map((б, i) => (
@@ -287,24 +293,15 @@ export default function Hero({ цифры }: { цифры: Цифры }) {
               <div className="hero-cta">
                 <StoreButtons тёмный />
               </div>
-              <p className="flex gap-6 text-[13px] text-white/70">
-                <span>(10 {t("stat_langs")})</span>
-                <span>(2026)</span>
+              <p className="flex flex-wrap gap-x-5 gap-y-1 text-[13px] text-white/75">
+                <span>✓ {t("trust_free")}</span>
+                <span>✓ {t("trust_offline")}</span>
+                <span>10 {t("stat_langs")}</span>
               </p>
             </div>
           </div>
         </div>
 
-        {/* Подсказка «листайте» */}
-        <div
-          ref={подсказка}
-          aria-hidden
-          className="absolute bottom-6 left-1/2 z-30 hidden -translate-x-1/2 flex-col items-center gap-2 text-white/70 lg:flex"
-        >
-          <span className="h-10 w-px overflow-hidden bg-white/20">
-            <span className="scroll-tick block h-4 w-px bg-white" />
-          </span>
-        </div>
       </div>
     </section>
   );

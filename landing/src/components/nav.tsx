@@ -65,27 +65,22 @@ export default function Nav() {
   return (
     <>
       <header
-        className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${тёмный ? "text-white" : ""} ${
+        className={`fixed inset-x-0 top-0 z-50 border-b border-transparent transition-[padding,background-color,box-shadow,border-color] duration-500 ${тёмный ? "text-white" : ""} ${
           прокручено
             ? тёмный
-              ? "glass py-2.5"
-              : "glass-light py-2.5 shadow-[0_8px_30px_-20px_rgba(13,23,21,0.5)]"
+              ? "py-2.5"
+              : "glass-light !border-x-0 !border-t-0 py-2.5 shadow-[0_8px_30px_-20px_rgba(13,23,21,0.5)]"
             : "py-5"
         }`}
         style={
           // Над тёмными блоками — без размытия подложки: под шапкой там движется
           // фото первого экрана, и размытие пересчитывалось бы каждый кадр.
           тёмный && прокручено
-            ? {
-                borderColor: "transparent",
-                background: "rgba(10,17,16,0.82)",
-                backdropFilter: "none",
-                WebkitBackdropFilter: "none",
-              }
+            ? { background: "rgba(10,17,16,0.82)" }
             : undefined
         }
       >
-        <div className="mx-auto flex max-w-7xl items-center gap-6 px-5 sm:px-8">
+        <div className="mx-auto flex max-w-7xl items-center gap-3 px-5 sm:gap-6 sm:px-8">
           <Link href="/" className="flex items-center gap-2.5">
             <Logo size={36} />
             <span className="text-xl font-semibold tracking-tight">
@@ -138,7 +133,9 @@ export default function Nav() {
               target="_blank"
               rel="noreferrer"
               aria-label={t("open_app")}
-              className="inline-flex h-9 w-9 items-center justify-center whitespace-nowrap rounded-full text-sm font-semibold text-white transition-transform hover:scale-[1.04] sm:h-auto sm:w-auto sm:px-5 sm:py-2.5"
+              // Уже 400px шапка не вмещает и язык, и стрелку, и меню — стрелку прячем,
+              // «Открыть HelloUZ» остаётся в меню.
+              className="hidden h-9 w-9 items-center justify-center whitespace-nowrap rounded-full text-sm font-semibold text-white transition-transform hover:scale-[1.04] min-[400px]:inline-flex sm:h-auto sm:w-auto sm:px-5 sm:py-2.5"
               style={{ background: тёмный ? "var(--accent-fill)" : "var(--accent-ink)" }}
             >
               {/* На телефоне места мало — только стрелка; надпись с 640px. */}

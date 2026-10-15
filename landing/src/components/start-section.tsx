@@ -60,7 +60,7 @@ export default function StartSection() {
         </div>
 
         <Reveal className="mt-14">
-          <div className="mx-auto flex max-w-3xl flex-col items-center gap-5 rounded-[28px] border p-6 text-center sm:p-8" style={{ borderColor: "var(--line)", background: "rgba(255,255,255,0.75)" }}>
+          <div className="mx-auto flex max-w-3xl flex-col items-center gap-5 rounded-[28px] border p-4 text-center sm:p-8" style={{ borderColor: "var(--line)", background: "rgba(255,255,255,0.75)" }}>
             <StoreButtons className="justify-center" />
           </div>
         </Reveal>

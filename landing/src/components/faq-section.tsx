@@ -17,7 +17,7 @@ export default function FaqSection() {
   const [открыт, setОткрыт] = useState(0);
   return (
     <section id="faq" className="relative px-5 py-24 sm:px-8 sm:py-32" style={{ background: "var(--cream)" }}>
-      <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-[0.8fr_1.2fr]">
+      <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[0.8fr_1.2fr]">
         <Reveal className="lg:sticky lg:top-28 lg:self-start">
           <p className="mb-5 text-xs font-semibold uppercase tracking-[0.3em]" style={{ color: "var(--accent-ink)" }}>
             {t("faq_kicker")}

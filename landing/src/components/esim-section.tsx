@@ -89,17 +89,28 @@ function Телефон() {
                 <p className="text-white/80">Uzbekistan · 4G</p>
               </div>
             </div>
+            {/* Остаток пакета — чтобы низ экрана не пустовал */}
+            <div className="mt-3 rounded-2xl bg-white px-4 py-3 shadow-[0_10px_30px_-18px_rgba(0,0,0,0.3)]">
+              <div className="flex items-baseline justify-between text-[12px] text-[#0d1715]">
+                <span className="font-bold">7.4 / 10 GB</span>
+                <span className="text-[#587470]">5 d</span>
+              </div>
+              <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#e3eeec]">
+                <div className="h-full w-[74%] rounded-full bg-gradient-to-r from-[#0fb3ac] to-[#f2ce6e]" />
+              </div>
+            </div>
           </div>
           {/* «Чёлка» */}
           <div className="absolute left-1/2 top-2 h-5 w-24 -translate-x-1/2 rounded-full bg-[#050a09]" />
         </div>
       </div>
       {/* Плавающие плашки */}
-      <div className="glass absolute -left-3 top-24 z-10 rounded-2xl px-3 py-2 text-xs font-semibold text-white sm:-left-16">
+      {/* Плашки тёмные: стекло над белым экраном телефона делало белый текст невидимым. */}
+      <div className="absolute -left-3 top-24 z-20 rounded-2xl border border-white/20 bg-[rgba(10,17,16,0.78)] px-3 py-2 text-xs font-semibold text-white shadow-lg backdrop-blur-md sm:-left-16">
         ✈️ → 📶
       </div>
       <div
-        className="glass absolute -right-3 bottom-28 z-10 rounded-2xl px-3 py-2 text-xs font-semibold text-white sm:-right-14"
+        className="absolute -right-3 bottom-28 z-20 rounded-2xl border border-white/20 bg-[rgba(10,17,16,0.78)] px-3 py-2 text-xs font-semibold text-white shadow-lg backdrop-blur-md sm:-right-14"
         style={{ animationDelay: "-2s" }}
       >
         Payme · Click

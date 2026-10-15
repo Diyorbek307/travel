@@ -192,6 +192,7 @@ export default function Features() {
   return (
     <section id="features" className="paper-grain px-3 py-20 sm:px-6 sm:py-28">
       <div
+        data-nav="dark"
         className="mx-auto max-w-7xl overflow-hidden rounded-[36px] px-6 py-14 sm:px-12 sm:py-20"
         style={{ background: "linear-gradient(145deg, var(--accent-deep), var(--night) 65%)", color: "var(--paper)" }}
       >
@@ -230,7 +231,7 @@ export default function Features() {
             {карточки.map((к, n) => (
               <Reveal key={к.заголовок} delay={n * 0.1}>
                 <article
-                  className={`group relative flex h-[420px] flex-col overflow-hidden rounded-[26px] p-6 transition-transform duration-500 hover:-translate-y-3 ${
+                  className={`group relative flex h-[300px] flex-col overflow-hidden sm:h-[420px] rounded-[26px] p-6 transition-transform duration-500 hover:-translate-y-3 ${
                     n === 1 ? "sm:mt-[-24px]" : ""
                   }`}
                   style={{ background: ГРАДИЕНТЫ[n], color: "var(--ink)" }}

@@ -110,6 +110,8 @@ export default function StoreButtons({
 
   return (
     <div className={`flex flex-wrap items-center gap-3 ${className}`}>
+      {/* Два значка — всегда парой и одной ширины, даже когда кнопка веб-версии уходит на новую строку. */}
+      <div className="grid w-full grid-cols-2 gap-3 min-[420px]:w-auto">
       {значки.map((з) => {
         const есть = Boolean(з.ссылка);
         const внутри = (
@@ -117,11 +119,11 @@ export default function StoreButtons({
             {з.знак}
             <span className="flex flex-col text-start leading-none">
               <span className="text-[10px] font-medium opacity-75">{тр(есть ? СКАЧАТЬ : СКОРО, язык)}</span>
-              <span className="mt-1 text-[16px] font-semibold tracking-[-0.01em]">{з.имя}</span>
+              <span className="mt-1 whitespace-nowrap text-[14.5px] font-semibold tracking-[-0.01em] min-[420px]:text-[16px]">{з.имя}</span>
             </span>
           </>
         );
-        const класс = `inline-flex h-[52px] items-center gap-2.5 rounded-[14px] border px-4 transition-transform ${рамка}`;
+        const класс = `inline-flex h-[52px] min-w-0 items-center justify-center gap-2 rounded-[14px] border px-2.5 transition-transform min-[420px]:min-w-[156px] min-[420px]:justify-start min-[420px]:px-4 ${рамка}`;
         return есть ? (
           <a
             key={з.имя}
@@ -143,12 +145,13 @@ export default function StoreButtons({
           </span>
         );
       })}
+      </div>
       {веб && (
         <a
           href={APP_URL}
           target="_blank"
           rel="noreferrer"
-          className="group inline-flex h-[52px] items-center gap-2.5 rounded-[14px] px-5 text-[14px] font-semibold text-white transition-transform hover:scale-[1.03]"
+          className="group inline-flex h-[52px] w-full items-center justify-center gap-2.5 rounded-[14px] px-5 text-[14px] font-semibold text-white transition-transform hover:scale-[1.03] min-[420px]:w-auto"
           style={{ background: "var(--accent-fill)" }}
         >
           {тр(ВЕБ, язык)}

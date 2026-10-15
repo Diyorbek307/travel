@@ -351,7 +351,7 @@ export default function Destinations() {
               >
                 →
               </button>
-              <div className="relative h-px flex-1 bg-white/25">
+              <div className="relative h-[2px] min-w-0 flex-1 overflow-hidden rounded-full bg-white/35">
                 <span
                   key={`${i}-${пауза}`}
                   className="absolute inset-y-0 left-0 bg-white"
