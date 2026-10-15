@@ -6,6 +6,37 @@
  * Файл собран скриптом при импорте базы; правьте осторожно.
  */
 export const ФОТО_САМАРКАНДА: Record<string, { img: string; imgs: string[]; credits: string; sources: string[] }> = {
+  smbehb: {
+    img: "/places/samarkand/smbehb-c1.webp",
+    imgs: ["/places/samarkand/smbehb-c2.webp","/places/samarkand/smbehb-c3.webp"],
+    credits: "Фото: Shamsiddin RS (CC BY-SA 4.0) — Wikimedia Commons",
+    sources: [
+      "https://commons.wikimedia.org/wiki/File:Muzey.png",
+      "https://commons.wikimedia.org/wiki/File:Interyer.png",
+      "https://commons.wikimedia.org/wiki/File:Noshirlik.png",
+    ],
+  },
+  smabdu: {
+    img: "/places/samarkand/smabdu-c1.webp",
+    imgs: ["/places/samarkand/smabdu-c2.webp","/places/samarkand/smabdu-c3.webp","/places/samarkand/smabdu-c4.webp"],
+    credits: "Фото: Jamshid Avazovich Djurakulov (CC BY-SA 4.0) — Wikimedia Commons",
+    sources: [
+      "https://commons.wikimedia.org/wiki/File:Khadjiabdulaziz_04.jpg",
+      "https://commons.wikimedia.org/wiki/File:Khadjiabdulaziz_05.jpg",
+      "https://commons.wikimedia.org/wiki/File:Khadjiabdulaziz_01.jpg",
+      "https://commons.wikimedia.org/wiki/File:Khadjiabdulaziz_02.jpg",
+    ],
+  },
+  smdaud: {
+    img: "/places/samarkand/smdaud-c1.webp",
+    imgs: ["/places/samarkand/smdaud-c2.webp","/places/samarkand/smdaud-c3.webp"],
+    credits: "Фото: Akobirolmasov diplomat (CC BY-SA 4.0); Peretz Partensky from San Francisco, USA (CC BY-SA 2.0); FeruzaJuraqulova (CC BY-SA 4.0) — Wikimedia Commons",
+    sources: [
+      "https://commons.wikimedia.org/wiki/File:Samarqand_viloyati_Zarafshon_tog%27_tizmasi_manzarasi.jpg",
+      "https://commons.wikimedia.org/wiki/File:King_Davids_Cave_(3914497189).jpg",
+      "https://commons.wikimedia.org/wiki/File:Khazrati_Dovud_touristic_center.jpg",
+    ],
+  },
   afros: {
     img: "/places/samarkand/afros-c1.webp",
     imgs: ["/places/samarkand/afros-c2.webp", "/places/samarkand/afros-c3.webp", "/places/samarkand/afros-c4.webp", "/places/samarkand/afros-c5.webp", "/places/samarkand/afros-c6.webp", "/places/samarkand/afros-c7.webp", "/places/samarkand/afros-c8.webp", "/places/samarkand/afros-c9.webp", "/places/samarkand/afros-c10.webp", "/places/samarkand/afros-c11.webp", "/places/samarkand/afros-c12.webp"],
