@@ -38,8 +38,47 @@ function найти(цель: string): HTMLElement | null {
 
 type Рамка = { top: number; left: number; width: number; height: number };
 
-export function ЖивоеОбучение({ onTab, onDone }: { onTab: (t: Tab) => void; onDone: () => void }) {
+/** Контур скруглённого прямоугольника для выреза в затемнении. */
+function окно(x: number, y: number, w: number, h: number, r: number): string {
+  const к = Math.max(0, Math.min(r, w / 2, h / 2));
+  return `M${x + к} ${y}H${x + w - к}A${к} ${к} 0 0 1 ${x + w} ${y + к}V${y + h - к}A${к} ${к} 0 0 1 ${
+    x + w - к
+  } ${y + h}H${x + к}A${к} ${к} 0 0 1 ${x} ${y + h - к}V${y + к}A${к} ${к} 0 0 1 ${x + к} ${y}Z`;
+}
+
+/**
+ * Что подсвечивать. У высокой цели (сетка плиток длиннее экрана) — только
+ * первые N плиток из data-tour-crop: иначе рамка охватывала весь экран, а
+ * облачко с текстом уезжало за край.
+ */
+function область(el: HTMLElement): {
+  top: number;
+  left: number;
+  right: number;
+  bottom: number;
+  первый: HTMLElement;
+} {
+  const n = Number(el.dataset.tourCrop);
+  const плитки = n ? [...(el.querySelector(".grid")?.children ?? [])].slice(0, n) : [];
+  const части = (плитки.length ? плитки : [el]).map((x) => x.getBoundingClientRect());
+  return {
+    top: Math.min(...части.map((r) => r.top)),
+    left: Math.min(...части.map((r) => r.left)),
+    right: Math.max(...части.map((r) => r.right)),
+    bottom: Math.max(...части.map((r) => r.bottom)),
+    первый: (плитки[0] as HTMLElement | undefined) ?? el,
+  };
+}
+
+export function ЖивоеОбучение({ onTab, onDone: закончить }: { onTab: (t: Tab) => void; onDone: () => void }) {
   const { t } = useT();
+  // Экран приложения не прокручивается сам (overflow: hidden), но
+  // scrollIntoView умеет сдвинуть и его. После обучения возвращаем на место.
+  const onDone = () => {
+    const экран = корень.current?.parentElement;
+    if (экран) экран.scrollTop = 0;
+    закончить();
+  };
   const [n, setN] = useState(0);
   const [рамка, setРамка] = useState<Рамка | null>(null);
   const корень = useRef<HTMLDivElement>(null);
@@ -50,11 +89,20 @@ export function ЖивоеОбучение({ onTab, onDone }: { onTab: (t: Tab) 
     const el = найти(шаг.цель);
     const коробка = корень.current?.parentElement?.getBoundingClientRect();
     if (!el || !коробка) return;
-    const r = el.getBoundingClientRect();
-    const новая = { top: r.top - коробка.top, left: r.left - коробка.left, width: r.width, height: r.height };
+    const r = область(el);
+    const новая = {
+      top: r.top - коробка.top,
+      left: r.left - коробка.left,
+      width: r.right - r.left,
+      height: r.bottom - r.top,
+    };
     // Без лишних перерисовок: замер идёт каждый кадр, а рамка стоит.
     setРамка((с) =>
-      с && с.top === новая.top && с.left === новая.left && с.width === новая.width && с.height === новая.height
+      с &&
+      с.top === новая.top &&
+      с.left === новая.left &&
+      с.width === новая.width &&
+      с.height === новая.height
         ? с
         : новая,
     );
@@ -74,9 +122,14 @@ export function ЖивоеОбучение({ onTab, onDone }: { onTab: (t: Tab) 
       const el = найти(шаг.цель);
       if (el && !прокрутили) {
         прокрутили = true;
-        const r = el.getBoundingClientRect();
-        if (r.top < 60 || r.bottom > window.innerHeight - 60) {
-          el.scrollIntoView({ block: "center", behavior: "smooth" });
+        const r = область(el);
+        // Кнопки нижнего меню стоят у самого края и видны всегда: их не
+        // прокручиваем. Раньше scrollIntoView сдвигал на них весь экран
+        // приложения (.device) на 4–5px, и он оставался сдвинутым.
+        const вМеню = Boolean(el.closest("nav"));
+        if (!вМеню && (r.top < 60 || r.bottom > window.innerHeight - 60)) {
+          // Высокую цель — к началу (под шапку), обычную — в центр.
+          r.первый.scrollIntoView({ block: el.dataset.tourCrop ? "start" : "center", behavior: "smooth" });
         }
       }
       измерить();
@@ -102,25 +155,45 @@ export function ЖивоеОбучение({ onTab, onDone }: { onTab: (t: Tab) 
 
   const отступ = 6;
   const коробкаВыс = корень.current?.parentElement?.clientHeight ?? 800;
+  const коробкаШир = корень.current?.parentElement?.clientWidth ?? 400;
   // Облачко — под целью, если внизу хватает места, иначе над ней.
   const снизу = рамка ? рамка.top + рамка.height + 190 < коробкаВыс : true;
 
   return (
     <div ref={корень} className="absolute inset-0 z-[80]" role="dialog" aria-modal aria-live="polite">
-      {/* Затемнение с «окном» над целью. Пока цель ищется — просто тень. */}
+      {/*
+        Затемнение с «окном» над целью. Раньше окно делала тень box-shadow
+        на 9999px — Chrome её в этом слое не рисовал, и экран вокруг цели
+        оставался светлым. Теперь — SVG-прямоугольник с вырезом (evenodd):
+        рисуется везде одинаково. Пока цель ищется — просто тень.
+      */}
       {рамка ? (
-        <div
-          className="tour-spot pointer-events-none absolute rounded-2xl"
-          style={{
-            top: рамка.top - отступ,
-            left: рамка.left - отступ,
-            width: рамка.width + отступ * 2,
-            height: рамка.height + отступ * 2,
-            boxShadow: "0 0 0 9999px rgba(3,10,9,0.72)",
-            border: `2px solid ${GOLD}`,
-            transition: "all 0.35s cubic-bezier(0.22,1,0.36,1)",
-          }}
-        />
+        <>
+          <svg className="pointer-events-none absolute inset-0 h-full w-full" aria-hidden>
+            <path
+              fillRule="evenodd"
+              fill="rgba(3,10,9,0.72)"
+              d={`M0 0H${коробкаШир}V${коробкаВыс}H0Z ${окно(
+                рамка.left - отступ,
+                рамка.top - отступ,
+                рамка.width + отступ * 2,
+                рамка.height + отступ * 2,
+                16,
+              )}`}
+            />
+          </svg>
+          <div
+            className="tour-spot pointer-events-none absolute rounded-2xl"
+            style={{
+              top: рамка.top - отступ,
+              left: рамка.left - отступ,
+              width: рамка.width + отступ * 2,
+              height: рамка.height + отступ * 2,
+              border: `2px solid ${GOLD}`,
+              transition: "all 0.35s cubic-bezier(0.22,1,0.36,1)",
+            }}
+          />
+        </>
       ) : (
         <div className="absolute inset-0" style={{ background: "rgba(3,10,9,0.72)" }} />
       )}

@@ -42,17 +42,10 @@ export function SplashScreen({ onStart, onLogin }: { onStart: () => void; onLogi
         <span data-brand-logo className="inline-flex shrink-0">
           <LogoMark size={44} intro tone="#ffffff" />
         </span>
-        <div>
-          <p className="leading-none">
-            <Wordmark size={26} light style={{ textShadow: "0 2px 12px rgba(0,0,0,0.55)" }} />
-          </p>
-          <p
-            className="text-white text-xs mt-1 font-medium"
-            style={{ textShadow: "0 1px 8px rgba(0,0,0,0.6)" }}
-          >
-            {t("splash_tagline")}
-          </p>
-        </div>
+        {/* Под знаком больше нет слогана: он же крупно чуть ниже — вышло дважды подряд. */}
+        <p className="leading-none">
+          <Wordmark size={26} light style={{ textShadow: "0 2px 12px rgba(0,0,0,0.55)" }} />
+        </p>
       </div>
       <div className="relative z-10 flex justify-end px-4 mt-2">
         <GeomPattern opacity={0.22} />

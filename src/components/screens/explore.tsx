@@ -300,29 +300,38 @@ export function ExploreScreen({
         {t(ключ)}
       </h2>
     );
-    const группа = (г: (typeof ГРУППЫ)[number], номерГруппы: number) => (
-      <section
-        key={г.заголовок ?? "main"}
-        className="mb-5"
-        data-tour={номерГруппы === 0 ? "tiles" : undefined}
-      >
-        {г.заголовок && заголовокГруппы(г.заголовок, г.метка)}
-        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-          {г.ключи.map((ключ, i) => (
-            <Плитка
-              key={ключ}
-              плитка={по(ключ)}
-              номер={порядок++}
-              lang={lang}
-              // Нечётная последняя плитка на телефоне — во всю ширину,
-              // иначе рядом с ней зияла бы дыра.
-              широкая={г.ключи.length % 2 === 1 && i === г.ключи.length - 1}
-              тон={г.тон}
-            />
-          ))}
-        </div>
-      </section>
-    );
+    const группа = (г: (typeof ГРУППЫ)[number], номерГруппы: number) => {
+      // Раздел, где пусто во всех городах, не показываем: плитка «0» на
+      // первом экране выглядит как сломанное приложение. Если выбран
+      // город — оставляем приглушённой: внутри можно сменить город.
+      const ключи = г.ключи.filter((к) => город || !по(к).пусто);
+      if (!ключи.length) return null;
+      return (
+        <section
+          key={г.заголовок ?? "main"}
+          className="mb-5"
+          data-tour={номерГруппы === 0 ? "tiles" : undefined}
+          // Обучение подсвечивает только первые две строки — вся сетка выше экрана.
+          data-tour-crop={номерГруппы === 0 ? 4 : undefined}
+        >
+          {г.заголовок && заголовокГруппы(г.заголовок, г.метка)}
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+            {ключи.map((ключ, i) => (
+              <Плитка
+                key={ключ}
+                плитка={по(ключ)}
+                номер={порядок++}
+                lang={lang}
+                // Нечётная последняя плитка на телефоне — во всю ширину,
+                // иначе рядом с ней зияла бы дыра.
+                широкая={ключи.length % 2 === 1 && i === ключи.length - 1}
+                тон={г.тон}
+              />
+            ))}
+          </div>
+        </section>
+      );
+    };
     return (
       <div className="flex flex-col h-full" style={{ background: CREAM }}>
         <Шапка
@@ -467,16 +476,18 @@ const ВИДЫ_ХОСТЕЛОВ: HotelKind[] = ["hostel", "guesthouse"];
  */
 const ГРУППЫ: { заголовок?: TKey; ключи: string[]; тон: string; метка: string }[] = [
   {
+    // Главное — первым: достопримечательности и музеи, дальше люди
+    // (гиды, водители), потом всё остальное.
     ключи: [
+      "places",
+      "museums",
+      "guides",
+      "drivers",
+      "fun",
       "hotels",
       "hostels",
       "restaurants",
-      "fun",
-      "museums",
-      "places",
       "excursions",
-      "guides",
-      "drivers",
       "transport",
       "ai",
       "taxi",
