@@ -39,6 +39,8 @@ type Данные = {
   bookings: Booking[];
   tariffs: Тарифы;
   emails: Record<string, string>;
+  /** Показываются ли туристам примеры анкет (data/provider-samples.ts). */
+  samples: boolean;
 };
 
 type Фильтр = "pending" | "live" | "unpaid" | "promoted" | "blocked" | "all";
@@ -170,9 +172,12 @@ function СписокПартнёров({
             : "Гиды и их авторские туры: проверка, размещение, «Рекомендуем»"
         }
         action={
-          <Btn onClick={() => setНовый(true)}>
-            + {вид === "driver" ? "Добавить водителя" : "Добавить гида"}
-          </Btn>
+          <div className="flex flex-wrap items-center gap-2">
+            <ПримерыВКаталоге вкл={данные.samples} обновить={обновить} />
+            <Btn onClick={() => setНовый(true)}>
+              + {вид === "driver" ? "Добавить водителя" : "Добавить гида"}
+            </Btn>
+          </div>
         }
       />
       <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -283,6 +288,47 @@ function СписокПартнёров({
       )}
       {новый && <НовыйПартнёр вид={вид} onClose={() => setНовый(false)} обновить={обновить} />}
     </div>
+  );
+}
+
+/**
+ * Примеры анкет в каталоге туриста. Пока настоящих партнёров мало, они
+ * показывают, как выглядит карточка; связаться с ними нельзя. Когда
+ * живых анкет станет достаточно — выключить.
+ */
+function ПримерыВКаталоге({ вкл, обновить }: { вкл: boolean; обновить: () => Promise<void> }) {
+  const [идёт, setИдёт] = useState(false);
+  return (
+    <button
+      disabled={идёт}
+      title="Примеры: 5 водителей и 3 гида с турами. С пометкой «Пример», без телефона и заявок."
+      onClick={async () => {
+        setИдёт(true);
+        try {
+          await действие({ action: "samples", value: !вкл });
+          await обновить();
+        } finally {
+          setИдёт(false);
+        }
+      }}
+      className="flex cursor-pointer items-center gap-2 rounded px-3 py-1.5 text-xs font-medium disabled:opacity-60"
+      style={{
+        background: "var(--color-panel)",
+        border: "1px solid var(--color-border)",
+        color: "var(--color-text)",
+      }}
+    >
+      <span
+        className="relative inline-block h-4 w-7 rounded-full transition-colors"
+        style={{ background: вкл ? "var(--color-teal)" : "var(--color-dim)" }}
+      >
+        <span
+          className="absolute top-0.5 h-3 w-3 rounded-full bg-white transition-all"
+          style={{ left: вкл ? 14 : 2 }}
+        />
+      </span>
+      Примеры в каталоге
+    </button>
   );
 }
 

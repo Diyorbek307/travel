@@ -111,6 +111,40 @@ function МеткаПроверен({ наФото = false }: { наФото?: b
   );
 }
 
+/** Пример анкеты — не живой партнёр (data/provider-samples.ts). */
+function МеткаПример({ наФото = false }: { наФото?: boolean }) {
+  const { t } = useT();
+  return (
+    <span
+      className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold"
+      style={наФото ? { ...glass, color: WHITE } : { background: "rgba(120,120,120,0.14)", color: MUTED }}
+    >
+      ◌ {t("pt_sample")}
+    </span>
+  );
+}
+
+const Метка = ({ п, наФото = false }: { п: { sample?: boolean }; наФото?: boolean }) =>
+  п.sample ? <МеткаПример наФото={наФото} /> : <МеткаПроверен наФото={наФото} />;
+
+/** Плашка в карточке примера: почему нельзя связаться. */
+function ПлашкаПримера({ кредит }: { кредит?: string }) {
+  const { t } = useT();
+  return (
+    <div
+      className="mb-3 rounded-2xl border border-dashed p-3.5 text-xs leading-relaxed"
+      style={{ borderColor: BORDER, background: SURFACE, color: MUTED }}
+    >
+      <p>◌ {t("pt_sample_note")}</p>
+      {кредит && (
+        <p className="mt-1.5 text-[10px] opacity-80">
+          {t("pt_photo")}: {кредит}
+        </p>
+      )}
+    </div>
+  );
+}
+
 function Аватар({ src, имя, размер = 40 }: { src: string; имя: string; размер?: number }) {
   return src ? (
     // eslint-disable-next-line @next/next/no-img-element
@@ -244,8 +278,20 @@ function Теги({ слова }: { слова: string[] }) {
 }
 
 /** Кнопки в карточке списка: заявка (открывает карточку) и звонок. */
-function Действия({ телефон, onOpen }: { телефон: string; onOpen: () => void }) {
+function Действия({ телефон, onOpen, пример }: { телефон: string; onOpen: () => void; пример?: boolean }) {
   const { t } = useT();
+  if (пример)
+    return (
+      <div className="mt-3.5" onClick={(e) => e.stopPropagation()}>
+        <button
+          onClick={onOpen}
+          className="w-full rounded-xl border py-2.5 text-xs font-bold transition-transform active:scale-95"
+          style={{ borderColor: BORDER, background: SURFACE, color: TEXT }}
+        >
+          {t("common_open")} →
+        </button>
+      </div>
+    );
   return (
     <div className="mt-3.5 flex gap-2" onClick={(e) => e.stopPropagation()}>
       <button
@@ -297,7 +343,7 @@ function КарточкаВодителя({ п, номер }: { п: Партнё
             <span className="truncate text-xs font-semibold" style={{ color: TEXT }}>
               {п.name}
             </span>
-            <МеткаПроверен />
+            <Метка п={п} />
           </div>
         </div>
         <div
@@ -333,7 +379,7 @@ function КарточкаВодителя({ п, номер }: { п: Партнё
         )}
       </div>
       <Теги слова={п.includes} />
-      <Действия телефон={п.phone} onOpen={открыть} />
+      <Действия телефон={п.phone} onOpen={открыть} пример={п.sample} />
     </Резюме>
   );
 }
@@ -412,7 +458,7 @@ function КарточкаГида({ гид, туров, номер }: { гид: 
         </div>
       </div>
       <div className="mt-2.5 flex items-center gap-1.5">
-        <МеткаПроверен />
+        <Метка п={гид} />
       </div>
       <div className="mt-2 space-y-1">
         <Факт иконка="📍">
@@ -434,7 +480,7 @@ function КарточкаГида({ гид, туров, номер }: { гид: 
         )}
       </div>
       <Теги слова={гид.specialties ?? []} />
-      <Действия телефон={гид.phone} onOpen={открыть} />
+      <Действия телефон={гид.phone} onOpen={открыть} пример={гид.sample} />
     </Резюме>
   );
 }
@@ -485,14 +531,14 @@ function КарточкаТура({ тур, гид, номер }: { тур: Ту
         <Факт иконка="📍">{тур.city}</Факт>
         {гид && (
           <Факт иконка="👤">
-            {t("pt_guide_word")}: {гид.name} ✓
+            {t("pt_guide_word")}: {гид.name} {гид.sample ? `· ${t("pt_sample")}` : "✓"}
           </Факт>
         )}
         <Факт иконка="👥">{t("pt_group_max").replace("{n}", String(тур.maxGroup))}</Факт>
         {тур.languages.length > 0 && <Факт иконка="🗣">{языки(тур.languages)}</Факт>}
       </div>
       <Теги слова={тур.program.map((д) => д.title)} />
-      {гид && <Действия телефон={гид.phone} onOpen={открыть} />}
+      {гид && <Действия телефон={гид.phone} onOpen={открыть} пример={гид.sample || тур.sample} />}
     </Резюме>
   );
 }
@@ -628,7 +674,7 @@ export function ДеталиВодителя({ п, onBack }: { п: Партнё�
       <Шапка фото={обложка(п)} onBack={onBack}>
         <div className="mb-1.5 flex gap-1.5">
           {п.promoted && <МеткаРекомендуем />}
-          <МеткаПроверен наФото />
+          <Метка п={п} наФото />
         </div>
         <h2 className="text-xl font-bold text-white" style={{ fontFamily: "var(--font-heading)" }}>
           {п.car ? `${п.car.make} ${п.car.model}` : п.name}
@@ -677,14 +723,14 @@ export function ДеталиВодителя({ п, onBack }: { п: Партнё�
           </Блок>
         )}
         <ГалереяЗаведения фото={фото} />
-        <Связь п={п} />
+        {п.sample ? <ПлашкаПримера кредит={п.photoCredit} /> : <Связь п={п} />}
         {п.includes.length > 0 && (
           <Блок заголовок={t("pt_includes")}>
             <Список пункты={п.includes} />
           </Блок>
         )}
         <О_партнёре п={п} языки={языки(п.languages)} />
-        <ЗаявкаПартнёру kind="driver" itemId={п.id} дней={1} />
+        {!п.sample && <ЗаявкаПартнёру kind="driver" itemId={п.id} дней={1} />}
         <div className="pb-6" />
       </div>
     </div>
@@ -737,7 +783,7 @@ export function ДеталиГида({ п, onBack }: { п: ПартнёрПуб�
       <Шапка фото={п.photos[0] || п.photo} onBack={onBack}>
         <div className="mb-1.5 flex gap-1.5">
           {п.promoted && <МеткаРекомендуем />}
-          <МеткаПроверен наФото />
+          <Метка п={п} наФото />
           {п.licensed && (
             <span
               className="rounded-full px-2 py-0.5 text-[10px] font-bold"
@@ -755,7 +801,7 @@ export function ДеталиГида({ п, onBack }: { п: ПартнёрПуб�
         </p>
       </Шапка>
       <div className="hide-scroll flex-1 overflow-y-auto px-4 pt-4">
-        <Связь п={п} />
+        {п.sample ? <ПлашкаПримера кредит={п.photoCredit} /> : <Связь п={п} />}
         <О_партнёре п={п} языки={языки(п.languages)} />
         {(п.specialties ?? []).length > 0 && (
           <Блок заголовок={t("pt_specialties")}>
@@ -790,7 +836,7 @@ export function ДеталиГида({ п, onBack }: { п: ПартнёрПуб�
             <Список пункты={п.includes} />
           </Блок>
         )}
-        <ЗаявкаПартнёру kind="guide" itemId={п.id} дней={1} />
+        {!п.sample && <ЗаявкаПартнёру kind="guide" itemId={п.id} дней={1} />}
         <div className="pb-6" />
       </div>
     </div>
@@ -908,8 +954,14 @@ export function ДеталиТура({ тур, onBack }: { тур: ТурПар�
             </Блок>
           </button>
         )}
-        {гид && <Связь п={гид} />}
-        <ЗаявкаПартнёру kind="guidetour" itemId={тур.id} дней={тур.days} людей={2} />
+        {тур.sample || гид?.sample ? (
+          <ПлашкаПримера />
+        ) : (
+          <>
+            {гид && <Связь п={гид} />}
+            <ЗаявкаПартнёру kind="guidetour" itemId={тур.id} дней={тур.days} людей={2} />
+          </>
+        )}
         <div className="pb-6" />
       </div>
     </div>

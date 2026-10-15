@@ -9,6 +9,7 @@ import {
   удалитьПартнёра,
   одобрить,
   сохранитьТарифы,
+  показыватьПримеры,
 } from "@/lib/providers";
 import { listBookings } from "@/lib/community";
 import {
@@ -32,7 +33,7 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   const нет = await отказЕсли("partners");
   if (нет) return нет;
-  const { партнёры, туры, тарифы } = await всеДанные();
+  const { партнёры, туры, тарифы, примеры } = await всеДанные();
   const брони = (await listBookings()).filter((b) => b.providerId);
   // Почта владельца анкеты — менеджеру видно, чей это аккаунт.
   const почты: Record<string, string> = {};
@@ -46,6 +47,7 @@ export async function GET() {
       bookings: брони,
       tariffs: тарифы,
       emails: почты,
+      samples: примеры,
     },
     { headers: { "Cache-Control": "no-store" } },
   );
@@ -83,7 +85,8 @@ type Действие =
   | "note"
   | "link"
   | "markPaid"
-  | "tariffs";
+  | "tariffs"
+  | "samples";
 
 export async function PATCH(request: Request) {
   const админ = await разрешено("partners");
@@ -111,6 +114,12 @@ export async function PATCH(request: Request) {
     };
     await сохранитьТарифы(новые);
     return NextResponse.json({ ok: true, tariffs: новые });
+  }
+
+  // Примеры анкет в каталоге туриста: включить или выключить.
+  if (действие === "samples") {
+    await показыватьПримеры(тело.value === true);
+    return NextResponse.json({ ok: true, samples: тело.value === true });
   }
 
   // Оплата наличными или переводом — менеджер отмечает заказ сам.

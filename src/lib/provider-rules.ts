@@ -82,6 +82,13 @@ export interface ПартнёрПубличный {
   phone: string;
   telegram?: string;
   whatsapp?: string;
+  /**
+   * Пример анкеты из кода (data/provider-samples.ts), а не живой человек:
+   * в карточке пометка «Пример», связи и заявки нет.
+   */
+  sample?: boolean;
+  /** Автор и лицензия фото — у примеров со свободными снимками. */
+  photoCredit?: string;
 }
 
 /** Полная анкета — у сервера, менеджера и самого партнёра. */
@@ -131,6 +138,8 @@ export interface ТурПартнёра {
   status: "active" | "hidden";
   createdAt: string;
   updatedAt: string;
+  /** Тур примера-гида — заявку на него не отправить. */
+  sample?: boolean;
 }
 
 /** Тарифы — в суммах. Меняет владелец в панели. */
@@ -224,6 +233,7 @@ export function публично(п: Партнёр, сейчас = Date.now()):
     whatsapp: остальное.whatsapp,
     car: чистая,
     promoted: действует(п.promotedUntil, сейчас),
+    ...(п.sample ? { sample: true, photoCredit: п.photoCredit } : {}),
   };
 }
 
