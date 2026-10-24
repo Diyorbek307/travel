@@ -610,6 +610,29 @@ export const СЛУЖЕБНЫЕ_РЕГИОНОВ: [string, Строка][] = [
     ar: "منطقة مزرباد",
   }),
 
+  с("Сардобинский район", {
+    en: "Sardoba district",
+    uz: "Sardoba tumani",
+    zh: "萨尔多巴区",
+    ko: "사르도바 지구",
+    de: "Bezirk Sardoba",
+    fr: "District de Sardoba",
+    ja: "サルドバ地区",
+    tr: "Sardoba ilçesi",
+    ar: "منطقة سردوبا",
+  }),
+  с("Хавастский район", {
+    en: "Khavast district",
+    uz: "Xovos tumani",
+    zh: "哈瓦斯特区",
+    ko: "하바스트 지구",
+    de: "Bezirk Chawos",
+    fr: "District de Khavast",
+    ja: "ハヴァスト地区",
+    tr: "Havast ilçesi",
+    ar: "منطقة خواست",
+  }),
+
   // ── Новые города ─────────────────────────────────────────────────
   с("Навои", {
     en: "Navoi",
