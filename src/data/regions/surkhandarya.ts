@@ -212,4 +212,18 @@ export const МЕСТА_СУРХАНДАРЬИ: ЗаписьРегиона[] = [
     en: { name: "St Alexander Nevsky Church, Termez", desc: "A working Orthodox church in Termez dedicated to the holy prince Alexander Nevsky. The small church with domes and a bell tower stands in a quiet quarter south of the centre and recalls the Russian history of the city, which grew up in the late 19th century around a border fortress on the Amu Darya. Inside are an iconostasis and icons, and on feast days the service gathers the local community. Dress modestly, women should cover their hair, and do not take photos during services." },
     uz: { name: "Termizdagi Aleksandr Nevskiy cherkovi", desc: "Termizdagi muqaddas knyaz Aleksandr Nevskiy nomidagi amaldagi pravoslav cherkovi. Gumbazli va qoʻngʻiroqxonali kichik cherkov markazdan janubdagi sokin mavzeda turibdi va XIX asr oxirida Amudaryo boʻyidagi chegara qalʼasi atrofida oʻsib chiqqan shaharning rus tarixini eslatadi. Ichkarida ikonostas va ikonalar bor, bayramlarda ibodatga mahalliy jamoa yigʻiladi. Yopiq kiyimda keling, ayollar — roʻmolda; ibodat paytida suratga olmang." },
   },
+  {
+    id: "sx-zulkifl",
+    name: "Мавзолей Зул-Кифл на острове Арал-Пайгамбар",
+    city: "Термез",
+    type: "Мавзолей",
+    geo: { lat: 37.294147, lon: 67.155626 },
+    время: "30–45 минут",
+    свято: true,
+    далеко: true,
+    desc: "Мавзолей XI–XII веков на острове Арал-Пайгамбар («Остров Пророка») посреди Амударьи у Термеза. Предание связывает его с пророком Зул-Кифлом, которого отождествляют с библейским Иезекиилем: по легенде, он завещал положить своё тело в лодку и похоронить там, где она пристанет, — и на этом месте появился остров. Мавзолей — комплекс из четырёх помещений, три из них под куполами. Остров — заповедник в пограничной зоне, поэтому посещение возможно только по специальному разрешению.",
+    en: { name: "Zulkifl Mausoleum on Aral-Paygambar Island", desc: "An 11th–12th-century mausoleum on Aral-Paygambar ('Island of the Prophet') in the middle of the Amu Darya near Termez. Tradition links it with the prophet Zulkifl, identified with the biblical Ezekiel: legend says he asked for his body to be placed in a boat and buried where it came ashore — and the island appeared on that spot. The mausoleum is a complex of four rooms, three of them domed. The island is a nature reserve in the border zone, so visits are possible only with special permission." },
+    uz: { name: "Orol-Paygʻambar orolidagi Zulkifl maqbarasi", desc: "Termiz yaqinida Amudaryo oʻrtasidagi Orol-Paygʻambar («Paygʻambar oroli») orolidagi XI–XII asrlarga oid maqbara. Rivoyat uni Injildagi Hizqiyol bilan tenglashtiriladigan Zulkifl paygʻambar bilan bogʻlaydi: afsonaga koʻra, u jasadini qayiqqa qoʻyib, qayiq qayerga toʻxtasa, oʻsha yerga dafn etishni vasiyat qilgan — va shu joyda orol paydo boʻlgan. Maqbara toʻrt xonali majmua, ulardan uchtasi gumbazli. Orol chegara hududidagi qoʻriqxona, shuning uchun unga faqat maxsus ruxsatnoma bilan borish mumkin." },
+    wikidata: "Q20536522",
+  },
 ];

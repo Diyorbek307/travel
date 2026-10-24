@@ -707,5 +707,55 @@ export const ФОТО_БУХАРЫ: Record<string, ФотоМеста> = {
       "https://commons.wikimedia.org/wiki/File:Sayyid_Mir_Kulol_architectural_complex._Bukhara.jpg",
       "https://commons.wikimedia.org/wiki/File:Sayyid_Amir_Kulol_Maqbarasi_01.jpg"
     ]
+  },
+  "bx-revgari": {
+    "img": "/places/bukhara/bx-revgari.webp",
+    "imgs": [],
+    "credits": "Фото: Ibrohimova Muhlisa (CC0) — Wikimedia Commons",
+    "sources": [
+      "https://commons.wikimedia.org/wiki/File:Xoja_Orif_Ar-Revgari_majmuasi.jpg"
+    ]
+  },
+  "bx-kalyanmosque": {
+    "img": "/places/bukhara/bx-kalyanmosque.webp",
+    "imgs": [
+      "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/ce/31_Kalan_Mosque_161.jpg/1280px-31_Kalan_Mosque_161.jpg",
+      "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/23/31_Kalan_Mosque_159.jpg/1280px-31_Kalan_Mosque_159.jpg",
+      "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/37/31_Kalan_Mosque_151.jpg/1280px-31_Kalan_Mosque_151.jpg",
+      "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ac/2011_Bukhara_6603854369.jpg/1280px-2011_Bukhara_6603854369.jpg",
+      "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/be/20230610_Boukhara163.jpg/1280px-20230610_Boukhara163.jpg"
+    ],
+    "credits": "Фото: Faqscl (CC BY-SA 3.0); BeshevI (CC BY-SA 4.0); Jacopo Romei from Rome, Italy (CC BY-SA 2.0); Jean Housen (CC BY-SA 4.0) — Wikimedia Commons",
+    "sources": [
+      "https://commons.wikimedia.org/wiki/File:Bukhara_Kalyan_Mosque_outside_view.JPG",
+      "https://commons.wikimedia.org/wiki/File:31_Kalan_Mosque_161.jpg",
+      "https://commons.wikimedia.org/wiki/File:31_Kalan_Mosque_159.jpg",
+      "https://commons.wikimedia.org/wiki/File:31_Kalan_Mosque_151.jpg",
+      "https://commons.wikimedia.org/wiki/File:2011_Bukhara_6603854369.jpg",
+      "https://commons.wikimedia.org/wiki/File:20230610_Boukhara163.jpg"
+    ]
+  },
+  "bx-kogonpalace": {
+    "img": "/places/bukhara/bx-kogonpalace.webp",
+    "imgs": [
+      "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/16/Palace_emir_Bukhara_142.jpg/1280px-Palace_emir_Bukhara_142.jpg",
+      "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/50/Palace_emir_Bukhara_143.jpg/1280px-Palace_emir_Bukhara_143.jpg",
+      "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d2/Palace_emir_Bukhara_146.jpg/1280px-Palace_emir_Bukhara_146.jpg",
+      "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9c/Emir_palace_in_Kagan_06.jpg/1280px-Emir_palace_in_Kagan_06.jpg",
+      "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/90/Emir_palace_in_Kagan_07.jpg/1280px-Emir_palace_in_Kagan_07.jpg",
+      "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/91/Emir_palace_in_Kagan_09.jpg/1280px-Emir_palace_in_Kagan_09.jpg",
+      "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/13/Emir_palace_in_Kagan_10.jpg/1280px-Emir_palace_in_Kagan_10.jpg"
+    ],
+    "credits": "Фото: Jamshid Nurkulov (CC BY-SA 4.0); BeshevI (CC BY-SA 4.0) — Wikimedia Commons",
+    "sources": [
+      "https://commons.wikimedia.org/wiki/File:Emir_palace_in_Kagan_05.jpg",
+      "https://commons.wikimedia.org/wiki/File:Palace_emir_Bukhara_142.jpg",
+      "https://commons.wikimedia.org/wiki/File:Palace_emir_Bukhara_143.jpg",
+      "https://commons.wikimedia.org/wiki/File:Palace_emir_Bukhara_146.jpg",
+      "https://commons.wikimedia.org/wiki/File:Emir_palace_in_Kagan_06.jpg",
+      "https://commons.wikimedia.org/wiki/File:Emir_palace_in_Kagan_07.jpg",
+      "https://commons.wikimedia.org/wiki/File:Emir_palace_in_Kagan_09.jpg",
+      "https://commons.wikimedia.org/wiki/File:Emir_palace_in_Kagan_10.jpg"
+    ]
   }
 };

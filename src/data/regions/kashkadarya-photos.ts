@@ -289,5 +289,37 @@ export const ФОТО_КАШКАДАРЬИ: Record<string, ФотоМеста> =
       "https://commons.wikimedia.org/wiki/File:Kitab_davlat_qo%27riqxonasi_fauna_olami.jpg",
       "https://commons.wikimedia.org/wiki/File:Kitob_dovoni.jpg"
     ]
+  },
+  "kd-maidanak": {
+    "img": "/places/kashkadarya/kd-maidanak.webp",
+    "imgs": [
+      "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f2/AZT-22.JPG/1280px-AZT-22.JPG"
+    ],
+    "credits": "Фото: German Stimban (CC BY-SA 3.0) — Wikimedia Commons",
+    "sources": [
+      "https://commons.wikimedia.org/wiki/File:Maydanak_telescopes.JPG",
+      "https://commons.wikimedia.org/wiki/File:AZT-22.JPG"
+    ]
+  },
+  "kd-amankutan": {
+    "img": "/places/kashkadarya/kd-amankutan.webp",
+    "imgs": [
+      "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e5/Omonqo%E2%80%98ton_foto_2.jpg/1280px-Omonqo%E2%80%98ton_foto_2.jpg",
+      "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5b/%D0%9E%D1%81%D0%B5%D0%BD%D0%BD%D0%B8%D0%B9_%D0%BA%D0%BE%D0%B2%D0%B5%D1%80_%D0%B2%D0%B4%D0%BE%D0%BB%D1%8C_%D1%81%D1%82%D0%B0%D1%80%D0%BE%D0%B9_%D0%B4%D0%BE%D1%80%D0%BE%D0%B3%D0%B8_%D0%BD%D0%B0_%D0%BF%D0%B5%D1%80%D0%B5%D0%B2%D0%B0%D0%BB_%D0%A2%D0%B0%D1%85%D1%82%D0%B0%D0%BA%D0%B0%D1%80%D0%B0%D1%87%D0%B0.jpg/1280px-%D0%9E%D1%81%D0%B5%D0%BD%D0%BD%D0%B8%D0%B9_%D0%BA%D0%BE%D0%B2%D0%B5%D1%80_%D0%B2%D0%B4%D0%BE%D0%BB%D1%8C_%D1%81%D1%82%D0%B0%D1%80%D0%BE%D0%B9_%D0%B4%D0%BE%D1%80%D0%BE%D0%B3%D0%B8_%D0%BD%D0%B0_%D0%BF%D0%B5%D1%80%D0%B5%D0%B2%D0%B0%D0%BB_%D0%A2%D0%B0%D1%85%D1%82%D0%B0%D0%BA%D0%B0%D1%80%D0%B0%D1%87%D0%B0.jpg",
+      "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/ca/%D0%9E%D1%81%D0%B5%D0%BD%D0%BD%D0%B8%D0%B9_%D0%BB%D0%B5%D1%81_%D0%B2_%D0%B4%D0%BE%D0%BB%D0%B8%D0%BD%D0%B5_%D1%80%D0%B5%D0%BA%D0%B8.jpg/1280px-%D0%9E%D1%81%D0%B5%D0%BD%D0%BD%D0%B8%D0%B9_%D0%BB%D0%B5%D1%81_%D0%B2_%D0%B4%D0%BE%D0%BB%D0%B8%D0%BD%D0%B5_%D1%80%D0%B5%D0%BA%D0%B8.jpg",
+      "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2a/%D0%9A%D0%B0%D0%BC%D0%B5%D0%BD%D0%BD%D1%8B%D0%B5_%D1%83%D0%B7%D0%BE%D1%80%D1%8B_%D1%81%D0%BA%D0%B0%D0%BB_%D0%BD%D0%B0_%D0%BF%D0%B5%D1%80%D0%B5%D0%B2%D0%B0%D0%BB%D0%B5_%D0%A2%D0%B0%D1%85%D1%82%D0%B0%D0%BA%D0%B0%D1%80%D0%B0%D1%87%D0%B0.jpg/1280px-%D0%9A%D0%B0%D0%BC%D0%B5%D0%BD%D0%BD%D1%8B%D0%B5_%D1%83%D0%B7%D0%BE%D1%80%D1%8B_%D1%81%D0%BA%D0%B0%D0%BB_%D0%BD%D0%B0_%D0%BF%D0%B5%D1%80%D0%B5%D0%B2%D0%B0%D0%BB%D0%B5_%D0%A2%D0%B0%D1%85%D1%82%D0%B0%D0%BA%D0%B0%D1%80%D0%B0%D1%87%D0%B0.jpg",
+      "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a1/%D0%92%D0%B8%D0%B4_%D0%BD%D0%B0_%D0%BA%D0%B0%D0%BC%D0%B5%D0%BD%D0%BD%D1%83%D1%8E_%D0%B4%D0%BE%D0%BB%D0%B8%D0%BD%D1%83_%D1%81_%D0%BF%D0%B5%D1%80%D0%B5%D0%B2%D0%B0%D0%BB%D0%B0_%D0%A2%D0%B0%D1%85%D1%82%D0%B0%D0%BA%D0%B0%D1%80%D0%B0%D1%87%D0%B0.jpg/1280px-%D0%92%D0%B8%D0%B4_%D0%BD%D0%B0_%D0%BA%D0%B0%D0%BC%D0%B5%D0%BD%D0%BD%D1%83%D1%8E_%D0%B4%D0%BE%D0%BB%D0%B8%D0%BD%D1%83_%D1%81_%D0%BF%D0%B5%D1%80%D0%B5%D0%B2%D0%B0%D0%BB%D0%B0_%D0%A2%D0%B0%D1%85%D1%82%D0%B0%D0%BA%D0%B0%D1%80%D0%B0%D1%87%D0%B0.jpg",
+      "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/13/%D0%92%D0%B8%D0%B4_%D1%81_%D0%BF%D0%B5%D1%80%D0%B5%D0%B2%D0%B0%D0%BB%D0%B0_%D0%A2%D0%B0%D1%85%D1%82%D0%B0%D0%BA%D0%B0%D1%80%D0%B0%D1%87%D0%B0_%D0%BD%D0%B0_%D0%A8%D0%B0%D1%85%D1%80%D0%B8%D1%81%D0%B0%D0%B1%D0%B7.jpg/1280px-%D0%92%D0%B8%D0%B4_%D1%81_%D0%BF%D0%B5%D1%80%D0%B5%D0%B2%D0%B0%D0%BB%D0%B0_%D0%A2%D0%B0%D1%85%D1%82%D0%B0%D0%BA%D0%B0%D1%80%D0%B0%D1%87%D0%B0_%D0%BD%D0%B0_%D0%A8%D0%B0%D1%85%D1%80%D0%B8%D1%81%D0%B0%D0%B1%D0%B7.jpg"
+    ],
+    "credits": "Фото: Уильям Дрейк (CC BY-SA 4.0); Xabibulla Muxamedov (CC BY-SA 4.0) — Wikimedia Commons",
+    "sources": [
+      "https://commons.wikimedia.org/wiki/File:%D0%92%D0%B8%D0%B4_%D1%81_%D0%BF%D0%B5%D1%80%D0%B5%D0%B2%D0%B0%D0%BB%D0%B0_%D0%A2%D0%B0%D1%85%D1%82%D0%B0%D0%BA%D0%B0%D1%80%D0%B0%D1%87%D0%B0_%D0%B2_%D0%B4%D0%BE%D0%BB%D0%B8%D0%BD%D1%83_%D0%90%D0%BC%D0%B0%D0%BD%D0%BA%D1%83%D1%82%D0%B0%D0%BD%D0%B0.jpg",
+      "https://commons.wikimedia.org/wiki/File:Omonqo%E2%80%98ton_foto_2.jpg",
+      "https://commons.wikimedia.org/wiki/File:%D0%9E%D1%81%D0%B5%D0%BD%D0%BD%D0%B8%D0%B9_%D0%BA%D0%BE%D0%B2%D0%B5%D1%80_%D0%B2%D0%B4%D0%BE%D0%BB%D1%8C_%D1%81%D1%82%D0%B0%D1%80%D0%BE%D0%B9_%D0%B4%D0%BE%D1%80%D0%BE%D0%B3%D0%B8_%D0%BD%D0%B0_%D0%BF%D0%B5%D1%80%D0%B5%D0%B2%D0%B0%D0%BB_%D0%A2%D0%B0%D1%85%D1%82%D0%B0%D0%BA%D0%B0%D1%80%D0%B0%D1%87%D0%B0.jpg",
+      "https://commons.wikimedia.org/wiki/File:%D0%9E%D1%81%D0%B5%D0%BD%D0%BD%D0%B8%D0%B9_%D0%BB%D0%B5%D1%81_%D0%B2_%D0%B4%D0%BE%D0%BB%D0%B8%D0%BD%D0%B5_%D1%80%D0%B5%D0%BA%D0%B8.jpg",
+      "https://commons.wikimedia.org/wiki/File:%D0%9A%D0%B0%D0%BC%D0%B5%D0%BD%D0%BD%D1%8B%D0%B5_%D1%83%D0%B7%D0%BE%D1%80%D1%8B_%D1%81%D0%BA%D0%B0%D0%BB_%D0%BD%D0%B0_%D0%BF%D0%B5%D1%80%D0%B5%D0%B2%D0%B0%D0%BB%D0%B5_%D0%A2%D0%B0%D1%85%D1%82%D0%B0%D0%BA%D0%B0%D1%80%D0%B0%D1%87%D0%B0.jpg",
+      "https://commons.wikimedia.org/wiki/File:%D0%92%D0%B8%D0%B4_%D0%BD%D0%B0_%D0%BA%D0%B0%D0%BC%D0%B5%D0%BD%D0%BD%D1%83%D1%8E_%D0%B4%D0%BE%D0%BB%D0%B8%D0%BD%D1%83_%D1%81_%D0%BF%D0%B5%D1%80%D0%B5%D0%B2%D0%B0%D0%BB%D0%B0_%D0%A2%D0%B0%D1%85%D1%82%D0%B0%D0%BA%D0%B0%D1%80%D0%B0%D1%87%D0%B0.jpg",
+      "https://commons.wikimedia.org/wiki/File:%D0%92%D0%B8%D0%B4_%D1%81_%D0%BF%D0%B5%D1%80%D0%B5%D0%B2%D0%B0%D0%BB%D0%B0_%D0%A2%D0%B0%D1%85%D1%82%D0%B0%D0%BA%D0%B0%D1%80%D0%B0%D1%87%D0%B0_%D0%BD%D0%B0_%D0%A8%D0%B0%D1%85%D1%80%D0%B8%D1%81%D0%B0%D0%B1%D0%B7.jpg"
+    ]
   }
 };

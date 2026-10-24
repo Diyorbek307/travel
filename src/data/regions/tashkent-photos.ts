@@ -907,5 +907,22 @@ export const ФОТО_ТАШКЕНТА: Record<string, ФотоМеста> = {
       "https://commons.wikimedia.org/wiki/File:Solar_collector_in_a_heliopolygon.jpg",
       "https://commons.wikimedia.org/wiki/File:Parkent_BSP_gekiostats.jpg"
     ]
+  },
+  "tk-kurama": {
+    "img": "/places/tashkent/tk-kurama.webp",
+    "imgs": [
+      "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a8/Qurama_mountains%2C_Ungurli-kan_mine.jpg/1280px-Qurama_mountains%2C_Ungurli-kan_mine.jpg",
+      "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9d/Qurama_mountains_near_Achangaran_reservoir.jpg/1280px-Qurama_mountains_near_Achangaran_reservoir.jpg",
+      "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3c/Akhangaran_water_reservoir.JPG/1280px-Akhangaran_water_reservoir.JPG",
+      "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3a/Saukbulak_%28head_race_of_Saukbulak_dam%29.jpg/1280px-Saukbulak_%28head_race_of_Saukbulak_dam%29.jpg"
+    ],
+    "credits": "Фото: German Stimban (CC BY-SA 3.0); Carpodacus (CC BY-SA 4.0) — Wikimedia Commons",
+    "sources": [
+      "https://commons.wikimedia.org/wiki/File:Kuramin_ridge.JPG",
+      "https://commons.wikimedia.org/wiki/File:Qurama_mountains,_Ungurli-kan_mine.jpg",
+      "https://commons.wikimedia.org/wiki/File:Qurama_mountains_near_Achangaran_reservoir.jpg",
+      "https://commons.wikimedia.org/wiki/File:Akhangaran_water_reservoir.JPG",
+      "https://commons.wikimedia.org/wiki/File:Saukbulak_(head_race_of_Saukbulak_dam).jpg"
+    ]
   }
 };

@@ -1,5 +1,8 @@
+import type { Locale } from "@/lib/i18n";
 import type { Geo, Place } from "@/lib/types";
 import { собрать, type ЗаписьРегиона, type ФотоМеста } from "./core";
+import { ЯЗЫКИ_РЕГИОНОВ } from "./i18n";
+import { РАССКАЗЫ_РЕГИОНОВ } from "./stories";
 import { МЕСТА_ТАШКЕНТА } from "./tashkent";
 import { ФОТО_ТАШКЕНТА } from "./tashkent-photos";
 import { МЕСТА_БУХАРЫ } from "./bukhara";
@@ -70,7 +73,9 @@ const ЦЕНТРЫ: Record<string, Geo> = {
 const ВСЕ = РЕГИОНЫ.flatMap(([места, фото]) => места.map((з) => ({ з, фото: фото[з.id] })));
 
 /** Места регионов в формате семян. */
-export const РЕГИОНЫ_МЕСТА: (Place & { geo: Geo })[] = ВСЕ.map(({ з, фото }) => собрать(з, ЦЕНТРЫ[з.city], фото));
+export const РЕГИОНЫ_МЕСТА: (Place & { geo: Geo })[] = ВСЕ.map(({ з, фото }) =>
+  собрать(з, ЦЕНТРЫ[з.city], фото, РАССКАЗЫ_РЕГИОНОВ[з.id]),
+);
 
 /** id мест — для поздних семян: на сайт они досыпаются один раз. */
 export const РЕГИОНЫ_ID = ВСЕ.map(({ з }) => з.id);
@@ -78,8 +83,21 @@ export const РЕГИОНЫ_ID = ВСЕ.map(({ з }) => з.id);
 /** Координаты по названию — для карты, такси и плана дня (data/geo.ts). */
 export const РЕГИОНЫ_КООРДИНАТЫ: Record<string, Geo> = Object.fromEntries(ВСЕ.map(({ з }) => [з.name, з.geo]));
 
-/** Переводы названий и описаний: ключ — русская строка, как во всём словаре. */
-export const РЕГИОНЫ_ПЕРЕВОДЫ: [string, Partial<Record<"en" | "uz", string>>][] = ВСЕ.flatMap(({ з }) => [
-  [з.name, { en: з.en.name, uz: з.uz.name }],
-  [з.desc, { en: з.en.desc, uz: з.uz.desc }],
-]);
+/**
+ * Переводы названий, описаний и рассказов: ключ — русская строка, как во
+ * всём словаре. en и uz лежат в записях, остальные языки — в i18n/ и stories/.
+ */
+export const РЕГИОНЫ_ПЕРЕВОДЫ: [string, Partial<Record<Locale, string>>][] = ВСЕ.flatMap(({ з }) => {
+  const ещё = Object.entries(ЯЗЫКИ_РЕГИОНОВ[з.id] ?? {});
+  const имя = Object.fromEntries(ещё.map(([язык, п]) => [язык, п?.name]));
+  const описание = Object.fromEntries(ещё.map(([язык, п]) => [язык, п?.desc]));
+  const рассказ = (РАССКАЗЫ_РЕГИОНОВ[з.id] ?? []).map(({ kind: _k, ru, ...языки }): [string, Partial<Record<Locale, string>>] => [
+    ru,
+    языки,
+  ]);
+  return [
+    [з.name, { ...имя, en: з.en.name, uz: з.uz.name }],
+    [з.desc, { ...описание, en: з.en.desc, uz: з.uz.desc }],
+    ...рассказ,
+  ];
+});

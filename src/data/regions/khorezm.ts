@@ -268,4 +268,17 @@ export const МЕСТА_ХОРЕЗМА: ЗаписьРегиона[] = [
     en: { name: "Khorezm National Park", desc: "Protected tugai riverine forests along the Amu Darya in the north of Khorezm Region, among the last in Central Asia. The key tree of the tugai is the Turanga poplar, and pheasants, wild boar and many birds live in thickets of tamarisk and oleaster. In autumn the leaves turn gold and the riverside scenery is especially beautiful. The tugai depend on river water, so every spring flood matters here. Come with a guide, and in the heat bring water and insect repellent." },
     uz: { name: "Xorazm milliy bogʻi", desc: "Xorazm viloyati shimolida, Amudaryo boʻylab muhofaza qilinadigan toʻqay oʻrmonlari — Oʻrta Osiyodagi soʻnggilaridan biri. Toʻqaylarning asosiy daraxti — turanga terak, yulgʻun va jiyda changalzorlarida qirgʻovullar, yovvoyi choʻchqalar va koʻplab qushlar yashaydi. Kuzda barglar oltinrangga kirib, daryo boʻyidagi manzara ayniqsa goʻzal boʻladi. Toʻqaylarga daryo suvi kerak, shuning uchun bu yerda har bir bahorgi toshqin muhim voqea. Yoʻlboshchi bilan keling, issiqda suv va pashshaga qarshi vosita oling." },
   },
+  {
+    id: "kh-qalajiq",
+    name: "Крепость Каладжик-кала",
+    city: "Хива",
+    type: "Археология",
+    geo: { lat: 41.27611, lon: 60.72589 },
+    district: "Багатский район",
+    время: "1–1,5 часа",
+    далеко: true,
+    desc: "Одна из древнейших крепостей Хорезма посреди песков Каракумов в Багатском районе, примерно в 90 км от Ургенча. Её основали в IV–III веках до н. э.; глинобитные стены с остатками башен стоят на краю солёного озера, и на закате руины и белые берега выглядят почти нереально. В 2019 году крепость внесли в национальный реестр объектов культурного наследия, рядом появился туристический комплекс с юртами. Дорога через пустыню — с водителем, знающим путь; берите воду.",
+    en: { name: "Qalajiq Qala Fortress", desc: "One of the oldest fortresses of Khorezm, in the Karakum sands of Bagat district about 90 km from Urgench. It was founded in the 4th–3rd centuries BC; its mud-brick walls with remains of towers stand at the edge of a salt lake, and at sunset the ruins and white shores look almost unreal. In 2019 the fortress was added to the national register of cultural heritage, and a tourist complex with yurts has opened nearby. Cross the desert with a driver who knows the way, and bring water." },
+    uz: { name: "Qalajiq qalʼa", desc: "Urganchdan taxminan 90 km uzoqlikda, Bogʻot tumanidagi Qoraqum qumlari oʻrtasidagi Xorazmning eng qadimiy qalʼalaridan biri. U miloddan avvalgi IV–III asrlarda asos solingan; burj qoldiqlari bor paxsa devorlar shoʻr koʻl chekkasida turibdi, quyosh botishida xarobalar va oq qirgʻoqlar deyarli afsonaviy koʻrinadi. 2019-yilda qalʼa madaniy meros obyektlari milliy roʻyxatiga kiritilgan, yonida oʻtovli turistik majmua ochilgan. Choʻl orqali yoʻlni biladigan haydovchi bilan boring, suv oling." },
+  },
 ];

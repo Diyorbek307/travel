@@ -740,4 +740,17 @@ export const МЕСТА_ТАШКЕНТА: ЗаписьРегиона[] = [
     uz: { name: "«Quyosh» quyosh pechi (Parkent)", desc: "Dunyodagi eng yirik quyosh pechlaridan biri — 1981–1987-yillarda Toshkentdan 45 km uzoqlikdagi Parkent yaqinidagi togʻlarda qurilgan. Yonbagʻirdagi 62 ta oynali geliostat quyoshni tutib, 54×47 metrli ulkan botiq konsentratorga yoʻnaltiradi, u nurlarni harorati 3000 °C gacha yetadigan nuqtaga jamlaydi. Joy yiliga 250–270 quyoshli kun va toza togʻ havosi uchun tanlangan. 2026-yilda majmua Toshkent modernizmi yodgorliklari bilan birga YUNESKO Butunjahon merosi roʻyxatiga kiritilgan; ekskursiyalar jadval boʻyicha oʻtkaziladi." },
     wikidata: "Q3080009",
   },
+  {
+    id: "tk-kurama",
+    name: "Кураминский хребет и Ахангаранская долина",
+    city: "Ташкент",
+    type: "Природа",
+    geo: { lat: 40.89813, lon: 69.93162 },
+    district: "Ахангаран, Ташкентская область",
+    время: "Полный день",
+    далеко: true,
+    desc: "Юго-западный отрог Тянь-Шаня, отделяющий Ташкентскую область от Ферганской долины. Через хребет проходит главная дорога Ташкент — Фергана с перевалом Камчик, откуда открываются виды на горные склоны, а внизу лежат Ахангаранское водохранилище и долины горных рек. В Кураминских горах сохранились следы средневековых рудников — здесь веками добывали серебро и медь для монетных дворов Илака. Хорошее направление для поездки на машине на целый день; весной склоны покрыты цветами.",
+    en: { name: "Kurama Range and Akhangaran Valley", desc: "A south-western spur of the Tian Shan separating Tashkent Region from the Fergana Valley. The main Tashkent–Fergana road crosses the range by the Kamchik pass, with views of the mountain slopes, while the Akhangaran reservoir and mountain river valleys lie below. Traces of medieval mines survive in the Kurama mountains, where silver and copper were dug for centuries for the mints of Ilak. A good destination for a full-day drive; in spring the slopes are covered in flowers." },
+    uz: { name: "Qurama tizmasi va Ohangaron vodiysi", desc: "Toshkent viloyatini Fargʻona vodiysidan ajratib turuvchi Tyanshanning janubi-gʻarbiy tarmogʻi. Tizma orqali Qamchiq dovoni bilan Toshkent — Fargʻona bosh yoʻli oʻtadi, u yerdan togʻ yonbagʻirlariga manzara ochiladi, pastda esa Ohangaron suv ombori va togʻ daryolari vodiylari yastanib yotadi. Qurama togʻlarida oʻrta asrlarda Iloq zarbxonalari uchun kumush va mis qazib olingan konlar izlari saqlangan. Bir kunlik avtosayohat uchun yaxshi yoʻnalish; bahorda yonbagʻirlar gullarga burkanadi." },
+  },
 ];

@@ -190,5 +190,20 @@ export const ФОТО_НАМАНГАНА: Record<string, ФотоМеста> = {
       "https://commons.wikimedia.org/wiki/File:Chotqol_to%27g%27i_12.jpg",
       "https://commons.wikimedia.org/wiki/File:Chotqol_to%27g%27i_18.jpg"
     ]
+  },
+  "nm-ibrat": {
+    "img": "/places/namangan/nm-ibrat.webp",
+    "imgs": [
+      "https://upload.wikimedia.org/wikipedia/commons/c/c0/Is%CA%BChoqxon_Ibrat_nomidagi_bog%CA%BB.jpg",
+      "https://upload.wikimedia.org/wikipedia/commons/2/2e/5-rasm.jpg",
+      "https://upload.wikimedia.org/wikipedia/commons/1/19/6-rasm.jpg"
+    ],
+    "credits": "Фото: Miss Kamola (CC BY-SA 4.0); Maftuna Rasulova (CC0); Nodirbek Abdumalikov (CC BY-SA 4.0) — Wikimedia Commons",
+    "sources": [
+      "https://commons.wikimedia.org/wiki/File:Is%27hoqxon_To%27ra_Ibrat_uy-muzeyi.jpg",
+      "https://commons.wikimedia.org/wiki/File:Is%CA%BChoqxon_Ibrat_nomidagi_bog%CA%BB.jpg",
+      "https://commons.wikimedia.org/wiki/File:5-rasm.jpg",
+      "https://commons.wikimedia.org/wiki/File:6-rasm.jpg"
+    ]
   }
 };

@@ -1,4 +1,5 @@
-import type { Fact, Geo, Place } from "@/lib/types";
+import type { Locale } from "@/lib/i18n";
+import type { Fact, Geo, Place, StorySection } from "@/lib/types";
 
 /**
  * Места регионов Узбекистана (кроме Самарканда) — из каталога владельца
@@ -50,6 +51,30 @@ export interface ЗаписьРегиона {
   wikidata?: string;
 }
 
+/** Остальные языки приложения — кроме ru, en и uz, что лежат в самой записи. */
+export type ЕщёЯзык = Exclude<Locale, "ru" | "en" | "uz">;
+
+/** Название и описание места на остальных языках: id → язык → тексты. */
+export type ЯзыкиРегиона = Record<string, Partial<Record<ЕщёЯзык, Перевод>>>;
+
+/**
+ * Раздел подробного рассказа (его читает аудиогид): русский текст и
+ * переводы. Заголовок берётся по виду раздела — как у Самарканда.
+ */
+export type РазделРассказа = { kind: NonNullable<StorySection["kind"]>; ru: string } & Partial<
+  Record<Exclude<Locale, "ru">, string>
+>;
+export type РассказыРегиона = Record<string, РазделРассказа[]>;
+
+export const ЗАГОЛОВКИ: Record<РазделРассказа["kind"], string> = {
+  history: "История",
+  architecture: "Архитектура и убранство",
+  see: "Что посмотреть",
+  legend: "Легенды и предания",
+  facts: "Интересные факты",
+  tips: "Советы",
+};
+
 export interface ФотоМеста {
   img: string;
   imgs: string[];
@@ -83,7 +108,12 @@ function км(a: Geo, b: Geo): number {
 }
 
 /** Запись → место в формате семян. центр — главная точка города раздела. */
-export function собрать(з: ЗаписьРегиона, центр: Geo | undefined, фото: ФотоМеста | undefined): Place & { geo: Geo } {
+export function собрать(
+  з: ЗаписьРегиона,
+  центр: Geo | undefined,
+  фото: ФотоМеста | undefined,
+  рассказ: РазделРассказа[] = [],
+): Place & { geo: Geo } {
   const расстояние = центр ? км(центр, з.geo) : null;
   return {
     id: з.id,
@@ -96,14 +126,15 @@ export function собрать(з: ЗаписьРегиона, центр: Geo |
     hours: з.hours || "Уточняйте",
     rating: 0,
     reviews: 0,
-    audio: false,
+    // Есть рассказ — аудиогид читает его голосом.
+    audio: рассказ.length > 0,
     qr: false,
     img: фото?.img ?? "/places/samarkand/no-photo.svg",
     imgs: фото?.imgs ?? [],
     credits: фото?.credits,
     desc: з.desc,
     facts: факты(з),
-    story: [],
+    story: рассказ.map((р) => ({ kind: р.kind, title: ЗАГОЛОВКИ[р.kind], text: р.ru })),
     tickets: [],
   };
 }

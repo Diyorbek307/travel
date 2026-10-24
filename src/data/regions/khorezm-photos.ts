@@ -425,5 +425,13 @@ export const ФОТО_ХОРЕЗМА: Record<string, ФотоМеста> = {
       "https://commons.wikimedia.org/wiki/File:Tugai_forest_at_sunset_on_both_sides_of_the_AmuDarya_river.jpg",
       "https://commons.wikimedia.org/wiki/File:Turanga_poplar-main_tree_of_tugai_forest.jpg"
     ]
+  },
+  "kh-qalajiq": {
+    "img": "/places/khorezm/kh-qalajiq.webp",
+    "imgs": [],
+    "credits": "Фото: Farid Salah (CC BY-SA 4.0) — Wikimedia Commons",
+    "sources": [
+      "https://commons.wikimedia.org/wiki/File:Qalajiq.jpg"
+    ]
   }
 };

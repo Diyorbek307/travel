@@ -240,4 +240,16 @@ export const МЕСТА_КАШКАДАРЬИ: ЗаписьРегиона[] = [
     uz: { name: "Maydanak observatoriyasi", desc: "Shahrisabzdan taxminan 45 km janubdagi Maydanak platosida 1970-yilda tashkil etilgan baland togʻ astronomiya observatoriyasi. Joy noyob astroiqlimi uchun tanlangan: quruq va barqaror havo hamda koʻp ochiq tunlar uni Yevrosiyodagi kuzatuvlar uchun eng yaxshi joylardan biriga aylantiradi. Bugun observatoriya Oʻzbekiston Fanlar akademiyasining Ulugʻbek nomidagi Astronomiya institutiga qarashli, bu yerda xalqaro loyihalar teleskoplari ishlaydi. Yoʻl togʻli; tashrif va tungi kuzatuvlar faqat oldindan kelishilgan holda." },
     wikidata: "Q1573566",
   },
+  {
+    id: "kd-amankutan",
+    name: "Аманкутан и перевал Тахтакарача",
+    city: "Шахрисабз",
+    type: "Природа",
+    geo: { lat: 39.2861, lon: 66.94097 },
+    время: "Полдня",
+    далеко: true,
+    desc: "Горная долина с арчовыми лесами на дороге из Самарканда в Шахрисабз через перевал Тахтакарача, на границе Самаркандской и Кашкадарьинской областей. Серпантин открывает виды на скалы с причудливыми узорами, луга и долину Кашкадарьи, а весной склоны покрываются цветами. В долине находится пещера Аманкутан — палеолитическая стоянка, где нашли орудия каменного века. Сегодня здесь национальный парк, зоны отдыха и чайханы у реки. Зимой перевал может быть закрыт.",
+    en: { name: "Amankutan and Takhtakaracha Pass", desc: "A mountain valley with juniper forests on the road from Samarkand to Shahrisabz over the Takhtakaracha pass, on the border of Samarkand and Kashkadarya regions. The serpentine road reveals cliffs with strange patterns, meadows and the Kashkadarya valley, and in spring the slopes are covered in flowers. The valley holds the Amankutan cave, a Palaeolithic site where Stone Age tools were found. Today there is a national park, picnic areas and teahouses by the river. The pass can be closed in winter." },
+    uz: { name: "Omonqoʻton va Taxtaqoracha dovoni", desc: "Samarqand va Qashqadaryo viloyatlari chegarasida, Taxtaqoracha dovoni orqali Samarqanddan Shahrisabzga boradigan yoʻldagi archazorli togʻ vodiysi. Ilonizi yoʻl gʻaroyib naqshli qoyalar, yaylovlar va Qashqadaryo vodiysiga manzara ochadi, bahorda yonbagʻirlar gullarga burkanadi. Vodiyda tosh asri qurollari topilgan paleolit makoni — Omonqoʻton gʻori bor. Bugun bu yerda milliy bogʻ, daryo boʻyida dam olish maskanlari va choyxonalar mavjud. Qishda dovon yopilishi mumkin." },
+  },
 ];

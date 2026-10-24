@@ -247,5 +247,30 @@ export const ФОТО_КАРАКАЛПАКСТАНА: Record<string, ФотоМ�
       "https://commons.wikimedia.org/wiki/File:%D0%9A%D0%B0%D1%81%D1%81%D0%B0%D1%80%D0%BC%D0%B0,_%D0%B4%D0%BD%D0%BE_%D0%BE%D0%BA%D0%B5%D0%B0%D0%BD%D0%B0_%D0%A2%D1%8D%D1%82%D0%B8%D1%81._%D0%A1%D0%BF%D1%80%D0%B0%D0%B2%D0%B0_%D0%BF%D0%BB%D0%B0%D1%82%D0%BE_%D0%A3%D1%81%D1%82%D1%8E%D1%80%D1%82.jpg",
       "https://commons.wikimedia.org/wiki/File:%D0%9A%D0%B0%D1%81%D1%81%D0%B0%D1%80%D0%BC%D0%B0,_%D0%B4%D0%BD%D0%BE_%D0%BE%D0%BA%D0%B5%D0%B0%D0%BD%D0%B0_%D0%A2%D1%8D%D1%82%D0%B8%D1%81._%D0%97%D0%B4%D0%B5%D1%81%D1%8C_%D0%BC%D0%BE%D0%B6%D0%BD%D0%BE_%D0%BD%D0%B0%D0%B9%D1%82%D0%B8_%D0%B7%D1%83%D0%B1%D1%8B_%D0%BC%D0%B5%D0%B3%D0%B0%D0%BB%D0%B0%D0%B4%D0%BE%D0%BD%D0%B0.jpg"
     ]
+  },
+  "kk-sultanuvays": {
+    "img": "/places/karakalpakstan/kk-sultanuvays.webp",
+    "imgs": [
+      "https://upload.wikimedia.org/wikipedia/commons/f/f5/Sultin_uvays_bobo_ziyoratgohi.jpg",
+      "https://upload.wikimedia.org/wikipedia/commons/8/88/Sulton_uyays_bobo.jpg",
+      "https://upload.wikimedia.org/wikipedia/commons/e/e0/Sulton_uyas_buva.jpg",
+      "https://upload.wikimedia.org/wikipedia/commons/2/29/Sulton_uvays_bobo_qabristoni.jpg"
+    ],
+    "credits": "Фото: Ashirbek14 (CC BY-SA 4.0); Oybarchin0302 (CC BY-SA 4.0) — Wikimedia Commons",
+    "sources": [
+      "https://commons.wikimedia.org/wiki/File:%D0%A1%D0%B2%D1%8F%D1%82%D0%B8%D0%BB%D0%B8%D1%89%D0%B5_%D0%A1%D1%83%D0%BB%D1%82%D0%B0%D0%BD_%D0%92%D0%B0%D0%B8%D1%81_%D0%91%D0%BE%D0%B1%D0%BE9.jpg",
+      "https://commons.wikimedia.org/wiki/File:Sultin_uvays_bobo_ziyoratgohi.jpg",
+      "https://commons.wikimedia.org/wiki/File:Sulton_uyays_bobo.jpg",
+      "https://commons.wikimedia.org/wiki/File:Sulton_uyas_buva.jpg",
+      "https://commons.wikimedia.org/wiki/File:Sulton_uvays_bobo_qabristoni.jpg"
+    ]
+  },
+  "kk-janbas": {
+    "img": "/places/karakalpakstan/kk-janbas.webp",
+    "imgs": [],
+    "credits": "Фото: Davide Mauro (CC BY-SA 4.0) — Wikimedia Commons",
+    "sources": [
+      "https://commons.wikimedia.org/wiki/File:Janbas_Kala._Atamurodov_D.jpg"
+    ]
   }
 };

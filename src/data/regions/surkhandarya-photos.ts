@@ -243,12 +243,20 @@ export const ФОТО_СУРХАНДАРЬИ: Record<string, ФотоМеста>
   "sx-teshiktash": {
     "img": "/places/surkhandarya/sx-teshiktash.webp",
     "imgs": [
-      "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/90/Teshik-Task._Homo_neanderthalensis_child.jpg/1280px-Teshik-Task._Homo_neanderthalensis_child.jpg"
+      "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/09/%D0%A1%D0%BA%D0%B0%D0%BB%D1%8B_%D0%A2%D0%B5%D1%88%D0%B8%D0%BA-%D0%A2%D0%B0%D1%88_05.jpg/1280px-%D0%A1%D0%BA%D0%B0%D0%BB%D1%8B_%D0%A2%D0%B5%D1%88%D0%B8%D0%BA-%D0%A2%D0%B0%D1%88_05.jpg",
+      "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2b/%D0%A1%D0%BA%D0%B0%D0%BB%D1%8B_%D0%A2%D0%B5%D1%88%D0%B8%D0%BA-%D0%A2%D0%B0%D1%88_04.jpg/1280px-%D0%A1%D0%BA%D0%B0%D0%BB%D1%8B_%D0%A2%D0%B5%D1%88%D0%B8%D0%BA-%D0%A2%D0%B0%D1%88_04.jpg",
+      "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d0/%D0%A1%D0%BA%D0%B0%D0%BB%D1%8B_%D0%A2%D0%B5%D1%88%D0%B8%D0%BA-%D0%A2%D0%B0%D1%88_03.jpg/1280px-%D0%A1%D0%BA%D0%B0%D0%BB%D1%8B_%D0%A2%D0%B5%D1%88%D0%B8%D0%BA-%D0%A2%D0%B0%D1%88_03.jpg",
+      "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/60/%D0%A1%D0%BA%D0%B0%D0%BB%D1%8B_%D0%A2%D0%B5%D1%88%D0%B8%D0%BA-%D0%A2%D0%B0%D1%88_02.jpg/1280px-%D0%A1%D0%BA%D0%B0%D0%BB%D1%8B_%D0%A2%D0%B5%D1%88%D0%B8%D0%BA-%D0%A2%D0%B0%D1%88_02.jpg",
+      "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/68/Skull_of_Teshik-Tash_Boy.jpg/1280px-Skull_of_Teshik-Tash_Boy.jpg"
     ],
-    "credits": "Фото: Stanislav Kozlovskiy (CC BY 3.0); Ryan Somma from Occoquan, USA (CC BY-SA 2.0) — Wikimedia Commons",
+    "credits": "Фото: Kemal KOZBAEV (CC BY-SA 4.0); Stanislav Kozlovskiy (CC BY 3.0) — Wikimedia Commons",
     "sources": [
-      "https://commons.wikimedia.org/wiki/File:Skull_of_Teshik-Tash_Boy.jpg",
-      "https://commons.wikimedia.org/wiki/File:Teshik-Task._Homo_neanderthalensis_child.jpg"
+      "https://commons.wikimedia.org/wiki/File:%D0%A1%D0%BA%D0%B0%D0%BB%D1%8B_%D0%A2%D0%B5%D1%88%D0%B8%D0%BA-%D0%A2%D0%B0%D1%88_01.jpg",
+      "https://commons.wikimedia.org/wiki/File:%D0%A1%D0%BA%D0%B0%D0%BB%D1%8B_%D0%A2%D0%B5%D1%88%D0%B8%D0%BA-%D0%A2%D0%B0%D1%88_05.jpg",
+      "https://commons.wikimedia.org/wiki/File:%D0%A1%D0%BA%D0%B0%D0%BB%D1%8B_%D0%A2%D0%B5%D1%88%D0%B8%D0%BA-%D0%A2%D0%B0%D1%88_04.jpg",
+      "https://commons.wikimedia.org/wiki/File:%D0%A1%D0%BA%D0%B0%D0%BB%D1%8B_%D0%A2%D0%B5%D1%88%D0%B8%D0%BA-%D0%A2%D0%B0%D1%88_03.jpg",
+      "https://commons.wikimedia.org/wiki/File:%D0%A1%D0%BA%D0%B0%D0%BB%D1%8B_%D0%A2%D0%B5%D1%88%D0%B8%D0%BA-%D0%A2%D0%B0%D1%88_02.jpg",
+      "https://commons.wikimedia.org/wiki/File:Skull_of_Teshik-Tash_Boy.jpg"
     ]
   },
   "sx-sangardak": {
@@ -337,6 +345,27 @@ export const ФОТО_СУРХАНДАРЬИ: Record<string, ФотоМеста>
       "https://commons.wikimedia.org/wiki/File:Church_of_Alexander_Nevsky_in_Termez_4222.JPG",
       "https://commons.wikimedia.org/wiki/File:Church_of_Alexander_Nevsky_in_Termez_14-01.JPG",
       "https://commons.wikimedia.org/wiki/File:Church_of_Alexander_Nevsky_in_Termez_13-55.JPG"
+    ]
+  },
+  "sx-zulkifl": {
+    "img": "/places/surkhandarya/sx-zulkifl.webp",
+    "imgs": [
+      "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cf/Zulkifl_maqbarasi18.jpg/1280px-Zulkifl_maqbarasi18.jpg",
+      "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cd/Zulkifl_maqbarasi21.jpg/1280px-Zulkifl_maqbarasi21.jpg",
+      "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9a/Zulkifl_maqbarasi20.jpg/1280px-Zulkifl_maqbarasi20.jpg",
+      "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d8/Payg%27ambar_oroli_02.jpg/1280px-Payg%27ambar_oroli_02.jpg",
+      "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/db/Payg%27ambar_oroli_01.jpg/1280px-Payg%27ambar_oroli_01.jpg",
+      "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ec/Zulkifl_maqbarasi16.jpg/1280px-Zulkifl_maqbarasi16.jpg"
+    ],
+    "credits": "Фото: Jonibek Qo'zimurodov (CC BY-SA 4.0) — Wikimedia Commons",
+    "sources": [
+      "https://commons.wikimedia.org/wiki/File:Zulkifl_maqbarasi.jpg",
+      "https://commons.wikimedia.org/wiki/File:Zulkifl_maqbarasi18.jpg",
+      "https://commons.wikimedia.org/wiki/File:Zulkifl_maqbarasi21.jpg",
+      "https://commons.wikimedia.org/wiki/File:Zulkifl_maqbarasi20.jpg",
+      "https://commons.wikimedia.org/wiki/File:Payg%27ambar_oroli_02.jpg",
+      "https://commons.wikimedia.org/wiki/File:Payg%27ambar_oroli_01.jpg",
+      "https://commons.wikimedia.org/wiki/File:Zulkifl_maqbarasi16.jpg"
     ]
   }
 };

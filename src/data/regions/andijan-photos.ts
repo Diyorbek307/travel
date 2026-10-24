@@ -121,5 +121,21 @@ export const ФОТО_АНДИЖАНА: Record<string, ФотоМеста> = {
     "sources": [
       "https://commons.wikimedia.org/wiki/File:Andijon_musiqali_drama_teatri.jpg"
     ]
+  },
+  "an-qutayba": {
+    "img": "/places/andijan/an-qutayba.webp",
+    "imgs": [],
+    "credits": "Фото: Umidjon Mamarasulov (CC BY-SA 4.0) — Wikimedia Commons",
+    "sources": [
+      "https://commons.wikimedia.org/wiki/File:%D2%9A%D1%83%D1%82%D0%B0%D0%B9%D0%B1%D0%B0_%D0%B8%D0%B1%D0%BD_%D0%9C%D1%83%D1%81%D0%BB%D0%B8%D0%BC_%D0%B7%D0%B8%D1%91%D1%80%D0%B0%D1%82%D0%B3%D0%BE%D2%B3%D0%B8.jpg"
+    ]
+  },
+  "an-imamota": {
+    "img": "/places/andijan/an-imamota.webp",
+    "imgs": [],
+    "credits": "Фото: Abdurahmon Egamberdiyev (CC BY-SA 4.0) — Wikimedia Commons",
+    "sources": [
+      "https://commons.wikimedia.org/wiki/File:Andijon_Imom_ota_tog%27lari.jpg"
+    ]
   }
 };

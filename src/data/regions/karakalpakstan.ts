@@ -187,4 +187,18 @@ export const МЕСТА_КАРАКАЛПАКСТАНА: ЗаписьРегион
     uz: { name: "Ustyurt platosi va «Janubiy Ustyurt» milliy bogʻi", desc: "Orol va Kaspiy oraligʻidagi ulkan choʻl platosi, balandligi oʻnlab metrlik tik jarliklar — chinklar bilan tugaydi. «Janubiy Ustyurt» milliy bogʻida rang-barang «marsdagidek» qoyalar, shamol yemirgan qoya haykallari, Orol dengizining sobiq tubi va qadimgi Tetis okeani toshqotganliklari bilan qatlamlar bor. Bu yerda jayronlar va saygʻoqlar yashaydi, tunda osmon yulduzlarga toʻla boʻladi. Sayohat tajribali gid bilan yoʻltanlamasda bir-ikki kun davom etadi, tunash — chodir yoki oʻtovlarda." },
     wikidata: "Q125465752",
   },
+  {
+    id: "kk-janbas",
+    name: "Крепость Джанбас-кала",
+    city: "Нукус",
+    type: "Археология",
+    geo: { lat: 41.8584, lon: 61.3037 },
+    district: "Элликкалинский район",
+    время: "45–60 минут",
+    далеко: true,
+    desc: "Одна из самых эффектных крепостей Древнего Хорезма в Элликкалинском районе, в 47 км к северо-востоку от Турткуля, на холме над старым руслом Амударьи. Археолог Сергей Толстов датировал её IV веком до н. э. — I веком н. э. Прямоугольная крепость около 200 на 170 метров не имеет башен: вместо них по всему периметру в два ряда прорезаны узкие бойницы, а вход устроен как коридор-ловушка для нападавших. Высокие глинобитные стены хорошо сохранились; крепость стоит у дороги, к востоку от кишлака Джанбас.",
+    en: { name: "Janbas Kala Fortress", desc: "One of the most striking fortresses of Ancient Khorezm, in Ellikkala district 47 km north-east of Turtkul, on a hill above an old channel of the Amu Darya. The archaeologist Sergei Tolstov dated it to the 4th century BC – 1st century AD. The rectangular fortress, about 200 by 170 metres, has no towers: instead, narrow arrow slits are cut in two rows around the whole perimeter, and the entrance was designed as a trap corridor for attackers. The tall mud-brick walls are well preserved; the fortress stands by the road east of Janbas village." },
+    uz: { name: "Jonbosqalʼa", desc: "Elliqqalʼa tumanida, Toʻrtkoʻldan 47 km shimoli-sharqda, Amudaryoning eski oʻzani ustidagi tepalikda joylashgan Qadimgi Xorazmning eng taʼsirli qalʼalaridan biri. Arxeolog Sergey Tolstov uni miloddan avvalgi IV asr — milodiy I asrga oid deb belgilagan. Taxminan 200 ga 170 metrlik toʻrtburchak qalʼada minoralar yoʻq: ularning oʻrniga butun perimetr boʻylab ikki qator tor shinaklar ochilgan, kirish esa hujumchilar uchun tuzoq-yoʻlak shaklida qurilgan. Baland paxsa devorlar yaxshi saqlangan; qalʼa Jonbos qishlogʻidan sharqda, yoʻl yonida turibdi." },
+    wikidata: "Q12543285",
+  },
 ];
