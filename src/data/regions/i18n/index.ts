@@ -2,6 +2,7 @@ import type { ЯзыкиРегиона } from "../core";
 import { ЯЗЫКИ_АНДИЖАНА } from "./andijan";
 import { ЯЗЫКИ_БУХАРЫ } from "./bukhara";
 import { ЯЗЫКИ_ДЖИЗАКА } from "./jizzakh";
+import { ЯЗЫКИ_КАШКАДАРЬИ } from "./kashkadarya";
 import { ЯЗЫКИ_ТАШКЕНТА } from "./tashkent";
 
 /**
@@ -13,5 +14,6 @@ export const ЯЗЫКИ_РЕГИОНОВ: ЯзыкиРегиона = {
   ...ЯЗЫКИ_АНДИЖАНА,
   ...ЯЗЫКИ_БУХАРЫ,
   ...ЯЗЫКИ_ДЖИЗАКА,
+  ...ЯЗЫКИ_КАШКАДАРЬИ,
   ...ЯЗЫКИ_ТАШКЕНТА,
 };
