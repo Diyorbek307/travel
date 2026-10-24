@@ -667,6 +667,29 @@ export const СЛУЖЕБНЫЕ_РЕГИОНОВ: [string, Строка][] = [
     ar: "منطقة فرغانة",
   }),
 
+  с("Ургенч", {
+    en: "Urgench",
+    uz: "Urganch",
+    zh: "乌尔根奇",
+    ko: "우르겐치",
+    de: "Urgentsch",
+    fr: "Ourguentch",
+    ja: "ウルゲンチ",
+    tr: "Ürgenç",
+    ar: "أورغنج",
+  }),
+  с("Ургенчский район", {
+    en: "Urgench district",
+    uz: "Urganch tumani",
+    zh: "乌尔根奇区",
+    ko: "우르겐치 지구",
+    de: "Bezirk Urgentsch",
+    fr: "District d'Ourguentch",
+    ja: "ウルゲンチ地区",
+    tr: "Ürgenç ilçesi",
+    ar: "منطقة أورغنج",
+  }),
+
   // ── Новые города ─────────────────────────────────────────────────
   с("Навои", {
     en: "Navoi",
