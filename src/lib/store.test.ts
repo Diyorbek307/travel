@@ -1,4 +1,5 @@
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { ПРИМЕРЫ_ID } from "@/data/real-examples";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -61,10 +62,15 @@ describe("поздние семена", () => {
 });
 
 describe("убранные демо-записи", () => {
-  it("в семенах нет гостиниц, ресторанов, экскурсий и событий", () => {
-    expect(SEED.hotels).toEqual([]);
-    expect(SEED.restaurants).toEqual([]);
-    expect(SEED.routes).toEqual([]);
+  it("в семенах нет демо — только настоящие примеры (data/real-examples.ts)", () => {
+    const примеры = new Set(ПРИМЕРЫ_ID);
+    expect(SEED.hotels.every((h) => примеры.has(h.id))).toBe(true);
+    expect(SEED.restaurants.every((r) => примеры.has(r.id))).toBe(true);
+    expect(SEED.routes.every((r) => примеры.has(r.id))).toBe(true);
+    // По одному в каждый раздел, чтобы плитки не пропадали.
+    expect(SEED.hotels.map((h) => h.kind)).toEqual(["hotel", "hostel"]);
+    expect(SEED.restaurants.map((r) => r.kind)).toEqual(["restaurant", "bar"]);
+    expect(SEED.routes).toHaveLength(1);
     expect(SEED.events).toEqual([]);
     expect(SEED.places.every((p) => p.city === "Самарканд")).toBe(true);
   });
@@ -72,7 +78,8 @@ describe("убранные демо-записи", () => {
   it("из сохранённого убираются, заведённое в панели остаётся", async () => {
     const { hotels } = await store.readContent();
     expect(убранныйОтель).toBeTruthy();
-    expect(hotels.map((h) => h.id)).toEqual(["свой-отель"]);
+    // Демо убрано, своё осталось; настоящие примеры досыпаются один раз.
+    expect(hotels.map((h) => h.id).filter((id) => !id.startsWith("ex-"))).toEqual(["свой-отель"]);
   });
 });
 
