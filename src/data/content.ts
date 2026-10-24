@@ -267,11 +267,15 @@ export const ФОТО_ГОРОДОВ: Record<string, string> = {
   Гулистан: "/scenic/guliston-1.webp",
   Джизак: "https://images.unsplash.com/photo-1716657309938-800da49506fa?w=900&h=600&fit=crop&auto=format",
   Чарвак: "/scenic/charvak-2.webp",
+  Шахрисабз: "/places/kashkadarya/kd-oqsaroy.webp",
 };
 
 export const UZ_CITIES = [
   "Ташкент","Самарканд","Бухара","Хива","Нукус","Фергана",
   "Наманган","Андижан","Термез","Карши","Гулистан","Джизак","Чарвак",
+  // Добавлены вместе с местами регионов (src/data/regions) — в конце,
+  // чтобы id прежних городов в семенах не сдвинулись.
+  "Шахрисабз",
 ];
 
 export const FLIGHTS = [

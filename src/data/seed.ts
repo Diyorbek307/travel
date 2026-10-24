@@ -66,13 +66,34 @@ function slug(value: string, index: number): string {
   return `${index + 1}-${value.toLowerCase().replace(/[^a-zа-я0-9]+/gi, "-").slice(0, 32)}`;
 }
 
+/** Область каждого города — для панели. */
+const ОБЛАСТИ: Record<string, string> = {
+  Ташкент: "Ташкент",
+  Самарканд: "Самаркандская область",
+  Бухара: "Бухарская область",
+  Хива: "Хорезмская область",
+  Нукус: "Республика Каракалпакстан",
+  Фергана: "Ферганская область",
+  Наманган: "Наманганская область",
+  Андижан: "Андижанская область",
+  Термез: "Сурхандарьинская область",
+  Карши: "Кашкадарьинская область",
+  Гулистан: "Сырдарьинская область",
+  Джизак: "Джизакская область",
+  Чарвак: "Ташкентская область",
+  Шахрисабз: "Кашкадарьинская область",
+};
+
+/** Города, появившиеся после запуска: досыпаются к сохранённому разделу. */
+const НОВЫЕ_ГОРОДА = new Set(["Шахрисабз"]);
+
 const cities: ManagedCity[] = UZ_CITIES.map((name, i) => {
   const popular = POPULAR_CITIES.find((c) => c.name === name);
   return {
     id: slug(name, i),
     name,
     sub: popular?.sub ?? "Узбекистан",
-    region: name === "Чарвак" ? "Ташкентская область" : `${name}ская область`,
+    region: ОБЛАСТИ[name] ?? "Узбекистан",
     img: popular?.img ?? ФОТО_ГОРОДОВ[name] ?? POPULAR_CITIES[i % POPULAR_CITIES.length].img,
     rating: popular?.rating ?? 4.5,
     // Числа демонстрационные: настоящие подставит редактор в панели.
@@ -298,6 +319,7 @@ const ПОЗДНИЕ_ИСХОДНЫЕ = new Set([
 const позднее = (x: { id: string }) => ПОЗДНИЕ_ИСХОДНЫЕ.has(x.id.replace(/^\d+-/, ""));
 
 export const ПОЗДНИЕ_СЕМЕНА: Partial<Record<ContentKey, string[]>> = {
+  cities: cities.filter((c) => НОВЫЕ_ГОРОДА.has(c.name)).map((x) => x.id),
   places: places.filter(позднее).map((x) => x.id),
   hotels: hotels.filter(позднее).map((x) => x.id),
   restaurants: restaurants.filter(позднее).map((x) => x.id),
