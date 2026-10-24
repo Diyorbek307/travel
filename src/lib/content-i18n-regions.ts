@@ -441,6 +441,29 @@ export const СЛУЖЕБНЫЕ_РЕГИОНОВ: [string, Строка][] = [
     ar: "منطقة جلال قدوق",
   }),
 
+  с("Зааминский район", {
+    en: "Zaamin district",
+    uz: "Zomin tumani",
+    zh: "扎阿明区",
+    ko: "자아민 지구",
+    de: "Bezirk Saamin",
+    fr: "District de Zaamin",
+    ja: "ザアミン地区",
+    tr: "Zaamin ilçesi",
+    ar: "منطقة زامين",
+  }),
+  с("Фаришский район", {
+    en: "Forish district",
+    uz: "Forish tumani",
+    zh: "法里什区",
+    ko: "포리시 지구",
+    de: "Bezirk Forisch",
+    fr: "District de Forich",
+    ja: "フォリシュ地区",
+    tr: "Foriş ilçesi",
+    ar: "منطقة فاريش",
+  }),
+
   // ── Новые города ─────────────────────────────────────────────────
   с("Навои", {
     en: "Navoi",
