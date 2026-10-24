@@ -40,6 +40,7 @@ import type {
 } from "@/lib/types";
 import { САМАРКАНД_НОВЫЕ_ID } from "./samarkand";
 import { ПРИМЕРЫ_ГОСТИНИЦ, ПРИМЕРЫ_ЭКСКУРСИЙ, ПРИМЕРЫ_РЕСТОРАНОВ, ПРИМЕРЫ_ID } from "./real-examples";
+import { РЕГИОНЫ_ID } from "./regions";
 
 /**
  * Начальное содержимое платформы.
@@ -290,6 +291,8 @@ const ПОЗДНИЕ_ИСХОДНЫЕ = new Set([
   ...САМАРКАНД_НОВЫЕ_ID,
   // Настоящие примеры заведений и экскурсии (data/real-examples.ts)
   ...ПРИМЕРЫ_ID,
+  // Регионы по каталогу владельца (src/data/regions)
+  ...РЕГИОНЫ_ID,
   "xkhiv", "xsito", "xmizd", "xyodg", "xrish", "xkhud", "xakhs", "xotav", "xbabm", "xandj", "xfaya", "xterm", "xhaki", "xkokg", "xodin", "xaydr", "xtemg", "xrash", "xsyrd", "xh1", "xh2", "xh3", "xh4", "xh5", "xh6", "xh7", "xh8", "xh9", "xh10", "xh11", "xh12", "xr1", "xr2", "xr3", "xr4", "xr5", "xr6", "xr7", "xr8", "xb1", "xb2", "xb3", "xb4", "xb5", "xb6", "xb7", "xb8", "xb9", "r11", "r12", "r13", "r14", "r15", "r16", "r17", "r18",
 ]);
 const позднее = (x: { id: string }) => ПОЗДНИЕ_ИСХОДНЫЕ.has(x.id.replace(/^\d+-/, ""));

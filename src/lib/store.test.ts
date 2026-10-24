@@ -1,5 +1,6 @@
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { ПРИМЕРЫ_ID } from "@/data/real-examples";
+import { РЕГИОНЫ_ID } from "@/data/regions";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -72,7 +73,11 @@ describe("убранные демо-записи", () => {
     expect(SEED.restaurants.map((r) => r.kind)).toEqual(["restaurant", "bar"]);
     expect(SEED.routes).toHaveLength(1);
     expect(SEED.events).toEqual([]);
-    expect(SEED.places.every((p) => p.city === "Самарканд")).toBe(true);
+    // Места — Самарканд и регионы по каталогу владельца, без старых демо.
+    const регионы = new Set(РЕГИОНЫ_ID);
+    expect(SEED.places.every((p) => p.city === "Самарканд" || регионы.has(p.id.replace(/^\d+-/, "")))).toBe(
+      true,
+    );
   });
 
   it("из сохранённого убираются, заведённое в панели остаётся", async () => {
