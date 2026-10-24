@@ -39,6 +39,7 @@ import type {
   ManagedAudio,
 } from "@/lib/types";
 import { САМАРКАНД_НОВЫЕ_ID } from "./samarkand";
+import { ПРИМЕРЫ_ГОСТИНИЦ, ПРИМЕРЫ_ЭКСКУРСИЙ, ПРИМЕРЫ_РЕСТОРАНОВ, ПРИМЕРЫ_ID } from "./real-examples";
 
 /**
  * Начальное содержимое платформы.
@@ -252,9 +253,10 @@ const оставить = <T extends { id: string }>(ключ: ContentKey, спи
   список.filter((x) => !УБРАННЫЕ_СЕМЕНА[ключ]?.has(x.id));
 
 const places = оставить("places", всеМеста);
-const hotels = оставить("hotels", всеГостиницы);
-const restaurants = оставить("restaurants", всеРестораны);
-const routes = оставить("routes", всеЭкскурсии);
+// По одному настоящему заведению в разделы, опустевшие после чистки демо.
+const hotels = [...оставить("hotels", всеГостиницы), ...ПРИМЕРЫ_ГОСТИНИЦ];
+const restaurants = [...оставить("restaurants", всеРестораны), ...ПРИМЕРЫ_РЕСТОРАНОВ];
+const routes = [...оставить("routes", всеЭкскурсии), ...ПРИМЕРЫ_ЭКСКУРСИЙ];
 const events = оставить("events", всеСобытия);
 
 export const SEED: Content = { cities, places, hotels, restaurants, routes, events, ads, audio };
@@ -286,6 +288,8 @@ const ПОЗДНИЕ_ИСХОДНЫЕ = new Set([
   "xnamm", "xkasm", "xgulm", "xb10", "xb11", "r19",
   // Самарканд по базе владельца (октябрь 2026)
   ...САМАРКАНД_НОВЫЕ_ID,
+  // Настоящие примеры заведений и экскурсии (data/real-examples.ts)
+  ...ПРИМЕРЫ_ID,
   "xkhiv", "xsito", "xmizd", "xyodg", "xrish", "xkhud", "xakhs", "xotav", "xbabm", "xandj", "xfaya", "xterm", "xhaki", "xkokg", "xodin", "xaydr", "xtemg", "xrash", "xsyrd", "xh1", "xh2", "xh3", "xh4", "xh5", "xh6", "xh7", "xh8", "xh9", "xh10", "xh11", "xh12", "xr1", "xr2", "xr3", "xr4", "xr5", "xr6", "xr7", "xr8", "xb1", "xb2", "xb3", "xb4", "xb5", "xb6", "xb7", "xb8", "xb9", "r11", "r12", "r13", "r14", "r15", "r16", "r17", "r18",
 ]);
 const позднее = (x: { id: string }) => ПОЗДНИЕ_ИСХОДНЫЕ.has(x.id.replace(/^\d+-/, ""));
