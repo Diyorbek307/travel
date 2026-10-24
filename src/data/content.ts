@@ -269,6 +269,7 @@ export const ФОТО_ГОРОДОВ: Record<string, string> = {
   Чарвак: "/scenic/charvak-2.webp",
   Шахрисабз: "/places/kashkadarya/kd-oqsaroy.webp",
   Коканд: "/places/fergana/fg-khudayar.webp",
+  Навои: "/places/navoi/nv-rabatimalik.webp",
 };
 
 export const UZ_CITIES = [
@@ -276,7 +277,7 @@ export const UZ_CITIES = [
   "Наманган","Андижан","Термез","Карши","Гулистан","Джизак","Чарвак",
   // Добавлены вместе с местами регионов (src/data/regions) — в конце,
   // чтобы id прежних городов в семенах не сдвинулись.
-  "Шахрисабз","Коканд",
+  "Шахрисабз","Коканд","Навои",
 ];
 
 export const FLIGHTS = [

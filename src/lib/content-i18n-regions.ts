@@ -690,6 +690,40 @@ export const СЛУЖЕБНЫЕ_РЕГИОНОВ: [string, Строка][] = [
     ar: "منطقة أورغنج",
   }),
 
+  с("Кармана", {
+    en: "Karmana",
+    uz: "Karmana",
+    zh: "卡尔马纳",
+    ko: "카르마나",
+    de: "Karmana",
+    fr: "Karmana",
+    ja: "カルマナ",
+    tr: "Kermine",
+    ar: "كرمانة",
+  }),
+  с("Навбахорский район", {
+    en: "Navbahor district",
+    uz: "Navbahor tumani",
+    zh: "瑙巴霍尔区",
+    ko: "나우바호르 지구",
+    de: "Bezirk Navbahor",
+    fr: "District de Navbahor",
+    ja: "ナヴバホル地区",
+    tr: "Nevbahar ilçesi",
+    ar: "منطقة نوبهار",
+  }),
+  с("Нуратинский район", {
+    en: "Nurota district",
+    uz: "Nurota tumani",
+    zh: "努拉塔区",
+    ko: "누라타 지구",
+    de: "Bezirk Nurota",
+    fr: "District de Nourata",
+    ja: "ヌラタ地区",
+    tr: "Nurata ilçesi",
+    ar: "منطقة نوراتا",
+  }),
+
   // ── Новые города ─────────────────────────────────────────────────
   с("Навои", {
     en: "Navoi",
