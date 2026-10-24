@@ -4,6 +4,8 @@ import { МЕСТА_ТАШКЕНТА } from "./tashkent";
 import { ФОТО_ТАШКЕНТА } from "./tashkent-photos";
 import { МЕСТА_БУХАРЫ } from "./bukhara";
 import { ФОТО_БУХАРЫ } from "./bukhara-photos";
+import { МЕСТА_АНДИЖАНА } from "./andijan";
+import { ФОТО_АНДИЖАНА } from "./andijan-photos";
 
 /**
  * Все регионы, кроме Самарканда: места, их фото и переводы.
@@ -12,6 +14,7 @@ import { ФОТО_БУХАРЫ } from "./bukhara-photos";
 const РЕГИОНЫ: [ЗаписьРегиона[], Record<string, ФотоМеста>][] = [
   [МЕСТА_ТАШКЕНТА, ФОТО_ТАШКЕНТА],
   [МЕСТА_БУХАРЫ, ФОТО_БУХАРЫ],
+  [МЕСТА_АНДИЖАНА, ФОТО_АНДИЖАНА],
 ];
 
 /**

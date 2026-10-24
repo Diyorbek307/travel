@@ -35,6 +35,18 @@ export const СЛУЖЕБНЫЕ_РЕГИОНОВ: [string, Строка][] = [
     ar: "آثار",
   }),
 
+  с("Церковь", {
+    en: "Church",
+    uz: "Cherkov",
+    zh: "教堂",
+    ko: "교회",
+    de: "Kirche",
+    fr: "Église",
+    ja: "教会",
+    tr: "Kilise",
+    ar: "كنيسة",
+  }),
+
   // ── «Полезно знать» ──────────────────────────────────────────────
   с("Район", {
     en: "District",
@@ -393,6 +405,40 @@ export const СЛУЖЕБНЫЕ_РЕГИОНОВ: [string, Строка][] = [
     ja: "タシケント州アハンガラン",
     tr: "Ahangaran, Taşkent bölgesi",
     ar: "أخنغران، ولاية طشقند",
+  }),
+
+  с("Мархаматский район", {
+    en: "Marhamat district",
+    uz: "Marhamat tumani",
+    zh: "马尔哈马特区",
+    ko: "마르하마트 지구",
+    de: "Bezirk Marhamat",
+    fr: "District de Marhamat",
+    ja: "マルハマト地区",
+    tr: "Marhamat ilçesi",
+    ar: "منطقة مرحمت",
+  }),
+  с("Ходжаабадский район", {
+    en: "Khojaabad district",
+    uz: "Xoʻjaobod tumani",
+    zh: "霍贾阿巴德区",
+    ko: "호자아바드 지구",
+    de: "Bezirk Chodschaabad",
+    fr: "District de Khodjaabad",
+    ja: "ホジャアバド地区",
+    tr: "Hocaabad ilçesi",
+    ar: "منطقة خوجه آباد",
+  }),
+  с("Джалакудукский район", {
+    en: "Jalaquduq district",
+    uz: "Jalaquduq tumani",
+    zh: "贾拉库杜克区",
+    ko: "잘라쿠두크 지구",
+    de: "Bezirk Dschalaquduq",
+    fr: "District de Djalakoudouk",
+    ja: "ジャラクドゥク地区",
+    tr: "Celalkuduk ilçesi",
+    ar: "منطقة جلال قدوق",
   }),
 
   // ── Новые города ─────────────────────────────────────────────────
