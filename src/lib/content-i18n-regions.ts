@@ -633,6 +633,40 @@ export const СЛУЖЕБНЫЕ_РЕГИОНОВ: [string, Строка][] = [
     ar: "منطقة خواست",
   }),
 
+  с("Маргилан", {
+    en: "Margilan",
+    uz: "Margʻilon",
+    zh: "马尔吉兰",
+    ko: "마르길란",
+    de: "Margilan",
+    fr: "Marguilan",
+    ja: "マルギラン",
+    tr: "Merginan",
+    ar: "مرغيلان",
+  }),
+  с("Риштан", {
+    en: "Rishtan",
+    uz: "Rishton",
+    zh: "里什坦",
+    ko: "리슈탄",
+    de: "Rischtan",
+    fr: "Richtan",
+    ja: "リシュタン",
+    tr: "Rişdan",
+    ar: "رشتان",
+  }),
+  с("Ферганский район", {
+    en: "Fergana district",
+    uz: "Fargʻona tumani",
+    zh: "费尔干纳区",
+    ko: "페르가나 지구",
+    de: "Bezirk Fergana",
+    fr: "District de Ferghana",
+    ja: "フェルガナ地区",
+    tr: "Fergana ilçesi",
+    ar: "منطقة فرغانة",
+  }),
+
   // ── Новые города ─────────────────────────────────────────────────
   с("Навои", {
     en: "Navoi",
