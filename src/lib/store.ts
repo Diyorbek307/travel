@@ -2,6 +2,7 @@ import path from "node:path";
 import { SEED, УБРАННЫЕ_СЕМЕНА, ПОЗДНИЕ_СЕМЕНА } from "@/data/seed";
 import { ФОТО_ГОРОДОВ } from "@/data/content";
 import { обновитьМестаСамарканда } from "@/data/samarkand";
+import { РЕГИОНЫ_МЕСТА } from "@/data/regions";
 import { создатьХранилище } from "./storage";
 import type { Content, ContentKey } from "@/lib/types";
 
@@ -73,6 +74,9 @@ export async function readContent(): Promise<Content> {
  * нет. Всё, что редактор хоть раз сохранил, — даже пустой список —
  * остаётся как есть: «убрал меню» значит убрал.
  */
+// По названию в семенах: id в семенах получают номер впереди.
+const РЕГИОНЫ = new Set(РЕГИОНЫ_МЕСТА.map((p) => p.name));
+
 const ПОДРОБНОСТИ = {
   hotels: ["facts"],
   restaurants: ["menu", "zones", "tables", "avgCheck", "imgs", "facts"],
@@ -98,6 +102,9 @@ function дополнитьПодробности(содержимое: Content)
       if (ключ === "places") {
         // Рассказ в панели не правится — у мест из семян он всегда свежий.
         if (семя.story) добавка.story = семя.story;
+        // Места регионов сохранились в панели ещё с выключенным аудио, когда
+        // голосом читался только рассказ. Теперь гид есть у всех.
+        if (РЕГИОНЫ.has(семя.name as string) && r.audio === false && семя.audio === true) добавка.audio = true;
         // Фото Самарканда из нашей папки (не загруженные редактором) — по
         // текущим семенам: в них галерея пополняется новыми ракурсами.
         const наши = (x: unknown) => typeof x === "string" && x.startsWith("/places/samarkand/");
