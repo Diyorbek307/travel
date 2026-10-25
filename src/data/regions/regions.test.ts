@@ -26,13 +26,13 @@ describe("места регионов", () => {
     for (const p of РЕГИОНЫ_МЕСТА) expect(все.has(p.type), `${p.id}: ${p.type}`).toBe(true);
   });
 
-  it("у каждого места есть английский и узбекский текст", () => {
+  it("у каждого места есть текст на всех языках сайта", () => {
     const словарь = new Map(РЕГИОНЫ_ПЕРЕВОДЫ);
     for (const p of РЕГИОНЫ_МЕСТА) {
       for (const ключ of [p.name, p.desc]) {
         const п = словарь.get(ключ);
-        expect(п?.en, `${p.id} en`).toBeTruthy();
-        expect(п?.uz, `${p.id} uz`).toBeTruthy();
+        for (const язык of ["en", "uz", "zh", "ko", "de", "fr", "ja", "tr", "ar"] as const)
+          expect(п?.[язык], `${p.id} ${язык}`).toBeTruthy();
       }
       expect(p.desc.length, p.id).toBeGreaterThan(120);
     }
