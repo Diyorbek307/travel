@@ -517,7 +517,8 @@ function собрать(з: Запись): Place & { geo: Geo } {
     hours: поля.hours || "Уточняйте",
     rating: 0,
     reviews: 0,
-    audio: false,
+    // Аудиогид есть сразу — читает голос телефона, пока нет записи диктора.
+    audio: true,
     qr: false,
     // Свободного фото нет — своя обложка с орнаментом, а не чужой снимок.
     img: фото?.img ?? "/places/samarkand/no-photo.svg",
