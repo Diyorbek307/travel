@@ -4,6 +4,7 @@ import { ЯЗЫКИ_БУХАРЫ } from "./bukhara";
 import { ЯЗЫКИ_ФЕРГАНЫ } from "./fergana";
 import { ЯЗЫКИ_ДЖИЗАКА } from "./jizzakh";
 import { ЯЗЫКИ_КАШКАДАРЬИ } from "./kashkadarya";
+import { ЯЗЫКИ_ХОРЕЗМА } from "./khorezm";
 import { ЯЗЫКИ_НАМАНГАНА } from "./namangan";
 import { ЯЗЫКИ_СУРХАНДАРЬИ } from "./surkhandarya";
 import { ЯЗЫКИ_СЫРДАРЬИ } from "./syrdarya";
@@ -20,6 +21,7 @@ export const ЯЗЫКИ_РЕГИОНОВ: ЯзыкиРегиона = {
   ...ЯЗЫКИ_ФЕРГАНЫ,
   ...ЯЗЫКИ_ДЖИЗАКА,
   ...ЯЗЫКИ_КАШКАДАРЬИ,
+  ...ЯЗЫКИ_ХОРЕЗМА,
   ...ЯЗЫКИ_НАМАНГАНА,
   ...ЯЗЫКИ_СУРХАНДАРЬИ,
   ...ЯЗЫКИ_СЫРДАРЬИ,
