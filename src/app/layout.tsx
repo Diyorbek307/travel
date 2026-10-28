@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./fonts.css";
 import "./fonts-vars.css";
 import ServiceWorker from "@/components/service-worker";
+import ImageFallback from "@/components/image-fallback";
 import "./globals.css";
 
 /*
@@ -101,6 +102,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       >
         {children}
         <ServiceWorker />
+        <ImageFallback />
       </body>
     </html>
   );

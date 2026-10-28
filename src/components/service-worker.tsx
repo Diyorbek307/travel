@@ -38,7 +38,7 @@ export default function ServiceWorker() {
           .map((e) => e.name)
           .filter((u) => {
             const адрес = new URL(u);
-            if (адрес.hostname.endsWith("unsplash.com")) return true;
+            if (/(^|\.)(unsplash\.com|wikimedia\.org)$/.test(адрес.hostname)) return true;
             if (адрес.origin !== location.origin) return false;
             return /^\/(_next\/static|tiles|scenic|icons|api\/media)\//.test(адрес.pathname);
           });

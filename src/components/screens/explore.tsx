@@ -393,7 +393,7 @@ export function ExploreScreen({
     translate: "ex_translate",
     photo: "ex_photo",
     drivers: "ex_drivers",
-    guides: "ex_guides",
+    guides: "ex_guides_title",
   };
   // У ИИ-помощников город ни при чём — чипы городов им не нужны.
   const безГородов =

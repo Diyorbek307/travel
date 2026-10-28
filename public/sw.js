@@ -7,7 +7,11 @@
  * данные (/api/content). Раньше кэшировалась только страница — без сети
  * она открывалась пустой, хотя в описании обещан офлайн.
  *
- * Снимки лежат на Unsplash: их кладём в отдельный кэш и отдаём из него.
+ * Снимки лежат на Unsplash и Wikimedia: их кладём в отдельный кэш и отдаём
+ * из него. Картинка без crossorigin приходит «непрозрачным» ответом
+ * (ok = false), и раньше такие ответы в кэш не попадали вовсе — без сети
+ * фото отелей и мест были битыми. Теперь воркер сам запрашивает чужой
+ * снимок в режиме CORS (оба хоста его разрешают) и сохраняет обычный ответ.
  * Города, скачанные в разделе «Аудио», лежат в своих кэшах offline-<город>
  * — поэтому любой ответ сначала ищется во всех кэшах сразу.
  *
@@ -21,23 +25,29 @@ const SHELL = `shell-${VERSION}`;
 const STATIC = "static-v1";
 const MEDIA = "media-v1";
 const ASSETS = "assets-v1";
+const ЗАГЛУШКА = "/places/samarkand/no-photo.svg";
 
 /** Сколько снимков держим: дальше вытесняем самые старые. */
-const MEDIA_LIMIT = 200;
+const MEDIA_LIMIT = 500;
 /** Свои картинки: плитки, виды городов, загруженные в панели фото. */
-const ASSETS_LIMIT = 300;
+const ASSETS_LIMIT = 600;
 /** Скрипты старых сборок копятся — держим с запасом на пару выкатов. */
 const STATIC_LIMIT = 400;
 
 /** Данные, без которых приложение без сети пустое. */
 const ДАННЫЕ = ["/api/content", "/api/site-config", "/api/ad-policy", "/api/translations"];
 
+/** Хосты снимков: Unsplash (демо и отели) и Wikimedia (галереи мест). */
+const СНИМКИ = /(^|\.)(unsplash\.com|wikimedia\.org)$/;
+
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches
-      .open(SHELL)
-      .then((cache) => cache.add(new Request("/", { cache: "reload" })))
-      .then(() => self.skipWaiting()),
+    Promise.all([
+      caches.open(SHELL).then((cache) => cache.add(new Request("/", { cache: "reload" }))),
+      // Обложка вместо фото, которое без сети не загрузить (см.
+      // image-fallback.tsx): сама она должна быть под рукой всегда.
+      caches.open(ASSETS).then((cache) => cache.add(ЗАГЛУШКА)),
+    ]).then(() => self.skipWaiting()),
   );
 });
 
@@ -63,8 +73,8 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(request.url);
 
   // Фотографии со стороннего хоста: сначала кэш — они не меняются.
-  if (url.hostname.endsWith("unsplash.com")) {
-    event.respondWith(cacheFirst(request, MEDIA, MEDIA_LIMIT));
+  if (СНИМКИ.test(url.hostname)) {
+    event.respondWith(mediaFirst(request));
     return;
   }
 
@@ -107,7 +117,7 @@ self.addEventListener("message", (event) => {
   const куда = (u) => {
     try {
       const url = new URL(u);
-      if (url.hostname.endsWith("unsplash.com")) return MEDIA;
+      if (СНИМКИ.test(url.hostname)) return MEDIA;
       if (url.origin !== self.location.origin) return null;
       if (url.pathname.startsWith("/_next/static/")) return STATIC;
       if (/^\/(tiles|scenic|icons|api\/media)\//.test(url.pathname)) return ASSETS;
@@ -124,12 +134,35 @@ self.addEventListener("message", (event) => {
         const cache = await caches.open(имя);
         if (await cache.match(u)) return;
         const чужой = new URL(u).origin !== self.location.origin;
-        const ответ = await fetch(u, чужой ? { mode: "no-cors" } : undefined).catch(() => null);
-        if (ответ && (ответ.ok || ответ.type === "opaque")) await cache.put(u, ответ);
+        // Чужой снимок — в режиме CORS: «непрозрачный» ответ браузер считает
+        // за мегабайты квоты, а обычный — по настоящему весу.
+        const ответ = await fetch(u, чужой ? { mode: "cors", credentials: "omit" } : undefined).catch(() => null);
+        if (ответ && ответ.ok) await cache.put(u, ответ);
       }),
     ),
   );
 });
+
+/**
+ * Чужой снимок: сначала кэш, потом сеть в режиме CORS — такой ответ можно
+ * сохранить. Не вышло (хост без CORS) — обычный запрос, как раньше.
+ */
+async function mediaFirst(request) {
+  const hit = await caches.match(request.url);
+  if (hit) return hit;
+  try {
+    const response = await fetch(request.url, { mode: "cors", credentials: "omit" });
+    if (response.ok) {
+      const cache = await caches.open(MEDIA);
+      await cache.put(request.url, response.clone());
+      await trim(cache, MEDIA_LIMIT);
+      return response;
+    }
+  } catch {
+    // нет сети или хост не отдаёт CORS — пробуем обычный запрос ниже
+  }
+  return fetch(request).catch(() => fromAnyCache(request));
+}
 
 /** Ответ из любого кэша: оболочки, снимков или скачанного города. */
 async function fromAnyCache(request) {
