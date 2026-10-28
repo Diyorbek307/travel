@@ -6,6 +6,7 @@ import { РАССКАЗЫ } from "@/data/samarkand-stories";
 import { ЗАГОЛОВКИ_РАССКАЗА, РАССКАЗЫ_ПЕРЕВОД } from "./content-i18n-samarkand-story";
 import { ЗАГОЛОВКИ_ПО_ЯЗЫКАМ, РАССКАЗЫ_ПО_ЯЗЫКАМ } from "./story-i18n";
 import { СЛУЖЕБНЫЕ_РЕГИОНОВ } from "./content-i18n-regions";
+import { ПЕРЕВОДЫ_ПРИМЕРОВ } from "./content-i18n-examples";
 import { РЕГИОНЫ_ПЕРЕВОДЫ } from "@/data/regions";
 
 /**
@@ -435,6 +436,7 @@ const СЛОВАРЬ: Map<string, Строка> = new Map([
   ...ПЕРЕВОДЫ_САМАРКАНДА,
   // Остальные регионы: служебные строки и тексты мест (src/data/regions).
   ...СЛУЖЕБНЫЕ_РЕГИОНОВ,
+  ...ПЕРЕВОДЫ_ПРИМЕРОВ,
   ...РЕГИОНЫ_ПЕРЕВОДЫ,
   ...Object.entries(ОПИСАНИЯ_САМАРКАНДА).flatMap(([id, п]): [string, Строка][] => {
     const текст = САМАРКАНД_ОПИСАНИЯ[id];

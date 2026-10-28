@@ -43,8 +43,61 @@ type Каталог = { drivers: ПартнёрПубличный[]; guides: П�
 const ПУСТО: Каталог = { drivers: [], guides: [], tours: [] };
 let кеш: { данные: Каталог; когда: number } | null = null;
 
+const ЛАТИНИЦА: Record<string, string> = {
+  а: "a", б: "b", в: "v", г: "g", д: "d", е: "e", ё: "yo", ж: "zh", з: "z", и: "i", й: "y", к: "k",
+  л: "l", м: "m", н: "n", о: "o", п: "p", р: "r", с: "s", т: "t", у: "u", ф: "f", х: "kh", ц: "ts",
+  ч: "ch", ш: "sh", щ: "shch", ъ: "", ы: "y", ь: "", э: "e", ю: "yu", я: "ya",
+  ў: "oʻ", қ: "q", ғ: "gʻ", ҳ: "h",
+};
+/** По-узбекски латиница своя: х — x, ж — j. */
+const ЛАТИНИЦА_UZ: Record<string, string> = { ...ЛАТИНИЦА, х: "x", ж: "j", ц: "s", щ: "sh" };
+
+/**
+ * Имя партнёра латиницей. Имя не переводят, но «Азиз К.» кириллицей
+ * японец или турок не прочтёт — пишем теми же звуками латиницей.
+ */
+function латиницей(имя: string, lang: string): string {
+  const буквы = lang === "uz" ? ЛАТИНИЦА_UZ : ЛАТИНИЦА;
+  return имя.replace(/[А-Яа-яЁёЎўҚқҒғҲҳ]/g, (ч) => {
+    const м = ч.toLowerCase();
+    const л = буквы[м] ?? ч;
+    return ч === м ? л : л.charAt(0).toUpperCase() + л.slice(1);
+  });
+}
+
+/**
+ * Анкеты и туры на языке туриста: тексты — через словарь и переводы
+ * панели (трК), имена — латиницей. Город не трогаем: по нему фильтруют
+ * чипы городов, его переводят при показе.
+ */
+function перевестиКаталог(к: Каталог, lang: string, трК: (s: string) => string): Каталог {
+  if (lang === "ru") return к;
+  const п = (x: ПартнёрПубличный): ПартнёрПубличный => ({
+    ...x,
+    name: латиницей(трК(x.name), lang),
+    bio: трК(x.bio),
+    includes: x.includes.map(трК),
+    specialties: x.specialties?.map(трК),
+    car: x.car ? { ...x.car, color: трК(x.car.color) } : x.car,
+  });
+  return {
+    drivers: к.drivers.map(п),
+    guides: к.guides.map(п),
+    tours: к.tours.map((т) => ({
+      ...т,
+      title: трК(т.title),
+      summary: трК(т.summary),
+      program: т.program.map((д) => ({ ...д, title: трК(д.title), text: д.text ? трК(д.text) : д.text })),
+      includes: т.includes.map(трК),
+      excludes: т.excludes.map(трК),
+      meetingPoint: трК(т.meetingPoint),
+    })),
+  };
+}
+
 /** Каталог партнёров: один запрос на минуту на всё приложение. */
 export function usePartners(): Каталог & { загружен: boolean } {
+  const { lang, трК } = useT();
   const [данные, setДанные] = useState<Каталог | null>(кеш?.данные ?? null);
   useEffect(() => {
     if (кеш && Date.now() - кеш.когда < 60_000) return;
@@ -60,7 +113,8 @@ export function usePartners(): Каталог & { загружен: boolean } {
       живо = false;
     };
   }, []);
-  return { ...(данные ?? ПУСТО), загружен: данные !== null };
+  const переведено = useMemo(() => перевестиКаталог(данные ?? ПУСТО, lang, трК), [данные, lang, трК]);
+  return { ...переведено, загружен: данные !== null };
 }
 
 const КЛАСС_КЛЮЧ: Record<КлассМашины, TKey> = {
@@ -315,7 +369,7 @@ function Действия({ телефон, onOpen, пример }: { телеф
 }
 
 function КарточкаВодителя({ п, номер }: { п: ПартнёрПубличный; номер: number }) {
-  const { t } = useT();
+  const { t, трК } = useT();
   const дг = useДеньги();
   const языки = useЯзыки();
   const открыть = () => открытьПартнёра({ kind: "driver", value: п });
@@ -361,11 +415,12 @@ function КарточкаВодителя({ п, номер }: { п: Партнё
       </div>
       <div className="mt-2.5 space-y-1">
         <Факт иконка="📍">
-          {п.city}
+          {трК(п.city)}
           {п.cities.length > 0 &&
             ` · ${п.cities
               .filter((c) => c !== п.city)
               .slice(0, 3)
+              .map(трК)
               .join(", ")}`}
         </Факт>
         {п.car && (
@@ -431,7 +486,7 @@ export function КаталогГидов({ город }: { город: string | 
 }
 
 function КарточкаГида({ гид, туров, номер }: { гид: ПартнёрПубличный; туров: number; номер: number }) {
-  const { t } = useT();
+  const { t, трК } = useT();
   const дг = useДеньги();
   const языки = useЯзыки();
   const открыть = () => открытьПартнёра({ kind: "guide", value: гид });
@@ -464,11 +519,12 @@ function КарточкаГида({ гид, туров, номер }: { гид: 
       </div>
       <div className="mt-2 space-y-1">
         <Факт иконка="📍">
-          {гид.city}
+          {трК(гид.city)}
           {гид.cities.length > 0 &&
             ` · ${гид.cities
               .filter((c) => c !== гид.city)
               .slice(0, 3)
+              .map(трК)
               .join(", ")}`}
         </Факт>
         <Факт иконка="🗣">{языки(гид.languages)}</Факт>
@@ -488,7 +544,7 @@ function КарточкаГида({ гид, туров, номер }: { гид: 
 }
 
 function КарточкаТура({ тур, гид, номер }: { тур: ТурПартнёра; гид?: ПартнёрПубличный; номер: number }) {
-  const { t } = useT();
+  const { t, трК } = useT();
   const дг = useДеньги();
   const языки = useЯзыки();
   const открыть = () => открытьПартнёра({ kind: "guidetour", value: тур });
@@ -530,7 +586,7 @@ function КарточкаТура({ тур, гид, номер }: { тур: Ту
         </div>
       </div>
       <div className="mt-2.5 space-y-1">
-        <Факт иконка="📍">{тур.city}</Факт>
+        <Факт иконка="📍">{трК(тур.city)}</Факт>
         {гид && (
           <Факт иконка="👤">
             {t("pt_guide_word")}: {гид.name} {гид.sample ? `· ${t("pt_sample")}` : "✓"}
@@ -700,7 +756,7 @@ function useПросмотр(id: string) {
 }
 
 export function ДеталиВодителя({ п, onBack }: { п: ПартнёрПубличный; onBack: () => void }) {
-  const { t } = useT();
+  const { t, трК } = useT();
   const дг = useДеньги();
   const языки = useЯзыки();
   useПросмотр(п.id);
@@ -716,7 +772,7 @@ export function ДеталиВодителя({ п, onBack }: { п: Партнё�
           {п.car ? `${п.car.make} ${п.car.model}` : п.name}
         </h2>
         <p className="mt-0.5 text-xs text-white/75">
-          {п.name} · {п.city}
+          {п.name} · {трК(п.city)}
         </p>
       </Шапка>
       <div className="hide-scroll flex-1 overflow-y-auto px-4 pt-4">
@@ -774,7 +830,7 @@ export function ДеталиВодителя({ п, onBack }: { п: Партнё�
 }
 
 function О_партнёре({ п, языки }: { п: ПартнёрПубличный; языки: string }) {
-  const { t } = useT();
+  const { t, трК } = useT();
   return (
     <Блок заголовок={t("pt_about")}>
       <div className="mb-2 flex items-center gap-3">
@@ -800,7 +856,7 @@ function О_партнёре({ п, языки }: { п: ПартнёрПубли�
       </p>
       {п.cities.length > 0 && (
         <p className="mt-1 text-xs" style={{ color: TEXT }}>
-          📍 <b>{t("pt_cities")}:</b> {[п.city, ...п.cities.filter((c) => c !== п.city)].join(", ")}
+          📍 <b>{t("pt_cities")}:</b> {[п.city, ...п.cities.filter((c) => c !== п.city)].map(трК).join(", ")}
         </p>
       )}
     </Блок>
@@ -808,7 +864,7 @@ function О_партнёре({ п, языки }: { п: ПартнёрПубли�
 }
 
 export function ДеталиГида({ п, onBack }: { п: ПартнёрПубличный; onBack: () => void }) {
-  const { t } = useT();
+  const { t, трК } = useT();
   const дг = useДеньги();
   const языки = useЯзыки();
   const { tours } = usePartners();
@@ -833,7 +889,7 @@ export function ДеталиГида({ п, onBack }: { п: ПартнёрПуб�
           {п.name}
         </h2>
         <p className="mt-0.5 text-xs text-white/75">
-          {t("pt_guide_word")} · {п.city} · {дг.цена(`$${п.priceDay}`)} {t("pt_per_day")}
+          {t("pt_guide_word")} · {трК(п.city)} · {дг.цена(`$${п.priceDay}`)} {t("pt_per_day")}
         </p>
       </Шапка>
       <div className="hide-scroll flex-1 overflow-y-auto px-4 pt-4">
@@ -880,7 +936,7 @@ export function ДеталиГида({ п, onBack }: { п: ПартнёрПуб�
 }
 
 export function ДеталиТура({ тур, onBack }: { тур: ТурПартнёра; onBack: () => void }) {
-  const { t } = useT();
+  const { t, трК } = useT();
   const дг = useДеньги();
   const языки = useЯзыки();
   const { guides } = usePartners();
@@ -902,7 +958,7 @@ export function ДеталиТура({ тур, onBack }: { тур: ТурПар�
           {тур.title}
         </h2>
         <p className="mt-0.5 text-xs text-white/75">
-          {тур.city}
+          {трК(тур.city)}
           {гид && ` · ${t("pt_guide_word")}: ${гид.name}`}
         </p>
       </Шапка>

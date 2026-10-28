@@ -4,6 +4,7 @@ import { anthropic, jsonИзОтвета, МОДЕЛЬ, текстОтвета, 
 import { вСловаре, type ЖивыеПереводы } from "./content-i18n";
 import { LOCALES, type Locale } from "./i18n";
 import { readContent } from "./store";
+import { каталог } from "./providers";
 import type { Content } from "./types";
 
 /**
@@ -81,6 +82,35 @@ export function строкиКонтента(c: Content): string[] {
   };
   for (const р of РАЗДЕЛЫ) обойти(c[р]);
   return [...все];
+}
+
+/**
+ * Тексты анкет и туров водителей и гидов: их пишут сами партнёры, чаще
+ * по-русски, а читают туристы на своём языке. Имена не переводим —
+ * приложение пишет их латиницей само.
+ */
+export function строкиПартнёров(к: Awaited<ReturnType<typeof каталог>>): string[] {
+  const все = new Set<string>();
+  const взять = (...x: (string | undefined)[]) => {
+    for (const s of x) {
+      const т = s?.trim();
+      if (т && т.length <= МАКС_ДЛИНА && КИРИЛЛИЦА.test(т)) все.add(т);
+    }
+  };
+  for (const п of [...к.drivers, ...к.guides]) {
+    взять(п.city, п.bio, п.car?.color, ...п.cities, ...п.includes, ...(п.specialties ?? []));
+  }
+  for (const т of к.tours) {
+    взять(т.title, т.city, т.summary, т.meetingPoint, ...т.includes, ...т.excludes);
+    for (const д of т.program) взять(д.title, д.text);
+  }
+  return [...все];
+}
+
+/** Всё, что турист читает и что может понадобиться перевести. */
+export async function строкиДляПеревода(): Promise<string[]> {
+  const [c, к] = await Promise.all([readContent(), каталог()]);
+  return [...new Set([...строкиКонтента(c), ...строкиПартнёров(к)])];
 }
 
 /** Для туристов: только сами переводы. */
@@ -172,8 +202,8 @@ export async function перевестиНедостающее(): Promise<Сос
   if (состояние.идёт) return состояние;
   if (!anthropic()) return (состояние = { идёт: false, переведено: 0, осталось: 0, ошибка: "off" });
 
-  const [c, все] = await Promise.all([readContent(), хранилище.read()]);
-  const очередь = строкиКонтента(c).filter((s) => недостаёт(s, все[s]).length > 0);
+  const [строки, все] = await Promise.all([строкиДляПеревода(), хранилище.read()]);
+  const очередь = строки.filter((s) => недостаёт(s, все[s]).length > 0);
   состояние = { идёт: true, переведено: 0, осталось: очередь.length };
 
   try {

@@ -245,7 +245,8 @@ export function PlaceDetail({
         <ГалереяЗаведения фото={place.imgs ?? []} подпись={place.credits ? t("d_photos") : трК(place.city)} />
         {place.credits && (
           <p className="-mt-2 mb-3 px-1 text-[10px] leading-snug" style={{ color: MUTED }}>
-            {place.credits}
+            {/* Подписи авторов пишутся в данных по-русски: «Фото: …». */}
+            {place.credits.replace(/^Фото:\s*/, `${t("d_photo_by")}: `)}
           </p>
         )}
         {/* Записи диктора нет — весь рассказ читает сам телефон, у каждого

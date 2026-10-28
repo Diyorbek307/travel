@@ -7,11 +7,10 @@ import {
   перевестиНедостающее,
   сохранитьРучной,
   состояниеАвто,
-  строкиКонтента,
+  строкиДляПеревода,
   ЦЕЛИ,
 } from "@/lib/content-translations";
 import { LOCALES, type Locale } from "@/lib/i18n";
-import { readContent } from "@/lib/store";
 
 export const dynamic = "force-dynamic";
 
@@ -26,8 +25,8 @@ type Источник = "словарь" | "ии" | "вручную" | null;
 export async function GET() {
   const нет = await отказЕсли("content");
   if (нет) return нет;
-  const [c, записи] = await Promise.all([readContent(), всеЗаписи()]);
-  const строки = строкиКонтента(c).map((ru) => {
+  const [все, записи] = await Promise.all([строкиДляПеревода(), всеЗаписи()]);
+  const строки = все.map((ru) => {
     const з = записи[ru];
     const языки = Object.fromEntries(
       ЦЕЛИ.map((l) => {
@@ -71,7 +70,7 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: "bad_body" }, { status: 400 });
   // Переводить можно только то, что правда есть в содержимом: иначе
   // запрос мимо формы набивал бы файл чем угодно.
-  if (!строкиКонтента(await readContent()).includes(ru))
+  if (!(await строкиДляПеревода()).includes(ru))
     return NextResponse.json({ error: "not_found" }, { status: 404 });
   await сохранитьРучной(ru, locale, text);
   return NextResponse.json({ ok: true });

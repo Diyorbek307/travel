@@ -1870,7 +1870,7 @@ function СписокОтелей({
                     className="text-[9px] font-medium px-2 py-0.5 rounded-full"
                     style={{ background: CREAM, color: MUTED }}
                   >
-                    {f}
+                    {трК(f)}
                   </span>
                 ))}
               </div>
@@ -1941,7 +1941,7 @@ function СписокРесторанов({
                 {r.name}
               </p>
               <p className="text-[10px] mt-0.5" style={{ color: MUTED }}>
-                {трК(r.city)} · {r.open}
+                {трК(r.city)} · {трК(r.open)}
               </p>
               <СтатусОткрыто часы={r.open} />
               <div className="flex items-center justify-between mt-2">

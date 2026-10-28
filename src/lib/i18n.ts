@@ -1047,6 +1047,7 @@ export const СЛОВАРЬ = {
   ex_drivers_sub: row("All day, anywhere in the country", "На весь день, по всей стране", "Kun bo‘yi, butun mamlakat bo‘ylab", "全天包车，全国通行", "하루 종일, 전국 어디든", "Den ganzen Tag, im ganzen Land", "Toute la journée, partout dans le pays", "一日中、全国どこへでも", "Tüm gün, ülkenin her yerine", "طوال اليوم وإلى أي مكان في البلاد"),
   ex_guides: row("Guides and tours", "Гиды и туры", "Gidlar va turlar", "导游与行程", "가이드와 투어", "Guides und Touren", "Guides et circuits", "ガイドとツアー", "Rehberler ve turlar", "مرشدون وجولات"),
   // Шапка раздела: туры здесь составляют сами местные гиды.
+  d_photo_by: row("Photos", "Фото", "Suratlar", "图片", "사진", "Fotos", "Photos", "写真", "Fotoğraflar", "الصور"),
   ex_guides_title: row("Uzbekistan guides and their tours", "Гиды Узбекистана и их туры", "Oʻzbekiston gidlari va ularning turlari", "乌兹别克斯坦导游及其行程", "우즈베키스탄 가이드와 그들의 투어", "Guides aus Usbekistan und ihre Touren", "Guides d’Ouzbékistan et leurs circuits", "ウズベキスタンのガイドとそのツアー", "Özbekistan rehberleri ve turları", "مرشدو أوزبكستان وجولاتهم"),
   ex_guides_sub: row("Original tours of 1–14 days", "Авторские туры на 1–14 дней", "1–14 kunlik mualliflik turlari", "1–14天特色行程", "1~14일 오리지널 투어", "Eigene Touren über 1–14 Tage", "Circuits d'auteur de 1 à 14 jours", "1〜14日のオリジナルツアー", "1–14 günlük özel turlar", "جولات خاصة من 1 إلى 14 يومًا"),
   pt_recommended: row("Recommended", "Рекомендуем", "Tavsiya etamiz", "推荐", "추천", "Empfohlen", "Recommandé", "おすすめ", "Önerilen", "موصى به"),
