@@ -3,7 +3,6 @@
 import { useЛёгкийРежим } from "@/lib/lite";
 import { useState } from "react";
 import { ГОРОДА } from "@/data/geo";
-import { useДеньги } from "@/lib/money";
 import { ссылкаНаЗаказ } from "@/lib/taxi";
 import { useT } from "@/components/lang-provider";
 import type { TKey } from "@/lib/i18n";
@@ -107,7 +106,6 @@ export function CityPicker({
 
 export function TransportScreen({ onBack, isPremium }: { onBack: () => void; isPremium: boolean }) {
   const { t, трК } = useT();
-  const дг = useДеньги();
   const [mode, setMode] = useState<"trains" | "flights" | "taxi">("trains");
   /*
    * Билеты продаёт перевозчик. Раньше «Купить» просто переключало
@@ -142,32 +140,92 @@ export function TransportScreen({ onBack, isPremium }: { onBack: () => void; isP
     ["taxi", "🚌", "tr_taxi"],
   ];
 
-  const TicketCard = ({
-    children,
-    price,
-    onBook,
+  /** Время в пути: «≈ 2 ч 10 мин». Минуты — округлённые, отсюда «≈». */
+  const вПути = (минут: number) => {
+    const ч = Math.floor(минут / 60);
+    const м = минут % 60;
+    return `≈ ${ч ? `${ч} ${t("common_h")}` : ""}${ч && м ? " " : ""}${м ? `${м} ${t("common_min")}` : ""}`;
+  };
+
+  /** Маршрут: откуда → куда, время в пути и кнопка к продавцу. */
+  const Маршрут = ({
+    метка,
+    подпись,
+    значок,
+    from,
+    to,
+    минут,
+    через,
+    кнопка,
+    пояснение,
+    onClick,
   }: {
-    children: React.ReactNode;
-    price: string;
-    onBook: () => void;
+    метка: string;
+    подпись?: string;
+    значок: string;
+    from: string;
+    to: string;
+    минут: number;
+    через?: string;
+    кнопка: string;
+    /** Где смотреть цену; по умолчанию — у перевозчика. */
+    пояснение?: string;
+    onClick: () => void;
   }) => (
     <div className="bg-white rounded-2xl overflow-hidden shadow-sm border" style={{ borderColor: BORDER }}>
-      {children}
-      <div className="px-4 pb-4 flex items-center justify-between">
-        <div>
-          <p className="text-[9px] uppercase font-bold tracking-widest" style={{ color: MUTED }}>
-            {t("tr_price_pp")}
-          </p>
-          <p className="font-bold text-lg" style={{ color: GREEN, fontFamily: "var(--font-heading)" }}>
-            {дг.цена(price)}
-          </p>
+      <div className="px-4 pt-4 pb-3">
+        <div className="flex items-center justify-between mb-3">
+          <span
+            className="text-[9px] font-bold px-2 py-0.5 rounded-full"
+            style={{ background: ACCENT_SOFT, color: GREEN }}
+          >
+            {метка}
+          </span>
+          {подпись && (
+            <span className="text-[9px] font-semibold" style={{ color: MUTED }}>
+              {подпись}
+            </span>
+          )}
         </div>
+        <div className="flex items-center gap-3">
+          <div className="flex-1 min-w-0">
+            <p className="font-bold text-base truncate" style={{ color: TEXT, fontFamily: "var(--font-heading)" }}>
+              {трК(from)}
+            </p>
+            <p className="text-[9px] mt-0.5" style={{ color: MUTED }}>
+              {t("tr_departure")}
+            </p>
+          </div>
+          <div className="flex flex-col items-center gap-1 flex-shrink-0">
+            <p className="text-[10px] font-semibold" style={{ color: MUTED }}>
+              {вПути(минут)}
+            </p>
+            <div className="flex items-center gap-1">
+              <div className="w-8 h-px" style={{ background: BORDER }} />
+              <span className="text-base">{значок}</span>
+              <div className="w-8 h-px" style={{ background: BORDER }} />
+            </div>
+          </div>
+          <div className="flex-1 min-w-0 text-right">
+            <p className="font-bold text-base truncate" style={{ color: TEXT, fontFamily: "var(--font-heading)" }}>
+              {трК(to)}
+            </p>
+            <p className="text-[9px] mt-0.5" style={{ color: MUTED }}>
+              {через ? трК(через) : t("tr_arrival")}
+            </p>
+          </div>
+        </div>
+      </div>
+      <div className="px-4 pb-4 flex items-center justify-between gap-3">
+        <p className="text-[10px] leading-snug" style={{ color: MUTED }}>
+          {пояснение ?? t("tr_schedule_note")}
+        </p>
         <button
-          onClick={onBook}
-          className="px-4 py-2.5 rounded-xl text-xs font-bold text-white transition-all active:scale-95"
+          onClick={onClick}
+          className="flex-shrink-0 px-4 py-2.5 rounded-xl text-xs font-bold text-white transition-all active:scale-95"
           style={{ background: ACCENT_FILL }}
         >
-          {t("tr_buy_ext")} <span className="rtl-flip inline-block">↗</span>
+          {кнопка}
         </button>
       </div>
     </div>
@@ -287,178 +345,50 @@ export function TransportScreen({ onBack, isPremium }: { onBack: () => void; isP
         {mode === "trains" && trains.length === 0 && <EmptyRoute icon="🚄" />}
         {mode === "trains" &&
           trains.map((п) => (
-            <TicketCard key={п.id} price={п.price} onBook={() => купить("trains")}>
-              <div className="px-4 pt-4 pb-3">
-                <div className="flex items-center justify-between mb-3">
-                  <span
-                    className="text-[9px] font-bold px-2 py-0.5 rounded-full"
-                    style={{
-                      background: п.type === "Скоростной" ? ACCENT_SOFT : CREAM,
-                      color: п.type === "Скоростной" ? GREEN : MUTED,
-                    }}
-                  >
-                    {трК(п.type)}
-                  </span>
-                  <span className="text-[9px] font-semibold" style={{ color: MUTED }}>
-                    {трК(п.name)}
-                  </span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="flex-1">
-                    <p
-                      className="text-2xl font-bold"
-                      style={{ color: TEXT, fontFamily: "var(--font-heading)" }}
-                    >
-                      {п.dep}
-                    </p>
-                    <p className="text-xs font-semibold mt-0.5" style={{ color: MUTED }}>
-                      {трК(п.from)}
-                    </p>
-                  </div>
-                  <div className="flex flex-col items-center gap-1 flex-shrink-0">
-                    <p className="text-[9px]" style={{ color: MUTED }}>
-                      {трК(п.dur)}
-                    </p>
-                    <div className="flex items-center gap-1">
-                      <div className="w-10 h-px" style={{ background: BORDER }} />
-                      <span className="text-base">🚄</span>
-                      <div className="w-10 h-px" style={{ background: BORDER }} />
-                    </div>
-                  </div>
-                  <div className="flex-1 text-right">
-                    <p
-                      className="text-2xl font-bold"
-                      style={{ color: TEXT, fontFamily: "var(--font-heading)" }}
-                    >
-                      {п.arr}
-                    </p>
-                    <p className="text-xs font-semibold mt-0.5" style={{ color: MUTED }}>
-                      {трК(п.to)}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </TicketCard>
+            <Маршрут
+              key={п.id}
+              метка={трК(п.type)}
+              подпись={трК(п.name)}
+              значок="🚄"
+              from={п.from}
+              to={п.to}
+              минут={п.минут}
+              кнопка={`${t("tr_buy_ext")} ↗`}
+              onClick={() => купить("trains")}
+            />
           ))}
 
         {mode === "flights" && flights.length === 0 && <EmptyRoute icon="✈️" />}
         {mode === "flights" &&
           flights.map((f) => (
-            <TicketCard key={f.id} price={f.price} onBook={() => купить("flights")}>
-              <div className="px-4 pt-4 pb-3">
-                <div className="flex items-center justify-between mb-3">
-                  <span
-                    className="text-[9px] font-bold px-2 py-0.5 rounded-full"
-                    style={{ background: "#1B9E8A18", color: "#1B9E8A" }}
-                  >
-                    {f.airline}
-                  </span>
-                  <span className="font-mono text-[9px] font-bold" style={{ color: MUTED }}>
-                    {f.code}
-                  </span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="flex-1">
-                    <p
-                      className="text-2xl font-bold"
-                      style={{ color: TEXT, fontFamily: "var(--font-heading)" }}
-                    >
-                      {f.dep}
-                    </p>
-                    <p className="text-xs font-semibold mt-0.5" style={{ color: MUTED }}>
-                      {трК(f.from)}
-                    </p>
-                  </div>
-                  <div className="flex flex-col items-center gap-1 flex-shrink-0">
-                    <div className="flex items-center gap-1">
-                      <div className="w-8 h-px" style={{ background: BORDER }} />
-                      <span className="text-lg">✈️</span>
-                      <div className="w-8 h-px" style={{ background: BORDER }} />
-                    </div>
-                  </div>
-                  <div className="flex-1 text-right">
-                    <p
-                      className="text-2xl font-bold"
-                      style={{ color: TEXT, fontFamily: "var(--font-heading)" }}
-                    >
-                      {f.arr}
-                    </p>
-                    <p className="text-xs font-semibold mt-0.5" style={{ color: MUTED }}>
-                      {трК(f.to)}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </TicketCard>
+            <Маршрут
+              key={f.id}
+              метка={f.airline}
+              значок="✈️"
+              from={f.from}
+              to={f.to}
+              минут={f.минут}
+              через={f.через}
+              кнопка={`${t("tr_buy_ext")} ↗`}
+              onClick={() => купить("flights")}
+            />
           ))}
 
         {mode === "taxi" && taxis.length === 0 && <EmptyRoute icon="🚌" />}
         {mode === "taxi" &&
           taxis.map((ic) => (
-            <div
+            <Маршрут
               key={ic.id}
-              className="bg-white rounded-2xl overflow-hidden shadow-sm border"
-              style={{ borderColor: BORDER }}
-            >
-              <div className="px-4 pt-4 pb-3">
-                <div className="flex items-center gap-3">
-                  <div className="flex-1">
-                    <p className="font-bold text-base" style={{ color: TEXT }}>
-                      {трК(ic.from)}
-                    </p>
-                    <p className="text-[9px] mt-0.5" style={{ color: MUTED }}>
-                      {t("tr_departure")}
-                    </p>
-                  </div>
-                  <div className="flex flex-col items-center gap-1 flex-shrink-0">
-                    <p className="text-[9px]" style={{ color: MUTED }}>
-                      {трК(ic.dur)}
-                    </p>
-                    <div className="flex items-center gap-1">
-                      <div className="w-8 h-px" style={{ background: BORDER }} />
-                      <span className="text-lg">🚌</span>
-                      <div className="w-8 h-px" style={{ background: BORDER }} />
-                    </div>
-                  </div>
-                  <div className="flex-1 text-right">
-                    <p className="font-bold text-base" style={{ color: TEXT }}>
-                      {трК(ic.to)}
-                    </p>
-                    <p className="text-[9px] mt-0.5" style={{ color: MUTED }}>
-                      {t("tr_arrival")}
-                    </p>
-                  </div>
-                </div>
-                <div
-                  className="mt-3 pt-3 border-t flex items-center justify-between"
-                  style={{ borderColor: BORDER }}
-                >
-                  <div>
-                    <p className="text-[9px]" style={{ color: MUTED }}>
-                      {трК(ic.departs)}
-                    </p>
-                    <p className="text-xs font-medium mt-0.5" style={{ color: TEXT }}>
-                      {трК(ic.note)}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p
-                      className="font-bold text-base"
-                      style={{ color: GREEN, fontFamily: "var(--font-heading)" }}
-                    >
-                      {дг.цена(ic.price)}
-                    </p>
-                    <button
-                      onClick={() => заказатьТакси(ic.from, ic.to)}
-                      className="mt-1 transition-all active:scale-95 px-3 py-1.5 rounded-lg text-[10px] font-bold text-white"
-                      style={{ background: ACCENT_FILL }}
-                    >
-                      {t("tr_book")}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
+              метка={t("tr_taxi")}
+              подпись={трК(ic.note)}
+              значок="🚕"
+              from={ic.from}
+              to={ic.to}
+              минут={ic.минут}
+              кнопка={t("tr_book")}
+              пояснение={t("ex_taxi_sub")}
+              onClick={() => заказатьТакси(ic.from, ic.to)}
+            />
           ))}
 
         <div className="pb-4" />

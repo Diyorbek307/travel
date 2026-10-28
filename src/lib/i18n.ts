@@ -792,6 +792,7 @@ export const СЛОВАРЬ = {
   tr_buy: row("Buy", "Купить", "Sotib olish", "购买", "구매", "Kaufen", "Acheter", "購入", "Satın al", "شراء"),
   tr_departure: row("Departure", "Отправление", "Joʻnash", "出发", "출발", "Abfahrt", "Départ", "出発", "Kalkış", "المغادرة"),
   tr_arrival: row("Arrival", "Прибытие", "Yetib borish", "到达", "도착", "Ankunft", "Arrivée", "到着", "Varış", "الوصول"),
+  tr_schedule_note: row("Timetable and prices — on the carrier’s site", "Расписание и цены — на сайте перевозчика", "Jadval va narxlar — tashuvchi saytida", "时刻表和票价请看承运方网站", "시간표와 요금은 운송사 사이트에서", "Fahrplan und Preise – auf der Website des Anbieters", "Horaires et prix sur le site du transporteur", "時刻表と料金は運行会社のサイトで", "Sefer saatleri ve fiyatlar taşıyıcının sitesinde", "المواعيد والأسعار على موقع شركة النقل"),
   tr_price_pp: row("Price / person", "Цена / чел.", "Narx / kishi", "价格 / 人", "가격 / 인", "Preis / Person", "Prix / pers.", "料金 / 人", "Fiyat / kişi", "السعر / شخص"),
   d_route: row("Route", "Маршрут", "Marshrut", "路线", "경로", "Route", "Itinéraire", "ルート", "Rota", "المسار"),
   d_add_route: row("Add to route", "В маршрут", "Marshrutga", "加入路线", "경로에 추가", "Zur Route", "À l'itinéraire", "ルートに追加", "Rotaya ekle", "أضف للمسار"),
