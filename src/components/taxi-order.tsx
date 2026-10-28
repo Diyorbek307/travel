@@ -13,7 +13,8 @@ import {
   ACCENT_SOFT,
   ON_GOLD,
 } from "@/lib/theme";
-import { ГОРОДА, МЕСТА, расстояниеКм } from "@/data/geo";
+import { ГОРОДА, расстояниеКм } from "@/data/geo";
+import { useAppContent } from "@/components/content-provider";
 import type { Geo } from "@/lib/types";
 import RealMap from "@/components/real-map";
 import { useT } from "@/components/lang-provider";
@@ -52,6 +53,7 @@ export default function TaxiOrder({
   сразуКуда?: { название: string; geo: Geo | null };
 }) {
   const { t, трК, lang } = useT();
+  const { PLACES } = useAppContent();
   const [город, setГород] = useState(городСразу);
   const [откуда, setОткуда] = useState<Geo | null>(null);
   const [геоОшибка, setГеоОшибка] = useState<string | null>(null);
@@ -72,15 +74,17 @@ export default function TaxiOrder({
   }
   const [ценаДоступна, setЦенаДоступна] = useState<boolean | null>(null);
 
-  // Куда можно поехать: известные места этого города плюс сам центр.
-  const направления = Object.entries(МЕСТА)
-    .filter(([, g]) => {
-      const центр = ГОРОДА[город];
-      if (!центр) return true;
-      // Грубо «в пределах города»: половина градуса примерно 50 км.
-      return Math.abs(g.lat - центр.lat) < 0.5 && Math.abs(g.lon - центр.lon) < 0.5;
-    })
-    .map(([название, geo]) => ({ название, geo }));
+  // Куда можно поехать: места из каталога (с точками) в этом городе плюс
+  // сам центр. Раньше брали справочник координат geo.ts — там остались
+  // старые и убранные из каталога названия («Хаст-Имам» рядом с
+  // «Ансамблем Хазрати Имам»), и одно место попадало в список дважды.
+  const известные = PLACES.filter((p) => p.geo).map((p) => ({ название: p.name, geo: p.geo as Geo }));
+  const направления = известные.filter(({ geo: g }) => {
+    const центр = ГОРОДА[город];
+    if (!центр) return true;
+    // Грубо «в пределах города»: половина градуса примерно 50 км.
+    return Math.abs(g.lat - центр.lat) < 0.5 && Math.abs(g.lon - центр.lon) < 0.5;
+  });
 
   // На карте показываем те же места плюс сам центр города — иначе при
   // приближении не за что зацепиться глазом.
@@ -105,8 +109,8 @@ export default function TaxiOrder({
    * точка на карте, и показываем координаты, чтобы человек мог свериться.
    */
   function точкаНаКарте(g: Geo) {
-    const рядом = [...Object.entries(МЕСТА), ...Object.entries(ГОРОДА)]
-      .map(([название, geo]) => ({ название, geo, км: расстояниеКм(g, geo) }))
+    const рядом = [...известные, ...Object.entries(ГОРОДА).map(([название, geo]) => ({ название, geo }))]
+      .map(({ название, geo }) => ({ название, geo, км: расстояниеКм(g, geo) }))
       .sort((a, b) => a.км - b.км)[0];
 
     if (рядом && рядом.км <= 1) {

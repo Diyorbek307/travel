@@ -6,6 +6,7 @@ import { useT } from "@/components/lang-provider";
 import { useДистанция } from "@/lib/distance";
 import GoogleMap, { googleКлюч } from "@/components/google-map";
 import { ГОРОДА, МЕСТА, расстояниеКм, точка } from "@/data/geo";
+import { useAppContent } from "@/components/content-provider";
 import { ссылкаНаЗаказ } from "@/lib/taxi";
 import type { СпособПути } from "@/components/how-to-get";
 import { ACCENT_FILL, BORDER, CREAM, GOLD, GREEN, MUTED, TEXT, WHITE, SURFACE } from "@/lib/theme";
@@ -80,6 +81,7 @@ export default function RouteView({
   onBack: () => void;
 }) {
   const { t, трК } = useT();
+  const { PLACES } = useAppContent();
   const единицы: Единицы = { ч: t("common_h"), мин: t("common_min") };
   const дист = useДистанция();
   // Точно знаем, где цель: координаты из панели или общеизвестное место.
@@ -190,7 +192,12 @@ export default function RouteView({
    * далеко ли это по городским меркам.
    */
   const рядом = цель
-    ? [...Object.entries(МЕСТА), ...Object.entries(ГОРОДА)]
+    ? [
+        // Места каталога, а не справочник geo.ts: в нём остались старые
+        // названия убранных карточек.
+        ...PLACES.filter((p) => p.geo).map((p) => [p.name, p.geo as Geo] as const),
+        ...Object.entries(ГОРОДА),
+      ]
         .filter(([имя]) => имя !== название)
         .map(([имя, geo]) => ({ название: имя, geo, км: расстояниеКм(цель, geo) }))
         .filter((м) => м.км <= (зона?.радиусКм ?? 12) * 1.5)
