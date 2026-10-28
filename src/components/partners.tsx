@@ -204,6 +204,7 @@ export function КаталогВодителей({ город }: { город: s
           <КарточкаВодителя key={п.id} п={п} номер={i} />
         ))}
       </div>
+      <Приглашение вид="driver" />
     </div>
   );
 }
@@ -424,6 +425,7 @@ export function КаталогГидов({ город }: { город: string | 
               />
             ))}
       </div>
+      <Приглашение вид="guide" />
     </div>
   );
 }
@@ -540,6 +542,40 @@ function КарточкаТура({ тур, гид, номер }: { тур: Ту
       <Теги слова={тур.program.map((д) => д.title)} />
       {гид && <Действия телефон={гид.phone} onOpen={открыть} пример={гид.sample || тур.sample} />}
     </Резюме>
+  );
+}
+
+/**
+ * Приглашение для самих гидов и водителей. Анкеты и туры они заполняют
+ * в кабинете (/cabinet), но путь туда был только из профиля — те, кому он
+ * нужен, его не находили. Ставим прямо под каталогом, где они себя ищут.
+ */
+function Приглашение({ вид }: { вид: "guide" | "driver" }) {
+  const { t } = useT();
+  return (
+    <a
+      href="/cabinet"
+      className="mt-4 flex items-center gap-3 rounded-3xl border p-4 transition-transform active:scale-[0.98]"
+      style={{ borderColor: GOLD, background: "linear-gradient(135deg, rgba(233,196,106,0.18), transparent)" }}
+    >
+      <span
+        className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl text-xl"
+        style={{ background: GOLD }}
+      >
+        {вид === "guide" ? "🧭" : "🚗"}
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-sm font-bold" style={{ color: TEXT }}>
+          {t(вид === "guide" ? "pt_join_guide" : "pt_join_driver")}
+        </span>
+        <span className="mt-0.5 block text-xs leading-snug" style={{ color: MUTED }}>
+          {t(вид === "guide" ? "pt_join_guide_sub" : "pt_join_driver_sub")}
+        </span>
+      </span>
+      <span className="text-lg" style={{ color: GREEN }}>
+        →
+      </span>
+    </a>
   );
 }
 
